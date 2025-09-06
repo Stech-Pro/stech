@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy Frontend and Backend
 
 on:
   push:
@@ -32,3 +32,24 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./Front/build
           publish_branch: gh-pages
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, 'Back/')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user/stech_1.0/Back
+            git pull origin main
+            npm install
+            npm run build
+            pm2 restart stech-backend
