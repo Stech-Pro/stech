@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './ProfileTeamPlayer.css';
 import { teamData } from '../../data/teamData';
 import { mockData } from '../../data/teamplayermock';
 

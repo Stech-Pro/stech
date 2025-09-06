@@ -1,7 +1,7 @@
-import TeamPlayer from '../../../../../components/Profile/ProfileTeamPlayer';
+import CoachTeamStats from '../../../../../components/Profile/CoachTeamStats';
 
 const ProfileTeamPlayer = ( ) => {
-    return <TeamPlayer />;
+    return <CoachTeamStats />;
 };
 
 export default ProfileTeamPlayer;
