@@ -118,6 +118,7 @@ const SignupProfileForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // 필수 항목 검증 강화
     if (!profileData.realName.trim()) return alert('성명을 입력해주세요.');
     if (!profileData.email.trim() || !isEmailValid(profileData.email)) {
       return alert('유효한 이메일을 입력해주세요.');
@@ -126,7 +127,32 @@ const SignupProfileForm = () => {
       return alert(emailMessage || '이메일을 확인해주세요.');
     }
 
-    // 토큰 확인 추가
+    // 추가 필수 항목 검증
+    if (!profileData.address1.trim()) {
+      return alert('주소를 입력해주세요.');
+    }
+    if (!profileData.height.trim()) {
+      return alert('키를 입력해주세요.');
+    }
+    if (!profileData.weight.trim()) {
+      return alert('몸무게를 입력해주세요.');
+    }
+    if (!profileData.grade.trim()) {
+      return alert('학년을 입력해주세요.');
+    }
+
+    // 숫자 형식 검증
+    const height = parseFloat(profileData.height);
+    const weight = parseFloat(profileData.weight);
+
+    if (isNaN(height) || height <= 0 || height > 300) {
+      return alert('올바른 키를 입력해주세요. (단위: cm)');
+    }
+    if (isNaN(weight) || weight <= 0 || weight > 500) {
+      return alert('올바른 몸무게를 입력해주세요. (단위: kg)');
+    }
+
+    // 토큰 확인
     if (!token) {
       alert('로그인이 필요합니다. 다시 로그인해주세요.');
       navigate('/auth');

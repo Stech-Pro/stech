@@ -199,7 +199,14 @@ const SignupForm = ({ onSuccess, className = '' }) => {
     };
 
     try {
-      await signup(payload);
+      const response = await signup(payload);
+
+      // 회원가입 응답에서 토큰 저장
+      if (response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        // AuthContext에 토큰 설정이 필요하면 추가
+      }
+
       onSuccess?.();
       navigate('../signupprofile');
     } catch (err) {

@@ -63,13 +63,16 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
 
-      const username = credentials.username || credentials.email || credentials.id;
+      const username =
+        credentials.username || credentials.email || credentials.id;
       const password = credentials.password;
-      if (!username || !password) throw new Error('아이디와 비밀번호를 입력해주세요.');
+      if (!username || !password)
+        throw new Error('아이디와 비밀번호를 입력해주세요.');
 
-      const data = await apiLogin(username, password);     // { token, user? }
-      const result = handleLoginResponse(data);            // token 저장 + user 저장(있다면)
-      if (!result?.success) throw new Error(result?.error || '로그인 처리 실패');
+      const data = await apiLogin(username, password); // { token, user? }
+      const result = handleLoginResponse(data); // token 저장 + user 저장(있다면)
+      if (!result?.success)
+        throw new Error(result?.error || '로그인 처리 실패');
 
       // user가 응답에 없으면 verify로 받아오기
       let u = data.user || null;
@@ -84,10 +87,9 @@ export const AuthProvider = ({ children }) => {
 
       // ✨ 1. 프로필 완성 여부 판단: user 객체에 nickname이 있는지 확인합니다.
       //    (SignupProfileForm에서 '성명(표시명)'을 nickname으로 저장하기 때문)
-     const isProfileComplete = !!u?.profile?.realName;
+      const isProfileComplete = !!u?.profile?.realName;
 
       return { success: true, user: u, profileComplete: isProfileComplete };
-
     } catch (e) {
       const msg = parseError(e);
       setError(msg);
@@ -97,7 +99,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-
   const signup = async (payload) => {
     try {
       setLoading(true);
@@ -106,7 +107,11 @@ export const AuthProvider = ({ children }) => {
         throw new Error('필수 항목(아이디/비밀번호/인증코드)을 입력해주세요.');
       }
       const res = await apiSignup(payload);
-      return { success: true, data: res, message: '회원가입이 완료되었습니다.' };
+      return {
+        success: true,
+        data: res,
+        message: '회원가입이 완료되었습니다.',
+      };
     } catch (e) {
       const msg = parseError(e);
       setError(msg);
@@ -120,7 +125,11 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      try { await apiLogout(); } catch { /* 서버 실패 무시 */ }
+      try {
+        await apiLogout();
+      } catch {
+        /* 서버 실패 무시 */
+      }
     } finally {
       clearAuthData();
       setLoading(false);
@@ -166,6 +175,7 @@ export const AuthProvider = ({ children }) => {
     error,
     isInitialized,
     isAuthenticated: !!user,
+    token: getToken(),
 
     login,
     signup,
@@ -182,6 +192,7 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth는 AuthProvider 내부에서만 사용 가능합니다.');
+  if (!ctx)
+    throw new Error('useAuth는 AuthProvider 내부에서만 사용 가능합니다.');
   return ctx;
 };
