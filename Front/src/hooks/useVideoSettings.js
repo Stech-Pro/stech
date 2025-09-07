@@ -28,7 +28,7 @@ export const useVideoSettings = () => {
       // 저장된 설정이 있을 경우, 기본 설정과 병합합니다.
       if (storedSettingsJSON) {
         const storedSettings = JSON.parse(storedSettingsJSON);
-        
+
         // **이 부분이 핵심적인 변경 사항입니다.**
         // 기본 설정을 먼저 깔아주고, 그 위에 저장된 설정을 덮어씁니다.
         // hotkeys 같은 중첩된 객체도 안전하게 병합합니다.
@@ -42,12 +42,11 @@ export const useVideoSettings = () => {
         };
         return mergedSettings;
       }
-      
+
       // 저장된 설정이 없으면 기본 설정을 그대로 반환합니다.
       return DEFAULT_SETTINGS;
-
     } catch (error) {
-      console.error("Failed to load settings from localStorage:", error);
+      console.error('Failed to load settings from localStorage:', error);
       return DEFAULT_SETTINGS;
     }
   });
@@ -57,19 +56,19 @@ export const useVideoSettings = () => {
     try {
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
     } catch (error) {
-      console.error("Failed to save settings to localStorage:", error);
+      console.error('Failed to save settings to localStorage:', error);
     }
   }, [settings]);
 
   const updateSetting = (key, value) => {
-    setSettings(prevSettings => ({
+    setSettings((prevSettings) => ({
       ...prevSettings,
       [key]: value,
     }));
   };
 
   const updateHotkey = (action, key) => {
-    setSettings(prevSettings => ({
+    setSettings((prevSettings) => ({
       ...prevSettings,
       hotkeys: {
         ...prevSettings.hotkeys,
