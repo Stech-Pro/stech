@@ -84,10 +84,19 @@ export const AuthProvider = ({ children }) => {
         } catch {}
       }
       setUser(u);
-
+      console.log('User object structure:', u);
+      console.log('User object keys:', Object.keys(u));
+      console.log('User object full:', JSON.stringify(u, null, 2));
       // ✨ 1. 프로필 완성 여부 판단: user 객체에 nickname이 있는지 확인합니다.
       //    (SignupProfileForm에서 '성명(표시명)'을 nickname으로 저장하기 때문)
-      const isProfileComplete = !!u?.profile?.realName;
+      const isProfileComplete = !!(u?.nickname || u?.email || u?.bio);
+
+      // 디버깅용 로그 추가
+      console.log('User object structure:', u);
+      console.log('nickname:', u?.nickname);
+      console.log('email:', u?.email);
+      console.log('bio:', u?.bio);
+      console.log('Profile complete result:', isProfileComplete);
 
       return { success: true, user: u, profileComplete: isProfileComplete };
     } catch (e) {

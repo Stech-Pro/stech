@@ -125,14 +125,12 @@ export class AuthService {
     console.log('=== 로그인 시도 ===');
     console.log('받은 아이디:', username);
 
-    // 아이디로 유저 찾기
-    const user = await this.userModel.findOne({ username });
+    const user = await this.userModel.findOne({ username: loginDto.username });
     if (!user) {
       console.log('❌ 아이디 불일치');
       throw new BadRequestException('존재하지 않는 아이디입니다.');
     }
 
-    // 비밀번호 확인
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       console.log('❌ 비밀번호 불일치');
@@ -143,7 +141,6 @@ export class AuthService {
       throw new UnauthorizedException('비활성화된 계정입니다.');
     }
 
-    // JWT 발급
     const token = this.jwtService.sign({
       id: user._id,
       username: user.username,
@@ -165,6 +162,10 @@ export class AuthService {
           teamName: user.teamName,
           role: user.role,
           region: user.region,
+          nickname: user.profile?.nickname || null,
+          email: user.profile?.contactInfo?.email || null,
+          bio: user.profile?.bio || null,
+          avatar: user.profile?.avatar || null,
         },
       },
     };
@@ -257,7 +258,6 @@ export class AuthService {
     try {
       const decoded = this.jwtService.verify(verifyTokenDto.token);
 
-      // 사용자 존재 확인
       const user = await this.userModel.findById(decoded.id);
       if (!user || !user.isActive) {
         throw new UnauthorizedException('유효하지 않은 사용자입니다.');
@@ -275,6 +275,10 @@ export class AuthService {
             role: user.role,
             region: user.region,
             playerId: user.playerId || null,
+            nickname: user.profile?.nickname || null,
+            email: user.profile?.contactInfo?.email || null,
+            bio: user.profile?.bio || null,
+            avatar: user.profile?.avatar || null,
           },
         },
       };
@@ -307,25 +311,23 @@ export class AuthService {
 
       console.log('✅ 토큰 갱신 성공');
       return {
-        success: true,
-        message: '토큰이 갱신되었습니다.',
-        data: {
-          token: newToken,
-          user: {
-            id: user._id,
-            username: user.username,
-            teamName: user.teamName,
-            role: user.role,
-            region: user.region,
-            playerId: user.playerId || null,
-          },
-        },
-      };
-    } catch (error) {
-      console.log('❌ 토큰 갱신 실패:', error.message);
-      throw new UnauthorizedException('토큰 갱신에 실패했습니다.');
-    }
-  }
+    success: true,
+    message: '토큰이 갱신되었습니다.',
+    data: {
+      token: newToken,
+      user: {
+        id: user._id,
+        username: user.username,
+        teamName: user.teamName,
+        role: user.role,
+        region: user.region,
+        playerId: user.playerId || null,
+        nickname: user.profile?.nickname || null,
+        email: user.profile?.contactInfo?.email || null,
+        bio: user.profile?.bio || null,
+        avatar: user.profile?.avatar || null,
+      },
+    },
 
   async logout() {
     console.log('=== 로그아웃 ===');
