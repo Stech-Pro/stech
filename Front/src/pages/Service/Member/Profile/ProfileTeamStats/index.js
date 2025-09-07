@@ -161,7 +161,7 @@ setSort((prev) => (!prev || prev.key !== key ? { key, direction: 'desc' } : { ke
 }
 
 /* ───────── 메인 컴포넌트 ───────── */
-const CoachTeamStats= () => {
+const ProfileTeamStats= () => {
   const { user } = useAuth();
 
   const GAME_OPTIONS = [
@@ -256,4 +256,4 @@ const CoachTeamStats= () => {
   );
 }
 
-export default CoachTeamStats;
+export default ProfileTeamStats;

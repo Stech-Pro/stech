@@ -1,29 +1,29 @@
 // src/components/profileheader.js
 import React, { useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext';
-import './ProfileHeader.css'; // 필요시 스타일 추가
+import { useAuth } from '../../../../../context/AuthContext';
+// import './ProfileHeader.css';
 
 export default function ProfileHeader() {
-  const { role = 'player' } = useAuth() || {};
+const auth = useAuth();
+const role = auth?.role ?? auth?.user?.role ?? 'player';
   const navigate = useNavigate();
   const location = useLocation();
   const [hovered, setHovered] = useState(null);
 
-  // 메뉴 정의 (경로/라벨은 예시)
   const playerItems = [
-    { path: '/service/profile', label: '프로필 수정' },
-    { path: '/service/profile/password', label: '메모 클립 영상' },
+    { path: '/service/profile' ,label: '프로필'},
+    { path: '/service/profile/modify', label: '프로필 수정' },
+    { path: '/service/profile/clip', label: '메모 클립 영상' },
   ];
 
   const coachItems = [
-    { path: '/service/profile', label: '팀 선수 스탯' },
-    { path: '/service/profile/password', label: '프로필 수정' },
-    { path: '/service/profile/team', label: '메모 클립 영상' },
-    { path: '/service/profile/members', label: '구단 관리' },
+    {path: '/service/profile', label: '프로필'},
+    { path: '/service/profile/teamstats', label: '팀 선수 스탯' },
+    { path: '/service/profile/modify', label: '프로필 수정' },
+    { path: '/service/profile/clip', label: '메모 클립 영상' },
+    { path: '/service/profile/manage', label: '구단 관리' },
   ];
-
-  const items = role === 'coach' ? coachItems : playerItems;
 
   const renderItem = (item) => (
     <li
@@ -54,7 +54,9 @@ export default function ProfileHeader() {
 
       <nav className="ph-nav">
         <ul className="ph-menu">
-          {items.map(renderItem)}
+          {role === 'coach'
+            ? coachItems.map(renderItem)
+            : playerItems.map(renderItem)}
         </ul>
       </nav>
     </header>

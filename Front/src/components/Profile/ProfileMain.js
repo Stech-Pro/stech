@@ -170,14 +170,7 @@ const ProfileMain = () => {
 
     return (
         <div className="profile-main">
-            {/* 상단 버튼들 ... (기존과 동일) */}
-            <div className="profile-buttons-top">
-                <a href="./profile/teamplayer" type="button" className="profile-button">팀 선수 스탯</a>
-                <a href="./profile/modify" type="button" className="profile-button">프로필 수정</a>
-                <a href="./profile/clip" type="button" className="profile-button">메모 클립 영상</a>
-                <a href="./profile/manage" type="button" className="profile-button">구단 관리</a>
-            </div>
-
+         
             {/* 프로필 정보 섹션 ... (기존과 거의 동일) */}
             <div className="profile-container">
                 <div className="profile-title-container">
