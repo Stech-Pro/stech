@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ProfileMain.css';
+// import './ProfileMain.css';
 import './ProfileManage.css';
 
 const ProfileManage = () => {

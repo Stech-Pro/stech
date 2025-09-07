@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import './ProfileMain.css';
 import './ProfileClip.css';
 import { teamData } from '../../data/teamData';
 
