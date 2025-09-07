@@ -1,7 +1,7 @@
 // src/components/Auth/SignupProfileForm.jsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { updateProfile, handleAuthError } from '../../api/authAPI';
+import { createProfile, handleAuthError } from '../../api/authAPI';
 import { useAuth } from '../../context/AuthContext';
 
 const DAUM_POSTCODE_URL =
@@ -24,12 +24,14 @@ const SignupProfileForm = () => {
     nationality: '',
     position: '',
     avatarUrl: '',
+    phone: '',
+    career: '',
+    playerID: '',
   });
 
   const [emailStatus, setEmailStatus] = useState(null);
   const [emailMessage, setEmailMessage] = useState('');
   const [scriptLoaded, setScriptLoaded] = useState(false);
-  const teamDropdownRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -139,16 +141,26 @@ const SignupProfileForm = () => {
     if (!profileData.grade.trim()) {
       return alert('경력을 입력해주세요.');
     }
+    if (!profileData.nationality.trim()) {
+      return alert('국적을 입력해주세요.');
+    }
+    if (!profileData.position.trim()) {
+      return alert('포지션을 선택해주세요.');
+    }
 
     // 숫자 형식 검증
     const height = parseFloat(profileData.height);
     const weight = parseFloat(profileData.weight);
+    const age = parseFloat(profileData.age);
 
     if (isNaN(height) || height <= 0 || height > 300) {
       return alert('올바른 키를 입력해주세요. (단위: cm)');
     }
     if (isNaN(weight) || weight <= 0 || weight > 500) {
       return alert('올바른 몸무게를 입력해주세요. (단위: kg)');
+    }
+    if (profileData.age && (isNaN(age) || age <= 0 || age > 100)) {
+      return alert('올바른 나이를 입력해주세요.');
     }
 
     // 토큰 확인
@@ -170,27 +182,36 @@ const SignupProfileForm = () => {
         `주소:${profileData.address1} ${profileData.address2 || ''}`,
     ].filter(Boolean);
 
+    // 새로운 createProfile API에 맞춘 데이터 구조
     const payload = {
-      // avatar는 URL만 허용. 파일만 있고 업로드 URL이 없으면 생략.
-      ...(profileData.avatarUrl?.trim()
-        ? { avatar: profileData.avatarUrl.trim() }
-        : {}),
-      nickname: profileData.realName.trim(), // 서버는 nickname 필드를 요구
+      realName: profileData.realName.trim(),
       email: profileData.email.trim(),
-      bio: bioParts.join(' | ') || '', // 선택
+      nationality: profileData.nationality.trim(),
+      phone: '010-0000-0000', // 기본값 또는 추가 입력 필드 필요
+      address: `${profileData.address1} ${profileData.address2 || ''}`.trim(),
+      height: parseInt(profileData.height),
+      weight: parseInt(profileData.weight),
+      age: parseInt(profileData.age) || 20, // 기본값
+      career: profileData.grade.trim(),
+      position: profileData.position.trim(),
+      playerID: profileData.playerID.trim(),
     };
-
+   
     try {
-      await updateProfile(payload, token);
+      const response = await createProfile(payload, token);
+      
+      // 새 토큰이 반환되면 저장
+      if (response.data?.token) {
+        localStorage.setItem('token', response.data.token);
+      }
 
-      alert('프로필이 업데이트되었습니다.');
+      alert('프로필이 생성되었습니다.');
       navigate('/service');
     } catch (err) {
-      console.error(err);
-      alert(handleAuthError(err));
+      console.error('프로필 생성 오류:', err);
+      alert('프로필 생성에 실패했습니다: ' + (err.message || '알 수 없는 오류'));
     }
   };
-
   return (
     <form onSubmit={handleSubmit} className="profileForm">
       <div className="profileformtab-container">
@@ -206,7 +227,7 @@ const SignupProfileForm = () => {
             <img
               src={URL.createObjectURL(profileData.profileImage)}
               alt="Profile"
-              className="profileformImage"
+              className="profileImage"
             />
           ) : (
             <div className="profileplaceholderText"></div>
@@ -254,6 +275,7 @@ const SignupProfileForm = () => {
             name="realName"
             value={profileData.realName}
             onChange={handleChange}
+            placeholder="예: 홍길동"
           />
         </div>
 
@@ -279,6 +301,28 @@ const SignupProfileForm = () => {
               {emailMessage}
             </div>
           )}
+        </div>
+
+        <div className="profileformGroup">
+          <label>연락처</label>
+          <input
+            type="tel"
+            name="phone"
+            value={profileData.phone}
+            onChange={handleChange}
+            placeholder="010-1234-5678"
+          />
+        </div>
+
+        <div className="profileformGroup">
+          <label>별명</label>
+          <input
+            type="text"
+            name="playerID"
+            value={profileData.playerID}
+            onChange={handleChange}
+            placeholder="개똥이"
+          />
         </div>
 
         <div className="profileformGroup full-width">
@@ -313,7 +357,7 @@ const SignupProfileForm = () => {
             name="height"
             value={profileData.height}
             onChange={handleChange}
-            placeholder="cm"
+            placeholder="180"
           />
         </div>
         <div className="profileformGroup">
@@ -323,7 +367,7 @@ const SignupProfileForm = () => {
             name="weight"
             value={profileData.weight}
             onChange={handleChange}
-            placeholder="kg"
+            placeholder="76"
           />
         </div>
         <div className="profileformGroup">
@@ -333,6 +377,7 @@ const SignupProfileForm = () => {
             name="age"
             value={profileData.age}
             onChange={handleChange}
+            placeholder="예: 25"
           />
         </div>
 

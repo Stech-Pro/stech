@@ -290,7 +290,7 @@ export async function updateProfile(payload, accessToken) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify(payload), // { avatar?, bio?, nickname?, email? }
+      body: JSON.stringify(payload), // { avatar?, bio?, playerID?, email? }
     }
   );
 
@@ -302,3 +302,27 @@ export async function updateProfile(payload, accessToken) {
     data
   );
 }
+
+export const createProfile = async (profileData, token) => {
+  if (!token) throw new APIError('인증이 필요합니다.', 401);
+
+  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CREATE_PROFILE}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(profileData),
+  });
+
+  const data = await jsonOrText(response);
+  if (response.ok) return data;
+  
+  throw new APIError(
+    typeof data === 'object' 
+      ? data.message || '프로필 생성 실패' 
+      : '프로필 생성 실패',
+    response.status,
+    data
+  );
+};

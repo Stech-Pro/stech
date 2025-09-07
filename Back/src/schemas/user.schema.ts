@@ -43,7 +43,7 @@ export class User {
     type: {
       avatar: String,
       bio: String,
-      nickname: String,
+      playerID: String,
       studentId: String,
       email: String,
       joinDate: { type: Date, default: Date.now },
@@ -100,7 +100,7 @@ export class User {
   profile: {
     avatar?: string;
     bio?: string;
-    nickname?: string;
+    playerID?: string;
     studentId?: string;
     email?: string;
     joinDate?: Date;

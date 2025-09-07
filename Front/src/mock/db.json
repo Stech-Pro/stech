@@ -1,7 +1,7 @@
 {
   "id": "1234567890",
   "email": "test@example.com",
-  "nickname": "kenlee",
+  "playerID": "kenlee",
   "team": {
     "teamId": "team123",
     "teamName": "Lions",

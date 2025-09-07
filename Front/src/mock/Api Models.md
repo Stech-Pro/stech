@@ -22,7 +22,9 @@ POST /auth/signup
 {
   "email": "test@example.com",
   "password": "12345678",
-  "nickname": "kenlee"
+  "
+  
+  ": "kenlee"
 }
 ```
 
@@ -59,7 +61,7 @@ GET /auth/me
 {
   "id": "1234567890",
   "email": "test@example.com",
-  "nickname": "kenlee",
+  "playerID": "kenlee",
   "team": {
     "teamId": "team123",
     "teamName": "Lions",
@@ -133,7 +135,7 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  nickname: { type: String },
+  playerID: { type: String },
   team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' }
 });
 

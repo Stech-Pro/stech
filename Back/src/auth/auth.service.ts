@@ -163,7 +163,7 @@ export class AuthService {
           teamName: user.teamName,
           role: user.role,
           region: user.region,
-          nickname: user.profile?.nickname || null,
+          playerID: user.profile?.playerID || null,
           email: user.profile?.contactInfo?.email || null,
           bio: user.profile?.bio || null,
           avatar: user.profile?.avatar || null,
@@ -231,7 +231,8 @@ export class AuthService {
         $set: {
           'profile.avatar': profileData.avatar,
           'profile.bio': profileData.bio,
-          'profile.nickname': profileData.nickname,
+          'profile.
+          ': profileData.playerID,
           'profile.email': profileData.email,
         },
       },
@@ -276,7 +277,7 @@ export class AuthService {
             role: user.role,
             region: user.region,
             playerId: user.playerId || null,
-            nickname: user.profile?.nickname || null,
+            playerID: user.profile?.playerID || null,
             email: user.profile?.contactInfo?.email || null,
             bio: user.profile?.bio || null,
             avatar: user.profile?.avatar || null,
@@ -323,7 +324,7 @@ export class AuthService {
             role: user.role,
             region: user.region,
             playerId: user.playerId || null,
-            nickname: user.profile?.nickname || null,
+            playerID: user.profile?.playerID || null,
             email: user.profile?.contactInfo?.email || null,
             bio: user.profile?.bio || null,
             avatar: user.profile?.avatar || null,
@@ -532,7 +533,7 @@ export class AuthService {
       {
         $set: {
           'profile.realName': profileData.realName,
-          'profile.nickname': profileData.nickname || null,
+          'profile.playerID': profileData.playerID || null,
           'profile.contactInfo.email': profileData.email,
           'profile.contactInfo.phone': profileData.phone,
           'profile.contactInfo.address': profileData.address,
@@ -578,7 +579,7 @@ export class AuthService {
           role: updatedUser.role,
           region: updatedUser.region,
           realName: updatedUser.profile?.realName,
-          nickname: updatedUser.profile?.nickname,
+          playerID: updatedUser.profile?.playerID,
         },
       },
     };

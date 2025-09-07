@@ -1,0 +1,10 @@
+.authLayoutContainer {
+  width: 100vw;
+  min-height: 100vh; /* 최소 높이 설정 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #141414;
+  padding: 40px 0; /* 내용이 너무 길 때 위아래 여백을 주기 위함 (선택 사항) */
+  box-sizing: border-box; /* 패딩이 너비/높이에 영향을 주지 않도록 설정 (선택 사항) */
+}
