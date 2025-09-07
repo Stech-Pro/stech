@@ -1,0 +1,46 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'Back/**'
+      - '.github/workflows/backend-deploy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # 프로젝트 디렉토리로 이동
+          cd /home/ubuntu/stech_fresh
+          
+          # 최신 코드 가져오기
+          git pull origin main
+          
+          # 백엔드 디렉토리로 이동
+          cd Back
+          
+          # 의존성 설치
+          npm install
+          
+          # TypeScript 빌드
+          npm run build
+          
+          # PM2로 서버 재시작
+          pm2 restart stech-backend --update-env
+          
+          # 상태 확인
+          pm2 status
+          
+          echo "✅ 배포 완료!"
