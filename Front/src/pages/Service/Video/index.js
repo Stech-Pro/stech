@@ -16,7 +16,7 @@ import {
 import { HiOutlineMenuAlt3 } from 'react-icons/hi';
 import { FaPencilAlt, FaStickyNote } from 'react-icons/fa';
 import './index.css';
-import { useVideoSettings } from '../../../hooks/useVideoSetting';
+import { useVideoSettings } from '../../../hooks/useVideoSettings';
 import { useClipFilter } from '../../../hooks/useClipFilter';
 import MagicPencil from '../../../components/MagicPencil/MagicPencil';
 import VideoMemo from '../../../components/VideoMemo/VideoMemo';
