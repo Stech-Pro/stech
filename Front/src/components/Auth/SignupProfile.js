@@ -1,5 +1,5 @@
 // src/components/Auth/SignupProfileForm.jsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { updateProfile, handleAuthError } from '../../api/authAPI';
 import { useAuth } from '../../context/AuthContext';
@@ -29,7 +29,6 @@ const SignupProfileForm = () => {
   const [emailStatus, setEmailStatus] = useState(null);
   const [emailMessage, setEmailMessage] = useState('');
   const [scriptLoaded, setScriptLoaded] = useState(false);
-  const teamDropdownRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -206,7 +205,7 @@ const SignupProfileForm = () => {
             <img
               src={URL.createObjectURL(profileData.profileImage)}
               alt="Profile"
-              className="profileformImage"
+              className="profileImage"
             />
           ) : (
             <div className="profileplaceholderText"></div>
@@ -254,6 +253,7 @@ const SignupProfileForm = () => {
             name="realName"
             value={profileData.realName}
             onChange={handleChange}
+            placeholder="예: 홍길동"
           />
         </div>
 
@@ -313,7 +313,7 @@ const SignupProfileForm = () => {
             name="height"
             value={profileData.height}
             onChange={handleChange}
-            placeholder="cm"
+            placeholder="180"
           />
         </div>
         <div className="profileformGroup">
@@ -323,7 +323,7 @@ const SignupProfileForm = () => {
             name="weight"
             value={profileData.weight}
             onChange={handleChange}
-            placeholder="kg"
+            placeholder="76"
           />
         </div>
         <div className="profileformGroup">
@@ -333,6 +333,7 @@ const SignupProfileForm = () => {
             name="age"
             value={profileData.age}
             onChange={handleChange}
+            placeholder="예: 25"
           />
         </div>
 
