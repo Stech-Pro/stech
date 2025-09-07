@@ -6,3 +6,8 @@
     "swagger-ui-react": "^5.27.0"
   }
 }
+{
+  "scripts": {
+    "tree": "tree /f > structure.txt && type structure.txt"
+  }
+}

@@ -23,7 +23,6 @@ const SignupProfileForm = () => {
     grade: '',
     nationality: '',
     position: '',
-    // 필요하면 URL 입력 칸을 따로 두고 avatarUrl 사용
     avatarUrl: '',
   });
 
@@ -138,7 +137,7 @@ const SignupProfileForm = () => {
       return alert('몸무게를 입력해주세요.');
     }
     if (!profileData.grade.trim()) {
-      return alert('학년을 입력해주세요.');
+      return alert('경력을 입력해주세요.');
     }
 
     // 숫자 형식 검증
@@ -165,7 +164,7 @@ const SignupProfileForm = () => {
       profileData.height && `키:${profileData.height}cm`,
       profileData.weight && `몸무게:${profileData.weight}kg`,
       profileData.age && `나이:${profileData.age}`,
-      profileData.grade && `학년:${profileData.grade}`,
+      profileData.grade && `경력:${profileData.grade}`,
       profileData.nationality && `국적:${profileData.nationality}`,
       (profileData.address1 || profileData.address2) &&
         `주소:${profileData.address1} ${profileData.address2 || ''}`,
@@ -338,13 +337,13 @@ const SignupProfileForm = () => {
         </div>
 
         <div className="profileformGroup">
-          <label>학년</label>
+          <label>경력</label>
           <input
             type="text"
             name="grade"
             value={profileData.grade}
             onChange={handleChange}
-            placeholder="예: 2학년"
+            placeholder="예: 2년"
           />
         </div>
         <div className="profileformGroup">

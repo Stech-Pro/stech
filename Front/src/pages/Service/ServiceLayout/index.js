@@ -15,7 +15,7 @@ const ServiceLayout = () => {
   const isVideo = !!useMatch('/service/video/*');
   const windowWidth = useDeviceWidth();
 
-  if (windowWidth <= 1500) {
+  if (windowWidth <= 1200) {
     return <DeviceWarning />;
   }
   return (

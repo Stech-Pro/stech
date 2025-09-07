@@ -13,6 +13,7 @@ import {
   LoginDto,
   VerifyTokenDto,
   RefreshTokenDto,
+  CreateProfileDto,
 } from '../common/dto/auth.dto';
 import { TEAM_CODES } from '../common/constants/team-codes';
 import { EmailService } from '../utils/email.service';
@@ -513,6 +514,95 @@ export class AuthService {
     return {
       success: true,
       message: '비밀번호가 확인되었습니다.',
+    };
+  }
+  // 프로필 생성
+  async createProfile(userId: string, profileData: CreateProfileDto) {
+    console.log('=== 프로필 생성 ===');
+    console.log('userId:', userId);
+    console.log('profileData:', profileData);
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          'profile.realName': profileData.realName,
+          'profile.nickname': profileData.nickname || null,
+          'profile.contactInfo.email': profileData.email,
+          'profile.contactInfo.phone': profileData.phone,
+          'profile.contactInfo.address': profileData.address,
+          'profile.contactInfo.postalCode': profileData.postalCode || null,
+          'profile.physicalInfo.height': profileData.height,
+          'profile.physicalInfo.weight': profileData.weight,
+          'profile.physicalInfo.age': profileData.age,
+          'profile.physicalInfo.nationality': profileData.nationality,
+          'profile.career': profileData.career,
+          'profile.positions.PS1': profileData.position,
+          'profile.joinDate': new Date(),
+        },
+      },
+      { new: true },
+    );
+
+    if (!updatedUser) {
+      throw new BadRequestException('프로필 생성에 실패했습니다.');
+    }
+
+    // 새로운 토큰 발급
+    const newToken = this.jwtService.sign({
+      id: updatedUser._id,
+      username: updatedUser.username,
+      team: updatedUser.teamName,
+      role: updatedUser.role,
+      playerId: updatedUser.playerId || null,
+      realName: updatedUser.profile?.realName || null,
+    });
+
+    console.log('✅ 프로필 생성 완료');
+
+    return {
+      success: true,
+      message: '프로필이 성공적으로 생성되었습니다.',
+      data: {
+        token: newToken,
+        profile: updatedUser.profile,
+        user: {
+          id: updatedUser._id,
+          username: updatedUser.username,
+          teamName: updatedUser.teamName,
+          role: updatedUser.role,
+          region: updatedUser.region,
+          realName: updatedUser.profile?.realName,
+          nickname: updatedUser.profile?.nickname,
+        },
+      },
+    };
+  }
+
+  // 프로필 존재 여부 확인
+  async checkProfileExists(userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    const hasCompleteProfile = !!(
+      user.profile?.realName &&
+      user.profile?.physicalInfo?.height &&
+      user.profile?.contactInfo?.email
+    );
+
+    return {
+      success: true,
+      data: {
+        hasProfile: hasCompleteProfile,
+        profile: user.profile,
+      },
     };
   }
 }
