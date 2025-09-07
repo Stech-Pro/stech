@@ -2,6 +2,10 @@
 
 가장 최신 버전
 
+## 자동 배포 설정 완료
+- GitHub Actions를 통한 자동 배포 구성됨
+- main, dev1.4 브랜치 푸시 시 EC2로 자동 배포
+
 # Branch list
 
 -   Main (SSH 연결(호스팅))
