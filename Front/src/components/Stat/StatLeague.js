@@ -1,15 +1,15 @@
-import React, {useState, useRef, useEffect, useMemo} from "react";
-import {FaChevronDown} from "react-icons/fa";
-import "./StatLeague.css";
-import NoGroupImg from "../../assets/images/png/NoGroup.png";
-import Trophy from "../../assets/images/png/trophy.png";
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { FaChevronDown } from 'react-icons/fa';
+import './StatLeague.css';
+import NoGroupImg from '../../assets/images/png/NoGroup.png';
+import Trophy from '../../assets/images/png/trophy.png';
 
 const Dropdown = ({
   options = [],
-  value = "",
+  value = '',
   onChange = () => {},
-  placeholder = "",
-  className = "",
+  placeholder = '',
+  className = '',
   disabled = false,
   hideValueUntilChange = false,
 }) => {
@@ -23,8 +23,8 @@ const Dropdown = ({
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleToggle = () => {
@@ -40,7 +40,7 @@ const Dropdown = ({
   const selectedOption = options.find((o) => o.value === value);
   const displayText =
     hideValueUntilChange && !dirty
-      ? placeholder || ""
+      ? placeholder || ''
       : selectedOption
       ? selectedOption.label
       : placeholder;
@@ -48,8 +48,8 @@ const Dropdown = ({
   return (
     <div className={`dropdown-container ${className}`} ref={dropdownRef}>
       <button
-        className={`dropdown-trigger ${isOpen ? "open" : ""} ${
-          disabled ? "disabled" : ""
+        className={`dropdown-trigger ${isOpen ? 'open' : ''} ${
+          disabled ? 'disabled' : ''
         }`}
         onClick={handleToggle}
         disabled={disabled}
@@ -58,7 +58,7 @@ const Dropdown = ({
         <span className="dropdown-text">{displayText}</span>
         <FaChevronDown
           size={16}
-          className={`dropdown-arrow ${isOpen ? "rotated" : ""}`}
+          className={`dropdown-arrow ${isOpen ? 'rotated' : ''}`}
         />
       </button>
 
@@ -69,7 +69,7 @@ const Dropdown = ({
               <li key={option.value} className="dropdown-item">
                 <button
                   className={`dropdown-option ${
-                    value === option.value ? "selected" : ""
+                    value === option.value ? 'selected' : ''
                   }`}
                   onClick={() => handleSelect(option)}
                   type="button"
@@ -129,8 +129,8 @@ function calculateGroupStandings(group) {
 
   function getHeadToHeadRecord(teamA, teamB) {
     const h2h = {
-      [teamA]: {points: 0, pointsFor: 0, pointsAgainst: 0},
-      [teamB]: {points: 0, pointsFor: 0, pointsAgainst: 0},
+      [teamA]: { points: 0, pointsFor: 0, pointsAgainst: 0 },
+      [teamB]: { points: 0, pointsFor: 0, pointsAgainst: 0 },
     };
 
     group.matches.forEach((match) => {
@@ -184,21 +184,21 @@ function calculateGroupStandings(group) {
   return sortedStandings;
 }
 
-export function GroupStandings({currentDivision, group, teams = []}) {
+export function GroupStandings({ currentDivision, group, teams = [] }) {
   const standings = calculateGroupStandings(group);
 
   const getRankClass = (index) => {
     switch (index) {
       case 0:
-        return "rank-1st";
+        return 'rank-1st';
       case 1:
-        return "rank-2nd";
+        return 'rank-2nd';
       case 2:
-        return "rank-3rd";
+        return 'rank-3rd';
       case 3:
-        return "rank-4th";
+        return 'rank-4th';
       default:
-        return "";
+        return '';
     }
   };
 
@@ -222,7 +222,7 @@ export function GroupStandings({currentDivision, group, teams = []}) {
             <div
               key={team.name}
               className={`standings-row ${
-                currentDivision.name === "2부" ? "minor" : ""
+                currentDivision.name === '2부' ? 'minor' : ''
               } ${getRankClass(index)}`}
             >
               <div className="standings-cell rank-cell">{index + 1}</div>
@@ -233,7 +233,7 @@ export function GroupStandings({currentDivision, group, teams = []}) {
                       src={teamInfo.logo}
                       alt={`${team.name} 로고`}
                       className={`team-logo-img ${
-                        teamInfo.logo.endsWith(".svg") ? "svg-logo" : "png-logo"
+                        teamInfo.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
                       }`}
                     />
                   </div>
@@ -269,26 +269,26 @@ function MatchRow({
 }) {
   const homeTeam = teams.find((t) => t.name === match.home) || {
     name: match.home,
-    logo: "",
+    logo: '',
   };
   const awayTeam = teams.find((t) => t.name === match.away) || {
     name: match.away,
-    logo: "",
+    logo: '',
   };
 
   const getScore = () => {
     if (match.homeScore == null || match.awayScore == null)
-      return match.status || "-";
+      return match.status || '-';
     return `${match.homeScore} : ${match.awayScore}`;
   };
 
   return (
     <div
-      className={`match-row ${currentDivision.name === "2부" ? "minor" : ""}`}
+      className={`match-row ${currentDivision.name === '2부' ? 'minor' : ''}`}
     >
       {group ? (
         <div className="match-round">
-          {hasMultipleGroups ? `${group} ` : ""}
+          {hasMultipleGroups ? `${group} ` : ''}
           {index + 1} 경기
         </div>
       ) : (
@@ -305,20 +305,20 @@ function MatchRow({
                 src={homeTeam.logo}
                 alt={`${homeTeam.name} 로고`}
                 className={`team-logo-img ${
-                  homeTeam.logo.endsWith(".svg") ? "svg-logo" : "png-logo"
+                  homeTeam.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
                 }`}
               />
             </div>
             <div className="team-name">{homeTeam.name}</div>
           </div>
           <div className="match-score">{getScore()}</div>
-          <div className="away-team"> 
+          <div className="away-team">
             <div className="team-logo">
               <img
                 src={awayTeam.logo}
                 alt={`${awayTeam.name} 로고`}
                 className={`team-logo-img ${
-                  awayTeam.logo.endsWith(".svg") ? "svg-logo" : "png-logo"
+                  awayTeam.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
                 }`}
               />
             </div>
@@ -326,8 +326,8 @@ function MatchRow({
           </div>
         </div>
       </div>
-      <div className="match-location">{match.location || "-"}</div>
-      <div className="match-date">{match.date || "-"}</div>
+      <div className="match-location">{match.location || '-'}</div>
+      <div className="match-date">{match.date || '-'}</div>
     </div>
   );
 }
@@ -364,7 +364,7 @@ function MatchList({
   );
 }
 
-function FinalMatch({currentDivision, teams = []}) {
+function FinalMatch({ currentDivision, teams = [] }) {
   return (
     <div className="matches-container">
       <div className="final-header">
@@ -379,7 +379,7 @@ function FinalMatch({currentDivision, teams = []}) {
   );
 }
 
-function SemiFinalMatches({currentDivision, teams = []}) {
+function SemiFinalMatches({ currentDivision, teams = [] }) {
   return (
     <div className="matches-container">
       <div className="final-header">
@@ -394,7 +394,7 @@ function SemiFinalMatches({currentDivision, teams = []}) {
   );
 }
 
-function QuarterFinalMatches({currentDivision, teams = []}) {
+function QuarterFinalMatches({ currentDivision, teams = [] }) {
   return (
     <div className="matches-container">
       <div className="final-header">
@@ -408,7 +408,7 @@ function QuarterFinalMatches({currentDivision, teams = []}) {
     </div>
   );
 }
-function PlayoffsMatches({currentDivision, teams = []}) {
+function PlayoffsMatches({ currentDivision, teams = [] }) {
   return (
     <div className="matches-container">
       <div className="playoffs-header">
@@ -423,7 +423,7 @@ function PlayoffsMatches({currentDivision, teams = []}) {
   );
 }
 
-function PromotionMatch({currentDivision, teams = []}) {
+function PromotionMatch({ currentDivision, teams = [] }) {
   return (
     <div className="promotion-matches-container">
       <div className="promotion-header">
@@ -438,13 +438,18 @@ function PromotionMatch({currentDivision, teams = []}) {
   );
 }
 
-function GroupMatches({currentDivision, group, teams = [], hasMultipleGroups}) {
+function GroupMatches({
+  currentDivision,
+  group,
+  teams = [],
+  hasMultipleGroups,
+}) {
   return (
     <div className="matches-container">
       <div className="group-header">
         <div className="group-title">
-          {currentDivision.name} 리그{" "}
-          {hasMultipleGroups ? `- ${group.name}` : ""}
+          {currentDivision.name} 리그{' '}
+          {hasMultipleGroups ? `- ${group.name}` : ''}
         </div>
       </div>
       <MatchList
@@ -458,15 +463,22 @@ function GroupMatches({currentDivision, group, teams = [], hasMultipleGroups}) {
   );
 }
 
-const KnockoutCard = ({match, teams = [], index = 0, className = "", isFinal=false, isPlfs=false}) => {
+const KnockoutCard = ({
+  match,
+  teams = [],
+  index = 0,
+  className = '',
+  isFinal = false,
+  isPlfs = false,
+}) => {
   if (!match) return null;
   const home = teams.find((t) => t.name === match.home) || {
     name: match.home,
-    logo: "",
+    logo: '',
   };
   const away = teams.find((t) => t.name == match.away) || {
     name: match.away,
-    logo: "",
+    logo: '',
   };
 
   return (
@@ -475,15 +487,20 @@ const KnockoutCard = ({match, teams = [], index = 0, className = "", isFinal=fal
         {match.stage} {!index == 0 && `${index}경기`} {match.date}
       </div>
       <div className="knockout-team">
-        <div className={`knockout-team-name-section 
-          ${isFinal ? match.winner===home?.name ? "s1st" : "s2nd" : ""}
-          ${isPlfs ? match.winner===home?.name ? "s3rd" : "" : ""}`
-        }>
+        <div
+          className={`knockout-team-name-section 
+          ${isFinal ? (match.winner === home?.name ? 's1st' : 's2nd') : ''}
+          ${isPlfs ? (match.winner === home?.name ? 's3rd' : '') : ''}`}
+        >
           {home.logo && (
             <div className="team-logo">
-              <img src={home.logo} alt="로고"  className={`team-logo-img ${
-                        home.logo.endsWith(".svg") ? "svg-logo" : "png-logo"
-                      }`} />
+              <img
+                src={home.logo}
+                alt="로고"
+                className={`team-logo-img ${
+                  home.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                }`}
+              />
             </div>
           )}
           <div className="team-name">{home.name}</div>
@@ -491,16 +508,20 @@ const KnockoutCard = ({match, teams = [], index = 0, className = "", isFinal=fal
         <div className="knockout-team-score">{match.homeScore}</div>
       </div>
       <div className="knockout-team">
-        <div 
-        className={`knockout-team-name-section 
-          ${isFinal ? match.winner===away?.name ? "s1st" : "s2nd" : ""}
-          ${isPlfs ? match.winner===away?.name ? "s3rd" : "" : ""}`
-        }>
+        <div
+          className={`knockout-team-name-section 
+          ${isFinal ? (match.winner === away?.name ? 's1st' : 's2nd') : ''}
+          ${isPlfs ? (match.winner === away?.name ? 's3rd' : '') : ''}`}
+        >
           {away?.logo && (
             <div className="team-logo">
-              <img src={away.logo} alt="로고"  className={`team-logo-img ${
-                        away.logo.endsWith(".svg") ? "svg-logo" : "png-logo"
-                      }`} />
+              <img
+                src={away.logo}
+                alt="로고"
+                className={`team-logo-img ${
+                  away.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                }`}
+              />
             </div>
           )}
           <div className="team-name">{away.name}</div>
@@ -510,7 +531,7 @@ const KnockoutCard = ({match, teams = [], index = 0, className = "", isFinal=fal
     </div>
   );
 };
-function KnockoutBracket({currentDivision, teams = []}) {
+function KnockoutBracket({ currentDivision, teams = [] }) {
   const qf = currentDivision?.quarterFinals || [];
   const sf = currentDivision?.semiFinals || [];
   const fin = (currentDivision?.final || [])[0];
@@ -542,9 +563,14 @@ function KnockoutBracket({currentDivision, teams = []}) {
         </div>
 
         <div className="final-row">
-          <KnockoutCard match={fin} teams={teams} isFinal={true}  />
+          <KnockoutCard match={fin} teams={teams} isFinal={true} />
 
-          <KnockoutCard match={plfs} teams={teams} className="plfs" isPlfs={true} />
+          <KnockoutCard
+            match={plfs}
+            teams={teams}
+            className="plfs"
+            isPlfs={true}
+          />
         </div>
       </div>
 
@@ -570,7 +596,7 @@ function KnockoutBracket({currentDivision, teams = []}) {
   );
 }
 
-function KnockoutBracket2({currentDivision, teams = []}) {
+function KnockoutBracket2({ currentDivision, teams = [] }) {
   const sf = currentDivision?.semiFinals || [];
   const fin = (currentDivision?.final || [])[0];
   const plfs = (currentDivision?.playoffs || [])[0];
@@ -604,33 +630,33 @@ function KnockoutBracket2({currentDivision, teams = []}) {
 /* ----------------------------------
  * Empty(예외) 페이지
  * ---------------------------------- */
-function EmptyState({message, onReset}) {
+function EmptyState({ message, onReset }) {
   return (
     <div
       style={{
-        padding: "40px 24px",
-        background: "#0b0b0e",
+        padding: '40px 24px',
+        background: '#0b0b0e',
         borderRadius: 12,
-        border: "1px solid #2b2b32",
-        color: "#e7e7ea",
-        textAlign: "center",
+        border: '1px solid #2b2b32',
+        color: '#e7e7ea',
+        textAlign: 'center',
         marginTop: 16,
       }}
     >
-      <div style={{fontSize: 18, fontWeight: 800, marginBottom: 8}}>
+      <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
         데이터가 없습니다
       </div>
-      <div style={{opacity: 0.8, marginBottom: 16}}>{message}</div>
+      <div style={{ opacity: 0.8, marginBottom: 16 }}>{message}</div>
       <button
         type="button"
         onClick={onReset}
         style={{
-          padding: "8px 14px",
+          padding: '8px 14px',
           borderRadius: 8,
-          border: "1px solid #8a8a8f",
-          background: "transparent",
-          color: "#fff",
-          cursor: "pointer",
+          border: '1px solid #8a8a8f',
+          background: 'transparent',
+          color: '#fff',
+          cursor: 'pointer',
           fontWeight: 700,
         }}
       >
@@ -640,18 +666,18 @@ function EmptyState({message, onReset}) {
   );
 }
 
-export default function StatLeague({data, teams = []}) {
-  const exceptionLeague = ["타이거볼", "챌린지볼"];
+export default function StatLeague({ data, teams = [] }) {
+  const exceptionLeague = ['타이거볼', '챌린지볼'];
   const [isExcepted, setIsExcepted] = useState(false);
 
   const yearOptions = useMemo(
-    () => Object.keys(data ?? {}).map((y) => ({value: y, label: y})),
-    [data]
+    () => Object.keys(data ?? {}).map((y) => ({ value: y, label: y })),
+    [data],
   );
 
-  const [selectedYear, setSelectedYear] = useState("2024");
-  const [selectedLeague, setSelectedLeague] = useState("서울");
-  const [selectedDivision, setSelectedDivision] = useState("1부");
+  const [selectedYear, setSelectedYear] = useState('2024');
+  const [selectedLeague, setSelectedLeague] = useState('서울');
+  const [selectedDivision, setSelectedDivision] = useState('1부');
 
   const [showDivisionFilter, setShowDivisionFilter] = useState(false);
 
@@ -662,7 +688,7 @@ export default function StatLeague({data, teams = []}) {
     const node = data?.[selectedYear]?.[newLeague];
     const divs = Array.isArray(node?.divisions) ? node.divisions : [];
     const nextDiv =
-      divs.find((d) => d.name === "1부")?.name || divs[0]?.name || "";
+      divs.find((d) => d.name === '1부')?.name || divs[0]?.name || '';
     setSelectedDivision(nextDiv);
 
     setShowDivisionFilter(divs.length > 1);
@@ -674,18 +700,18 @@ export default function StatLeague({data, teams = []}) {
 
     const leagues = Object.keys(data?.[y] ?? {});
     if (!leagues.includes(selectedLeague)) {
-      const firstLeague = leagues[0] || "";
+      const firstLeague = leagues[0] || '';
       setSelectedLeague(firstLeague);
       const node = data?.[y]?.[firstLeague];
       const divs = Array.isArray(node?.divisions) ? node.divisions : [];
       const nextDiv =
-        divs.find((d) => d.name === "1부")?.name || divs[0]?.name || "";
+        divs.find((d) => d.name === '1부')?.name || divs[0]?.name || '';
       setSelectedDivision(nextDiv);
     } else {
       const node = data?.[y]?.[selectedLeague];
       const divs = Array.isArray(node?.divisions) ? node.divisions : [];
       const nextDiv =
-        divs.find((d) => d.name === "1부")?.name || divs[0]?.name || "";
+        divs.find((d) => d.name === '1부')?.name || divs[0]?.name || '';
       setSelectedDivision(nextDiv);
     }
   };
@@ -711,29 +737,29 @@ export default function StatLeague({data, teams = []}) {
 
   const hasDivisions = useMemo(
     () => divisionList.length > 1, // 1부/2부 등 2개 이상이면 부 개념 있음
-    [divisionList]
+    [divisionList],
   );
 
   const divisionOptions = useMemo(
-    () => divisionList.map((d) => ({value: d.name, label: d.name})),
-    [divisionList]
+    () => divisionList.map((d) => ({ value: d.name, label: d.name })),
+    [divisionList],
   );
 
   useEffect(() => {
     if (!divisionList.length) {
-      setSelectedDivision("");
+      setSelectedDivision('');
       return;
     }
     if (hasDivisions) {
       const valid = divisionList.some((d) => d.name === selectedDivision);
       if (!valid) {
         const fallback =
-          divisionList.find((d) => d.name === "1부")?.name ||
+          divisionList.find((d) => d.name === '1부')?.name ||
           divisionList[0].name;
         setSelectedDivision(fallback);
       }
     } else {
-      setSelectedDivision("");
+      setSelectedDivision('');
     }
   }, [selectedLeague, divisionList, hasDivisions, selectedDivision]);
 
@@ -746,7 +772,7 @@ export default function StatLeague({data, teams = []}) {
     if (!hasDivisions) return divisionList[0];
     return (
       divisionList.find((d) => d.name === selectedDivision) ||
-      divisionList.find((d) => d.name === "1부") ||
+      divisionList.find((d) => d.name === '1부') ||
       divisionList[0]
     );
   }, [divisionList, selectedDivision, hasDivisions]);
@@ -755,7 +781,7 @@ export default function StatLeague({data, teams = []}) {
   const hasMultipleGroups = currentDivision?.groups?.length > 1;
 
   const selectionReady = Boolean(
-    selectedYear && selectedLeague && (hasDivisions ? selectedDivision : true)
+    selectedYear && selectedLeague && (hasDivisions ? selectedDivision : true),
   );
 
   const hasAnyContent = (div) => {
@@ -773,9 +799,9 @@ export default function StatLeague({data, teams = []}) {
     return <div className="tournament-status">데이터가 없습니다</div>;
   }
   const resetFilters = () => {
-    setSelectedYear("2024");
-    setSelectedLeague("서울");
-    setSelectedDivision("1부");
+    setSelectedYear('2024');
+    setSelectedLeague('서울');
+    setSelectedDivision('1부');
     setShowDivisionFilter(false);
   };
 
@@ -883,7 +909,7 @@ export default function StatLeague({data, teams = []}) {
                     <div className="group-section">
                       <img
                         src={NoGroupImg}
-                        alt={"no-group-section"}
+                        alt={'no-group-section'}
                         className="no-group-img"
                       />
                     </div>
