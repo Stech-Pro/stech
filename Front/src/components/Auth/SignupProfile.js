@@ -194,7 +194,7 @@ const SignupProfileForm = () => {
       age: parseInt(profileData.age) || 20, // 기본값
       career: profileData.grade.trim(),
       position: profileData.position.trim(),
-      playerID: profileData.playerID.trim(), // 선택사항
+      playerID: profileData.playerID.trim(),
     };
    
     try {
@@ -280,17 +280,6 @@ const SignupProfileForm = () => {
         </div>
 
         <div className="profileformGroup">
-  <label>연락처</label>
-  <input
-    type="tel"
-    name="phone"
-    value={profileData.phone}
-    onChange={handleChange}
-    placeholder="010-1234-5678"
-  />
-</div>
-
-        <div className="profileformGroup">
           <label>이메일</label>
           <input
             type="email"
@@ -312,6 +301,28 @@ const SignupProfileForm = () => {
               {emailMessage}
             </div>
           )}
+        </div>
+
+        <div className="profileformGroup">
+          <label>연락처</label>
+          <input
+            type="tel"
+            name="phone"
+            value={profileData.phone}
+            onChange={handleChange}
+            placeholder="010-1234-5678"
+          />
+        </div>
+
+        <div className="profileformGroup">
+          <label>별명</label>
+          <input
+            type="text"
+            name="playerID"
+            value={profileData.playerID}
+            onChange={handleChange}
+            placeholder="개똥이"
+          />
         </div>
 
         <div className="profileformGroup full-width">
