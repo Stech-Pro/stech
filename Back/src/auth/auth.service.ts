@@ -311,23 +311,29 @@ export class AuthService {
 
       console.log('✅ 토큰 갱신 성공');
       return {
-    success: true,
-    message: '토큰이 갱신되었습니다.',
-    data: {
-      token: newToken,
-      user: {
-        id: user._id,
-        username: user.username,
-        teamName: user.teamName,
-        role: user.role,
-        region: user.region,
-        playerId: user.playerId || null,
-        nickname: user.profile?.nickname || null,
-        email: user.profile?.contactInfo?.email || null,
-        bio: user.profile?.bio || null,
-        avatar: user.profile?.avatar || null,
-      },
-    },
+        success: true,
+        message: '토큰이 갱신되었습니다.',
+        data: {
+          token: newToken,
+          user: {
+            id: user._id,
+            username: user.username,
+            teamName: user.teamName,
+            role: user.role,
+            region: user.region,
+            playerId: user.playerId || null,
+            nickname: user.profile?.nickname || null,
+            email: user.profile?.contactInfo?.email || null,
+            bio: user.profile?.bio || null,
+            avatar: user.profile?.avatar || null,
+          },
+        },
+      };
+    } catch (error) {
+      console.log('❌ 토큰 갱신 실패:', error.message);
+      throw new UnauthorizedException('토큰 갱신에 실패했습니다.');
+    }
+  }
 
   async logout() {
     console.log('=== 로그아웃 ===');
