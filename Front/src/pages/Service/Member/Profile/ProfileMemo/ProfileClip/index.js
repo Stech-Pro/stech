@@ -1,38 +1,25 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useProfileMemo } from '../ProfileMemoLayout/index.js';
-// import '../ProfileClip.css';
+import { useProfileMemo } from '../ProfileMemoLayout';
+import './ProfileClip.css'; // CSS 파일 임포트
+import {TEAMS} from '../../../../../../data/TEAMS';
 
-const PT_LABEL = {
-  RUN: '런',
-  PASS: '패스',
-  PASS_INCOMPLETE: '패스 실패',
-  KICKOFF: '킥오프',
-  PUNT: '펀트',
-  PAT: 'PAT',
-  TWOPT: '2PT',
-  FIELDGOAL: 'FG',
+/* ───────────────────────────────
+   시드 게임/클립 (부산 그리폰즈)
+   ─────────────────────────────── */
+
+const findTeamMeta = (teamName) => {
+  // 팀 이름이 없으면 기본값 반환
+  if (!teamName) {
+    return { name: '알 수 없음', logo: '' };
+  }
+  // TEAMS 배열에서 이름이 일치하는 팀을 찾아서 반환, 없으면 기본값 반환
+  return TEAMS.find(t => t.name === teamName) || { name: teamName, logo: '' };
 };
-
-const SIG_MAP = {
-  'TWOPTCONV.GOOD': '2PT 성공',
-  'TWOPTCONV.NOGOOD': '2PT 실패',
-  PATGOOD: 'PAT 성공',
-  PATNOGOOD: 'PAT 실패',
-  'FIELDGOAL.GOOD': 'FG 성공',
-  'FIELDGOAL.NOGOOD': 'FG 실패',
-  TD: '터치다운',
-  TOUCHDOWN: '터치다운',
-  SACK: '색',
-  TFL: 'TFL',
-  FUMBLE: '펌블',
-  INTERCEPTION: '인터셉트',
-  TURNOVER: '턴오버',
-  SAFETY: '세이프티',
-  PENALTY: '페널티',
-};
-
-const DOWN_ALIAS = { PAT: 'PAT', TPT: '2PT', '2PT': '2PT', KICKOFF: '킥오프' };
+/* 라벨/표기 */
+const PT_LABEL = { RUN: '런', PASS: '패스', KICKOFF: '킥오프', PUNT: '펀트', PAT: 'PAT', TWOPT: '2PT', FIELDGOAL: 'FG' };
+const SIG_MAP = { 'TWOPTCONV.GOOD': '2PT 성공', 'TWOPTCONV.NOGOOD': '2PT 실패', PATGOOD: 'PAT 성공', PATNOGOOD: 'PAT 실패', 'FIELDGOAL.GOOD': 'FG 성공', 'FIELDGOAL.NOGOOD': 'FG 실패', TD: '터치다운', SACK: '색' };
+const DOWN_ALIAS = { PAT: 'PAT', TPT: '2PT', KICKOFF: '킥오프' };
 const getDownDisplay = (c) => {
   if (c.specialTeam && DOWN_ALIAS[String(c.specialTeam).toUpperCase()]) {
     return DOWN_ALIAS[String(c.specialTeam).toUpperCase()];
@@ -41,7 +28,7 @@ const getDownDisplay = (c) => {
   if (DOWN_ALIAS[ds]) return DOWN_ALIAS[ds];
   const dNum = parseInt(ds, 10);
   if (Number.isFinite(dNum)) {
-    const ytg = c.toGoYard ?? 0;
+    const ytg = c.toGoYard ?? c.yardsToGo ?? 0;
     return `${dNum} & ${ytg}`;
   }
   return '';
@@ -56,29 +43,33 @@ export default function ProfileClip() {
   const game = memo.map?.[gameKey];
 
   if (!game) {
-    return (
-      <div className="clip-page-container" style={{ padding: 16 }}>
-        <div style={{ marginBottom: 8, fontWeight: 700 }}>경기를 찾을 수 없습니다.</div>
-        <div style={{ fontSize: 12, opacity: 0.8 }}>
-          현재 URL의 gameKey: <code>{gameKey || '(빈값)'}</code><br />
-          사용 가능한 gameKey: <code>{memo.list.map(g=>g.gameKey).join(', ') || '(없음)'}</code>
-        </div>
-        <div style={{ marginTop: 12 }}>
-          <button className="resetButton" onClick={() => navigate('/service/profile/clip')}>← 목록으로</button>
-        </div>
-      </div>
-    );
+    return <div>경기를 찾을 수 없습니다.</div>;
   }
 
+  // 실제 TEAMS 데이터를 사용해 정보 조회
+  const homeMeta = findTeamMeta(game.homeTeam);
+  const awayMeta = findTeamMeta(game.awayTeam);
+
   return (
-    <div className="clip-page-container">
-      <div className="clip-page-header" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-        <button className="resetButton" onClick={() => navigate('/service/profile/clip')}>← 목록으로</button>
-        <div style={{ fontWeight: 700 }}>{game.date}</div>
-        <div style={{ opacity: 0.7 }}>{game.homeTeam} vs {game.awayTeam} · {game.location || '-'}</div>
+    <div className="profile-clip-page-container">
+      <div className="clip-page-header">
+        {/* "목록으로" 버튼이 없는 버전 */}
+        <div className="matchup-header">
+          <div className="team-display">
+            <img src={homeMeta.logo} alt={homeMeta.name} className="team-logo" />
+            <span className="team-name">{homeMeta.name}</span>
+          </div>
+          <span className="vs-text">VS</span>
+          <div className="team-display">
+            <span className="team-name">{awayMeta.name}</span>
+            <img src={awayMeta.logo} alt={awayMeta.name} className="team-logo" />
+          </div>
+        </div>
       </div>
 
-      <div className="clip-list">
+
+      {/* 전폭 클립 리스트 */}
+      <div className="profile-clip-list">
         {game.Clips.map((c) => (
           <div key={c.clipKey} className="clip-row">
             <div className="quarter-name"><div>{c.quarter}Q</div></div>
@@ -103,7 +94,9 @@ export default function ProfileClip() {
           </div>
         ))}
         {game.Clips.length === 0 && (
-          <div className="empty" style={{ padding: 24 }}>이 경기에는 표시할 메모가 없습니다.</div>
+          <div className="empty">
+            이 경기에는 표시할 메모가 없습니다.
+          </div>
         )}
       </div>
     </div>
