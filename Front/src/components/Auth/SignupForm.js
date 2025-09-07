@@ -8,7 +8,7 @@ import {
   signup,
   handleAuthError,
 } from '../../api/authAPI';
-
+import { useAuth } from '../../context/AuthContext';
 import Kakao from '../../assets/images/png/AuthPng/Kakao.png';
 import Google from '../../assets/images/png/AuthPng/Google.png';
 import Eye from '../../assets/images/png/AuthPng/Eye.png';
@@ -16,6 +16,8 @@ import EyeActive from '../../assets/images/png/AuthPng/EyeActive.png';
 
 const SignupForm = ({ onSuccess, className = '' }) => {
   const navigate = useNavigate();
+  const {setToken, setUser } = useAuth();
+   const { updateUserData, setAuthToken } = useAuth();
 
   const [formData, setFormData] = useState({
     username: '',
@@ -83,6 +85,7 @@ const SignupForm = ({ onSuccess, className = '' }) => {
 
     try {
       const res = await checkUsername(username);
+      
       if (res.available) {
         setIdStatus('available');
         setIdMessage('사용 가능한 아이디입니다.');
@@ -182,8 +185,10 @@ const SignupForm = ({ onSuccess, className = '' }) => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (isSubmitting) return; // 중복 요청 방지
     if (!validateForm()) return;
 
     setIsSubmitting(true);
@@ -200,16 +205,28 @@ const SignupForm = ({ onSuccess, className = '' }) => {
 
     try {
       const response = await signup(payload);
+      console.log('회원가입 응답:', response);
 
-      // 회원가입 응답에서 토큰 저장
+      // 회원가입 응답에서 토큰과 사용자 정보 저장
       if (response.data && response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        // AuthContext에 토큰 설정이 필요하면 추가
+        const { token, user } = response.data;
+        
+        // localStorage에 토큰 저장
+        localStorage.setItem('token', token);
+        
+        // 사용자 정보가 있으면 AuthContext 업데이트
+        if (user) {
+          updateUserData(user);
+        }
+        
+        console.log('토큰 저장 완료:', token);
       }
 
       onSuccess?.();
       navigate('../signupprofile');
+      
     } catch (err) {
+      console.error('회원가입 오류:', err);
       setError(handleAuthError(err));
     } finally {
       setIsSubmitting(false);

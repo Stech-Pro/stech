@@ -13,6 +13,7 @@ import {
   LoginDto,
   VerifyTokenDto,
   RefreshTokenDto,
+  CreateProfileDto,
 } from '../common/dto/auth.dto';
 import { TEAM_CODES } from '../common/constants/team-codes';
 import { EmailService } from '../utils/email.service';
@@ -103,11 +104,14 @@ export class AuthService {
       playerId: newUser.playerId || null,
     });
 
+    console.log('발급된 토큰:', token);
+
+    // 회원가입 성공 후 토큰 반환 부분 확인
     return {
       success: true,
       message: '회원가입 성공!',
       data: {
-        token,
+        token, // 토큰이 여기 포함되어야 함
         user: {
           id: newUser._id,
           username: newUser.username,
@@ -125,14 +129,12 @@ export class AuthService {
     console.log('=== 로그인 시도 ===');
     console.log('받은 아이디:', username);
 
-    // 아이디로 유저 찾기
-    const user = await this.userModel.findOne({ username });
+    const user = await this.userModel.findOne({ username: loginDto.username });
     if (!user) {
       console.log('❌ 아이디 불일치');
       throw new BadRequestException('존재하지 않는 아이디입니다.');
     }
 
-    // 비밀번호 확인
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       console.log('❌ 비밀번호 불일치');
@@ -143,7 +145,6 @@ export class AuthService {
       throw new UnauthorizedException('비활성화된 계정입니다.');
     }
 
-    // JWT 발급
     const token = this.jwtService.sign({
       id: user._id,
       username: user.username,
@@ -165,6 +166,10 @@ export class AuthService {
           teamName: user.teamName,
           role: user.role,
           region: user.region,
+          playerID: user.profile?.playerID || null,
+          email: user.profile?.contactInfo?.email || null,
+          bio: user.profile?.bio || null,
+          avatar: user.profile?.avatar || null,
         },
       },
     };
@@ -229,7 +234,7 @@ export class AuthService {
         $set: {
           'profile.avatar': profileData.avatar,
           'profile.bio': profileData.bio,
-          'profile.nickname': profileData.nickname,
+          'profile.playerID': profileData.playerID || null,
           'profile.email': profileData.email,
         },
       },
@@ -257,7 +262,6 @@ export class AuthService {
     try {
       const decoded = this.jwtService.verify(verifyTokenDto.token);
 
-      // 사용자 존재 확인
       const user = await this.userModel.findById(decoded.id);
       if (!user || !user.isActive) {
         throw new UnauthorizedException('유효하지 않은 사용자입니다.');
@@ -275,6 +279,10 @@ export class AuthService {
             role: user.role,
             region: user.region,
             playerId: user.playerId || null,
+            playerID: user.profile?.playerID || null,
+            email: user.profile?.contactInfo?.email || null,
+            bio: user.profile?.bio || null,
+            avatar: user.profile?.avatar || null,
           },
         },
       };
@@ -318,6 +326,10 @@ export class AuthService {
             role: user.role,
             region: user.region,
             playerId: user.playerId || null,
+            playerID: user.profile?.playerID || null,
+            email: user.profile?.contactInfo?.email || null,
+            bio: user.profile?.bio || null,
+            avatar: user.profile?.avatar || null,
           },
         },
       };
@@ -505,6 +517,127 @@ export class AuthService {
     return {
       success: true,
       message: '비밀번호가 확인되었습니다.',
+    };
+  }
+  // 프로필 생성
+  async createProfile(userId: string, profileData: CreateProfileDto) {
+    console.log('=== 프로필 생성 ===');
+    console.log('userId:', userId);
+    console.log('profileData:', profileData);
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          'profile.realName': profileData.realName,
+          'profile.playerID': profileData.playerID,
+          'profile.contactInfo.email': profileData.email,
+          'profile.contactInfo.phone': profileData.phone,
+          'profile.contactInfo.address': profileData.address,
+          'profile.contactInfo.postalCode': profileData.postalCode || null,
+          'profile.physicalInfo.height': profileData.height,
+          'profile.physicalInfo.weight': profileData.weight,
+          'profile.physicalInfo.age': profileData.age,
+          'profile.physicalInfo.nationality': profileData.nationality,
+          'profile.career': profileData.career,
+          'profile.positions.PS1': profileData.position,
+          'profile.joinDate': new Date(),
+        },
+      },
+      { new: true },
+    );
+
+    console.log('업데이트된 사용자:', updatedUser);
+
+    if (!updatedUser) {
+      throw new BadRequestException('프로필 생성에 실패했습니다.');
+    }
+
+    // 새로운 토큰 발급
+    const newToken = this.jwtService.sign({
+      id: updatedUser._id,
+      username: updatedUser.username,
+      team: updatedUser.teamName,
+      role: updatedUser.role,
+      playerId: updatedUser.playerId || null,
+      realName: updatedUser.profile?.realName || null,
+    });
+
+    console.log('✅ 프로필 생성 완료');
+
+    return {
+      success: true,
+      message: '프로필이 성공적으로 생성되었습니다.',
+      data: {
+        token: newToken,
+        profile: updatedUser.profile,
+        user: {
+          id: updatedUser._id,
+          username: updatedUser.username,
+          teamName: updatedUser.teamName,
+          role: updatedUser.role,
+          region: updatedUser.region,
+          realName: updatedUser.profile?.realName,
+          playerID: updatedUser.profile?.playerID,
+        },
+      },
+    };
+  }
+
+  async uploadAvatar(userId: string, file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('이미지 파일이 없습니다.');
+    }
+
+    // 파일 크기 제한 (예: 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      throw new BadRequestException('파일 크기는 5MB를 초과할 수 없습니다.');
+    }
+
+    // 이미지 파일 타입 확인
+    if (!file.mimetype.startsWith('image/')) {
+      throw new BadRequestException('이미지 파일만 업로드 가능합니다.');
+    }
+
+    // S3 업로드 로직은 나중에 구현
+    const fileName = `avatars/${userId}_${Date.now()}_${file.originalname}`;
+
+    // 임시로 로컬 URL 반환
+    const avatarUrl = `https://temp-url.com/${fileName}`;
+
+    return {
+      success: true,
+      message: '프로필 이미지 업로드 성공',
+      data: {
+        avatarUrl,
+      },
+    };
+  }
+
+  // 프로필 존재 여부 확인
+  async checkProfileExists(userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    const hasCompleteProfile = !!(
+      user.profile?.realName &&
+      user.profile?.physicalInfo?.height &&
+      user.profile?.contactInfo?.email
+    );
+
+    return {
+      success: true,
+      data: {
+        hasProfile: hasCompleteProfile,
+        profile: user.profile,
+      },
     };
   }
 }

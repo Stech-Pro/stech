@@ -4,6 +4,8 @@ import { useLocation, useNavigate, Outlet, useMatch } from 'react-router-dom';
 import ServiceSidebar from './ServiceSidebar';
 import SupportModal from '../../../components/SupportModal';
 import UploadVideoModal from '../../../components/UploadVideoModal.jsx';
+import useDeviceWidth from '../../../hooks/useDeviceWidth.js';
+import DeviceWarning from '../../../pages/Common/DeviceWarning/index.js';
 import './index.css';
 
 const ServiceLayout = () => {
@@ -11,12 +13,16 @@ const ServiceLayout = () => {
   const navigate = useNavigate();
   const [showUpload, setShowUpload] = useState(false);
   const isVideo = !!useMatch('/service/video/*');
+  const windowWidth = useDeviceWidth();
 
+  if (windowWidth <= 1200) {
+    return <DeviceWarning />;
+  }
   return (
     <>
       {isVideo ? (
         <div className="flex-1">
-          <Outlet/>
+          <Outlet />
         </div>
       ) : (
         <div className="serviceLayoutContainer">

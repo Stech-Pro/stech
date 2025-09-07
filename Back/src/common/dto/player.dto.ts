@@ -231,7 +231,7 @@ export class CreatePlayerDto {
   @ApiProperty({ example: 'Kenny', required: false })
   @IsOptional()
   @IsString()
-  nickname?: string;
+  playerID?: string;
 
   @ApiProperty({ example: '1부' })
   @IsEnum(['1부', '2부'])

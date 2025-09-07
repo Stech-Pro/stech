@@ -22,9 +22,10 @@ export class AuthService {
   ) {}
 
   async signup(signupDto: SignupDto) {
-    const { email, password, name, nickname } = signupDto;
+    const { email, password, name, playerID } = signupDto;
 
-    const fullName = name || nickname;
+    const fullName = name || 
+    ;
 
     // 이메일 중복 확인
     const existingUser = await this.userModel.findOne({ email });

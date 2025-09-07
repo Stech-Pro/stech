@@ -330,8 +330,7 @@ const ServiceSidebar = () => {
               <div className="logoutIcon">
                 {isLoading ? <div className="spinner" /> : <CiLogout />}
               </div>
-              <span className="logoutText">
-                {isLoading ? 'Logging out...' : 'Logout'}
+              <span className="logoutText">로그아웃
               </span>
             </button>
           ) : (

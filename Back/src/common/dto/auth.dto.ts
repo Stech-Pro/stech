@@ -1,4 +1,11 @@
-import { IsString, MinLength, IsOptional, Matches, IsEmail } from 'class-validator';
+import {
+  IsString,
+  MinLength,
+  IsOptional,
+  Matches,
+  IsEmail,
+  IsNumber,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SignupDto {
@@ -56,18 +63,18 @@ export class VerifyTeamCodeDto {
 }
 
 export class VerifyTokenDto {
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    description: '검증할 JWT 토큰'
+    description: '검증할 JWT 토큰',
   })
   @IsString()
   token: string;
 }
 
 export class RefreshTokenDto {
-  @ApiProperty({ 
+  @ApiProperty({
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    description: '갱신할 JWT 토큰'
+    description: '갱신할 JWT 토큰',
   })
   @IsString()
   token: string;
@@ -111,4 +118,56 @@ export class CheckUserExistsDto {
   @ApiProperty({ example: 'user123' })
   @IsString()
   username: string;
+}
+
+export class CreateProfileDto {
+  @ApiProperty({ example: '김건국', description: '성함' })
+  @IsString()
+  realName: string;
+
+  @ApiProperty({ example: 'user@example.com', description: '이메일' })
+  @IsEmail({}, { message: '올바른 이메일 형식을 입력해주세요.' })
+  email: string;
+
+  @ApiProperty({ example: '대한민국', description: '국적' })
+  @IsString()
+  nationality: string;
+
+  @ApiProperty({ example: '010-1234-5678', description: '연락처' })
+  @IsString()
+  phone: string;
+
+  @ApiProperty({ example: '서울특별시 광진구 능동로 120', description: '주소' })
+  @IsString()
+  address: string;
+
+  @ApiProperty({ example: 180, description: '키 (cm)' })
+  @IsNumber()
+  height: number;
+
+  @ApiProperty({ example: 75, description: '몸무게 (kg)' })
+  @IsNumber()
+  weight: number;
+
+  @ApiProperty({ example: 22, description: '나이' })
+  @IsNumber()
+  age: number;
+
+  @ApiProperty({ example: '2년', description: '경력' })
+  @IsString()
+  career: string;
+
+  @ApiProperty({ example: 'QB', description: '주포지션' })
+  @IsString()
+  position: string;
+
+  @ApiProperty({ example: '05029', required: false })
+  @IsOptional()
+  @IsString()
+  postalCode?: string;
+
+  @ApiProperty({ example: '건국이', description: '플레이어ID' })
+  @IsOptional()
+  @IsString()
+  playerID?: string;
 }

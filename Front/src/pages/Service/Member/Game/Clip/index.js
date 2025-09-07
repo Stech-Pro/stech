@@ -155,32 +155,30 @@ const findTeamMeta = (raw) => {
       (t) =>
         String(t.name).toLowerCase() === norm ||
         String(t.enName || '').toLowerCase() === norm ||
-        String(t.code || '').toLowerCase() === norm
+        String(t.code || '').toLowerCase() === norm,
     ) || { name: String(raw), logo: null }
   );
 };
-const TEAM_BY_ID = TEAMS.reduce((m, t) => { m[t.id] = t; return m; }, {});
-
-
+const TEAM_BY_ID = TEAMS.reduce((m, t) => {
+  m[t.id] = t;
+  return m;
+}, {});
 
 export default function ClipPage() {
   const { gameKey } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const {user } = useAuth();
+  const { user } = useAuth();
 
   const [teamStats, setTeamStats] = useState(null); // {home, away}
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState(null);
 
-
-
-  const MY_TEAM_ID =
-    user?.teamName || user?.team;
+  const MY_TEAM_ID = user?.teamName || user?.team;
 
   const selfTeam = useMemo(
     () => (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || TEAMS[0] || null,
-    [MY_TEAM_ID]
+    [MY_TEAM_ID],
   );
   const logoSrc = selfTeam?.logo || defaultLogo;
   const label = selfTeam?.name || 'Choose Team';
@@ -262,40 +260,42 @@ export default function ClipPage() {
     );
   }, [homeMeta, awayMeta]);
 
-
   const SPECIAL_DOWN_MAP = {
-  TPT: '2PT',
-  KICKOFF: '킥오프',
-  PAT: 'PAT',
-};
-const getDownDisplay = (c) => {
-  const pt = String(c.playType || '').trim().toUpperCase();
-  const downRaw = c.down;
-  const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
+    TPT: '2PT',
+    KICKOFF: '킥오프',
+    PAT: 'PAT',
+  };
+  const getDownDisplay = (c) => {
+    const pt = String(c.playType || '')
+      .trim()
+      .toUpperCase();
+    const downRaw = c.down;
+    const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
 
-  // 1) down 값이 특수 문자열이면 그 라벨만 표시 (야드투고 X)
-  if (SPECIAL_DOWN_MAP[downStr]) return SPECIAL_DOWN_MAP[downStr];
+    // 1) down 값이 특수 문자열이면 그 라벨만 표시 (야드투고 X)
+    if (SPECIAL_DOWN_MAP[downStr]) return SPECIAL_DOWN_MAP[downStr];
 
-  // 2) playType으로도 특수 플레이라면 라벨만 표시
-  if (SPECIAL_DOWN_MAP[pt]) return SPECIAL_DOWN_MAP[pt];
+    // 2) playType으로도 특수 플레이라면 라벨만 표시
+    if (SPECIAL_DOWN_MAP[pt]) return SPECIAL_DOWN_MAP[pt];
 
-  // 3) 일반 다운: "n & ytg"
-  const d =
-    typeof downRaw === 'number'
-      ? downRaw
-      : Number.isFinite(parseInt(downStr, 10))
-      ? parseInt(downStr, 10)
-      : null;
+    // 3) 일반 다운: "n & ytg"
+    const d =
+      typeof downRaw === 'number'
+        ? downRaw
+        : Number.isFinite(parseInt(downStr, 10))
+        ? parseInt(downStr, 10)
+        : null;
 
-  if (d != null) {
-    const ytg = c.yardsToGo ?? 0;
-    return `${d} & ${ytg}`;
-  }
+    if (d != null) {
+      const ytg = c.yardsToGo ?? 0;
+      return `${d} & ${ytg}`;
+    }
 
-  // 다운 정보가 없으면 빈값/대시 등
-  return '';
-};
-  /* ========== 실제 API에서 클립 데이터 가져오기 ========== */
+
+    // 다운 정보가 없으면 빈값/대시 등
+    return '';
+  };
+  /* ========== 예시 클립 데이터(실제 API로 교체) ========== */
   const [rawClips, setRawClips] = useState([]);
   const [clipsLoading, setClipsLoading] = useState(false);
   const [clipsError, setClipsError] = useState(null);
@@ -623,14 +623,6 @@ const getDownDisplay = (c) => {
                 </button>
               </div>
             </div>
-
-            {/* 업로드 모달 버튼 */}
-            <button
-              className="newVideoButton"
-              onClick={() => setShowUpload(true)}
-            >
-              경기 업로드
-            </button>
           </div>
         </div>
 

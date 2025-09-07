@@ -9,8 +9,11 @@ import Google from '../../assets/images/png/AuthPng/Google.png';
 import Eye from '../../assets/images/png/AuthPng/Eye.png';
 import EyeActive from '../../assets/images/png/AuthPng/EyeActive.png';
 
-
-const LoginForm = ({ onSuccess, showForgotPassword = true, className = '' }) => {
+const LoginForm = ({
+  onSuccess,
+  showForgotPassword = true,
+  className = '',
+}) => {
   const { login: authLogin, error: authError, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -50,7 +53,10 @@ const LoginForm = ({ onSuccess, showForgotPassword = true, className = '' }) => 
 
     try {
       // ✨ 수정된 부분: authLogin의 반환 값을 객체로 받음
-      const result = await authLogin({ username: formData.username, password: formData.password });
+      const result = await authLogin({
+        username: formData.username,
+        password: formData.password,
+      });
 
       // ✨ 수정된 부분: 반환된 객체를 기반으로 분기 처리
       if (result.success) {
@@ -65,7 +71,10 @@ const LoginForm = ({ onSuccess, showForgotPassword = true, className = '' }) => 
       }
       // 로그인 실패 시에는 authError가 자동으로 설정되므로 별도 처리가 필요 없습니다.
     } catch (err) {
-      setFormError(err?.message || '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      setFormError(
+        err?.message ||
+          '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -76,14 +85,24 @@ const LoginForm = ({ onSuccess, showForgotPassword = true, className = '' }) => 
 
   return (
     // ... 나머지 JSX는 동일 ...
-    <form onSubmit={handleSubmit} className={`loginForm ${className}`} autoComplete="on">
+    <form
+      onSubmit={handleSubmit}
+      className={`loginForm ${className}`}
+      autoComplete="on"
+    >
       <div className="tab-container">
-        <button type="button" className="loginTitle">로그인</button>
-        <a href="/auth/signup" className="loginTitleTosignup">회원가입</a>
+        <button type="button" className="loginTitle">
+          로그인
+        </button>
+        <a href="/auth/signup" className="loginTitleTosignup">
+          회원가입
+        </a>
       </div>
 
       <div className="formGroup">
-        <label className="LoginformLabel ID" htmlFor="username">아이디</label>
+        <label className="LoginformLabel ID" htmlFor="username">
+          아이디
+        </label>
         <input
           id="username"
           type="text"
@@ -105,7 +124,9 @@ const LoginForm = ({ onSuccess, showForgotPassword = true, className = '' }) => 
         <label className="LoginformLabel PW" htmlFor="password">
           비밀번호
           {showForgotPassword && (
-            <a href="/auth/find" className="forgotPasswordLink">비밀번호 찾기</a>
+            <a href="/auth/find" className="forgotPasswordLink">
+              비밀번호 찾기
+            </a>
           )}
         </label>
 
@@ -157,11 +178,19 @@ const LoginForm = ({ onSuccess, showForgotPassword = true, className = '' }) => 
       </div>
 
       <div className="social-buttons-container">
-        <button type="button" className="socialButton google-button" disabled={isFormLoading}>
+        <button
+          type="button"
+          className="socialButton google-button"
+          disabled={isFormLoading}
+        >
           <img src={Google} alt="google" className="socialicon" />
           구글로 로그인
         </button>
-        <button type="button" className="socialButton kakao-button" disabled={isFormLoading}>
+        <button
+          type="button"
+          className="socialButton kakao-button"
+          disabled={isFormLoading}
+        >
           <img src={Kakao} alt="kakao" className="socialicon" />
           카카오로 로그인
         </button>
