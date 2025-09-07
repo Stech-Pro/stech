@@ -7,7 +7,10 @@ import {
   HttpStatus,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -374,5 +377,20 @@ export class AuthController {
   @ApiResponse({ status: 401, description: '❌ 인증 필요' })
   async checkProfile(@Request() req) {
     return this.authService.checkProfileExists(req.user.id);
+  }
+
+  @Post('upload-avatar')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @UseInterceptors(FileInterceptor('avatar'))
+  @ApiOperation({
+    summary: '프로필 이미지 업로드',
+    description: '프로필 이미지를 S3에 업로드하고 URL을 반환합니다.',
+  })
+  async uploadAvatar(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.authService.uploadAvatar(req.user.id, file);
   }
 }

@@ -1,7 +1,7 @@
 // src/components/Auth/SignupProfileForm.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createProfile, handleAuthError } from '../../api/authAPI';
+import { createProfile } from '../../api/authAPI';
 import { useAuth } from '../../context/AuthContext';
 
 const DAUM_POSTCODE_URL =
@@ -38,9 +38,33 @@ const SignupProfileForm = () => {
     setProfileData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImageChange = (e) => {
-    setProfileData((prev) => ({ ...prev, profileImage: e.target.files[0] }));
-  };
+//   const handleImageUpload = async (file) => {
+//   if (!file) return;
+
+//   try {
+//     const response = await uploadAvatar(file, token);
+//     const avatarUrl = response.data.avatarUrl;
+    
+//     setProfileData(prev => ({
+//       ...prev,
+//       avatarUrl: avatarUrl
+//     }));
+    
+//     alert('이미지 업로드 성공!');
+//   } catch (error) {
+//     console.error('이미지 업로드 오류:', error);
+//     alert('이미지 업로드에 실패했습니다.');
+//   }
+// };
+
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    setProfileData(prev => ({ ...prev, profileImage: file }));
+    // 즉시 업로드하거나 프로필 생성 시 업로드
+    // handleImageUpload(file);
+  }
+};
 
   const handleAddressSearch = () => {
     if (!scriptLoaded) {
@@ -170,24 +194,12 @@ const SignupProfileForm = () => {
       return;
     }
 
-    // 서버 스펙에 맞춰 필드 구성
-    const bioParts = [
-      profileData.position && `포지션:${profileData.position}`,
-      profileData.height && `키:${profileData.height}cm`,
-      profileData.weight && `몸무게:${profileData.weight}kg`,
-      profileData.age && `나이:${profileData.age}`,
-      profileData.grade && `경력:${profileData.grade}`,
-      profileData.nationality && `국적:${profileData.nationality}`,
-      (profileData.address1 || profileData.address2) &&
-        `주소:${profileData.address1} ${profileData.address2 || ''}`,
-    ].filter(Boolean);
-
     // 새로운 createProfile API에 맞춘 데이터 구조
     const payload = {
       realName: profileData.realName.trim(),
       email: profileData.email.trim(),
       nationality: profileData.nationality.trim(),
-      phone: '010-0000-0000', // 기본값 또는 추가 입력 필드 필요
+      phone: profileData.phone.trim(),
       address: `${profileData.address1} ${profileData.address2 || ''}`.trim(),
       height: parseInt(profileData.height),
       weight: parseInt(profileData.weight),
@@ -196,14 +208,20 @@ const SignupProfileForm = () => {
       position: profileData.position.trim(),
       playerID: profileData.playerID.trim(),
     };
+
+    console.log('전송할 payload:', payload); 
    
     try {
       const response = await createProfile(payload, token);
       
+      console.log('프로필 생성 응답:', response); 
+
       // 새 토큰이 반환되면 저장
       if (response.data?.token) {
+        console.log('새 토큰 저장:', response.data.token); // 디버깅용
         localStorage.setItem('token', response.data.token);
       }
+
 
       alert('프로필이 생성되었습니다.');
       navigate('/service');
@@ -254,16 +272,6 @@ const SignupProfileForm = () => {
           >
             삭제
           </button>
-        </div>
-        {/* 서버는 URL만 받으므로 URL 입력 칸 제공(선택) */}
-        <div className="profileformGroup full-width" style={{ marginTop: 12 }}>
-          <input
-            type="text"
-            name="avatarUrl"
-            value={profileData.avatarUrl}
-            onChange={handleChange}
-            placeholder="프로필 이미지 URL (선택)"
-          />
         </div>
       </div>
 

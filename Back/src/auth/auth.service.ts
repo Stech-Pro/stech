@@ -104,11 +104,14 @@ export class AuthService {
       playerId: newUser.playerId || null,
     });
 
+    console.log('발급된 토큰:', token);
+
+    // 회원가입 성공 후 토큰 반환 부분 확인
     return {
       success: true,
       message: '회원가입 성공!',
       data: {
-        token,
+        token, // 토큰이 여기 포함되어야 함
         user: {
           id: newUser._id,
           username: newUser.username,
@@ -231,8 +234,7 @@ export class AuthService {
         $set: {
           'profile.avatar': profileData.avatar,
           'profile.bio': profileData.bio,
-          'profile.
-          ': profileData.playerID,
+          'profile.playerID': profileData.playerID || null,
           'profile.email': profileData.email,
         },
       },
@@ -533,7 +535,7 @@ export class AuthService {
       {
         $set: {
           'profile.realName': profileData.realName,
-          'profile.playerID': profileData.playerID || null,
+          'profile.playerID': profileData.playerID,
           'profile.contactInfo.email': profileData.email,
           'profile.contactInfo.phone': profileData.phone,
           'profile.contactInfo.address': profileData.address,
@@ -549,6 +551,8 @@ export class AuthService {
       },
       { new: true },
     );
+
+    console.log('업데이트된 사용자:', updatedUser);
 
     if (!updatedUser) {
       throw new BadRequestException('프로필 생성에 실패했습니다.');
@@ -581,6 +585,36 @@ export class AuthService {
           realName: updatedUser.profile?.realName,
           playerID: updatedUser.profile?.playerID,
         },
+      },
+    };
+  }
+
+  async uploadAvatar(userId: string, file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('이미지 파일이 없습니다.');
+    }
+
+    // 파일 크기 제한 (예: 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      throw new BadRequestException('파일 크기는 5MB를 초과할 수 없습니다.');
+    }
+
+    // 이미지 파일 타입 확인
+    if (!file.mimetype.startsWith('image/')) {
+      throw new BadRequestException('이미지 파일만 업로드 가능합니다.');
+    }
+
+    // S3 업로드 로직은 나중에 구현
+    const fileName = `avatars/${userId}_${Date.now()}_${file.originalname}`;
+
+    // 임시로 로컬 URL 반환
+    const avatarUrl = `https://temp-url.com/${fileName}`;
+
+    return {
+      success: true,
+      message: '프로필 이미지 업로드 성공',
+      data: {
+        avatarUrl,
       },
     };
   }
