@@ -21,20 +21,21 @@ export interface TeamStatsData {
   rushingYards: number;
   interceptionReturnYards: number;
   puntReturnYards: number;
+  kickoffReturnYards: number;
   turnovers: number;
-  opponentTurnovers: number;
+  opponentTurnovers?: number;
   penaltyYards: number;
   sackYards: number;
   puntAttempts: number;
   puntYards: number;
   fumbles: number;
   fumblesLost: number;
-  touchdowns: number;
-  fieldGoals: number;
-  patGood: number;
-  twoPtGood: number;
-  safeties: number;
-  totalPoints: number;
+  touchdowns?: number;
+  fieldGoals?: number;
+  patGood?: number;
+  twoPtGood?: number;
+  safeties?: number;
+  totalPoints?: number;
   passingAttempts: number;
   passingCompletions: number;
   passingTouchdowns: number;
@@ -43,8 +44,9 @@ export interface TeamStatsData {
   interceptions: number;
   sacks: number;
   kickReturns: number;
-  kickReturnYards: number;
   puntReturns: number;
+  interceptionReturns: number;
+  kickReturnYards: number;
   totalReturnYards: number;
   penalties: number;
   touchbacks: number;
@@ -441,9 +443,65 @@ export class TeamStatsAnalyzerService {
   }
 
   async getTeamStatsByGame(gameKey: string): Promise<TeamStatsResult | null> {
-    console.log('팀 스탯 조회:', gameKey);
-    // TODO: 게임별 팀 스탯 조회 로직 구현
-    return null;
+    console.log('🔍 팀 스탯 조회 시작:', gameKey);
+    const gameStats = await this.teamGameStatsModel.find({ gameKey });
+
+    if (gameStats.length !== 2) {
+      console.log(`❌ 게임 스탯 개수 부족: ${gameStats.length}개 (2개 필요)`);
+      return null;
+    }
+
+    const homeStats = gameStats.find(stat => stat.isHomeGame);
+    const awayStats = gameStats.find(stat => !stat.isHomeGame);
+
+    if (!homeStats || !awayStats) {
+      console.log('❌ 홈/어웨이 스탯을 찾을 수 없습니다');
+      return null;
+    }
+
+    console.log('✅ 팀 스탯 조회 성공');
+    return {
+      homeTeamStats: this.convertToTeamStatsData(homeStats),
+      awayTeamStats: this.convertToTeamStatsData(awayStats),
+    };
+  }
+
+  private convertToTeamStatsData(stats: any): TeamStatsData {
+    return {
+      teamName: stats.teamName,
+      totalYards: stats.stats?.totalYards || 0,
+      passingYards: stats.stats?.passingYards || 0,
+      rushingYards: stats.stats?.rushingYards || 0,
+      interceptionReturnYards: stats.stats?.interceptionReturnYards || 0,
+      puntReturnYards: stats.stats?.puntReturnYards || 0,
+      kickoffReturnYards: stats.stats?.kickoffReturnYards || 0,
+      turnovers: stats.stats?.turnovers || 0,
+      penaltyYards: stats.stats?.penaltyYards || 0,
+      sackYards: stats.stats?.sackYards || 0,
+      puntAttempts: stats.stats?.puntAttempts || 0,
+      puntYards: stats.stats?.puntYards || 0,
+      fumbles: stats.stats?.fumbles || 0,
+      fumblesLost: stats.stats?.fumblesLost || 0,
+      passingAttempts: stats.stats?.passingAttempts || 0,
+      passingCompletions: stats.stats?.passingCompletions || 0,
+      passingTouchdowns: stats.stats?.passingTouchdowns || 0,
+      rushingAttempts: stats.stats?.rushingAttempts || 0,
+      rushingTouchdowns: stats.stats?.rushingTouchdowns || 0,
+      interceptions: stats.stats?.interceptions || 0,
+      sacks: stats.stats?.sacks || 0,
+      kickReturns: stats.stats?.kickReturns || 0,
+      puntReturns: stats.stats?.puntReturns || 0,
+      interceptionReturns: stats.stats?.interceptionReturns || 0,
+      kickReturnYards: stats.stats?.kickReturnYards || 0,
+      totalReturnYards: stats.stats?.totalReturnYards || 0,
+      penalties: stats.stats?.penalties || 0,
+      touchbacks: stats.stats?.touchbacks || 0,
+      fieldGoalAttempts: stats.stats?.fieldGoalAttempts || 0,
+      // 옵셔널 필드들
+      touchdowns: stats.stats?.touchdowns,
+      fieldGoals: stats.stats?.fieldGoals,
+      totalPoints: stats.stats?.totalPoints,
+    };
   }
 
   async analyzeGameForDisplay(gameData: any) {
@@ -654,6 +712,8 @@ export class TeamStatsAnalyzerService {
       kickReturnYards: 0,
       puntReturns: 0,
       puntReturnYards: 0,
+      kickoffReturnYards: 0,
+      interceptionReturns: 0,
       totalReturnYards: 0,
       penalties: 0,
       touchbacks: 0,

@@ -12,6 +12,9 @@ import {
 } from '../../schemas/player-total-stats.schema';
 import { Player, PlayerDocument } from '../../schemas/player.schema';
 import { TeamTotalStats, TeamTotalStatsDocument } from '../../schemas/team-total-stats.schema';
+import { TeamGameStats, TeamGameStatsDocument } from '../../schemas/team-game-stats.schema';
+import { GameInfo, GameInfoDocument } from '../../schemas/game-info.schema';
+import { GameClips, GameClipsDocument } from '../../schemas/game-clips.schema';
 import { NewClipDto } from '../dto/new-clip.dto';
 
 @Injectable()
@@ -26,6 +29,12 @@ export class StatsManagementService {
     @InjectModel(Player.name) private playerModel: Model<PlayerDocument>,
     @InjectModel(TeamTotalStats.name)
     private teamTotalStatsModel: Model<TeamTotalStatsDocument>,
+    @InjectModel(TeamGameStats.name)
+    private teamGameStatsModel: Model<TeamGameStatsDocument>,
+    @InjectModel(GameInfo.name)
+    private gameInfoModel: Model<GameInfoDocument>,
+    @InjectModel(GameClips.name)
+    private gameClipsModel: Model<GameClipsDocument>,
   ) {}
 
   /**
@@ -514,5 +523,49 @@ export class StatsManagementService {
     const result = await this.teamTotalStatsModel.deleteMany({});
     console.log(`🗑️ ${result.deletedCount}개 팀의 누적 스탯이 삭제되었습니다`);
     return { deletedCount: result.deletedCount };
+  }
+
+  /**
+   * 팀 경기별 스탯 초기화 
+   */
+  async resetTeamGameStats() {
+    const result = await this.teamGameStatsModel.deleteMany({});
+    console.log(`🗑️ ${result.deletedCount}개 팀의 경기별 스탯이 삭제되었습니다`);
+    return { deletedCount: result.deletedCount };
+  }
+
+  /**
+   * 게임 정보 초기화
+   */
+  async resetGameInfos() {
+    const result = await this.gameInfoModel.deleteMany({});
+    console.log(`🗑️ ${result.deletedCount}개 게임 정보가 삭제되었습니다`);
+    return { deletedCount: result.deletedCount };
+  }
+
+  /**
+   * 게임 클립 초기화
+   */
+  async resetGameClips() {
+    const result = await this.gameClipsModel.deleteMany({});
+    console.log(`🗑️ ${result.deletedCount}개 게임 클립이 삭제되었습니다`);
+    return { deletedCount: result.deletedCount };
+  }
+
+  /**
+   * 선수 개별 스탯 초기화 (GameStats, SeasonStats, TotalStats)
+   */
+  async resetPlayerStats() {
+    const gameStatsResult = await this.playerGameStatsModel.deleteMany({});
+    const seasonStatsResult = await this.playerSeasonStatsModel.deleteMany({});
+    const totalStatsResult = await this.playerTotalStatsModel.deleteMany({});
+    
+    console.log(`🗑️ 선수 스탯 삭제: Game(${gameStatsResult.deletedCount}), Season(${seasonStatsResult.deletedCount}), Total(${totalStatsResult.deletedCount})`);
+    
+    return {
+      gameStats: gameStatsResult.deletedCount,
+      seasonStats: seasonStatsResult.deletedCount, 
+      totalStats: totalStatsResult.deletedCount
+    };
   }
 }

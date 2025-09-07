@@ -49,6 +49,7 @@ export class GameClips {
     tkl: { num: number | null; pos: string | null };
     tkl2: { num: number | null; pos: string | null };
     significantPlays: Array<string | null>;
+    clipUrl?: string; // 비디오 URL 추가
   }>;
 }
 

@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { GameInfo, GameInfoDocument } from '../schemas/game-info.schema';
 import { GameClips, GameClipsDocument } from '../schemas/game-clips.schema';
+import { TeamGameStats, TeamGameStatsDocument } from '../schemas/team-game-stats.schema';
+import { TeamTotalStats, TeamTotalStatsDocument } from '../schemas/team-total-stats.schema';
 
 @Injectable()
 export class GameService {
@@ -11,6 +13,10 @@ export class GameService {
     private gameInfoModel: Model<GameInfoDocument>,
     @InjectModel(GameClips.name)
     private gameClipsModel: Model<GameClipsDocument>,
+    @InjectModel(TeamGameStats.name)
+    private teamGameStatsModel: Model<TeamGameStatsDocument>,
+    @InjectModel(TeamTotalStats.name)
+    private teamTotalStatsModel: Model<TeamTotalStatsDocument>,
   ) {}
 
   async createGameInfo(gameData: any): Promise<GameInfo> {
@@ -66,7 +72,40 @@ export class GameService {
   }
 
   async deleteGameInfo(gameKey: string): Promise<any> {
-    return this.gameInfoModel.deleteOne({ gameKey }).exec();
+    console.log(`🗑️ 게임 ${gameKey} 관련 모든 데이터 삭제 시작...`);
+    
+    try {
+      // 1. GameInfo 삭제
+      const gameInfoResult = await this.gameInfoModel.deleteOne({ gameKey }).exec();
+      console.log(`✅ GameInfo 삭제: ${gameInfoResult.deletedCount}개`);
+
+      // 2. GameClips 삭제
+      const gameClipsResult = await this.gameClipsModel.deleteOne({ gameKey }).exec();
+      console.log(`✅ GameClips 삭제: ${gameClipsResult.deletedCount}개`);
+
+      // 3. TeamGameStats 삭제 (해당 게임의 모든 팀 통계)
+      const teamGameStatsResult = await this.teamGameStatsModel.deleteMany({ gameKey }).exec();
+      console.log(`✅ TeamGameStats 삭제: ${teamGameStatsResult.deletedCount}개`);
+
+      // 4. TeamTotalStats는 재계산이 필요하므로 삭제 후 재생성
+      const teamTotalStatsResult = await this.teamTotalStatsModel.deleteMany({}).exec();
+      console.log(`✅ TeamTotalStats 삭제 (전체 재계산 필요): ${teamTotalStatsResult.deletedCount}개`);
+
+      console.log(`🎉 게임 ${gameKey} 관련 모든 데이터 삭제 완료`);
+      
+      return {
+        success: true,
+        deletedCounts: {
+          gameInfo: gameInfoResult.deletedCount,
+          gameClips: gameClipsResult.deletedCount,
+          teamGameStats: teamGameStatsResult.deletedCount,
+          teamTotalStats: teamTotalStatsResult.deletedCount
+        }
+      };
+    } catch (error) {
+      console.error(`❌ 게임 ${gameKey} 삭제 실패:`, error);
+      throw error;
+    }
   }
 
   // 경기 클립 데이터 저장 (전체 데이터 포함)

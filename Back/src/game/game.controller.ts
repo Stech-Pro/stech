@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Delete,
   Param,
   UseInterceptors,
   UploadedFile,
@@ -24,6 +25,7 @@ import {
 import { PlayerService } from '../player/player.service';
 import { TeamStatsAnalyzerService } from '../team/team-stats-analyzer.service';
 import { GameService } from './game.service';
+import { S3Service } from '../common/services/s3.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import {
@@ -45,6 +47,7 @@ export class GameController {
     @Inject(forwardRef(() => TeamStatsAnalyzerService))
     private readonly teamStatsService: TeamStatsAnalyzerService,
     private readonly gameService: GameService,
+    private readonly s3Service: S3Service,
   ) {}
 
   @Post('upload-json')
@@ -756,6 +759,145 @@ export class GameController {
         accessLevel: 'player',
       };
     }
+  }
+
+  @Get('clips/:gameKey')
+  @ApiOperation({
+    summary: '🎬 경기별 클립 데이터 조회',
+    description: 'gameKey로 특정 경기의 모든 클립 데이터를 조회합니다.',
+  })
+  @ApiParam({
+    name: 'gameKey',
+    description: '조회할 게임 키',
+    example: 'SNUS20240907',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 클립 데이터 조회 성공',
+    schema: {
+      example: {
+        success: true,
+        message: 'SNUS20240907 경기 클립 데이터 조회 성공',
+        data: {
+          gameKey: 'SNUS20240907',
+          homeTeam: 'SNGreenTerrors',
+          awayTeam: 'USCityhawks',
+          date: '2024-09-07(토) 10:00',
+          Clips: [
+            {
+              clipKey: '1',
+              offensiveTeam: 'SNGreenTerrors',
+              quarter: 1,
+              down: 1,
+              toGoYard: 10,
+              playType: 'PASSING',
+              gainYard: 15,
+              car: { num: 12, pos: 'QB' },
+              significantPlays: ['TOUCHDOWN', null, null, null]
+            }
+          ]
+        },
+        totalClips: 45
+      }
+    }
+  })
+  @ApiResponse({
+    status: 404,
+    description: '❌ 클립 데이터를 찾을 수 없음',
+  })
+  async getGameClips(@Param('gameKey') gameKey: string) {
+    const clips = await this.gameService.getGameClipsByKey(gameKey);
+    
+    if (!clips) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `${gameKey} 경기의 클립 데이터를 찾을 수 없습니다`,
+          code: 'CLIPS_NOT_FOUND',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    try {
+      // S3에서 비디오 URL들 가져오기
+      console.log(`🎬 ${gameKey}의 ${clips.Clips.length}개 클립에 대한 비디오 URL 생성 시작`);
+      
+      const videoUrls = await this.s3Service.generateClipUrls(gameKey, clips.Clips.length);
+      
+      // 클립 데이터에 videoUrl 추가
+      const clipsWithUrls = clips.Clips.map((clip, index) => ({
+        ...clip,
+        clipUrl: videoUrls[index] || null, // URL이 없으면 null
+      }));
+
+      // 원본 데이터 구조 유지하면서 Clips만 수정
+      const responseData = {
+        ...(clips as any).toObject(),
+        Clips: clipsWithUrls,
+      };
+
+      console.log(`✅ ${gameKey} 클립 URL 매핑 완료: ${videoUrls.length}/${clips.Clips.length}`);
+
+      return {
+        success: true,
+        message: `${gameKey} 경기 클립 데이터 조회 성공`,
+        data: responseData,
+        totalClips: clips.Clips?.length || 0,
+        videoUrlsGenerated: videoUrls.length,
+      };
+    } catch (error) {
+      console.error(`❌ ${gameKey} 비디오 URL 생성 실패:`, error);
+      
+      // S3 오류가 있어도 클립 데이터는 반환 (clipUrl 없이)
+      return {
+        success: true,
+        message: `${gameKey} 경기 클립 데이터 조회 성공 (비디오 URL 생성 실패)`,
+        data: clips,
+        totalClips: clips.Clips?.length || 0,
+        warning: 'S3 비디오 URL 생성에 실패했습니다',
+      };
+    }
+  }
+
+  @Delete(':gameKey')
+  @ApiOperation({
+    summary: '🗑️ 경기 데이터 완전 삭제',
+    description: '게임 키로 경기와 관련된 모든 데이터를 삭제합니다 (GameInfo, GameClips, TeamGameStats, TeamTotalStats)',
+  })
+  @ApiParam({
+    name: 'gameKey',
+    description: '삭제할 게임 키',
+    example: 'SNUS20240907',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 경기 데이터 삭제 성공',
+    schema: {
+      example: {
+        success: true,
+        message: 'SNUS20240907 경기 관련 모든 데이터가 삭제되었습니다',
+        deletedCounts: {
+          gameInfo: 1,
+          gameClips: 1,
+          teamGameStats: 2,
+          teamTotalStats: 5
+        }
+      }
+    }
+  })
+  @ApiResponse({
+    status: 404,
+    description: '❌ 경기를 찾을 수 없음',
+  })
+  async deleteGameByKey(@Param('gameKey') gameKey: string) {
+    const result = await this.gameService.deleteGameInfo(gameKey);
+    
+    return {
+      success: true,
+      message: `${gameKey} 경기 관련 모든 데이터가 삭제되었습니다`,
+      ...result,
+    };
   }
 
   @Get(':gameKey')
