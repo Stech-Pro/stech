@@ -364,9 +364,14 @@ const UploadVideoModal = ({
     setError('');
     if (!home || !away) return setError('홈/원정 팀을 선택해 주세요.');
     if (!matchDate) return setError('경기 날짜를 선택해 주세요.');
-    
+
     // ✨ 업로드할 파일이 하나라도 있는지 확인 (배열 길이 체크)
-    if (q1.length === 0 && q2.length === 0 && q3.length === 0 && q4.length === 0) {
+    if (
+      q1.length === 0 &&
+      q2.length === 0 &&
+      q3.length === 0 &&
+      q4.length === 0
+    ) {
       return setError('최소 1개 분기 영상을 업로드해 주세요.');
     }
 
@@ -491,7 +496,6 @@ const UploadVideoModal = ({
                 value={gameType}
                 onChange={(e) => setGameType(e.target.value)}
               >
-                <option>리그</option>
                 <option>친선전</option>
                 <option>연습 경기</option>
               </select>
