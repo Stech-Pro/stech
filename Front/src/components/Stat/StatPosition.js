@@ -180,42 +180,42 @@ const parsePair = (str) => {
 
 /* 포지션/카테고리 기본 정렬 키(주황) */
 const PRIMARY_METRIC = {
-  QB: { pass: 'passing_yards', run: 'rushing_yards' },
+  QB: { 패스: 'passing_yards', 런: 'rushing_yards' },
   RB: {
-    run: 'rushing_yards',
-    pass: 'receiving_yards',
+    런: 'rushing_yards',
+    패스: 'receiving_yards',
     스페셜팀: 'kick_return_yards',
   },
   WR: {
-    pass: 'receiving_yards',
-    run: 'rushing_yards',
+    패스: 'receiving_yards',
+    런: 'rushing_yards',
     스페셜팀: 'kick_return_yards',
   },
-  TE: { pass: 'receiving_yards', run: 'rushing_yards' },
+  TE: { 패스: 'receiving_yards', 런: 'rushing_yards' },
   K: { 스페셜팀: 'field_goal_percentage' },
   P: { 스페셜팀: 'average_punt_yard' },
   OL: { default: 'offensive_snaps_played' },
   DL: { default: 'sacks' },
   LB: { default: 'tackles' },
-  DB: { defense: 'interceptions', 스페셜팀: 'kick_return_yards' },
+  DB: { 수비: 'interceptions', 스페셜팀: 'kick_return_yards' },
 };
 
 const POSITION_CATEGORIES = {
-  QB: ['pass', 'run'],
-  RB: ['run', 'pass', '스페셜팀'],
-  WR: ['pass', 'run', '스페셜팀'],
-  TE: ['pass', 'run'],
+  QB: ['패스', '런'],
+  RB: ['패스', '런', '스페셜팀'],
+  WR: ['패스', '런', '스페셜팀'],
+  TE: ['패스', '런'],
   K: ['스페셜팀'],
   P: ['스페셜팀'],
   OL: ['default'],
   DL: ['default'],
   LB: ['default'],
-  DB: ['defense', '스페셜팀'],
+  DB: ['수비', '스페셜팀'],
 };
 
 const statColumns = {
   QB: {
-    pass: [
+    패스: [
       { key: 'games', label: '경기 수' },
       { key: 'passing_attempts', label: '패스 시도 수' },
       { key: 'pass_completions', label: '패스 성공 수' },
@@ -226,7 +226,7 @@ const statColumns = {
       { key: 'longest_pass', label: '가장 긴 패스' },
       { key: 'sacks', label: '경기 당 색 허용 수' },
     ],
-    run: [
+    런: [
       { key: 'games', label: '경기 수' },
       { key: 'rushing_attempts', label: '러싱 시도 수' },
       { key: 'rushing_yards', label: '러싱 야드' },
@@ -236,7 +236,7 @@ const statColumns = {
     ],
   },
   RB: {
-    run: [
+    런: [
       { key: 'games', label: '경기 수' },
       { key: 'rushing_attempts', label: '러싱 시도 수' },
       { key: 'rushing_yards', label: '러싱 야드' },
@@ -246,7 +246,7 @@ const statColumns = {
       { key: 'rushingFumbles', label: '펌블 수' },
       { key: 'rushingFumblesLost', label: '펌블 턴오버 수' },
     ],
-    pass: [
+    패스: [
       { key: 'games', label: '경기 수' },
       { key: 'targets', label: '패스 타겟 수' },
       { key: 'receptions', label: '패스 캐치 수' },
@@ -270,7 +270,7 @@ const statColumns = {
     ],
   },
   WR: {
-    pass: [
+    패스: [
       { key: 'games', label: '경기 수' },
       { key: 'targets', label: '패스 타겟 수' },
       { key: 'receptions', label: '패스 캐치 수' },
@@ -282,7 +282,7 @@ const statColumns = {
       { key: 'passingFumbles', label: '펌블 수' },
       { key: 'passingFumblesLost', label: '펌블 턴오버 수' },
     ],
-    run: [
+    런: [
       { key: 'games', label: '경기 수' },
       { key: 'rushing_attempts', label: '러싱 시도 수' },
       { key: 'rushing_yards', label: '러싱 야드' },
@@ -304,7 +304,7 @@ const statColumns = {
     ],
   },
   TE: {
-    pass: [
+    패스: [
       { key: 'games', label: '경기 수' },
       { key: 'targets', label: '패스 타겟 수' },
       { key: 'receptions', label: '패스 캐치 수' },
@@ -315,7 +315,7 @@ const statColumns = {
       { key: 'fumbles', label: '펌블 수' },
       { key: 'fumbles_lost', label: '펌블 턴오버 수' },
     ],
-    run: [
+    런: [
       { key: 'games', label: '경기 수' },
       { key: 'rushing_attempts', label: '러싱 시도 수' },
       { key: 'rushing_yards', label: '러싱 야드' },
@@ -418,7 +418,7 @@ const statColumns = {
     ],
   },
   DB: {
-    defense: [
+    수비: [
       { key: 'games', label: '경기 수' },
       { key: 'tackles', label: '태클 수' },
       { key: 'TFL', label: 'TFL' },
@@ -448,7 +448,7 @@ export default function StatPosition({ data, teams = [] }) {
   const [league, setLeague] = useState('서울');
   const [division, setDivision] = useState('1부');
   const [position, setPosition] = useState('QB');
-  const [category, setCategory] = useState('pass');
+  const [category, setCategory] = useState('패스');
   const [leagueSelected, setLeagueSelected] = useState(false);
   const categories = useMemo(
     () => POSITION_CATEGORIES[position] || ['default'],

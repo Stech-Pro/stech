@@ -125,7 +125,7 @@ const TEAM_TO_LEAGUE = {
 
 const LEAGUE_OPTIONS = [...Array.from(new Set(Object.values(TEAM_TO_LEAGUE)))];
 const DIVISION_OPTIONS = ['1부', '2부'];
-const PLAY_TYPES = ['득점/경기', 'run', 'pass', '스페셜팀', '기타']; // ← 유형 드롭다운
+const PLAY_TYPES = ['득점/경기', '런', '패스', '스페셜팀', '기타']; // ← 유형 드롭다운
 
 /* ─────────────────────────  정렬/컬럼 정의  ───────────────────────── */
 const LOWER_IS_BETTER = new Set([
@@ -211,8 +211,8 @@ const BACKEND_TO_FRONTEND_TEAM = {
 // 카테고리별 기본 정렬 키
 const PRIMARY_TEAM_METRIC = {
   '득점/경기': 'total_yards',
-  pass: 'pass_completions-attempts',
-  run: 'rushing_attempts',
+  패스: 'pass_completions-attempts',
+  런: 'rushing_attempts',
   스페셜팀: 'total_return_yards',
   기타: 'turnover_per_game',
 };
@@ -228,7 +228,7 @@ const TEAM_COLUMNS = {
     { key: 'yards_per_game', label: '경기당 전진 야드' },
   ],
   // 러시
-  run: [
+  런: [
     { key: 'rushing_attempts', label: '러싱 시도' },
     { key: 'rushing_yards', label: '러싱 야드' },
     { key: 'yards_per_carry', label: '볼 캐리 당 러싱 야드' },
@@ -236,7 +236,7 @@ const TEAM_COLUMNS = {
     { key: 'rushing_td', label: '러싱 터치다운' },
   ],
   // 패스
-  pass: [
+  패스: [
     { key: 'pass_completions-attempts', label: '패스 성공-패스 시도' },
     { key: 'passing_yards', label: '패싱 야드' },
     {
