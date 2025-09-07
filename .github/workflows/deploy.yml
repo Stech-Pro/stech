@@ -2,7 +2,7 @@ name: Deploy Frontend and Backend
 
 on:
   push:
-    branches: [main, dev1.4]
+    branches: [main]
 
 jobs:
   deploy-frontend:
@@ -57,4 +57,4 @@ jobs:
       - name: Health Check
         run: |
           sleep 30
-          curl -f http://${{ secrets.EC2_HOST }}:4000/health || exit 1
+          curl -f http://${{ secrets.EC2_HOST }}:4000/api/health || exit 1
