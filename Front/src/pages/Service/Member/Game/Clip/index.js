@@ -211,7 +211,7 @@ export default function ClipPage() {
     setStatsLoading(true);
     setStatsError(null);
 
-    fetch(`/api/team/stats/${encodeURIComponent(key)}`)
+    fetch(`/team/stats/${encodeURIComponent(key)}`)
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
@@ -291,110 +291,81 @@ export default function ClipPage() {
       return `${d} & ${ytg}`;
     }
 
+
     // 다운 정보가 없으면 빈값/대시 등
     return '';
   };
   /* ========== 예시 클립 데이터(실제 API로 교체) ========== */
   const [rawClips, setRawClips] = useState([]);
+  const [clipsLoading, setClipsLoading] = useState(false);
+  const [clipsError, setClipsError] = useState(null);
+
   useEffect(() => {
-    if (!teamOptions.length) return;
-    setRawClips([
-      {
-        id: 'p1',
-        quarter: 1,
-        clipUrl:
-          'https://res.cloudinary.com/dhmq7d7no/video/upload/v1753534853/IMG_3313_r3dhah.mov',
-        playType: 'KICKOFF',
-        down: 'kickoff',
-        significantPlay: [],
-        offensiveTeam: '한양대 라이온스',
-      },
-      {
-        id: 'p2',
-        quarter: 1,
-        playType: 'RUN',
-        down: 1,
-        yardsToGo: 10,
-        significantPlay: ['TFL'],
-        offensiveTeam: '한양대 라이온스',
-      },
-      {
-        id: 'p3',
-        quarter: 1,
-        playType: 'PASS',
-        down: 3,
-        yardsToGo: 7,
-        significantPlay: ['색'],
-        offensiveTeam: '한양대 라이온스',
-      },
-      // Q2
-      {
-        id: 'p4',
-        quarter: 2,
-        playType: 'PASS',
-        down: 2,
-        yardsToGo: 5,
-        significantPlay: ['인터셉트', '턴오버'],
-        offensiveTeam: '한양대 라이온스',
-      },
-      {
-        id: 'p5',
-        quarter: 2,
-        playType: 'RUN',
-        down: 1,
-        yardsToGo: 10,
-        significantPlay: ['펌블', '턴오버'],
-        offensiveTeam: '연세대 이글스',
-      },
-      {
-        id: 'p6',
-        quarter: 2,
-        playType: 'PASS',
-        down: 3,
-        yardsToGo: 12,
-        significantPlay: ['터치다운', 'PAT 성공'],
-        offensiveTeam: '한양대 라이온스',
-      },
-      // Q3
-      {
-        id: 'p7',
-        quarter: 3,
-        playType: 'RUN',
-        down: 2,
-        yardsToGo: 3,
-        significantPlay: ['2PT 실패'],
-        offensiveTeam: '연세대 이글스',
-      },
-      {
-        id: 'p8',
-        quarter: 3,
-        playType: 'PASS',
-        down: 1,
-        yardsToGo: 10,
-        significantPlay: ['페널티'],
-        offensiveTeam: '연세대 이글스',
-      },
-      // Q4
-      {
-        id: 'p9',
-        quarter: 4,
-        playType: 'PASS',
-        down: 'pat',
-        yardsToGo: 8,
-        significantPlay: ['FG 성공'],
-        offensiveTeam: '한양대 라이온스',
-      },
-      {
-        id: 'p10',
-        quarter: 4,
-        playType: 'RUN',
-        down: 'tpt',
-        yardsToGo: 1,
-        significantPlay: ['세이프티'],
-        offensiveTeam: '연세대 이글스',
-      },
-    ]);
-  }, [teamOptions]);
+    const key = game?.gameKey || gameKey;
+    if (!key) return;
+
+    let abort = false;
+    setClipsLoading(true);
+    setClipsError(null);
+
+    fetch(`/game/clips/${encodeURIComponent(key)}`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((json) => {
+        if (abort) return;
+        const clipsData = json?.data?.Clips || [];
+        
+        // API 데이터를 프론트엔드 형식으로 변환
+        const transformedClips = clipsData.map(clip => ({
+          id: clip.clipKey,
+          quarter: clip.quarter,
+          playType: clip.playType,
+          down: clip.down,
+          yardsToGo: clip.toGoYard,
+          significantPlay: clip.significantPlays?.filter(p => p !== null) || [],
+          offensiveTeam: clip.offensiveTeam,
+          gainYard: clip.gainYard,
+          clipUrl: clip.clipUrl || null
+        }));
+        
+        setRawClips(transformedClips);
+      })
+      .catch((err) => {
+        if (!abort) {
+          console.error('클립 데이터 조회 오류:', err);
+          setClipsError(err);
+          // 오류시 목업 데이터 사용
+          setRawClips([
+            {
+              id: 'mock1',
+              quarter: 1,
+              playType: 'KICKOFF',
+              down: 'kickoff',
+              significantPlay: [],
+              offensiveTeam: homeMeta?.name || '홈팀',
+            },
+            {
+              id: 'mock2',
+              quarter: 1,
+              playType: 'RUN',
+              down: 1,
+              yardsToGo: 10,
+              significantPlay: ['TFL'],
+              offensiveTeam: homeMeta?.name || '홈팀',
+            }
+          ]);
+        }
+      })
+      .finally(() => {
+        if (!abort) setClipsLoading(false);
+      });
+
+    return () => {
+      abort = true;
+    };
+  }, [game?.gameKey, gameKey, homeMeta?.name]);
 
   /* ========== 훅 사용 (필터/클립/요약/초기화/네비) ========== */
   const persistKey = `clipFilters:${game?.gameKey || gameKey || 'default'}`;

@@ -27,6 +27,8 @@ import { PlayerSeasonStats, PlayerSeasonStatsSchema } from '../schemas/player-se
 import { PlayerTotalStats, PlayerTotalStatsSchema } from '../schemas/player-total-stats.schema';
 import { TeamGameStats, TeamGameStatsSchema } from '../schemas/team-game-stats.schema';
 import { TeamTotalStats, TeamTotalStatsSchema } from '../schemas/team-total-stats.schema';
+import { GameInfo, GameInfoSchema } from '../schemas/game-info.schema';
+import { GameClips, GameClipsSchema } from '../schemas/game-clips.schema';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { TeamTotalStats, TeamTotalStatsSchema } from '../schemas/team-total-stat
       { name: PlayerTotalStats.name, schema: PlayerTotalStatsSchema },
       { name: TeamGameStats.name, schema: TeamGameStatsSchema },
       { name: TeamTotalStats.name, schema: TeamTotalStatsSchema },
+      { name: GameInfo.name, schema: GameInfoSchema },
+      { name: GameClips.name, schema: GameClipsSchema },
     ]),
     forwardRef(() => TeamModule),
   ],

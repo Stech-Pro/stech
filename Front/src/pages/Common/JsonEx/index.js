@@ -190,7 +190,7 @@ export default function JsonEx() {
   // 스탯 초기화
   // ──────────────────────────────
   const handleResetStats = useCallback(async () => {
-    if (!window.confirm('⚠️ 모든 선수 데이터와 팀 스탯을 완전히 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다!')) {
+    if (!window.confirm('⚠️ 모든 게임 데이터, 선수 데이터, 팀 스탯을 완전히 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다!')) {
       return;
     }
 
@@ -198,22 +198,15 @@ export default function JsonEx() {
       setResetStatus("resetting");
       setResetMessage("");
 
-      // 1. 모든 선수 데이터 삭제
+      // 새로운 통합 삭제 API 사용 - 모든 데이터를 한 번에 삭제
       await axios.post(
-        `${API_CONFIG.BASE_URL}/player/reset-all`,
-        {},
-        { timeout: API_CONFIG.TIMEOUT }
-      );
-
-      // 2. 팀 스탯 초기화 (모든 팀)
-      await axios.post(
-        `${API_CONFIG.BASE_URL}/player/reset-team-stats/all`,
+        `${API_CONFIG.BASE_URL}/player/reset-all-data`,
         {},
         { timeout: API_CONFIG.TIMEOUT }
       );
 
       setResetStatus("success");
-      setResetMessage("모든 선수 데이터가 성공적으로 삭제되었습니다!");
+      setResetMessage("모든 게임 데이터, 선수 데이터, 팀 스탯이 성공적으로 삭제되었습니다!");
       
       // 3초 후 자동으로 상태 리셋
       setTimeout(() => {
@@ -303,7 +296,7 @@ export default function JsonEx() {
       <div style={{ marginBottom: '20px', padding: '15px', border: '2px solid #ff6b6b', borderRadius: '8px', backgroundColor: '#ffe0e0' }}>
         <h3 style={{ color: '#d63031', marginBottom: '10px' }}>⚠️ 위험한 작업</h3>
         <p style={{ marginBottom: '15px', color: '#666' }}>
-          모든 선수 데이터와 팀 스탯을 완전히 삭제합니다. 이 작업은 되돌릴 수 없습니다!
+          모든 게임 데이터, 선수 데이터, 팀 스탯을 완전히 삭제합니다. 이 작업은 되돌릴 수 없습니다!
         </p>
         <button
           type="button"
@@ -320,7 +313,7 @@ export default function JsonEx() {
             fontWeight: 'bold'
           }}
         >
-          {resetStatus === "resetting" ? "🔄 삭제 중..." : "🗑️ 모든 선수 데이터 삭제"}
+          {resetStatus === "resetting" ? "🔄 삭제 중..." : "🗑️ 모든 데이터 삭제"}
         </button>
         
         {/* 초기화 상태 메시지 */}

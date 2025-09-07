@@ -579,6 +579,86 @@ export class PlayerController {
     }
   }
 
+  @Post('reset-team-game-stats')
+  @ApiOperation({
+    summary: '🗑️ 팀 경기별 스탯 전체 삭제',
+    description: 'team_game_stats 컬렉션의 모든 데이터를 삭제합니다. (개발/테스트용)',
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: '팀 경기별 스탯 삭제 성공'
+  })
+  async resetTeamGameStats() {
+    try {
+      const result = await this.statsManagementService.resetTeamGameStats();
+
+      return {
+        success: true,
+        message: '팀 경기별 스탯이 삭제되었습니다',
+        deletedCount: result.deletedCount,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error('❌ 팀 경기별 스탯 삭제 실패:', error);
+      return {
+        success: false,
+        message: '팀 경기별 스탯 삭제 중 오류가 발생했습니다',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
+  @Post('reset-all-data')
+  @ApiOperation({
+    summary: '🚨 모든 데이터 완전 삭제',
+    description: '선수, 게임정보, 클립, 팀통계 등 모든 데이터를 삭제합니다. (개발/테스트용 - 주의!)',
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: '모든 데이터 삭제 성공'
+  })
+  async resetAllData() {
+    try {
+      console.log('🚨 모든 데이터 완전 삭제 시작...');
+      
+      const results = await Promise.all([
+        this.playerService.resetAllPlayerData(),
+        this.statsManagementService.resetPlayerStats(),
+        this.statsManagementService.resetTeamTotalStats(),
+        this.statsManagementService.resetTeamGameStats(),
+        this.statsManagementService.resetGameInfos(),
+        this.statsManagementService.resetGameClips(),
+      ]);
+
+      const deletedCounts = {
+        players: results[0].deletedCount,
+        playerStats: results[1],
+        teamTotalStats: results[2].deletedCount, 
+        teamGameStats: results[3].deletedCount,
+        gameInfos: results[4].deletedCount,
+        gameClips: results[5].deletedCount,
+      };
+
+      console.log('🎉 모든 데이터 삭제 완료:', deletedCounts);
+
+      return {
+        success: true,
+        message: '모든 데이터가 삭제되었습니다',
+        deletedCounts,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error('❌ 전체 데이터 삭제 실패:', error);
+      return {
+        success: false,
+        message: '전체 데이터 삭제 중 오류가 발생했습니다',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
+
   @Get('my-stats')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
