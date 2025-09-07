@@ -7,11 +7,13 @@ const AuthLayout = () => {
     <div
       className="authLayoutContainer"
       style={{
-        height: '100vh',
+        widht: '100vw',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: '#141414',
+        overflow: 'auto',
+        margin:0,
       }}
     >
       <div>

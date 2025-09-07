@@ -28,6 +28,7 @@ import {
   ResetPasswordDto,
   VerifyPasswordDto,
   CheckUserExistsDto,
+  CreateProfileDto,
 } from '../common/dto/auth.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
@@ -343,5 +344,35 @@ export class AuthController {
       req.user.id,
       verifyPasswordDto.password,
     );
+  }
+  @Post('create-profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '👤 프로필 생성',
+    description: '회원가입 후 상세 프로필을 생성합니다.',
+  })
+  @ApiResponse({ status: 200, description: '✅ 프로필 생성 성공' })
+  @ApiResponse({ status: 401, description: '❌ 인증 필요' })
+  async createProfile(
+    @Request() req,
+    @Body() createProfileDto: CreateProfileDto,
+  ) {
+    return this.authService.createProfile(req.user.id, createProfileDto);
+  }
+
+  @Post('check-profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '🔍 프로필 존재 여부 확인',
+    description: '사용자의 프로필이 생성되어 있는지 확인합니다.',
+  })
+  @ApiResponse({ status: 200, description: '✅ 프로필 상태 확인' })
+  @ApiResponse({ status: 401, description: '❌ 인증 필요' })
+  async checkProfile(@Request() req) {
+    return this.authService.checkProfileExists(req.user.id);
   }
 }

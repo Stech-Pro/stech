@@ -90,7 +90,7 @@ export class ProfileDto {
   @IsNumber()
   age?: number;
 
-  @ApiProperty({ description: '학년', required: false })
+  @ApiProperty({ description: '년', required: false })
   @IsOptional()
   @IsNumber()
   grade?: number;

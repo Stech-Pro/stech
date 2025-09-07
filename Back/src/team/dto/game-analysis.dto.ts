@@ -3,135 +3,135 @@ import { ApiProperty } from '@nestjs/swagger';
 export class GameAnalysisRequestDto {
   @ApiProperty({
     description: '분석할 경기의 gameKey',
-    example: 'SNUS240908'
+    example: 'SNUS240908',
   })
   gameKey: string;
 }
 
 export class PlayCallRatioDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: '런 플레이 수',
-    example: 25 
+    example: 25,
   })
   runPlays: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '패스 플레이 수',
-    example: 35 
+    example: 35,
   })
   passPlays: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '런 비율 (%)',
-    example: 42 
+    example: 42,
   })
   runPercentage: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '패스 비율 (%)',
-    example: 58 
+    example: 58,
   })
   passPercentage: number;
 }
 
 export class ThirdDownStatsDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: '3rd down 시도 수',
-    example: 12 
+    example: 12,
   })
   attempts: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '3rd down 성공 수',
-    example: 5 
+    example: 5,
   })
   conversions: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '3rd down 성공률 (%)',
-    example: 42 
+    example: 42,
   })
   percentage: number;
 }
 
 export class TeamGameAnalysisDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: '팀명',
-    example: 'SNGreenTerrors' 
+    example: 'SNGreenTerrors',
   })
   teamName: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '플레이콜 비율',
-    type: PlayCallRatioDto 
+    type: PlayCallRatioDto,
   })
   playCallRatio: PlayCallRatioDto;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '총 야드',
-    example: 325 
+    example: 325,
   })
   totalYards: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '패싱 야드',
-    example: 185 
+    example: 185,
   })
   passingYards: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '러싱 야드',
-    example: 140 
+    example: 140,
   })
   rushingYards: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '3rd down 스탯',
-    type: ThirdDownStatsDto 
+    type: ThirdDownStatsDto,
   })
   thirdDownStats: ThirdDownStatsDto;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '턴오버',
-    example: 2 
+    example: 2,
   })
   turnovers: number;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '페널티 야드',
-    example: 45 
+    example: 45,
   })
   penaltyYards: number;
 }
 
 export class GameAnalysisResponseDto {
-  @ApiProperty({ 
+  @ApiProperty({
     description: '성공 여부',
-    example: true 
+    example: true,
   })
   success: boolean;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '응답 메시지',
-    example: '경기 분석이 완료되었습니다' 
+    example: '경기 분석이 완료되었습니다',
   })
   message: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '홈팀 분석 데이터',
-    type: TeamGameAnalysisDto 
+    type: TeamGameAnalysisDto,
   })
   homeTeam: TeamGameAnalysisDto;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '어웨이팀 분석 데이터',
-    type: TeamGameAnalysisDto 
+    type: TeamGameAnalysisDto,
   })
   awayTeam: TeamGameAnalysisDto;
 
-  @ApiProperty({ 
+  @ApiProperty({
     description: '응답 시간',
-    example: '2024-09-08T10:30:00.000Z' 
+    example: '2024-09-08T10:30:00.000Z',
   })
   timestamp: string;
 }
