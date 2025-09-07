@@ -4,18 +4,7 @@ import './index.css';
 
 const AuthLayout = () => {
   return (
-    <div
-      className="authLayoutContainer"
-      style={{
-        widht: '100vw',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#141414',
-        overflow: 'auto',
-        margin:0,
-      }}
-    >
+    <div className="authLayoutContainer">
       <div>
         <Outlet />
       </div>
