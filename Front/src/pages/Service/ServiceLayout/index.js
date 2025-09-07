@@ -4,9 +4,8 @@ import { useLocation, useNavigate, Outlet, useMatch } from 'react-router-dom';
 import ServiceSidebar from './ServiceSidebar';
 import SupportModal from '../../../components/SupportModal';
 import UploadVideoModal from '../../../components/UploadVideoModal.jsx';
-import { Outlet } from 'react-router-dom';
-import useDeviceWidth from '../../../hooks/useDeviceWidth';
-import DeviceWarning from '../../../components/DeviceWarning';
+import useDeviceWidth from '../../../hooks/useDeviceWidth.js';
+import DeviceWarning from '../../../pages/Common/DeviceWarning/index.js';
 import './index.css';
 
 const ServiceLayout = () => {
@@ -19,7 +18,6 @@ const ServiceLayout = () => {
   if (windowWidth <= 1500) {
     return <DeviceWarning />;
   }
-
   return (
     <>
       {isVideo ? (
