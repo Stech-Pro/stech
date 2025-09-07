@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.0a6c1c95.css",
-    "main.js": "/static/js/main.e0b20b94.js",
+    "main.css": "/static/css/main.c140c6b3.css",
+    "main.js": "/static/js/main.caab8731.js",
     "static/media/headimg.png": "/static/media/headimg.08a64629290141cfd3f2.png",
     "static/media/screen.png": "/static/media/screen.be2fc7903e70af964c72.png",
     "static/media/TP3.png": "/static/media/TP3.230dbd55813f9fa2ac68.png",
@@ -37,11 +37,11 @@
     "static/media/Stechlogo.svg": "/static/media/Stechlogo.2515ff7fa7a75b8f8e85a718db911acc.svg",
     "static/media/teamLogo.png": "/static/media/teamLogo.1cbc0faa7edd66f0a77c.png",
     "index.html": "/index.html",
-    "main.0a6c1c95.css.map": "/static/css/main.0a6c1c95.css.map",
-    "main.e0b20b94.js.map": "/static/js/main.e0b20b94.js.map"
+    "main.c140c6b3.css.map": "/static/css/main.c140c6b3.css.map",
+    "main.caab8731.js.map": "/static/js/main.caab8731.js.map"
   },
   "entrypoints": [
-    "static/css/main.0a6c1c95.css",
-    "static/js/main.e0b20b94.js"
+    "static/css/main.c140c6b3.css",
+    "static/js/main.caab8731.js"
   ]
 }
