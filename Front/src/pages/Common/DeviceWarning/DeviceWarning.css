@@ -1,0 +1,112 @@
+.device-warning-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  flex-direction: column;
+}
+
+.device-warning-content {
+  text-align: center;
+  color: white;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.device-warning-image {
+  max-width: 400px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.device-warning-text h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.device-warning-text p {
+  font-size: 1.2rem;
+  margin: 8px 0;
+  color: #cccccc;
+  line-height: 1.5;
+}
+
+.device-warning-buttons {
+  display: flex;
+  gap: 20px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.back-button,
+.home-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.back-button {
+  background-color: #ff6b35;
+  color: white;
+}
+
+.back-button:hover {
+  background-color: #e55a2b;
+  transform: translateY(-2px);
+}
+
+.home-button {
+  background-color: transparent;
+  color: white;
+  border: 2px solid #ffffff;
+}
+
+.home-button:hover {
+  background-color: #ffffff;
+  color: #1a1a1a;
+  transform: translateY(-2px);
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .device-warning-text h1 {
+    font-size: 1.8rem;
+  }
+
+  .device-warning-text p {
+    font-size: 1rem;
+  }
+
+  .device-warning-image {
+    max-width: 280px;
+  }
+
+  .device-warning-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .back-button,
+  .home-button {
+    width: 200px;
+  }
+}
