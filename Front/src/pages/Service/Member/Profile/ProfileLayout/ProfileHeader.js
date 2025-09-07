@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../../../context/AuthContext';
-// import './ProfileHeader.css';
+import './ProfileHeader.css';
 
-export default function ProfileHeader() {
+const ProfileHeader= () => {
 const auth = useAuth();
 const role = auth?.role ?? auth?.user?.role ?? 'player';
   const navigate = useNavigate();
@@ -48,10 +48,6 @@ const role = auth?.role ?? auth?.user?.role ?? 'player';
 
   return (
     <header className="ph-container">
-      <div className="ph-left">
-        <h1 className="ph-title" onClick={() => navigate('/service/profile')}>프로필</h1>
-      </div>
-
       <nav className="ph-nav">
         <ul className="ph-menu">
           {role === 'coach'
@@ -62,3 +58,5 @@ const role = auth?.role ?? auth?.user?.role ?? 'player';
     </header>
   );
 }
+
+export default ProfileHeader;
