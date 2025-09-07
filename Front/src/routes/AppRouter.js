@@ -39,7 +39,7 @@ export default function AppRouter() {
           <Route index element={<ServicePages.ProfilePage />} />
           <Route
             path="teamplayer"
-            element={<ServicePages.ProfileTeamPlayer />}
+            element={<ServicePages.CoachTeamStats />}
           />
           <Route path="modify" element={<ServicePages.ProfileModify />} />
           <Route path="clip" element={<ServicePages.ProfileClip />} />

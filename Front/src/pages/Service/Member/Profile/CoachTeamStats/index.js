@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { RxTriangleDown } from 'react-icons/rx';
 import { FaChevronDown } from 'react-icons/fa';
-import { useAuth } from '../../context/AuthContext';
-import { mockData } from '../../data/teamplayermock';
+import { useAuth } from '../../../../../context/AuthContext';
+import { mockData } from '../../../../../data/teamplayermock';
 
 
 /* ───────── 공통 드롭다운 (버그 수정) ───────── */
@@ -161,7 +161,7 @@ setSort((prev) => (!prev || prev.key !== key ? { key, direction: 'desc' } : { ke
 }
 
 /* ───────── 메인 컴포넌트 ───────── */
-export default function CoachTeamStats () {
+const CoachTeamStats= () => {
   const { user } = useAuth();
 
   const GAME_OPTIONS = [
@@ -255,3 +255,5 @@ export default function CoachTeamStats () {
     </div>
   );
 }
+
+export default CoachTeamStats;

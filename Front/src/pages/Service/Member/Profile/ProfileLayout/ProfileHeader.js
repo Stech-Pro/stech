@@ -12,15 +12,15 @@ export default function ProfileHeader() {
 
   // 메뉴 정의 (경로/라벨은 예시)
   const playerItems = [
-    { path: '/service/profile', label: '내 정보' },
-    { path: '/service/profile/password', label: '비밀번호 변경' },
+    { path: '/service/profile', label: '프로필 수정' },
+    { path: '/service/profile/password', label: '메모 클립 영상' },
   ];
 
   const coachItems = [
-    { path: '/service/profile', label: '내 정보' },
-    { path: '/service/profile/password', label: '비밀번호 변경' },
-    { path: '/service/profile/team', label: '팀 설정' },
-    { path: '/service/profile/members', label: '멤버 관리' },
+    { path: '/service/profile', label: '팀 선수 스탯' },
+    { path: '/service/profile/password', label: '프로필 수정' },
+    { path: '/service/profile/team', label: '메모 클립 영상' },
+    { path: '/service/profile/members', label: '구단 관리' },
   ];
 
   const items = role === 'coach' ? coachItems : playerItems;
