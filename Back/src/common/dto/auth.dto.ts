@@ -166,8 +166,8 @@ export class CreateProfileDto {
   @IsString()
   postalCode?: string;
 
-  @ApiProperty({ example: '건국이', required: false })
+  @ApiProperty({ example: '건국이', description: '플레이어ID' })
   @IsOptional()
   @IsString()
-  nickname?: string;
+  playerID?: string;
 }

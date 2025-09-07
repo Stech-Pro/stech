@@ -8,19 +8,27 @@ import {
   HttpStatus,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiProperty } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+  ApiProperty,
+} from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class AssignPlayerDto {
   @ApiProperty({
     description: 'PlayerId (형식: 시즌_학교코드_등번호)',
-    example: '2025_KK_10'
+    example: '2025_KK_10',
   })
   @IsNotEmpty()
   @IsString()
   @Matches(/^\d{4}_[A-Z]{2,3}_\d+$/, {
-    message: 'playerId는 "년도_학교코드_번호" 형식이어야 합니다 (예: 2025_KK_10)'
+    message:
+      'playerId는 "년도_학교코드_번호" 형식이어야 합니다 (예: 2025_KK_10)',
   })
   playerId: string;
 }
@@ -33,7 +41,7 @@ export class UnassignedUserDto {
   authCode: string;
   createdAt: Date;
   profile?: {
-    nickname?: string;
+    playerID?: string;
     email?: string;
     studentId?: string;
   };
@@ -84,19 +92,19 @@ export class AdminController {
             authCode: '1802',
             createdAt: '2025-01-15T09:30:00.000Z',
             profile: {
-              nickname: '김철수',
+              playerID: '김철수',
               email: 'kim@hanyang.ac.kr',
-              studentId: '2021001234'
-            }
-          }
+              studentId: '2021001234',
+            },
+          },
         ],
         count: 3,
         filters: {
           teamName: null,
-          role: null
-        }
-      }
-    }
+          role: null,
+        },
+      },
+    },
   })
   async getUnassignedUsers(
     @Query('teamName') teamName?: string,
@@ -162,9 +170,9 @@ export class AdminController {
     description: 'PlayerId 배정 정보',
     schema: {
       example: {
-        playerId: '2025_KK_10'
-      }
-    }
+        playerId: '2025_KK_10',
+      },
+    },
   })
   @ApiResponse({
     status: 200,
@@ -172,17 +180,18 @@ export class AdminController {
     schema: {
       example: {
         success: true,
-        message: 'kim_chulsu 사용자에게 playerId "2025_KK_10"가 성공적으로 배정되었습니다.',
+        message:
+          'kim_chulsu 사용자에게 playerId "2025_KK_10"가 성공적으로 배정되었습니다.',
         data: {
           userId: '507f1f77bcf86cd799439011',
           username: 'kim_chulsu',
           playerId: '2025_KK_10',
           teamName: '건국대 레이징불스',
           role: 'player',
-          assignedAt: '2025-01-15T10:30:00.000Z'
-        }
-      }
-    }
+          assignedAt: '2025-01-15T10:30:00.000Z',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 400,
@@ -191,9 +200,9 @@ export class AdminController {
       example: {
         success: false,
         message: 'playerId "2025_KK_10"는 이미 다른 사용자에게 배정되었습니다.',
-        code: 'PLAYER_ID_ALREADY_ASSIGNED'
-      }
-    }
+        code: 'PLAYER_ID_ALREADY_ASSIGNED',
+      },
+    },
   })
   @ApiResponse({
     status: 404,
@@ -202,16 +211,19 @@ export class AdminController {
       example: {
         success: false,
         message: '해당 사용자를 찾을 수 없습니다.',
-        code: 'USER_NOT_FOUND'
-      }
-    }
+        code: 'USER_NOT_FOUND',
+      },
+    },
   })
   async assignPlayerId(
     @Param('userId') userId: string,
     @Body() assignPlayerDto: AssignPlayerDto,
   ) {
     try {
-      const result = await this.adminService.assignPlayerId(userId, assignPlayerDto.playerId);
+      const result = await this.adminService.assignPlayerId(
+        userId,
+        assignPlayerDto.playerId,
+      );
       return {
         success: true,
         message: `${result.username} 사용자에게 playerId "${result.playerId}"가 성공적으로 배정되었습니다.`,
@@ -228,7 +240,7 @@ export class AdminController {
           HttpStatus.BAD_REQUEST,
         );
       }
-      
+
       if (error.message.includes('찾을 수 없습니다')) {
         throw new HttpException(
           {

@@ -286,7 +286,7 @@ export class Player {
   email: string;
 
   @Prop({ trim: true })
-  nickname: string;
+  playerID: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Team' })
   teamId: Types.ObjectId;

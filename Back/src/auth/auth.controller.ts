@@ -98,7 +98,7 @@ export class AuthController {
       example: {
         avatar: 'https://example.com/avatar.jpg',
         bio: '소개글',
-        nickname: '별명',
+        playerID: '별명',
         email: 'email@example.com',
       },
     },

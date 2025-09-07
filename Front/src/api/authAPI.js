@@ -290,7 +290,7 @@ export async function updateProfile(payload, accessToken) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify(payload), // { avatar?, bio?, nickname?, email? }
+      body: JSON.stringify(payload), // { avatar?, bio?, playerID?, email? }
     }
   );
 
