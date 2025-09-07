@@ -194,6 +194,17 @@ export const AuthProvider = ({ children }) => {
     verifyTeamCode,
 
     clearError: () => setError(null),
+    
+    // 이 함수들 추가
+    updateUserData: (userData) => {
+      setUser(userData);
+      setUserData(userData);
+    },
+    
+    setAuthToken: (token) => {
+      localStorage.setItem('token', token);
+      // 토큰 설정 후 사용자 정보도 새로 가져오기
+    },
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
