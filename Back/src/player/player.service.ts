@@ -1515,11 +1515,11 @@ export class PlayerService {
   async getPlayerStats(user: any) {
     try {
       // 1. playerId 확인
-      if (!user.playerId) {
+      if (!user.profile?.playerKey) {
         throw new Error('playerId가 배정되지 않았습니다. 관리자에게 문의하세요.');
       }
 
-      const playerId = user.playerId;
+      const playerId = user.profile?.playerKey;
       console.log(`📊 선수 스탯 조회 시작: ${playerId} (${user.username})`);
 
       // 2. 경기별 스탯 조회 (최근 10경기)

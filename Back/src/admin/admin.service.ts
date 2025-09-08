@@ -53,14 +53,14 @@ export class AdminService {
     }
 
     // 2. 이미 playerId가 배정되었는지 확인
-    if (user.playerId) {
+    if (user.profile?.playerKey) {
       throw new BadRequestException(
-        `해당 사용자는 이미 playerId "${user.playerId}"가 배정되어 있습니다.`
+        `해당 사용자는 이미 playerId "${user.profile?.playerKey}"가 배정되어 있습니다.`
       );
     }
 
     // 3. playerId 중복 확인
-    const existingUser = await this.userModel.findOne({ playerId });
+    const existingUser = await this.userModel.findOne({ 'profile.playerKey': playerId });
     if (existingUser) {
       throw new BadRequestException(
         `playerId "${playerId}"는 이미 다른 사용자(${existingUser.username})에게 배정되었습니다.`
@@ -76,7 +76,10 @@ export class AdminService {
     }
 
     // 5. playerId 배정
-    user.playerId = playerId;
+    if (!user.profile) {
+      user.profile = {};
+    }
+    user.profile.playerKey = playerId;
     await user.save();
 
     console.log(`✅ PlayerId 배정 완료: ${user.username} → ${playerId}`);
@@ -84,7 +87,7 @@ export class AdminService {
     return {
       userId: user._id,
       username: user.username,
-      playerId: user.playerId,
+      playerId: user.profile?.playerKey,
       teamName: user.teamName,
       role: user.role,
       assignedAt: new Date(),
@@ -146,8 +149,10 @@ export class AdminService {
       throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
     }
 
-    const oldPlayerId = user.playerId;
-    user.playerId = null;
+    const oldPlayerId = user.profile?.playerKey;
+    if (user.profile) {
+      user.profile.playerKey = null;
+    }
     await user.save();
 
     console.log(`🔄 PlayerId 배정 해제: ${user.username} (${oldPlayerId} → null)`);

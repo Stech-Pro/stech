@@ -281,21 +281,21 @@ export class AdminDashboardController {
     const playerStatsArray = [];
 
     for (const player of players) {
-      if (!player.playerId) continue;
+      if (!player.profile?.playerKey) continue;
 
       try {
         // 각 선수의 시즌 통계 조회
         const seasonStats = await this.playerSeasonStatsModel.findOne({
-          playerId: player.playerId,
+          playerId: player.profile?.playerKey,
         });
 
         // 각 선수의 게임 수 계산
         const gameCount = await this.playerGameStatsModel.countDocuments({
-          playerId: player.playerId,
+          playerId: player.profile?.playerKey,
         });
 
         playerStatsArray.push({
-          playerId: player.playerId,
+          playerId: player.profile?.playerKey,
           username: player.username,
           teamName: player.teamName,
           position: seasonStats?.position || 'Unknown',
@@ -303,7 +303,7 @@ export class AdminDashboardController {
           seasonStats: seasonStats || null,
         });
       } catch (error) {
-        console.error(`Error fetching stats for player ${player.playerId}:`, error);
+        console.error(`Error fetching stats for player ${player.profile?.playerKey}:`, error);
       }
     }
 

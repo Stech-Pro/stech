@@ -101,7 +101,7 @@ export class AuthService {
       username: newUser.username,
       team: newUser.teamName,
       role: newUser.role,
-      playerId: newUser.playerId || null,
+      playerId: newUser.profile?.playerKey || null,
     });
 
     console.log('발급된 토큰:', token);
@@ -150,7 +150,7 @@ export class AuthService {
       username: user.username,
       team: user.teamName,
       role: user.role,
-      playerId: user.playerId || null,
+      playerId: user.profile?.playerKey || null,
     });
 
     console.log('✅ 로그인 성공');
@@ -278,7 +278,7 @@ export class AuthService {
             teamName: user.teamName,
             role: user.role,
             region: user.region,
-            playerId: user.playerId || null,
+            playerId: user.profile?.playerKey || null,
             playerID: user.profile?.playerID || null,
             email: user.profile?.contactInfo?.email || null,
             bio: user.profile?.bio || null,
@@ -310,7 +310,7 @@ export class AuthService {
         username: user.username,
         team: user.teamName,
         role: user.role,
-        playerId: user.playerId || null,
+        playerId: user.profile?.playerKey || null,
       });
 
       console.log('✅ 토큰 갱신 성공');
@@ -325,7 +325,7 @@ export class AuthService {
             teamName: user.teamName,
             role: user.role,
             region: user.region,
-            playerId: user.playerId || null,
+            playerId: user.profile?.playerKey || null,
             playerID: user.profile?.playerID || null,
             email: user.profile?.contactInfo?.email || null,
             bio: user.profile?.bio || null,
