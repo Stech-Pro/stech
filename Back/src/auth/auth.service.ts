@@ -564,7 +564,7 @@ export class AuthService {
       username: updatedUser.username,
       team: updatedUser.teamName,
       role: updatedUser.role,
-      playerId: updatedUser.playerId || null,
+      playerId: updatedUser.profile?.playerID || null,
       realName: updatedUser.profile?.realName || null,
     });
 
