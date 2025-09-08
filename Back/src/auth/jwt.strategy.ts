@@ -30,7 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       username: user.username,
       team: user.teamName,
       role: user.role,
-      playerId: user.playerId || null
+      playerId: user.profile?.playerKey || null
     };
   }
 }

@@ -271,4 +271,20 @@ export class AnalyzeNewClipsDto {
   @ValidateNested({ each: true })
   @Type(() => NewClipDto)
   clips: NewClipDto[];
+
+  @ApiProperty({
+    example: 'HFBlackKnights',
+    description: '홈팀 ID (프론트 TEAMS.js의 id 값 사용)',
+    required: true,
+  })
+  @IsString()
+  homeTeam: string;
+
+  @ApiProperty({
+    example: 'HYLions',
+    description: '어웨이팀 ID (프론트 TEAMS.js의 id 값 사용)',
+    required: true,
+  })
+  @IsString()
+  awayTeam: string;
 }

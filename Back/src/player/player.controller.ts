@@ -190,21 +190,21 @@ export class PlayerController {
     try {
       if (analyzeNewClipsDto.clips && analyzeNewClipsDto.clips.length > 0) {
         const gameKey = analyzeNewClipsDto.clips[0]?.clipKey || 'unknown';
-        const season = '2024'; // 현재 시즌
-
-        // JSON 전체에서 게임 정보 추출 (homeTeam, awayTeam은 게임 레벨에 있음)
-        // AnalyzeNewClipsDto에 게임 정보가 없으므로 임시로 클립에서 추정
-        let homeTeam = '한양대'; // 기본값
-        let awayTeam = '외대'; // 기본값
-
-        // 실제 JSON에는 게임 레벨에 homeTeam, awayTeam이 있지만,
-        // 현재 DTO에는 clips만 있으므로 하드코딩된 매핑 사용
-        // TODO: DTO를 수정해서 게임 정보도 포함하도록 개선 필요
-        if (analyzeNewClipsDto.clips.length > 0) {
-          // 임시 매핑: 실제 JSON의 팀명을 DTO 팀명으로 변환
-          homeTeam = 'HFBlackKnights'; // 한국외대 블랙나이츠
-          awayTeam = 'HYLions'; // 한양대 라이온즈
+        
+        // clipKey에서 시즌(연도) 추출 (예: HFHY20240907 → 2024)
+        let season = '2024'; // 기본값
+        if (gameKey && gameKey.length >= 8) {
+          const extractedYear = gameKey.substring(4, 8);
+          if (/^\d{4}$/.test(extractedYear)) {
+            season = extractedYear;
+          }
         }
+
+        // DTO에서 팀 정보 가져오기
+        const homeTeam = analyzeNewClipsDto.homeTeam;
+        const awayTeam = analyzeNewClipsDto.awayTeam;
+        
+        console.log(`📊 팀 스탯 업데이트 - 홈팀: ${homeTeam}, 어웨이팀: ${awayTeam}`);
 
         // 팀 시즌 스탯 업데이트 - 시즌별 스탯 제거로 임시 비활성화
         /*
