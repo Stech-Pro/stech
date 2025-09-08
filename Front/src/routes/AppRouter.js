@@ -35,14 +35,17 @@ export default function AppRouter() {
         <Route path="suggestion" element={<ServicePages.SuggestionPage />} />
         <Route path="support" element={<ServicePages.SupportPage />} />
         <Route path="faq" element={<ServicePages.FAQPage />} />
+
         <Route path="profile" element={<ServicePages.ProfileLayout />}>
           <Route index element={<ServicePages.ProfilePage />} />
-          <Route
-            path="teamplayer"
-            element={<ServicePages.ProfileTeamPlayer />}
-          />
+          <Route path="teamstats" element={<ServicePages.ProfileTeamStats />} />
           <Route path="modify" element={<ServicePages.ProfileModify />} />
-          <Route path="clip" element={<ServicePages.ProfileClip />} />
+          
+          <Route path="clip" element={<ServicePages.ProfileMemoLayout />}>
+            <Route index element={<ServicePages.ProfileGame />} />
+            <Route path=":gameKey" element={<ServicePages.ProfileClip />} />
+          </Route>
+          
           <Route path="manage" element={<ServicePages.ProfileManage />} />
         </Route>
         <Route path="settings" element={<ServicePages.SettingsPage />} />

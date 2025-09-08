@@ -7,7 +7,10 @@ import {
   HttpStatus,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -28,6 +31,7 @@ import {
   ResetPasswordDto,
   VerifyPasswordDto,
   CheckUserExistsDto,
+  CreateProfileDto,
 } from '../common/dto/auth.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
@@ -97,7 +101,7 @@ export class AuthController {
       example: {
         avatar: 'https://example.com/avatar.jpg',
         bio: '소개글',
-        nickname: '별명',
+        playerID: '별명',
         email: 'email@example.com',
       },
     },
@@ -343,5 +347,50 @@ export class AuthController {
       req.user.id,
       verifyPasswordDto.password,
     );
+  }
+  @Post('create-profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '👤 프로필 생성',
+    description: '회원가입 후 상세 프로필을 생성합니다.',
+  })
+  @ApiResponse({ status: 200, description: '✅ 프로필 생성 성공' })
+  @ApiResponse({ status: 401, description: '❌ 인증 필요' })
+  async createProfile(
+    @Request() req,
+    @Body() createProfileDto: CreateProfileDto,
+  ) {
+    return this.authService.createProfile(req.user.id, createProfileDto);
+  }
+
+  @Post('check-profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '🔍 프로필 존재 여부 확인',
+    description: '사용자의 프로필이 생성되어 있는지 확인합니다.',
+  })
+  @ApiResponse({ status: 200, description: '✅ 프로필 상태 확인' })
+  @ApiResponse({ status: 401, description: '❌ 인증 필요' })
+  async checkProfile(@Request() req) {
+    return this.authService.checkProfileExists(req.user.id);
+  }
+
+  @Post('upload-avatar')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @UseInterceptors(FileInterceptor('avatar'))
+  @ApiOperation({
+    summary: '프로필 이미지 업로드',
+    description: '프로필 이미지를 S3에 업로드하고 URL을 반환합니다.',
+  })
+  async uploadAvatar(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.authService.uploadAvatar(req.user.id, file);
   }
 }

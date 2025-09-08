@@ -96,3 +96,31 @@
   cursor: pointer;
   padding: 0.25rem;
 }
+
+.input-with-icon {
+  position: relative;                 /* 기준 */
+}
+
+.profile-input-password {
+  width: 100%;
+  /* 아이콘과 겹치지 않도록 우측 여백 */
+  padding-right: 42px;
+}
+
+.profilepasswordToggleButton {
+  position: absolute;
+  top: 50%;
+  right: 10px;                        /* 필요 시 조정 */
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.profilepasswordToggleButton:focus { outline: none; }
+.profilepasswordToggleButton img { width: 18px; height: 18px; }

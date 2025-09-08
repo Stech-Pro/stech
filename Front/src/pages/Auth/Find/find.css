@@ -1,9 +1,8 @@
 .findPage {
     box-sizing: border-box;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(20,20,20);
     align-items: center;
     justify-content: center;
-    max-width: 400px;
     margin: 50px auto;
     margin-bottom: 50px;
     border-radius: 20px;

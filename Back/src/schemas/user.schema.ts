@@ -59,7 +59,7 @@ export class User {
     type: {
       avatar: String,
       bio: String,
-      nickname: String,
+      playerID: String,
       studentId: String,
       email: String,
       joinDate: { type: Date, default: Date.now },
@@ -88,7 +88,7 @@ export class User {
           height: Number, // cm
           weight: Number, // kg
           age: Number,
-          grade: String, // 학년
+          grade: String, // 년
           nationality: String,
         },
         default: {},
@@ -116,11 +116,10 @@ export class User {
   profile: {
     avatar?: string;
     bio?: string;
-    nickname?: string;
+    playerID?: string;
     studentId?: string;
     email?: string;
     joinDate?: Date;
-    // 새로운 선수 프로필 필드들
     playerKey?: string;
     realName?: string;
     status?: '은퇴' | '휴학' | '재학' | '진학';
@@ -140,7 +139,7 @@ export class User {
       height?: number; // cm
       weight?: number; // kg
       age?: number;
-      grade?: string; // 학년
+      grade?: string; // 년
       nationality?: string;
     };
     contactInfo?: {

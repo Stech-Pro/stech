@@ -1,4 +1,4 @@
-// src/mock/positionStats.kku.js
+// src/mock/positionStats.js
 // 포지션별 2명, 팀 동일(건국대 레이징불스), division=1부
 export const mockData = {
   QB: [

@@ -5,6 +5,7 @@ export const API_CONFIG = {
     //Auth
     CHECK_USER_EXISTS: '/auth/check-user-exists',
     CHECK_USERNAME: '/auth/check-username',
+    CREATE_PROFILE: '/auth/create-profile',
     FIND_EMAIL: '/auth/find-email',
     LOGIN: '/auth/login',
     LOGOUT: '/auth/logout',

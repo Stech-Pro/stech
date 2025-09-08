@@ -1,0 +1,100 @@
+/* 프로필 클립 전용 컨테이너 */
+.profile-clip-root {
+  /* 16px 상하 패딩, 60px 좌우 패딩 */
+  padding: 1rem 3.75rem; 
+}
+
+.profile-clip-page-container{
+  display: flex;
+  flex-direction: column;
+  padding-left: 3.75rem;
+  padding-right: 3.75rem;
+  
+}
+
+/* 상단 헤더(뒤로가기 + 안내 텍스트) */
+.profile-clip-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* 12px */
+  margin-bottom: 0.75rem; /* 12px */
+}
+.profile-clip-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* 12px */
+}
+.profile-clip-meta {
+  opacity: 0.7;
+}
+
+/* 리스트가 페이지 전체 너비를 쓰도록 강제 */
+.profile-clip-list {
+  width: 100%;
+}
+.profile-clip-list .clip-row {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 경기를 찾지 못했을 때의 에러 메시지 스타일 */
+.error-header {
+  margin-bottom: 0.5rem; /* 8px */
+  font-weight: 700;
+}
+.error-details {
+  font-size: 0.75rem; /* 12px */
+  opacity: 0.8;
+}
+.error-actions {
+  margin-top: 0.75rem; /* 12px */
+}
+
+/* 표시할 메모가 없을 때의 메시지 스타일 */
+.empty {
+  padding: 1.5rem; /* 24px */
+}
+
+/* ... (기존 clip-page-container 등 다른 스타일 유지) ... */
+
+.clip-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.matchup-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.5rem; /* ✅ 간격 증가 (1rem -> 1.5rem) */
+  width: 100%;
+}
+
+.team-display {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* ✅ 간격 증가 (0.75rem -> 1rem) */
+}
+
+.team-logo {
+  width: 3.5rem; /* ✅ 로고 크기 증가 (2.5rem -> 3.5rem, 56px) */
+  height: 3.5rem; /* ✅ 로고 크기 증가 (2.5rem -> 3.5rem, 56px) */
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #f0f0f0;
+}
+
+.team-name {
+  font-size: 1.5rem; /* ✅ 폰트 크기 증가 (1.125rem -> 1.5rem, 24px) */
+  font-weight: bold;
+  color: #e0e0e0;
+}
+
+.vs-text {
+  font-size: 1.25rem; /* ✅ 폰트 크기 증가 (1rem -> 1.25rem, 20px) */
+  font-weight: bold;
+  color: #888;
+}
