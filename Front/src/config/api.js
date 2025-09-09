@@ -20,5 +20,8 @@ export const API_CONFIG = {
 
     UPLOAD_VIDEO: '/video/upload',
     JSON_EX: '/player/analyze-game-data',
+
+    
+    GET_GAMES_BY_TEAM: '/games/team',
   },
 };
