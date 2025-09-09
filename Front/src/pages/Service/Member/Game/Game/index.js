@@ -316,9 +316,7 @@ export default function GamePage() {
       </header>
 
       {/* ===== 경기 표 ===== */}
-      {loading && <div className="game-loading">불러오는 중…</div>}
-      {error && <div className="game-error">{error}</div>}
-
+    
       <div className="game-container" style={{ display: loading ? 'none' : 'block' }}>
         <div className="game-header">
           <div className="game-header-cell">날짜</div>
@@ -329,6 +327,9 @@ export default function GamePage() {
         </div>
 
         <div className="game-list">
+            {loading && <div className="game-loading">불러오는 중…</div>}
+            {error && <div className="game-error">{error}</div>}
+
           {filteredGames.map((g) => {
             const homeMeta = TEAM_BY_ID[g.homeId];
             const awayMeta = TEAM_BY_ID[g.awayId];
