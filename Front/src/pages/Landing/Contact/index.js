@@ -101,7 +101,7 @@ const Contact = () => {
         timestamp: new Date().toISOString(),
       });
 
-      const response = await fetch('http://localhost:4000/api/contact', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
