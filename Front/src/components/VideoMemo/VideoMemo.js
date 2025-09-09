@@ -133,6 +133,14 @@ const VideoMemo = ({
             <div>시간: {clipInfo.time}</div>
           </div>
 
+          {/* 클립 ID 표시 */}
+          <div className="clip-id-display">
+            Clip ID: {clipId} | Player:{' '}
+            {currentUser?.profile?.playerID ||
+              currentUser?.username ||
+              'unknown'}
+          </div>
+
           {/* 기존 메모 표시 */}
           {currentMemo && (
             <div className="existing-memo">
@@ -172,7 +180,7 @@ const VideoMemo = ({
                 onChange={(e) => setIsPrivate(e.target.checked)}
               />
               <span className="private-icon">🔒</span>
-              나만 보기
+              <span>나만 보기</span>
             </label>
           </div>
 
