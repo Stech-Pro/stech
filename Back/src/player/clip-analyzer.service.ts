@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Player, PlayerDocument } from '../schemas/player.schema';
+import { User, UserDocument } from '../schemas/user.schema';
 import { QbAnalyzerService } from './analyzers/qb-analyzer.service';
 import { RbAnalyzerService } from './analyzers/rb-analyzer.service';
 import { WrAnalyzerService } from './analyzers/wr-analyzer.service';
@@ -12,6 +13,7 @@ import { OlAnalyzerService } from './analyzers/ol-analyzer.service';
 import { DlAnalyzerService } from './analyzers/dl-analyzer.service';
 import { LbAnalyzerService } from './analyzers/lb-analyzer.service';
 import { DbAnalyzerService } from './analyzers/db-analyzer.service';
+import { AuthService } from '../auth/auth.service';
 
 // 클립 데이터 인터페이스
 export interface ClipData {
@@ -71,6 +73,7 @@ export interface QBStats {
 export class ClipAnalyzerService {
   constructor(
     @InjectModel(Player.name) private playerModel: Model<PlayerDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
     private qbAnalyzer: QbAnalyzerService,
     private rbAnalyzer: RbAnalyzerService,
     private wrAnalyzer: WrAnalyzerService,
@@ -81,6 +84,7 @@ export class ClipAnalyzerService {
     private dlAnalyzer: DlAnalyzerService,
     private lbAnalyzer: LbAnalyzerService,
     private dbAnalyzer: DbAnalyzerService,
+    private authService: AuthService,
   ) {}
 
   /**
@@ -149,6 +153,9 @@ export class ClipAnalyzerService {
       console.error('❌ 팀 스탯 클립 분석 실패:', error);
     }
     */
+
+    // 자동 하이라이트 처리
+    await this.processAutoHighlights(gameData);
 
     return {
       success: true,
@@ -640,6 +647,74 @@ export class ClipAnalyzerService {
         error: error.message,
         qbStats,
       };
+    }
+  }
+
+  /**
+   * 자동 하이라이트 처리
+   */
+  private async processAutoHighlights(gameData: GameData) {
+    console.log('\n🌟 자동 하이라이트 처리 시작...');
+    
+    try {
+      // 게임에 참여한 두 팀의 모든 사용자 찾기
+      const users = await this.userModel.find({
+        teamName: { $in: [gameData.homeTeam, gameData.awayTeam] },
+        'profile.playerID': { $exists: true, $ne: null }
+      });
+
+      console.log(`📌 ${users.length}명의 사용자 확인 중...`);
+
+      for (const user of users) {
+        const playerNumber = user.profile?.playerID;
+        if (!playerNumber) continue;
+
+        // 해당 선수가 활약한 클립 찾기
+        for (const clip of gameData.Clips) {
+          // significantPlays에 해당 선수 번호가 있는지 확인
+          if (clip.significantPlays && clip.significantPlays.includes(playerNumber)) {
+            // 공격팀 확인하여 사용자 팀과 일치하는지 체크
+            const clipTeam = clip.offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
+            
+            if (clipTeam === user.teamName) {
+              // 하이라이트에 추가
+              await this.authService.addHighlight(
+                user._id.toString(), 
+                gameData.gameKey, 
+                clip.clipKey
+              );
+              console.log(`✨ ${user.username}(${playerNumber}번)의 하이라이트 추가: ${clip.clipKey}`);
+            }
+          }
+
+          // 태클, 캐리 등에서도 확인
+          const isInClip = 
+            clip.car?.num?.toString() === playerNumber ||
+            clip.car2?.num?.toString() === playerNumber ||
+            clip.tkl?.num?.toString() === playerNumber ||
+            clip.tkl2?.num?.toString() === playerNumber;
+
+          if (isInClip && clip.significantPlays?.length > 0) {
+            // 수비 선수의 경우 팀 확인이 복잡하므로 추가 로직 필요
+            // 일단 태클러의 경우 상대팀 선수일 가능성이 높음
+            if ((clip.tkl?.num?.toString() === playerNumber || clip.tkl2?.num?.toString() === playerNumber)) {
+              const defenseTeam = clip.offensiveTeam === 'Home' ? gameData.awayTeam : gameData.homeTeam;
+              if (defenseTeam === user.teamName) {
+                await this.authService.addHighlight(
+                  user._id.toString(), 
+                  gameData.gameKey, 
+                  clip.clipKey
+                );
+                console.log(`✨ ${user.username}(${playerNumber}번)의 수비 하이라이트 추가: ${clip.clipKey}`);
+              }
+            }
+          }
+        }
+      }
+
+      console.log('✅ 자동 하이라이트 처리 완료');
+    } catch (error) {
+      console.error('❌ 자동 하이라이트 처리 중 오류:', error);
     }
   }
 

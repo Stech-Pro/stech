@@ -564,7 +564,7 @@ export class AuthService {
       username: updatedUser.username,
       team: updatedUser.teamName,
       role: updatedUser.role,
-      playerId: updatedUser.playerId || null,
+      playerId: updatedUser.profile?.playerID || null,
       realName: updatedUser.profile?.realName || null,
     });
 
@@ -639,5 +639,100 @@ export class AuthService {
         profile: user.profile,
       },
     };
+  }
+
+  // 메모 추가
+  async addMemo(userId: string, gameKey: string, clipKey: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    // 중복 체크
+    const alreadyExists = user.memos.some(
+      memo => memo.gameKey === gameKey && memo.clipKey === clipKey
+    );
+
+    if (alreadyExists) {
+      throw new BadRequestException('이미 메모에 추가된 클립입니다.');
+    }
+
+    user.memos.push({ gameKey, clipKey });
+    await user.save();
+
+    return {
+      success: true,
+      message: '메모가 성공적으로 추가되었습니다.',
+      memos: user.memos,
+    };
+  }
+
+  // 메모 삭제
+  async removeMemo(userId: string, gameKey: string, clipKey: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    const initialLength = user.memos.length;
+    user.memos = user.memos.filter(
+      memo => !(memo.gameKey === gameKey && memo.clipKey === clipKey)
+    );
+
+    if (user.memos.length === initialLength) {
+      throw new BadRequestException('해당 메모를 찾을 수 없습니다.');
+    }
+
+    await user.save();
+
+    return {
+      success: true,
+      message: '메모가 성공적으로 삭제되었습니다.',
+      memos: user.memos,
+    };
+  }
+
+  // 하이라이트 조회
+  async getHighlights(userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    return {
+      success: true,
+      highlights: user.highlights || [],
+    };
+  }
+
+  // 메모 조회
+  async getMemos(userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    return {
+      success: true,
+      memos: user.memos || [],
+    };
+  }
+
+  // 자동 하이라이트 추가 (게임 분석 시 호출)
+  async addHighlight(userId: string, gameKey: string, clipKey: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      return; // 사용자가 없으면 조용히 종료
+    }
+
+    // 중복 체크
+    const alreadyExists = user.highlights.some(
+      highlight => highlight.gameKey === gameKey && highlight.clipKey === clipKey
+    );
+
+    if (!alreadyExists) {
+      user.highlights.push({ gameKey, clipKey });
+      await user.save();
+    }
   }
 }
