@@ -17,8 +17,12 @@ export const API_CONFIG = {
     VERIFY_PASSWORD: '/auth/verify-password',
     VERIFY_TEAM_CODE: '/auth/verify-team-code',
     VERIFY_TOKEN: '/auth/verify-token',
+    GET_USER_HIGHLIGHTS: '/auth/highlights',
 
     UPLOAD_VIDEO: '/video/upload',
     JSON_EX: '/player/analyze-game-data',
+
+    
+    GET_GAMES_BY_TEAM: '/game/team',
   },
 };

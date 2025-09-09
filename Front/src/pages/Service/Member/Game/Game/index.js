@@ -1,10 +1,11 @@
-// GamePage.jsx (id 기반으로 전면 수정)
+// src/pages/Service/Member/Game/GamePage.jsx
+// (id 기반으로 전면 수정)
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { FaChevronDown, FaRegFileAlt } from 'react-icons/fa';
 import { useAuth } from '../../../../../context/AuthContext.js';
-
+import { fetchTeamGames } from '../../../../../api/gameAPI.js';
 import './GamePage.css';
 import { TEAMS } from '../../../../../data/TEAMS';
 import CalendarDropdown from '../../../../../components/Calendar.jsx';
@@ -16,52 +17,30 @@ const TYPES = ['Scrimmage', 'Friendly match', 'Season'];
 
 /** region 코드 → 한글 라벨 */
 const REGION_LABEL = {
-  'Seoul': '서울',
+  Seoul: '서울',
   'Gyeonggi-Gangwon': '경기강원',
   'Daegu-Gyeongbuk': '대구경북',
   'Busan-Gyeongnam': '부산경남',
-  'Amateur': '사회인',
+  Amateur: '사회인',
 };
 
-/** 빠른 조회용 맵 */
-const TEAM_BY_ID = TEAMS.reduce((m, t) => { m[t.id] = t; return m; }, {});
-
-/* ===== Mock 데이터 (id 기반) ===== */
-const mockGames = [
-  {
-    gameKey: '2024-09-08-DGT-KMR',
-    date: '2024-09-08',
-    homeId: 'HFBlackKnights', // 한국외대 블랙나이츠
-    awayId: 'KUTigers',       // 고려대 타이거스
-    type: 'Season',
-    location: '서울대',
-    homeScore: 12,
-    awayScore: 2,
-    length: '01:15:24',
-    report: true,
-  },
-  {
-    gameKey: '2024-10-01-HY-YS',
-    date: '2024-10-01',
-    homeId: 'HYLions',  // 한양대 라이온스
-    awayId: 'YSEagles', // 연세대 이글스
-    type: 'Friendly match',
-    location: '서울대',
-    homeScore: 12,
-    awayScore: 2,
-    length: '01:15:24',
-    report: false,
-  },
-];
+/** 빠른 조회용 맵 (id → 팀 메타) */
+const TEAM_BY_ID = TEAMS.reduce((m, t) => {
+  m[t.id] = t;
+  return m;
+}, {});
 
 export default function GamePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // 로딩/에러
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   /* ===== 내 팀 (고정 표기) ===== */
   // 백엔드/스토리지에 따라 teamId가 다양한 키에 있을 수 있으니 방어적으로 가져오기
-  const MY_TEAM_ID =
-    user?.teamName || user?.team;
+  const MY_TEAM_ID =   user?.team || user?.teamName ;
 
   const selfTeam = useMemo(
     () => (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || TEAMS[0] || null,
@@ -120,7 +99,7 @@ export default function GamePage() {
   useEffect(() => {
     if (showOpps) {
       setActiveLeague((cur) =>
-        cur && teamsByLeague[cur]?.length ? cur : (leaguesList[0] || null),
+        cur && teamsByLeague[cur]?.length ? cur : leaguesList[0] || null
       );
     }
   }, [showOpps, leaguesList, teamsByLeague]);
@@ -136,9 +115,31 @@ export default function GamePage() {
 
   /* ===== 경기 리스트 ===== */
   const [games, setGames] = useState([]);
+
   useEffect(() => {
-    setGames(mockGames); // TODO: 실제 API로 교체
-  }, []);
+    if (!MY_TEAM_ID) {
+      setGames([]);
+      return;
+    }
+    let alive = true;
+    async function load() {
+      try {
+        setLoading(true);
+        setError(null);
+        const list = await fetchTeamGames(MY_TEAM_ID);
+        if (alive) setGames(list);
+      } catch (e) {
+        if (alive) setError(e?.message || '경기 목록을 불러오지 못했습니다.');
+        console.error(e);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+    load();
+    return () => {
+      alive = false;
+    };
+  }, [MY_TEAM_ID]);
 
   /* 필터 적용 (모두 id 기준) */
   const filteredGames = useMemo(() => {
@@ -272,7 +273,9 @@ export default function GamePage() {
                                 <img
                                   src={t.logo}
                                   alt={t.name}
-                                  className={`opps-team-logo-img ${t.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'}`}
+                                  className={`opps-team-logo-img ${
+                                    t.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                                  }`}
                                 />
                               </div>
                             )}
@@ -313,7 +316,8 @@ export default function GamePage() {
       </header>
 
       {/* ===== 경기 표 ===== */}
-      <div className="game-container">
+    
+      <div className="game-container" style={{ display: loading ? 'none' : 'block' }}>
         <div className="game-header">
           <div className="game-header-cell">날짜</div>
           <div className="game-header-cell">경기 결과</div>
@@ -323,6 +327,9 @@ export default function GamePage() {
         </div>
 
         <div className="game-list">
+            {loading && <div className="game-loading">불러오는 중…</div>}
+            {error && <div className="game-error">{error}</div>}
+
           {filteredGames.map((g) => {
             const homeMeta = TEAM_BY_ID[g.homeId];
             const awayMeta = TEAM_BY_ID[g.awayId];
@@ -345,7 +352,9 @@ export default function GamePage() {
                         <img
                           src={homeMeta.logo}
                           alt={`${homeMeta.name} 로고`}
-                          className={`game-team-logo-img ${homeMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'}`}
+                          className={`game-team-logo-img ${
+                            homeMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                          }`}
                         />
                       </div>
                     )}
@@ -362,7 +371,9 @@ export default function GamePage() {
                         <img
                           src={awayMeta.logo}
                           alt={`${awayMeta.name} 로고`}
-                          className={`game-team-logo-img ${awayMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'}`}
+                          className={`game-team-logo-img ${
+                            awayMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                          }`}
                         />
                       </div>
                     )}

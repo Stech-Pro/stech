@@ -19,6 +19,7 @@ import { LbAnalyzerService } from './analyzers/lb-analyzer.service';
 import { DbAnalyzerService } from './analyzers/db-analyzer.service';
 import { StatsManagementService } from '../common/services/stats-management.service';
 import { TeamModule } from '../team/team.module';
+import { AuthModule } from '../auth/auth.module';
 import { Player, PlayerSchema } from '../schemas/player.schema';
 import { Team, TeamSchema } from '../schemas/team.schema';
 import { User, UserSchema } from '../schemas/user.schema';
@@ -45,6 +46,7 @@ import { GameClips, GameClipsSchema } from '../schemas/game-clips.schema';
       { name: GameClips.name, schema: GameClipsSchema },
     ]),
     forwardRef(() => TeamModule),
+    forwardRef(() => AuthModule),
   ],
   controllers: [PlayerController, /* PlayerNewController, */ QbAnalyzerController],
   providers: [
