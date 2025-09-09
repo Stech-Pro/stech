@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { IoClose, IoSave, IoTrash, IoTime } from 'react-icons/io5';
+// src/components/VideoMemo/VideoMemo.js
+import React, { useState, useRef, useEffect } from 'react';
 import './VideoMemo.css';
 
 const VideoMemo = ({
@@ -9,131 +9,211 @@ const VideoMemo = ({
   memos,
   onSaveMemo,
   clipInfo,
+  teamPlayers = [], // 팀 선수 목록
+  currentUser = null, // 현재 사용자 정보를 props로 받기
 }) => {
-  const [memoContent, setMemoContent] = useState('');
-  const [savedMemos, setSavedMemos] = useState([]);
+  const [content, setContent] = useState('');
+  const [isPrivate, setIsPrivate] = useState(false); // 나만 보기 상태
+  const [showPlayerList, setShowPlayerList] = useState(false);
+  const [mentionPosition, setMentionPosition] = useState({ x: 0, y: 0 });
+  const [filteredPlayers, setFilteredPlayers] = useState([]);
+  const textareaRef = useRef(null);
+  const currentMemo = memos[clipId] || '';
 
   useEffect(() => {
-    // 저장된 메모 불러오기
-    const storedMemos = JSON.parse(
-      localStorage.getItem(`memo_${clipId}`) || '[]',
-    );
-    setSavedMemos(storedMemos);
-
-    // 현재 클립의 메모 불러오기
-    if (memos[clipId]) {
-      setMemoContent(memos[clipId]);
-    } else {
-      setMemoContent('');
+    if (isVisible) {
+      if (typeof currentMemo === 'string') {
+        setContent(currentMemo);
+        setIsPrivate(false);
+      } else if (currentMemo && typeof currentMemo === 'object') {
+        setContent(currentMemo.content || '');
+        setIsPrivate(currentMemo.isPrivate || false);
+      }
     }
-  }, [clipId, memos, isVisible]);
+  }, [isVisible, currentMemo]);
 
-  const saveMemo = () => {
-    if (!memoContent.trim()) return;
+  // @ 입력 감지 및 플레이어 목록 표시
+  const handleContentChange = (e) => {
+    const value = e.target.value;
+    const cursorPosition = e.target.selectionStart;
 
-    const newMemo = {
-      id: Date.now(),
-      content: memoContent,
+    // @ 문자 감지
+    const beforeCursor = value.substring(0, cursorPosition);
+    const atIndex = beforeCursor.lastIndexOf('@');
+
+    if (atIndex !== -1) {
+      const searchText = beforeCursor.substring(atIndex + 1);
+      if (searchText.length >= 0 && !searchText.includes(' ')) {
+        // 플레이어 필터링
+        const filtered = teamPlayers.filter(
+          (player) =>
+            (player.name &&
+              player.name.toLowerCase().includes(searchText.toLowerCase())) ||
+            (player.playerID &&
+              player.playerID.toLowerCase().includes(searchText.toLowerCase())),
+        );
+        setFilteredPlayers(filtered);
+        setShowPlayerList(true);
+
+        // 커서 위치 계산 (간단한 예시)
+        const textarea = textareaRef.current;
+        if (textarea) {
+          const rect = textarea.getBoundingClientRect();
+          setMentionPosition({
+            x: rect.left,
+            y: rect.bottom,
+          });
+        }
+      } else {
+        setShowPlayerList(false);
+      }
+    } else {
+      setShowPlayerList(false);
+    }
+
+    setContent(value);
+  };
+
+  // 플레이어 선택 시 멘션 추가
+  const handlePlayerSelect = (player) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const cursorPosition = textarea.selectionStart;
+    const beforeCursor = content.substring(0, cursorPosition);
+    const afterCursor = content.substring(cursorPosition);
+
+    // @ 이후 텍스트 제거하고 플레이어 멘션 추가
+    const atIndex = beforeCursor.lastIndexOf('@');
+    const newContent =
+      beforeCursor.substring(0, atIndex) + `@${player.playerID} ` + afterCursor;
+
+    setContent(newContent);
+    setShowPlayerList(false);
+
+    // 커서 위치 재설정
+    setTimeout(() => {
+      const newPosition = atIndex + player.playerID.length + 2;
+      textarea.setSelectionRange(newPosition, newPosition);
+      textarea.focus();
+    }, 0);
+  };
+
+  const handleSave = () => {
+    const memoData = {
+      content: content.trim(),
+      isPrivate,
+      authorId:
+        currentUser?.profile?.playerID || currentUser?.username || 'unknown',
+      authorName:
+        currentUser?.profile?.realName || currentUser?.username || '익명',
       timestamp: new Date().toISOString(),
-      clipInfo: clipInfo,
+      clipInfo,
     };
 
-    const updatedMemos = [...savedMemos, newMemo];
-    setSavedMemos(updatedMemos);
-    localStorage.setItem(`memo_${clipId}`, JSON.stringify(updatedMemos));
-    onSaveMemo(clipId, memoContent);
-    setMemoContent('');
-  };
-
-  const deleteMemo = (memoId) => {
-    const updatedMemos = savedMemos.filter((m) => m.id !== memoId);
-    setSavedMemos(updatedMemos);
-    localStorage.setItem(`memo_${clipId}`, JSON.stringify(updatedMemos));
-
-    if (updatedMemos.length === 0) {
-      onSaveMemo(clipId, null);
-    }
-  };
-
-  const exportMemos = () => {
-    const dataStr = JSON.stringify(savedMemos, null, 2);
-    const dataUri =
-      'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-
-    const exportFileDefaultName = `memos_clip_${clipId}_${Date.now()}.json`;
-
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
+    onSaveMemo(clipId, memoData);
+    onClose();
   };
 
   if (!isVisible) return null;
 
   return (
-    <div className="memoOverlay">
-      <div className="memoContainer">
-        <div className="memoHeader">
-          <h3>📝 플레이 메모</h3>
-          <button className="memoCloseBtn" onClick={onClose}>
-            <IoClose size={24} />
-          </button>
+    <div className="video-memo-overlay">
+      <div className="video-memo-modal">
+        <div className="video-memo-header">
+          <h3>메모 작성</h3>
+          <button onClick={onClose}>×</button>
         </div>
 
-        <div className="memoClipInfo">
-          <span>Q{clipInfo.quarter}</span>
-          {clipInfo.down && <span>{clipInfo.down}번째 다운</span>}
-          {clipInfo.playType && <span>{clipInfo.playType}</span>}
-          <span className="memoTime">
-            <IoTime size={14} /> {clipInfo.time}
-          </span>
-        </div>
-
-        <div className="memoContent">
-          <div className="memoInput">
-            <textarea
-              value={memoContent}
-              onChange={(e) => setMemoContent(e.target.value)}
-              placeholder="이 플레이에 대한 메모를 작성하세요..."
-              rows={4}
-            />
-            <div className="memoActions">
-              <button
-                className="memoSaveBtn"
-                onClick={saveMemo}
-                disabled={!memoContent.trim()}
-              >
-                <IoSave /> 저장
-              </button>
+        <div className="video-memo-content">
+          <div className="video-memo-info">
+            <div>
+              Q{clipInfo.quarter} - {clipInfo.down} & {clipInfo.yardsToGo}
             </div>
+            <div>시간: {clipInfo.time}</div>
           </div>
 
-          {savedMemos.length > 0 && (
-            <div className="memoList">
-              <div className="memoListHeader">
-                <h4>저장된 메모 ({savedMemos.length})</h4>
-                <button className="memoExportBtn" onClick={exportMemos}>
-                  내보내기
-                </button>
-              </div>
-              {savedMemos.map((memo) => (
-                <div key={memo.id} className="memoItem">
-                  <div className="memoItemHeader">
-                    <span className="memoDate">
-                      {new Date(memo.timestamp).toLocaleString('ko-KR')}
-                    </span>
-                    <button
-                      className="memoDeleteBtn"
-                      onClick={() => deleteMemo(memo.id)}
-                    >
-                      <IoTrash size={16} />
-                    </button>
-                  </div>
-                  <div className="memoItemContent">{memo.content}</div>
+          {/* 기존 메모 표시 */}
+          {currentMemo && (
+            <div className="existing-memo">
+              <h4>저장된 메모</h4>
+              <div className="memo-item">
+                <div className="memo-header">
+                  <span className="memo-author">
+                    {typeof currentMemo === 'object'
+                      ? currentMemo.authorName
+                      : '나'}
+                  </span>
+                  <span className="memo-type">
+                    {typeof currentMemo === 'object' && currentMemo.isPrivate
+                      ? '🔒 개인'
+                      : '💬 팀'}
+                  </span>
+                  <span className="memo-time">
+                    {typeof currentMemo === 'object' && currentMemo.timestamp
+                      ? new Date(currentMemo.timestamp).toLocaleString('ko-KR')
+                      : ''}
+                  </span>
                 </div>
-              ))}
+                <div className="memo-content">
+                  {typeof currentMemo === 'string'
+                    ? currentMemo
+                    : currentMemo.content}
+                </div>
+              </div>
             </div>
           )}
+
+          <div className="memo-options">
+            <label className="private-memo-toggle">
+              <input
+                type="checkbox"
+                checked={isPrivate}
+                onChange={(e) => setIsPrivate(e.target.checked)}
+              />
+              <span className="private-icon">🔒</span>
+              나만 보기
+            </label>
+          </div>
+
+          <div className="memo-input-container">
+            <textarea
+              ref={textareaRef}
+              value={content}
+              onChange={handleContentChange}
+              placeholder="메모를 입력하세요... (@playerID로 선수 멘션 가능)"
+              className="memo-textarea"
+            />
+
+            {showPlayerList && filteredPlayers.length > 0 && (
+              <div className="player-mention-list">
+                {filteredPlayers.map((player) => (
+                  <div
+                    key={player.playerID}
+                    className="player-mention-item"
+                    onClick={() => handlePlayerSelect(player)}
+                  >
+                    {player.avatar && (
+                      <img src={player.avatar} alt={player.name} />
+                    )}
+                    <div>
+                      <div className="player-name">{player.name}</div>
+                      <div className="player-id">@{player.playerID}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="memo-actions">
+            <button onClick={onClose} className="cancel-btn">
+              취소
+            </button>
+            <button onClick={handleSave} className="save-btn">
+              {isPrivate ? '🔒 개인 메모 저장' : '💬 팀 메모 저장'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
