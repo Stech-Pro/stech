@@ -207,7 +207,6 @@ export function GroupStandings({ currentDivision, group, teams = [] }) {
       <div className="group-standings">
         <div className="standings-header">
           <div className="standings-cell">순위</div>
-          <div className="standings-cell"></div>
           <div className="standings-cell team-cell title">팀 이름</div>
           <div className="standings-cell">승</div>
           <div className="standings-cell">무</div>
@@ -239,7 +238,12 @@ export function GroupStandings({ currentDivision, group, teams = [] }) {
                   </div>
                 )}
               </div>
-              <div className="standings-cell team-cell">{team.name}</div>
+              <div
+                className="standings-cell team-cell"
+                style={{ fontSize: '14px' }}
+              >
+                {team.name}
+              </div>
               <div className="standings-cell stat-cell">{team.wins}</div>
               <div className="standings-cell stat-cell">{team.draws}</div>
               <div className="standings-cell stat-cell">{team.losses}</div>
@@ -309,7 +313,9 @@ function MatchRow({
                 }`}
               />
             </div>
-            <div className="team-name">{homeTeam.name}</div>
+            <div className="team-name" style={{ fontSize: '14px' }}>
+              {homeTeam.name}
+            </div>
           </div>
           <div className="match-score">{getScore()}</div>
           <div className="away-team">
@@ -322,7 +328,9 @@ function MatchRow({
                 }`}
               />
             </div>
-            <div className="team-name">{awayTeam.name}</div>
+            <div className="team-name" style={{ fontSize: '14px' }}>
+              {awayTeam.name}
+            </div>
           </div>
         </div>
       </div>
