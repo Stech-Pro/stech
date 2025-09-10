@@ -21,7 +21,7 @@ const LeagueTeamPage = () => {
         }
 
         const response = await fetch(
-          'http://localhost:4000/api/team/total-stats',
+          `${process.env.REACT_APP_API_URL}/team/total-stats`,
           {
             headers: {
               'Authorization': `Bearer ${token}`,
