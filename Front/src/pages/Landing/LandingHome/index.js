@@ -5,26 +5,60 @@ import { Link } from 'react-router-dom';
 import img from './images/headimg.png';
 import MainHeader from './MainHeader';
 import Footer from './Footer';
-import ChungAng from './images/ChungAng-Blue-Dragons.png';
-import Dongguk from './images/Dongguk-Tuskers.png';
-import Hanyang from './images/Hanyang-Lions.png';
-import Hongik from './images/Hongik-Cowboys.png';
-import HUFS from './images/HUFS-Black-Knights.png';
-import Konkuk from './images/Konkuk-Raging-Bulls.png';
-import Kookmin from './images/Kookmin-Razorbacks.png';
-import Korea from './images/Korea-Univeristy-Tigers.png';
-import Kyunghee from './images/Kyunghee-Commanders.png';
-import Seoul from './images/Seoul-Vikings.png';
-import SNU from './images/SNU-Green-Terrors.png';
-import Sogang from './images/Sogang-Albatross.png';
-import Soongsil from './images/soongsil-crusaders.png';
-import UOS from './images/UOS-City-Hawks.png';
-import Yonsei from './images/Yonsei-Eagles.png';
 import Component from './images/Component.png';
 import Detail from './images/detail.png';
 import Screen from './images/screen.png';
 import MobileScreen from './images/mobilescreen.png';
 import Gameimage from './images/Gameimage.png';
+import BF from './images/BF.png';
+import BG from './images/BG.png';
+import BK from './images/BK.png';
+import BS from './images/BS.png';
+import BT from './images/BT.png';
+import CA from './images/CA.png';
+import DA from './images/DA.png';
+import DC from './images/DC.png';
+import DD from './images/DD.png';
+import DF from './images/DF.png';
+import DH from './images/DH.png';
+import DK from './images/DK.png';
+import DS from './images/DS.png';
+import DT from './images/DT.png';
+import DU from './images/DU.png';
+import DW from './images/DW.png';
+import GE from './images/GE.png';
+import GP from './images/GP.png';
+import GS from './images/GS.png';
+import HD from './images/HD.png';
+import HF from './images/HF.png';
+import HH from './images/HH.png';
+import HI from './images/HI.png';
+import HL from './images/HL.png';
+import HY from './images/HY.png';
+import KA from './images/KA.png';
+import IH from './images/IH.png';
+import KH from './images/KH.png';
+import HS from './images/HS.png';
+import KI from './images/KI.png';
+import KK from './images/KK.png';
+import KM from './images/KM.png';
+import RH from './images/RH.png';
+import KO from './images/KO.png';
+import KP from './images/KP.png';
+import KU from './images/KU.png';
+import KS from './images/KS.png';
+import KW from './images/KW.png';
+import SG from './images/SG.png';
+import SK from './images/SK.png';
+import SL from './images/SL.png';
+import SN from './images/SN.png';
+import UD from './images/UD.png';
+import SS from './images/SS.png';
+import US from './images/US.png';
+import VI from './images/VI.png';
+import YI from './images/YI.png';
+import YN from './images/YN.png';
+import YS from './images/YS.png';
 
 const LandingPage = () => {
   usePageTitle('Stech');
@@ -73,26 +107,55 @@ const LandingPage = () => {
         </div>
         <div className="slider-container">
           <div className="slider-track">
-            <img src={ChungAng} alt="ChungAng Blue Dragons" />
-            <img src={Dongguk} alt="Dongguk Tuskers" />
-            <img src={Hanyang} alt="Hanyang Lions" />
-            <img src={Hongik} alt="Hongik Cowboys" />
-            <img src={HUFS} alt="HUFS Black Knights" />
-            <img src={Konkuk} alt="Konkuk Raging Bulls" />
-            <img src={Kookmin} alt="Kookmin Razorbacks" />
-            <img src={Korea} alt="Korea University Tigers" />
-            <img src={Kyunghee} alt="Kyunghee Commanders" />
-            <img src={Seoul} alt="Seoul Vikings" />
-            <img src={SNU} alt="SNU Green Terrors" />
-            <img src={Sogang} alt="Sogang Albatross" />
-            <img src={Soongsil} alt="soongsil crusaders" />
-            <img src={UOS} alt="UOS City Hawks" />
-            <img src={Yonsei} alt="Yonsei Eagles" />
-            <img src={ChungAng} alt="ChungAng Blue Dragons<copy>" />
-            <img src={Dongguk} alt="Dongguk Tuskers<copy>" />
-            <img src={Hanyang} alt="Hanyang Lions<copy>" />
-            <img src={Hongik} alt="Hongik Cowboys<copy>" />
-            <img src={HUFS} alt="HUFS Black Knights<copy>" />
+            <img src={YS} alt="연세대 이글스" width="80px" />
+            <img src={SN} alt="서울대 그린테러스" width="80px" />
+            <img src={HY} alt="한양대 라이온스" width="80px" />
+            <img src={KM} alt="국민대 레이저백스" width="80px" />
+            <img src={US} alt="서울시립대 시티혹스" width="80px" />
+            <img src={HF} alt="한국외대 블랙나이츠" width="80px" />
+            <img src={KK} alt="건국대 레이징불스" width="80px" />
+            <img src={HI} alt="홍익대 카우보이스" width="80px" />
+            <img src={KU} alt="고려대 타이거스" width="80px" />
+            <img src={DT} alt="동국대 터스커스" width="80px" />
+            <img src={SS} alt="숭실대 크루세이더스" width="80px" />
+            <img src={CA} alt="중앙대 블루드래곤스" width="80px" />
+            <img src={KH} alt="경희대 커맨더스" width="80px" />
+            <img src={SG} alt="서강대 알바트로스" width="80px" />
+            <img src={SK} alt="성균관대 로얄스" width="80px" />
+            <img src={KW} alt="강원대 카프라스" width="80px" />
+            <img src={DK} alt="단국대 코디악베어스" width="80px" />
+            <img src={YI} alt="용인대 화이트타이거스" width="80px" />
+            <img src={IH} alt="인하대 틸 드래곤스" width="80px" />
+            <img src={HL} alt="한림대 피닉스" width="80px" />
+            <img src={HS} alt="한신대 킬러웨일스" width="80px" />
+            <img src={KA} alt="카이스트 매버릭스" width="80px" />
+            <img src={KP} alt="경북대 오렌지파이터스" width="80px" />
+            <img src={KI} alt="경일대 블랙베어스" width="80px" />
+            <img src={KS} alt="계명대 슈퍼라이온스" width="80px" />
+            <img src={KO} alt="금오공대 레이븐스" width="80px" />
+            <img src={DC} alt="대구가톨릭대 스커드엔젤스" width="80px" />
+            <img src={DD} alt="대구대 플라잉타이거스" width="80px" />
+            <img src={DH} alt="대구한의대 라이노스" width="80px" />
+            <img src={DW} alt="동국대 화이트엘리펀츠" width="80px" />
+            <img src={YN} alt="영남대 페가수스" width="80px" />
+            <img src={HD} alt="한동대 홀리램스" width="80px" />
+            <img src={GS} alt="경성대 드래곤스" width="80px" />
+            <img src={BS} alt="부산대 이글스" width="80px" />
+            <img src={HH} alt="한국해양대 바이킹스" width="80px" />
+            <img src={SL} alt="신라대 데빌스" width="80px" />
+            <img src={BK} alt="부경대 매드모비딕스" width="80px" />
+            <img src={DU} alt="동의대 터틀파이터스" width="80px" />
+            <img src={DA} alt="동아대 레오파즈" width="80px" />
+            <img src={DS} alt="동서대 블루돌핀스" width="80px" />
+            <img src={BF} alt="부산외대 토네이도" width="80px" />
+            <img src={UD} alt="울산대 유니콘스" width="80px" />
+            <img src={GP} alt="군위 피닉스" width="80px" />
+            <img src={BG} alt="부산 그리폰즈" width="80px" />
+            <img src={BT} alt="삼성 블루스톰" width="80px" />
+            <img src={GE} alt="서울 골든이글스" width="80px" />
+            <img src={DF} alt="서울 디펜더스" width="80px" />
+            <img src={VI} alt="서울 바이킹스" width="80px" />
+            <img src={RH} alt="인천 라이노스" width="80px" />
           </div>
         </div>
       </section>

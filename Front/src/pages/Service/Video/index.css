@@ -133,6 +133,7 @@
   justify-content: center;
   color: #a5a5a5;
   text-align: center;
+  height: 100vh;
   padding: 60px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 20px;
