@@ -76,6 +76,7 @@ const Contact = () => {
   };
 
   // 폼 제출 핸들러
+  // handleSubmit 함수의 fetch 부분만 수정
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -101,7 +102,14 @@ const Contact = () => {
         timestamp: new Date().toISOString(),
       });
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/contact`, {
+      // 프록시 사용시 상대 경로로 변경
+      const apiUrl =
+        process.env.NODE_ENV === 'production'
+          ? 'https://api.stechpro.ai/api'
+          : '';
+      console.log('API URL:', apiUrl); // 디버깅용
+
+      const response = await fetch(`${apiUrl}/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
