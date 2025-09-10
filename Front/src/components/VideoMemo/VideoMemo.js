@@ -1,5 +1,6 @@
 // src/components/VideoMemo/VideoMemo.js
 import React, { useState, useRef, useEffect } from 'react';
+import { IoTime, IoSave, IoTrash } from 'react-icons/io5';
 import './VideoMemo.css';
 
 /**
@@ -18,18 +19,35 @@ const VideoMemo = ({
   clipInfo,
   teamPlayers = [], // 팀 선수 목록
   currentUser = null, // 현재 사용자 정보를 props로 받기
+  teamId = null, // 팀 ID 추가
 }) => {
   const [content, setContent] = useState('');
   const [isPrivate, setIsPrivate] = useState(false); // 나만 보기 상태
   const [showPlayerList, setShowPlayerList] = useState(false);
   const [mentionPosition, setMentionPosition] = useState({ x: 0, y: 0 });
   const [filteredPlayers, setFilteredPlayers] = useState([]);
+
+  // 멘션 관련 state 추가
+  const [memoContent, setMemoContent] = useState('');
+  const [mentionOpen, setMentionOpen] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [mentionList, setMentionList] = useState([]);
+  const [mentionIndex, setMentionIndex] = useState(0);
+
+  // 선수 데이터 관련 state 추가
+  const [players, setPlayers] = useState([]);
+
+  // 메모 관련 state 추가
+  const [savedMemos, setSavedMemos] = useState([]);
+
   const textareaRef = useRef(null);
   const currentMemo = memos[clipId] || '';
 
   useEffect(() => {
     // 저장된 메모 불러오기
-    const storedMemos = JSON.parse(localStorage.getItem(`memo_${clipId}`) || '[]');
+    const storedMemos = JSON.parse(
+      localStorage.getItem(`memo_${clipId}`) || '[]',
+    );
     setSavedMemos(storedMemos);
 
     // 현재 클립의 메모 불러오기
@@ -123,8 +141,39 @@ const VideoMemo = ({
     } else {
       setShowPlayerList(false);
     }
+  };
 
+  // content 변경 핸들러 추가
+  const handleContentChange = (e) => {
+    const value = e.target.value;
     setContent(value);
+
+    // @ 멘션 트리거 감지
+    const cursorPosition = e.target.selectionStart;
+    const beforeCursor = value.substring(0, cursorPosition);
+    const words = beforeCursor.split(/\s/);
+    const lastWord = words[words.length - 1];
+
+    if (lastWord.startsWith('@') && lastWord.length > 1) {
+      const query = lastWord.substring(1).toLowerCase();
+      const filtered = teamPlayers.filter(
+        (player) =>
+          player.name.toLowerCase().includes(query) ||
+          player.playerID.toLowerCase().includes(query),
+      );
+      setFilteredPlayers(filtered);
+      setShowPlayerList(filtered.length > 0);
+
+      // 멘션 리스트 위치 계산
+      const textarea = e.target;
+      const rect = textarea.getBoundingClientRect();
+      setMentionPosition({
+        x: rect.left,
+        y: rect.bottom,
+      });
+    } else {
+      setShowPlayerList(false);
+    }
   };
 
   // 플레이어 선택 시 멘션 추가
@@ -160,9 +209,20 @@ const VideoMemo = ({
         currentUser?.profile?.playerID || currentUser?.username || 'unknown',
       authorName:
         currentUser?.profile?.realName || currentUser?.username || '익명',
-      setMentionOpen(false);
-      setMentionQuery('');
+    };
+
+    // 메모 저장 로직 추가
+    if (onSaveMemo) {
+      onSaveMemo(clipId, memoData);
     }
+
+    // 멘션 관련 상태 초기화
+    setMentionOpen(false);
+    setMentionQuery('');
+
+    // 입력 필드 초기화
+    setContent('');
+    onClose();
   };
 
   const extractMentionQueryFromText = (text, caretPos) => {
@@ -192,7 +252,9 @@ const VideoMemo = ({
     const after = memoContent.slice(hit.end);
 
     // @[이름](playerId) 토큰 삽입
-    const token = `@[${player.name}](${player._id || player.playerId || player.id}) `;
+    const token = `@[${player.name}](${
+      player._id || player.playerId || player.id
+    }) `;
     const result = before + token + after;
 
     setMemoContent(result);
@@ -211,7 +273,9 @@ const VideoMemo = ({
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setMentionIndex((i) => Math.min(i + 1, Math.max(mentionList.length - 1, 0)));
+      setMentionIndex((i) =>
+        Math.min(i + 1, Math.max(mentionList.length - 1, 0)),
+      );
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setMentionIndex((i) => Math.max(i - 1, 0));
@@ -311,7 +375,8 @@ const VideoMemo = ({
 
   const exportMemos = () => {
     const dataStr = JSON.stringify(savedMemos, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const dataUri =
+      'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
     const exportFileDefaultName = `memos_clip_${clipId}_${Date.now()}.json`;
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
@@ -327,17 +392,24 @@ const VideoMemo = ({
     let lastIdx = 0;
     text.replace(MENTION_TOKEN_REGEX, (match, name, playerId, offset) => {
       if (lastIdx < offset) {
-        parts.push(<span key={`t-${offset}`}>{text.slice(lastIdx, offset)}</span>);
+        parts.push(
+          <span key={`t-${offset}`}>{text.slice(lastIdx, offset)}</span>,
+        );
       }
       parts.push(
-        <span key={`m-${offset}`} className="memoMention" title={`playerId: ${playerId}`}>
+        <span
+          key={`m-${offset}`}
+          className="memoMention"
+          title={`playerId: ${playerId}`}
+        >
           @{name}
-        </span>
+        </span>,
       );
       lastIdx = offset + match.length;
       return match;
     });
-    if (lastIdx < text.length) parts.push(<span key={`t-end`}>{text.slice(lastIdx)}</span>);
+    if (lastIdx < text.length)
+      parts.push(<span key={`t-end`}>{text.slice(lastIdx)}</span>);
     return parts;
   };
 
@@ -374,7 +446,9 @@ const VideoMemo = ({
                 {mentionList.map((p, idx) => (
                   <div
                     key={p._id || p.playerId || p.id || `${p.name}-${idx}`}
-                    className={`mentionItem ${idx === mentionIndex ? 'active' : ''}`}
+                    className={`mentionItem ${
+                      idx === mentionIndex ? 'active' : ''
+                    }`}
                     onMouseDown={(e) => {
                       e.preventDefault();
                       insertMentionToken(p);
@@ -382,7 +456,8 @@ const VideoMemo = ({
                   >
                     <div className="mentionName">@{p.name}</div>
                     <div className="mentionMeta">
-                      {p.position ? `${p.position}` : ''}{p.jerseyNumber ? ` • #${p.jerseyNumber}` : ''}
+                      {p.position ? `${p.position}` : ''}
+                      {p.jerseyNumber ? ` • #${p.jerseyNumber}` : ''}
                     </div>
                   </div>
                 ))}
@@ -426,7 +501,7 @@ const VideoMemo = ({
                     {renderWithMentions(memo.content)}
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
           )}
 
