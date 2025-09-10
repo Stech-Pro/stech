@@ -10,6 +10,22 @@ import './VideoMemo.css';
  */
 const MENTION_TOKEN_REGEX = /@\[([^\]]+)\]\(([^)]+)\)/g;
 
+// 안전한 문자열 trim 함수
+const safeTrim = (str) => {
+  if (typeof str === 'string') {
+    return str.trim();
+  }
+  return '';
+};
+
+// 안전한 문자열 변환 함수
+const safeString = (value) => {
+  if (typeof value === 'string') {
+    return value;
+  }
+  return '';
+};
+
 const VideoMemo = ({
   isVisible,
   onClose,
@@ -21,27 +37,24 @@ const VideoMemo = ({
   currentUser = null, // 현재 사용자 정보를 props로 받기
   teamId = null, // 팀 ID 추가
 }) => {
-  const [content, setContent] = useState('');
   const [isPrivate, setIsPrivate] = useState(false); // 나만 보기 상태
-  const [showPlayerList, setShowPlayerList] = useState(false);
-  const [mentionPosition, setMentionPosition] = useState({ x: 0, y: 0 });
-  const [filteredPlayers, setFilteredPlayers] = useState([]);
 
-  // 멘션 관련 state 추가
+  // 메모 입력 관련 state (하나로 통합)
   const [memoContent, setMemoContent] = useState('');
+
+  // 멘션 관련 state
   const [mentionOpen, setMentionOpen] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
   const [mentionList, setMentionList] = useState([]);
   const [mentionIndex, setMentionIndex] = useState(0);
 
-  // 선수 데이터 관련 state 추가
+  // 선수 데이터 관련 state
   const [players, setPlayers] = useState([]);
 
-  // 메모 관련 state 추가
+  // 메모 관련 state
   const [savedMemos, setSavedMemos] = useState([]);
 
   const textareaRef = useRef(null);
-  const currentMemo = memos[clipId] || '';
 
   useEffect(() => {
     // 저장된 메모 불러오기
@@ -51,8 +64,12 @@ const VideoMemo = ({
     setSavedMemos(storedMemos);
 
     // 현재 클립의 메모 불러오기
-    if (memos[clipId]) setMemoContent(memos[clipId]);
-    else setMemoContent('');
+    if (memos[clipId]) {
+      const memoValue = memos[clipId];
+      setMemoContent(safeString(memoValue));
+    } else {
+      setMemoContent('');
+    }
   }, [clipId, memos, isVisible]);
 
   /* ───────────────────────── 선수 데이터 로드 ───────────────────────── */
@@ -82,44 +99,28 @@ const VideoMemo = ({
     };
   }, [teamPlayers, teamId]);
 
-  /* ───────────────────────── 멘션: 트리거/필터 ───────────────────────── */
-  // 커서 기준 현재 '@'로 시작하는 "단어"를 추출
-  const extractMentionQuery = () => {
-    const el = textareaRef.current;
-    if (!el) return null;
-    const { selectionStart } = el;
-    const text = memoContent;
-
-    // selectionStart 이전에서 가장 가까운 '@'의 위치를 찾되, 공백/줄바꿈/문장부호로 막히기 전까지만 유효
-    let i = selectionStart - 1;
-    while (i >= 0) {
-      const ch = text[i];
-      if (ch === '@') {
-        // '@' 직전이 문자/숫자/']'이면(예: 토큰 뒤) 트리거 아님
-        if (i > 0 && /[\w\]\)]/.test(text[i - 1])) return null;
-        const fragment = text.slice(i + 1, selectionStart);
-        // '@' 다음이 공백으로 시작하면 트리거 아님
-        if (fragment.startsWith(' ')) return null;
-        return { start: i, end: selectionStart, fragment };
-      }
-      // 멘션은 공백/개행/특수구분자에서 끊긴다
-      if (/\s|[.,;:!?()[\]{}]/.test(ch)) break;
-      i--;
-    }
-    return null;
-  };
-
   // mentionQuery에 따라 선수 필터링
   useEffect(() => {
     if (!mentionOpen) return;
-    const q = (mentionQuery || '').trim().toLowerCase();
-    const filtered = players
+    const q = safeTrim(safeString(mentionQuery)).toLowerCase();
+
+    // teamPlayers와 players 모두에서 검색
+    const allPlayers = [...(teamPlayers || []), ...(players || [])];
+
+    const filtered = allPlayers
+      .filter(
+        (p, index, self) =>
+          // 중복 제거 (playerID 기준)
+          self.findIndex((player) => player.playerID === p.playerID) === index,
+      )
       .filter((p) => {
         const name = String(p.name || '').toLowerCase();
+        const playerID = String(p.playerID || '').toLowerCase();
         const jersey = String(p.jerseyNumber || '');
         const pos = String(p.position || '').toLowerCase();
         return (
           name.includes(q) ||
+          playerID.includes(q) ||
           (q && jersey && jersey.startsWith(q)) ||
           pos.includes(q)
         );
@@ -127,111 +128,17 @@ const VideoMemo = ({
       .slice(0, 8); // 상단 8명 제한
     setMentionList(filtered);
     setMentionIndex(0);
-  }, [mentionQuery, players, mentionOpen]);
+  }, [mentionQuery, players, mentionOpen, teamPlayers]);
 
   /* ───────────────────────── 멘션: 입력/키보드 ───────────────────────── */
-  const onChangeText = (e) => {
-    const next = e.target.value;
-    setMemoContent(next);
-
-    const hit = extractMentionQueryFromText(next, e.target.selectionStart);
-    if (hit) {
-      setMentionOpen(true);
-      setMentionQuery(hit.fragment);
-    } else {
-      setShowPlayerList(false);
-    }
-  };
-
-  // content 변경 핸들러 추가
-  const handleContentChange = (e) => {
-    const value = e.target.value;
-    setContent(value);
-
-    // @ 멘션 트리거 감지
-    const cursorPosition = e.target.selectionStart;
-    const beforeCursor = value.substring(0, cursorPosition);
-    const words = beforeCursor.split(/\s/);
-    const lastWord = words[words.length - 1];
-
-    if (lastWord.startsWith('@') && lastWord.length > 1) {
-      const query = lastWord.substring(1).toLowerCase();
-      const filtered = teamPlayers.filter(
-        (player) =>
-          player.name.toLowerCase().includes(query) ||
-          player.playerID.toLowerCase().includes(query),
-      );
-      setFilteredPlayers(filtered);
-      setShowPlayerList(filtered.length > 0);
-
-      // 멘션 리스트 위치 계산
-      const textarea = e.target;
-      const rect = textarea.getBoundingClientRect();
-      setMentionPosition({
-        x: rect.left,
-        y: rect.bottom,
-      });
-    } else {
-      setShowPlayerList(false);
-    }
-  };
-
-  // 플레이어 선택 시 멘션 추가
-  const handlePlayerSelect = (player) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const cursorPosition = textarea.selectionStart;
-    const beforeCursor = content.substring(0, cursorPosition);
-    const afterCursor = content.substring(cursorPosition);
-
-    // @ 이후 텍스트 제거하고 플레이어 멘션 추가
-    const atIndex = beforeCursor.lastIndexOf('@');
-    const newContent =
-      beforeCursor.substring(0, atIndex) + `@${player.playerID} ` + afterCursor;
-
-    setContent(newContent);
-    setShowPlayerList(false);
-
-    // 커서 위치 재설정
-    setTimeout(() => {
-      const newPosition = atIndex + player.playerID.length + 2;
-      textarea.setSelectionRange(newPosition, newPosition);
-      textarea.focus();
-    }, 0);
-  };
-
-  const handleSave = () => {
-    const memoData = {
-      content: content.trim(),
-      isPrivate,
-      authorId:
-        currentUser?.profile?.playerID || currentUser?.username || 'unknown',
-      authorName:
-        currentUser?.profile?.realName || currentUser?.username || '익명',
-    };
-
-    // 메모 저장 로직 추가
-    if (onSaveMemo) {
-      onSaveMemo(clipId, memoData);
-    }
-
-    // 멘션 관련 상태 초기화
-    setMentionOpen(false);
-    setMentionQuery('');
-
-    // 입력 필드 초기화
-    setContent('');
-    onClose();
-  };
-
   const extractMentionQueryFromText = (text, caretPos) => {
+    const textStr = safeString(text);
     let i = caretPos - 1;
     while (i >= 0) {
-      const ch = text[i];
+      const ch = textStr[i];
       if (ch === '@') {
-        if (i > 0 && /[\w\]\)]/.test(text[i - 1])) return null;
-        const fragment = text.slice(i + 1, caretPos);
+        if (i > 0 && /[\w\]\)]/.test(textStr[i - 1])) return null;
+        const fragment = textStr.slice(i + 1, caretPos);
         if (fragment.startsWith(' ')) return null;
         return { start: i, end: caretPos, fragment };
       }
@@ -241,19 +148,35 @@ const VideoMemo = ({
     return null;
   };
 
+  const onChangeText = (e) => {
+    const next = e.target.value;
+    setMemoContent(next);
+
+    // @ 멘션 트리거 감지
+    const hit = extractMentionQueryFromText(next, e.target.selectionStart);
+    if (hit) {
+      setMentionOpen(true);
+      setMentionQuery(hit.fragment);
+    } else {
+      setMentionOpen(false);
+      setMentionQuery('');
+    }
+  };
+
   const insertMentionToken = (player) => {
     const el = textareaRef.current;
     if (!el) return;
     const { selectionStart } = el;
-    const hit = extractMentionQueryFromText(memoContent, selectionStart);
+    const currentContent = safeString(memoContent);
+    const hit = extractMentionQueryFromText(currentContent, selectionStart);
     if (!hit) return;
 
-    const before = memoContent.slice(0, hit.start);
-    const after = memoContent.slice(hit.end);
+    const before = currentContent.slice(0, hit.start);
+    const after = currentContent.slice(hit.end);
 
     // @[이름](playerId) 토큰 삽입
     const token = `@[${player.name}](${
-      player._id || player.playerId || player.id
+      player.playerID || player._id || player.playerId || player.id
     }) `;
     const result = before + token + after;
 
@@ -291,10 +214,11 @@ const VideoMemo = ({
     }
   };
 
-  /* ───────────────────────── 저장/삭제/내보내기 ───────────────────────── */
+  /* ───────────────────────── 저장/삭제 ───────────────────────── */
   const parseMentions = (text) => {
+    const textStr = safeString(text);
     const mentions = [];
-    for (const m of text.matchAll(MENTION_TOKEN_REGEX)) {
+    for (const m of textStr.matchAll(MENTION_TOKEN_REGEX)) {
       mentions.push({ name: m[1], playerId: m[2] });
     }
     return mentions;
@@ -303,7 +227,6 @@ const VideoMemo = ({
   const saveMentionsToDB = async (mentions, clipId, memoId) => {
     if (!mentions.length) return;
     try {
-      // 1) 메모 단위 저장 (권장)
       await fetch('/api/memos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -311,39 +234,46 @@ const VideoMemo = ({
           clipId,
           memoId,
           mentions, // [{playerId, name}]
-          content: memoContent,
+          content: safeString(memoContent),
           createdAt: new Date().toISOString(),
         }),
       });
-
-      // 2) 선택: 선수별로도 집계 저장을 원하면 아래 루프 활성화
-      // await Promise.all(
-      //   mentions.map((m) =>
-      //     fetch(`/api/players/${m.playerId}/mentions`, {
-      //       method: 'POST',
-      //       headers: { 'Content-Type': 'application/json' },
-      //       body: JSON.stringify({
-      //         clipId,
-      //         memoId,
-      //         content: memoContent,
-      //         createdAt: new Date().toISOString(),
-      //       }),
-      //     })
-      //   )
-      // );
     } catch (e) {
       console.error('Failed to save mentions:', e);
     }
   };
 
+  // 작성자 정보 표시 함수
+  const getAuthorDisplay = (user) => {
+    if (!user) return '익명';
+
+    // Admin 체크
+    if (user.role === 'admin' || user.isAdmin) {
+      return '관리자';
+    }
+
+    // PlayerID 우선 표시, 없으면 이름, 없으면 username
+    return (
+      user.profile?.playerID ||
+      user.profile?.realName ||
+      user.username ||
+      '익명'
+    );
+  };
+
   const saveMemo = async () => {
-    if (!memoContent.trim()) return;
+    const memoContentStr = safeString(memoContent);
+    if (!safeTrim(memoContentStr)) return;
 
     const newMemo = {
       id: Date.now(),
-      content: memoContent,
+      content: memoContentStr,
       timestamp: new Date().toISOString(),
       clipInfo,
+      isPrivate,
+      authorId:
+        currentUser?.profile?.playerID || currentUser?.username || 'unknown',
+      authorName: getAuthorDisplay(currentUser),
     };
 
     const updatedMemos = [...savedMemos, newMemo];
@@ -351,13 +281,13 @@ const VideoMemo = ({
     localStorage.setItem(`memo_${clipId}`, JSON.stringify(updatedMemos));
 
     // 기존 상위 콜백 유지
-    onSaveMemo(clipId, memoContent);
+    onSaveMemo(clipId, newMemo);
 
     // 멘션 DB 저장
-    const mentions = parseMentions(memoContent);
+    const mentions = parseMentions(memoContentStr);
     await saveMentionsToDB(mentions, clipId, newMemo.id);
 
-    // 입력창 비우기(목록은 남김)
+    // 입력창 비우기
     setMemoContent('');
     setMentionOpen(false);
     setMentionQuery('');
@@ -373,27 +303,19 @@ const VideoMemo = ({
     }
   };
 
-  const exportMemos = () => {
-    const dataStr = JSON.stringify(savedMemos, null, 2);
-    const dataUri =
-      'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-    const exportFileDefaultName = `memos_clip_${clipId}_${Date.now()}.json`;
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-  };
-
   if (!isVisible) return null;
 
   /* ───────────────────────── 렌더: 멘션 하이라이트 ───────────────────────── */
   const renderWithMentions = (text) => {
+    const textStr = safeString(text);
+    if (!textStr) return [<span key="empty"></span>];
+
     const parts = [];
     let lastIdx = 0;
-    text.replace(MENTION_TOKEN_REGEX, (match, name, playerId, offset) => {
+    textStr.replace(MENTION_TOKEN_REGEX, (match, name, playerId, offset) => {
       if (lastIdx < offset) {
         parts.push(
-          <span key={`t-${offset}`}>{text.slice(lastIdx, offset)}</span>,
+          <span key={`t-${offset}`}>{textStr.slice(lastIdx, offset)}</span>,
         );
       }
       parts.push(
@@ -408,8 +330,8 @@ const VideoMemo = ({
       lastIdx = offset + match.length;
       return match;
     });
-    if (lastIdx < text.length)
-      parts.push(<span key={`t-end`}>{text.slice(lastIdx)}</span>);
+    if (lastIdx < textStr.length)
+      parts.push(<span key={`t-end`}>{textStr.slice(lastIdx)}</span>);
     return parts;
   };
 
@@ -421,90 +343,18 @@ const VideoMemo = ({
           <button onClick={onClose}>×</button>
         </div>
 
-        <div className="memoClipInfo">
-          <span>Q{clipInfo.quarter}</span>
-          {clipInfo.down && <span>{clipInfo.down}번째 다운</span>}
-          {clipInfo.playType && <span>{clipInfo.playType}</span>}
-          <span className="memoTime">
-            <IoTime size={14} /> {clipInfo.time}
-          </span>
-        </div>
-
         <div className="memoContent">
-          <div className="memoInput">
-            <textarea
-              ref={textareaRef}
-              value={memoContent}
-              onChange={onChangeText}
-              onKeyDown={onKeyDown}
-              placeholder="이 플레이에 대한 메모를 작성하세요... (예: @오지영)"
-              rows={4}
-            />
-            {/* 멘션 드롭다운 */}
-            {mentionOpen && mentionList.length > 0 && (
-              <div className="mentionDropdown">
-                {mentionList.map((p, idx) => (
-                  <div
-                    key={p._id || p.playerId || p.id || `${p.name}-${idx}`}
-                    className={`mentionItem ${
-                      idx === mentionIndex ? 'active' : ''
-                    }`}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      insertMentionToken(p);
-                    }}
-                  >
-                    <div className="mentionName">@{p.name}</div>
-                    <div className="mentionMeta">
-                      {p.position ? `${p.position}` : ''}
-                      {p.jerseyNumber ? ` • #${p.jerseyNumber}` : ''}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="memoActions">
-              <button
-                className="memoSaveBtn"
-                onClick={saveMemo}
-                disabled={!memoContent.trim()}
-              >
-                <IoSave /> 저장
-              </button>
-            </div>
-            <div>시간: {clipInfo.time}</div>
+          {/* 클립 정보 */}
+          <div className="memoClipInfo">
+            <span>Q{clipInfo.quarter}</span>
+            {clipInfo.down && <span>{clipInfo.down}번째 다운</span>}
+            {clipInfo.playType && <span>{clipInfo.playType}</span>}
+            <span className="memoTime">
+              <IoTime size={14} /> {clipInfo.time}
+            </span>
           </div>
 
-          {savedMemos.length > 0 && (
-            <div className="memoList">
-              <div className="memoListHeader">
-                <h4>저장된 메모 ({savedMemos.length})</h4>
-                <button className="memoExportBtn" onClick={exportMemos}>
-                  내보내기
-                </button>
-              </div>
-              {savedMemos.map((memo) => (
-                <div key={memo.id} className="memoItem">
-                  <div className="memoItemHeader">
-                    <span className="memoDate">
-                      {new Date(memo.timestamp).toLocaleString('ko-KR')}
-                    </span>
-                    <button
-                      className="memoDeleteBtn"
-                      onClick={() => deleteMemo(memo.id)}
-                    >
-                      <IoTrash size={16} />
-                    </button>
-                  </div>
-                  <div className="memoItemContent">
-                    {renderWithMentions(memo.content)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
+          {/* 나만 보기 옵션 */}
           <div className="memo-options">
             <label className="private-memo-toggle">
               <input
@@ -517,42 +367,95 @@ const VideoMemo = ({
             </label>
           </div>
 
-          <div className="memo-input-container">
+          {/* 메모 입력 (통합된 하나의 textarea) */}
+          <div className="memoInput">
             <textarea
               ref={textareaRef}
-              value={content}
-              onChange={handleContentChange}
-              placeholder="메모를 입력하세요... (@playerID로 선수 멘션 가능)"
-              className="memo-textarea"
+              value={safeString(memoContent)}
+              onChange={onChangeText}
+              onKeyDown={onKeyDown}
+              placeholder="이 플레이에 대한 메모를 작성하세요... (@playerID로 선수 멘션 가능)"
+              rows={6}
             />
 
-            {showPlayerList && filteredPlayers.length > 0 && (
-              <div className="player-mention-list">
-                {filteredPlayers.map((player) => (
+            {/* 멘션 드롭다운 */}
+            {mentionOpen && mentionList.length > 0 && (
+              <div className="mentionDropdown">
+                {mentionList.map((p, idx) => (
                   <div
-                    key={player.playerID}
-                    className="player-mention-item"
-                    onClick={() => handlePlayerSelect(player)}
+                    key={p.playerID || p._id || p.id || `${p.name}-${idx}`}
+                    className={`mentionItem ${
+                      idx === mentionIndex ? 'active' : ''
+                    }`}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      insertMentionToken(p);
+                    }}
                   >
-                    {player.avatar && (
-                      <img src={player.avatar} alt={player.name} />
-                    )}
-                    <div>
-                      <div className="player-name">{player.name}</div>
-                      <div className="player-id">@{player.playerID}</div>
+                    <div className="mentionName">@{p.name}</div>
+                    <div className="mentionMeta">
+                      {p.playerID && `ID: ${p.playerID}`}
+                      {p.position && ` • ${p.position}`}
+                      {p.jerseyNumber && ` • #${p.jerseyNumber}`}
                     </div>
                   </div>
                 ))}
               </div>
             )}
+
+            <div className="memoActions">
+              <button
+                className="memoSaveBtn"
+                onClick={saveMemo}
+                disabled={!safeTrim(safeString(memoContent))}
+              >
+                <IoSave /> {isPrivate ? '개인 메모 저장' : '팀 메모 저장'}
+              </button>
+            </div>
           </div>
 
+          {/* 저장된 메모 목록 */}
+          {savedMemos.length > 0 && (
+            <div className="memoList">
+              <div className="memoListHeader">
+                <h4>저장된 메모 ({savedMemos.length})</h4>
+              </div>
+              {savedMemos.map((memo) => (
+                <div key={memo.id} className="memoItem">
+                  <div className="memoItemHeader">
+                    <div className="memoAuthorInfo">
+                      <span className="memoAuthor">{memo.authorName}</span>
+                      {memo.isPrivate && (
+                        <span className="memoType">🔒 개인</span>
+                      )}
+                      {!memo.isPrivate && (
+                        <span className="memoType">💬 팀</span>
+                      )}
+                    </div>
+                    <div className="memoActions">
+                      <span className="memoDate">
+                        {new Date(memo.timestamp).toLocaleString('ko-KR')}
+                      </span>
+                      <button
+                        className="memoDeleteBtn"
+                        onClick={() => deleteMemo(memo.id)}
+                      >
+                        <IoTrash size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="memoItemContent">
+                    {renderWithMentions(memo.content)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 하단 액션 버튼 */}
           <div className="memo-actions">
             <button onClick={onClose} className="cancel-btn">
-              취소
-            </button>
-            <button onClick={handleSave} className="save-btn">
-              {isPrivate ? '🔒 개인 메모 저장' : '💬 팀 메모 저장'}
+              닫기
             </button>
           </div>
         </div>
