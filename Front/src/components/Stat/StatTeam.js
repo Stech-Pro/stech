@@ -231,40 +231,40 @@ const TEAM_COLUMNS = {
   런: [
     { key: 'rushing_attempts', label: '러싱 시도' },
     { key: 'rushing_yards', label: '러싱 야드' },
-    { key: 'yards_per_carry', label: '볼 캐리 당 러싱 야드' },
+    { key: 'yards_per_carry', label: '볼 캐리 당\n러싱 야드' },
     { key: 'rushing_yards_per_game', label: '경기당 러싱 야드' },
     { key: 'rushing_td', label: '러싱 터치다운' },
   ],
   // 패스
   패스: [
-    { key: 'pass_completions-attempts', label: '패스 성공-패스 시도' },
+    { key: 'pass_completions-attempts', label: '패스 성공\n패스 시도' },
     { key: 'passing_yards', label: '패싱 야드' },
     {
       key: 'passing_yards_per_passing_attempts',
-      label: '패스 시도 당 패스 야드',
+      label: '패스 시도 당\n패스 야드',
     },
-    { key: 'passing_yards_per_game', label: '경기당 패스 야드' },
-    { key: 'passing_td', label: '패스 터치다운' },
+    { key: 'passing_yards_per_game', label: '경기당\n패스 야드' },
+    { key: 'passing_td', label: '패스\n터치다운' },
     { key: 'interceptions', label: '인터셉트' },
   ],
   // 스페셜팀(킥/펀트/리턴 통합)
   스페셜팀: [
-    { key: 'total_punt_yards', label: '총 펀트 야드' },
-    { key: 'average_punt_yards', label: '평균 펀트 야드' },
-    { key: 'touchback_percentage', label: '터치백 퍼센티지' },
+    { key: 'total_punt_yards', label: '총 펀트\n야드' },
+    { key: 'average_punt_yards', label: '평균 펀트\n야드' },
+    { key: 'touchback_percentage', label: '터치백\n퍼센티지' },
 
-    { key: 'field_goal_completions-attempts', label: '필드골 성공-총 시도' },
-    { key: 'yards_per_kick_return', label: '평균 킥 리턴 야드' },
+    { key: 'field_goal_completions-attempts', label: '필드골 성공총 시도' },
+    { key: 'yards_per_kick_return', label: '평균 킥\n리턴 야드' },
 
-    { key: 'yards_per_punt_return', label: '평균 펀트 리턴 야드' },
-    { key: 'total_return_yards', label: '총 리턴 야드' },
+    { key: 'yards_per_punt_return', label: '평균 펀트\n리턴 야드' },
+    { key: 'total_return_yards', label: '총 리턴\n야드' },
   ],
   기타: [
-    { key: 'fumble-turnover', label: '펌블 수-펌블 턴오버 수' },
-    { key: 'turnover_per_game', label: '경기 당 턴오버 수' },
+    { key: 'fumble-turnover', label: '펌블 수\n펌블 턴오버 수' },
+    { key: 'turnover_per_game', label: '경기 당\n턴오버 수' },
     { key: 'turnover_rate', label: '턴오버 비율' },
-    { key: 'penalty-pen_yards', label: '총 페널티 수-총 페널티 야드' },
-    { key: 'pen_yards_per_game', label: '경기 당 페널티 야드' },
+    { key: 'penalty-pen_yards', label: '총 페널티 수\n총 페널티 야드' },
+    { key: 'pen_yards_per_game', label: '경기 당\n페널티 야드' },
   ],
 };
 
@@ -407,7 +407,10 @@ export default function StatTeam({ data, teams = [] }) {
               </div>
               <div
                 className="team-table-row2"
-                style={{ '--cols': currentColumns.length }}
+                style={{
+                  '--cols': currentColumns.length,
+                  whiteSpace: 'pre-line',
+                }}
               >
                 {currentColumns.map((col) => {
                   const isActive = currentSort && currentSort.key === col.key;

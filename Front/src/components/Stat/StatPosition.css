@@ -22,11 +22,12 @@
 
 .table-row {
   display: grid;
-  grid-template-columns: 28rem 1fr;
+  grid-template-columns: 21rem 1fr;
   align-items: stretch;
   padding: 1rem 0rem;
   color: #a5a5a5;
   font-weight: 700;
+  white-space: nowrap;
 }
 .table-rows {
   height: 3.75rem;
@@ -34,7 +35,7 @@
   border: 0.236px solid #6e6e6e;
   background: rgba(255, 255, 255, 0.4);
   display: grid;
-  grid-template-columns: 28rem 1fr;
+  grid-template-columns: 20rem 1fr;
   align-items: center;
   font-weight: 700;
 }
@@ -42,9 +43,9 @@
   background: rgba(110, 110, 110, 0.2);
 }
 .table-row1 {
-  width: 28rem;
+  width: 20rem;
   display: grid;
-  grid-template-columns: 5rem 7rem 1fr;
+  grid-template-columns: 5rem 5rem 1fr;
   align-items: center;
 }
 
@@ -162,7 +163,6 @@
 .sort-toggle.one {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   background: transparent;
   border: none;
   padding: 0;

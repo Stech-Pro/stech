@@ -158,7 +158,7 @@
 .sort-toggle.one {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 0px;
   background: transparent;
   border: none;
   padding: 0;
