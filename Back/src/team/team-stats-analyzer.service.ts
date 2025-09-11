@@ -171,6 +171,12 @@ export class TeamStatsAnalyzerService {
         offenseStats.rushingTouchdowns =
           (offenseStats.rushingTouchdowns || 0) + 1;
       }
+
+      // OL 런 펌블 처리 (스냅 미스)
+      if (significantPlays.includes('FUMBLE') && (clip.car?.pos === 'OL' || clip.car2?.pos === 'OL')) {
+        offenseStats.fumbles += 1;
+        console.log(`   🏈 팀 런 펌블 (OL 스냅 미스) 기록! 팀: ${isHomeOffense ? '홈' : '어웨이'}`);
+      }
     }
 
     // 펀트 처리
