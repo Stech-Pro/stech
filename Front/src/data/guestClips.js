@@ -10,7 +10,6 @@ export const GUEST_CLIPS = [
     "gainYard": 38,
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757527629/Wide_-_Clip_001_tqkgou.mp4"
   },
-
   {
     "id": "2",
     "quarter": 1,
@@ -25,11 +24,11 @@ export const GUEST_CLIPS = [
   {
     "id": "3",
     "quarter": 1,
-    "playType": null,
+    "playType": "NONE",
     "down": 2,
     "yardsToGo": 8,
     "significantPlay": [
-      "PENALTY.HOME"
+      "PENALTY.경기강원올스타"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
@@ -73,11 +72,11 @@ export const GUEST_CLIPS = [
   {
     "id": "7",
     "quarter": 1,
-    "playType": null,
+    "playType": "NONE",
     "down": 1,
     "yardsToGo": 10,
     "significantPlay": [
-      "PENALTY.AWAY"
+      "PENALTY.서울 바이킹스"
     ],
     "offensiveTeam": "경기강원올스타",
     "gainYard": 0,
@@ -86,11 +85,11 @@ export const GUEST_CLIPS = [
   {
     "id": "8",
     "quarter": 1,
-    "playType": null,
+    "playType": "NONE",
     "down": 1,
     "yardsToGo": 5,
     "significantPlay": [
-      "PENALTY.HOME"
+      "PENALTY.경기강원올스타"
     ],
     "offensiveTeam": "경기강원올스타",
     "gainYard": 0,
@@ -145,11 +144,11 @@ export const GUEST_CLIPS = [
   {
     "id": "13",
     "quarter": 1,
-    "playType": null,
+    "playType": "NONE",
     "down": 1,
     "yardsToGo": 10,
     "significantPlay": [
-      "PENALTY.AWAY"
+      "PENALTY.서울 바이킹스"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
@@ -203,19 +202,6 @@ export const GUEST_CLIPS = [
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757527907/Wide_-_Clip_018_rdrih1.mp4"
   },
   {
-    "id": "18",
-    "quarter": 1,
-    "playType": "RETURN",
-    "down": 4,
-    "yardsToGo": 23,
-    "significantPlay": [
-      "PUNT"
-    ],
-    "offensiveTeam": "경기강원올스타",
-    "gainYard": -3,
-    "clipUrl": null
-  },
-  {
     "id": "19",
     "quarter": 1,
     "playType": "RUN",
@@ -262,19 +248,6 @@ export const GUEST_CLIPS = [
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757527958/Wide_-_Clip_022_lgp2du.mp4"
   },
   {
-    "id": "22",
-    "quarter": 1,
-    "playType": "RETURN",
-    "down": 4,
-    "yardsToGo": 7,
-    "significantPlay": [
-      "PUNT"
-    ],
-    "offensiveTeam": "서울 바이킹스",
-    "gainYard": 8,
-    "clipUrl": null
-  },
-  {
     "id": "23",
     "quarter": 1,
     "playType": "NOPASS",
@@ -288,11 +261,11 @@ export const GUEST_CLIPS = [
   {
     "id": "24",
     "quarter": 1,
-    "playType": null,
+    "playType": "NONE",
     "down": 2,
     "yardsToGo": 10,
     "significantPlay": [
-      "PENALTY.AWAY"
+      "PENALTY.서울 바이킹스"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
@@ -311,20 +284,6 @@ export const GUEST_CLIPS = [
     "offensiveTeam": "서울 바이킹스",
     "gainYard": -7,
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757527959/Wide_-_Clip_026_jhoele.mp4"
-  },
-  {
-    "id": "26",
-    "quarter": 1,
-    "playType": "RETURN",
-    "down": 1,
-    "yardsToGo": 10,
-    "significantPlay": [
-      "FUMBLERECDEF",
-      "TURNOVER"
-    ],
-    "offensiveTeam": "서울 바이킹스",
-    "gainYard": -13,
-    "clipUrl": null
   },
   {
     "id": "27",
@@ -455,11 +414,11 @@ export const GUEST_CLIPS = [
   {
     "id": "39",
     "quarter": 2,
-    "playType": null,
+    "playType": "NONE",
     "down": 2,
     "yardsToGo": 15,
     "significantPlay": [
-      "PENALTY.AWAY"
+      "PENALTY.서울 바이킹스"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
@@ -506,7 +465,7 @@ export const GUEST_CLIPS = [
   {
     "id": "44",
     "quarter": 2,
-    "playType": null,
+    "playType": "NONE",
     "down": 1,
     "yardsToGo": 10,
     "significantPlay": [],
@@ -551,27 +510,13 @@ export const GUEST_CLIPS = [
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528021/Wide_-_Clip_047_aylle6.mp4"
   },
   {
-    "id": "47",
-    "quarter": 2,
-    "playType": "RETURN",
-    "down": 3,
-    "yardsToGo": 15,
-    "significantPlay": [
-      "FUMBLERECDEF",
-      "TURNOVER"
-    ],
-    "offensiveTeam": "경기강원올스타",
-    "gainYard": 0,
-    "clipUrl": null
-  },
-  {
     "id": "49",
     "quarter": 2,
-    "playType": null,
+    "playType": "NONE",
     "down": 1,
     "yardsToGo": 8,
     "significantPlay": [
-      "PENALTY.HOME"
+      "PENALTY.경기강원올스타"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
@@ -637,19 +582,6 @@ export const GUEST_CLIPS = [
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528026/Wide_-_Clip_055_tmltl6.mp4"
   },
   {
-    "id": "55",
-    "quarter": 2,
-    "playType": "RETURN",
-    "down": null,
-    "yardsToGo": null,
-    "significantPlay": [
-      "KICKOFF"
-    ],
-    "offensiveTeam": "경기강원올스타",
-    "gainYard": 11,
-    "clipUrl": null
-  },
-  {
     "id": "56",
     "quarter": 2,
     "playType": "NOPASS",
@@ -681,19 +613,6 @@ export const GUEST_CLIPS = [
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 62,
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528028/Wide_-_Clip_059_dttuaw.mp4"
-  },
-  {
-    "id": "59",
-    "quarter": 3,
-    "playType": "RETURN",
-    "down": null,
-    "yardsToGo": null,
-    "significantPlay": [
-      "KICKOFF"
-    ],
-    "offensiveTeam": "경기강원올스타",
-    "gainYard": 16,
-    "clipUrl": null
   },
   {
     "id": "61",
@@ -738,19 +657,6 @@ export const GUEST_CLIPS = [
     "offensiveTeam": "경기강원올스타",
     "gainYard": 30,
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528032/Wide_-_Clip_064_gnutzp.mp4"
-  },
-  {
-    "id": "64",
-    "quarter": 3,
-    "playType": "RETURN",
-    "down": 4,
-    "yardsToGo": 10,
-    "significantPlay": [
-      "PUNT"
-    ],
-    "offensiveTeam": "서울 바이킹스",
-    "gainYard": 24,
-    "clipUrl": null
   },
   {
     "id": "65",
@@ -809,20 +715,6 @@ export const GUEST_CLIPS = [
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 14,
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528076/Wide_-_Clip_069_bbk2z2.mp4"
-  },
-  {
-    "id": "69",
-    "quarter": 3,
-    "playType": null,
-    "down": 1,
-    "yardsToGo": 10,
-    "significantPlay": [
-      "FUMBLERECDEF",
-      "TURNOVER"
-    ],
-    "offensiveTeam": "서울 바이킹스",
-    "gainYard": 0,
-    "clipUrl": null
   },
   {
     "id": "70",
@@ -983,7 +875,7 @@ export const GUEST_CLIPS = [
   {
     "id": "85",
     "quarter": 3,
-    "playType": "FIELDGOAL",
+    "playType": "FG",
     "down": 4,
     "yardsToGo": 12,
     "significantPlay": [
@@ -1003,19 +895,6 @@ export const GUEST_CLIPS = [
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 50,
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528085/Wide_-_Clip_086_nvv6jg.mp4"
-  },
-  {
-    "id": "86",
-    "quarter": 3,
-    "playType": "RETURN",
-    "down": null,
-    "yardsToGo": null,
-    "significantPlay": [
-      "KICKOFF"
-    ],
-    "offensiveTeam": "경기강원올스타",
-    "gainYard": 23,
-    "clipUrl": null
   },
   {
     "id": "87",
@@ -1064,19 +943,6 @@ export const GUEST_CLIPS = [
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528180/Wide_-_Clip_091_tzdfuw.mp4"
   },
   {
-    "id": "91",
-    "quarter": 4,
-    "playType": "RETURN",
-    "down": 2,
-    "yardsToGo": 8,
-    "significantPlay": [
-      "TURNOVER"
-    ],
-    "offensiveTeam": "경기강원올스타",
-    "gainYard": 18,
-    "clipUrl": null
-  },
-  {
     "id": "92",
     "quarter": 4,
     "playType": "NOPASS",
@@ -1090,11 +956,11 @@ export const GUEST_CLIPS = [
   {
     "id": "93",
     "quarter": 4,
-    "playType": null,
+    "playType": "NONE",
     "down": 2,
     "yardsToGo": 10,
     "significantPlay": [
-      "PENALTY.AWAY"
+      "PENALTY.서울 바이킹스"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
@@ -1145,20 +1011,6 @@ export const GUEST_CLIPS = [
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528184/Wide_-_Clip_099_pyljvp.mp4"
-  },
-  {
-    "id": "99",
-    "quarter": 4,
-    "playType": "RETURN",
-    "down": 2,
-    "yardsToGo": 10,
-    "significantPlay": [
-      "TURNOVER",
-      "TOUCHDOWN"
-    ],
-    "offensiveTeam": "서울 바이킹스",
-    "gainYard": -59,
-    "clipUrl": null
   },
   {
     "id": "100",
@@ -1314,19 +1166,6 @@ export const GUEST_CLIPS = [
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528190/Wide_-_Clip_112_f8q2jv.mp4"
   },
   {
-    "id": "112",
-    "quarter": 4,
-    "playType": "RETURN",
-    "down": null,
-    "yardsToGo": null,
-    "significantPlay": [
-      "KICKOFF"
-    ],
-    "offensiveTeam": "경기강원올스타",
-    "gainYard": 17,
-    "clipUrl": null
-  },
-  {
     "id": "115",
     "quarter": 4,
     "playType": "RUN",
@@ -1360,19 +1199,6 @@ export const GUEST_CLIPS = [
     "offensiveTeam": "경기강원올스타",
     "gainYard": 0,
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528191/Wide_-_Clip_117_iadx63.mp4"
-  },
-  {
-    "id": "117",
-    "quarter": 4,
-    "playType": "RETURN",
-    "down": 3,
-    "yardsToGo": 5,
-    "significantPlay": [
-      "TURNOVER"
-    ],
-    "offensiveTeam": "경기강원올스타",
-    "gainYard": -19,
-    "clipUrl": null
   },
   {
     "id": "118",
@@ -1411,19 +1237,6 @@ export const GUEST_CLIPS = [
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 11,
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528194/Wide_-_Clip_120_heqbld.mp4"
-  },
-  {
-    "id": "120",
-    "quarter": 4,
-    "playType": "RUN",
-    "down": 3,
-    "yardsToGo": 22,
-    "significantPlay": [
-      "FUMBLERECOFF"
-    ],
-    "offensiveTeam": "서울 바이킹스",
-    "gainYard": 0,
-    "clipUrl": null
   },
   {
     "id": "121",
