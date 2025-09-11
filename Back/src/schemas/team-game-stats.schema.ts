@@ -20,6 +20,10 @@ export class TeamGameStats {
   @Prop({ required: true })
   season: string; // date에서 추출한 연도
 
+  // 리그 구분 추가
+  @Prop({ enum: ['1부', '2부'], default: '1부' })
+  league: string;
+
   @Prop({ required: true })
   opponent: string;
 
@@ -43,20 +47,20 @@ export class TeamGameStats {
     turnovers?: number;
     fumbles?: number;
     fumblesLost?: number;
-    
+
     // 디펜스 스탯
     yardsAllowed?: number;
     sacks?: number;
     interceptions?: number;
     fumblesRecovered?: number;
-    
+
     // 스페셜팀 스탯
     puntAttempts?: number;
     puntYards?: number;
     puntReturns?: number;
     kickReturns?: number;
     returnYards?: number;
-    
+
     // 팀 전체
     penalties?: number;
     penaltyYards?: number;
@@ -65,12 +69,12 @@ export class TeamGameStats {
     fourthDownConversions?: string; // "1/2"
   };
 
-  @Prop({ 
+  @Prop({
     type: {
       own: Number,
       opponent: Number,
     },
-    default: { own: 0, opponent: 0 }
+    default: { own: 0, opponent: 0 },
   })
   finalScore?: {
     own: number;

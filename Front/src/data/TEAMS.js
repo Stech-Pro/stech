@@ -1,4 +1,35 @@
 // src/data/TEAMS.js
+
+// 팀명 정규화 매핑 (JSON에서 오는 팀명 → 표준 팀명)
+const TEAM_NAME_MAPPING = {
+  // 소문자/비표준 형태 → 표준 형태
+  'HYlions': 'HYLions',
+  'KMrazorbacks': 'KMRazorbacks', 
+  'DGtuskers': 'DGTuskers',
+  'YSeagles': 'YSEagles',
+  'SNgreenTerrors': 'SNGreenTerrors',
+  'UScityhawks': 'USCityhawks',
+  'HFblackKnights': 'HFBlackKnights',
+  'KKragingBulls': 'KKRagingBulls',
+  'HIcowboys': 'HICowboys',
+  'KUtigers': 'KUTigers',
+  'SScrusaders': 'SSCrusaders',
+  'KHcommanders': 'KHCommanders',
+  'GSDragons': 'GSDragons',
+  'DSblueDolphons': 'DSBlueDolphons',
+  // 기타 발견되는 비표준 팀명들 추가 가능
+};
+
+/**
+ * 팀명을 표준 형태로 정규화
+ * @param {string} teamName - 정규화할 팀명
+ * @returns {string} 표준 형태의 팀명
+ */
+export const normalizeTeamName = (teamName) => {
+  if (!teamName) return teamName;
+  return TEAM_NAME_MAPPING[teamName] || teamName;
+};
+
 export const TEAMS = [
   // Seoul
   { id: 'YSEagles',        name: '연세대 이글스',        logo: '/assets/images/svg/teams/Yonsei.png',              region: 'Seoul' },

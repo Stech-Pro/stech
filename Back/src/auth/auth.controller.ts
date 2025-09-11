@@ -413,8 +413,8 @@ export class AuthController {
       required: ['gameKey', 'clipKey'],
     },
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: '메모가 성공적으로 추가되었습니다.',
     schema: {
       type: 'object',
@@ -458,8 +458,8 @@ export class AuthController {
       required: ['gameKey', 'clipKey'],
     },
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: '메모가 성공적으로 삭제되었습니다.',
     schema: {
       type: 'object',
@@ -493,8 +493,8 @@ export class AuthController {
     summary: '사용자 하이라이트 조회',
     description: '사용자의 자동 생성된 하이라이트 클립 목록을 조회합니다.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: '하이라이트 목록 조회 성공',
     schema: {
       type: 'object',
@@ -524,8 +524,8 @@ export class AuthController {
     summary: '사용자 메모 조회',
     description: '사용자가 저장한 메모 클립 목록을 조회합니다.',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: '메모 목록 조회 성공',
     schema: {
       type: 'object',

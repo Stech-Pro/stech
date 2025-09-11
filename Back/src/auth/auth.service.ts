@@ -650,7 +650,7 @@ export class AuthService {
 
     // 중복 체크
     const alreadyExists = user.memos.some(
-      memo => memo.gameKey === gameKey && memo.clipKey === clipKey
+      (memo) => memo.gameKey === gameKey && memo.clipKey === clipKey,
     );
 
     if (alreadyExists) {
@@ -676,7 +676,7 @@ export class AuthService {
 
     const initialLength = user.memos.length;
     user.memos = user.memos.filter(
-      memo => !(memo.gameKey === gameKey && memo.clipKey === clipKey)
+      (memo) => !(memo.gameKey === gameKey && memo.clipKey === clipKey),
     );
 
     if (user.memos.length === initialLength) {
@@ -727,7 +727,8 @@ export class AuthService {
 
     // 중복 체크
     const alreadyExists = user.highlights.some(
-      highlight => highlight.gameKey === gameKey && highlight.clipKey === clipKey
+      (highlight) =>
+        highlight.gameKey === gameKey && highlight.clipKey === clipKey,
     );
 
     if (!alreadyExists) {

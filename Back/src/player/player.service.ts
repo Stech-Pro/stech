@@ -4,9 +4,18 @@ import { Model, Types } from 'mongoose';
 import { Player, PlayerDocument } from '../schemas/player.schema';
 import { Team, TeamDocument } from '../schemas/team.schema';
 import { User, UserDocument } from '../schemas/user.schema';
-import { PlayerGameStats, PlayerGameStatsDocument } from '../schemas/player-game-stats.schema';
-import { PlayerSeasonStats, PlayerSeasonStatsDocument } from '../schemas/player-season-stats.schema';
-import { PlayerTotalStats, PlayerTotalStatsDocument } from '../schemas/player-total-stats.schema';
+import {
+  PlayerGameStats,
+  PlayerGameStatsDocument,
+} from '../schemas/player-game-stats.schema';
+import {
+  PlayerSeasonStats,
+  PlayerSeasonStatsDocument,
+} from '../schemas/player-season-stats.schema';
+import {
+  PlayerTotalStats,
+  PlayerTotalStatsDocument,
+} from '../schemas/player-total-stats.schema';
 import {
   CreatePlayerDto,
   UpdatePlayerStatsDto,
@@ -21,9 +30,12 @@ export class PlayerService {
     @InjectModel(Player.name) private playerModel: Model<PlayerDocument>,
     @InjectModel(Team.name) private teamModel: Model<TeamDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(PlayerGameStats.name) private playerGameStatsModel: Model<PlayerGameStatsDocument>,
-    @InjectModel(PlayerSeasonStats.name) private playerSeasonStatsModel: Model<PlayerSeasonStatsDocument>,
-    @InjectModel(PlayerTotalStats.name) private playerTotalStatsModel: Model<PlayerTotalStatsDocument>,
+    @InjectModel(PlayerGameStats.name)
+    private playerGameStatsModel: Model<PlayerGameStatsDocument>,
+    @InjectModel(PlayerSeasonStats.name)
+    private playerSeasonStatsModel: Model<PlayerSeasonStatsDocument>,
+    @InjectModel(PlayerTotalStats.name)
+    private playerTotalStatsModel: Model<PlayerTotalStatsDocument>,
     private clipAnalyzer: ClipAnalyzerService,
     private statsManagement: StatsManagementService,
   ) {}
@@ -31,27 +43,27 @@ export class PlayerService {
   // 팀명을 학교 이름으로 변환 (playerId용)
   private mapTeamNameToSchoolCode(teamName: string): string {
     const schoolMapping = {
-      'KKRagingBulls': 'KK',
+      KKRagingBulls: 'KK',
       '건국대 레이징불스': 'KK',
-      'KHCommanders': 'KH',
+      KHCommanders: 'KH',
       '경희대 커맨더스': 'KH',
-      'SNGreenTerrors': 'SN',
+      SNGreenTerrors: 'SN',
       '서울대 그린테러스': 'SN',
-      'USCityhawks': 'US',
+      USCityhawks: 'US',
       '서울시립대 시티호크스': 'US',
-      'DGTuskers': 'DG',
+      DGTuskers: 'DG',
       '대구대 터스커스': 'DG',
-      'KMRazorbacks': 'KM',
+      KMRazorbacks: 'KM',
       '국민대 레이저백스': 'KM',
-      'YSEagles': 'YS',
+      YSEagles: 'YS',
       '연세대 이글스': 'YS',
-      'KUTigers': 'KU',
+      KUTigers: 'KU',
       '고려대 타이거스': 'KU',
-      'HICowboys': 'HI',
+      HICowboys: 'HI',
       '한국항공대 카우보이스': 'HI',
-      'SSCrusaders': 'SS',
+      SSCrusaders: 'SS',
       '숭실대 크루세이더스': 'SS',
-      'HYLions': 'HY',
+      HYLions: 'HY',
       '한양대 라이온스': 'HY',
     };
 
@@ -226,15 +238,15 @@ export class PlayerService {
 
     // 멀티포지션 선수를 각 포지션별로 분리하여 반환
     const expandedPlayers = [];
-    
+
     for (const player of players) {
       // stats 구조 확인 및 변환
       const playerStats = player.stats || {};
-      
+
       for (const position of player.positions) {
         // 포지션별 스탯 가져오기
         let positionStats = {};
-        
+
         // stats 구조가 포지션별로 분리되어 있는지 확인
         if (playerStats[position]) {
           // 예: stats.RB, stats.WR 형태
@@ -243,7 +255,7 @@ export class PlayerService {
           // 포지션별 스탯이 없으면 전체 stats 사용 (하위 호환성)
           positionStats = playerStats;
         }
-        
+
         // 각 포지션별로 별도의 선수 객체 생성
         const playerObject = {
           _id: `${player._id}_${position}`,
@@ -264,16 +276,20 @@ export class PlayerService {
 
         // WR 포지션일 경우 패스/런별 펌블 데이터를 최상위 레벨에 추가
         if (position === 'WR' && positionStats) {
-          (playerObject as any).passingFumbles = (positionStats as any).passingFumbles || 0;
-          (playerObject as any).rushingFumbles = (positionStats as any).rushingFumbles || 0;
-          (playerObject as any).passingFumblesLost = (positionStats as any).passingFumblesLost || 0;
-          (playerObject as any).rushingFumblesLost = (positionStats as any).rushingFumblesLost || 0;
-          
+          (playerObject as any).passingFumbles =
+            (positionStats as any).passingFumbles || 0;
+          (playerObject as any).rushingFumbles =
+            (positionStats as any).rushingFumbles || 0;
+          (playerObject as any).passingFumblesLost =
+            (positionStats as any).passingFumblesLost || 0;
+          (playerObject as any).rushingFumblesLost =
+            (positionStats as any).rushingFumblesLost || 0;
+
           console.log(`🐛 WR ${player.jerseyNumber}번 펌블 데이터:`, {
             passingFumbles: (playerObject as any).passingFumbles,
             rushingFumbles: (playerObject as any).rushingFumbles,
             passingFumblesLost: (playerObject as any).passingFumblesLost,
-            rushingFumblesLost: (playerObject as any).rushingFumblesLost
+            rushingFumblesLost: (playerObject as any).rushingFumblesLost,
           });
         }
 
@@ -282,26 +298,34 @@ export class PlayerService {
     }
 
     // DB 스페셜팀 스탯 디버깅
-    const dbPlayers = expandedPlayers.filter(p => p.position === 'DB');
+    const dbPlayers = expandedPlayers.filter((p) => p.position === 'DB');
     if (dbPlayers.length > 0) {
-      console.log('🐛 원본 DB 선수 stats 구조:', players.filter(p => p.positions.includes('DB')).map(p => ({
-        name: p.name,
-        positions: p.positions,
-        dbStats: p.stats?.DB,
-        totalStats: p.stats
-      })));
-      
-      console.log('🐛 API 응답 - DB 선수들:', dbPlayers.map(p => ({
-        name: p.name,
-        position: p.position,
-        kickReturns: p.stats?.kickReturns,
-        kickReturnYards: p.stats?.kickReturnYards,
-        yardsPerKickReturn: p.stats?.yardsPerKickReturn,
-        puntReturns: p.stats?.puntReturns,
-        puntReturnYards: p.stats?.puntReturnYards,
-        yardsPerPuntReturn: p.stats?.yardsPerPuntReturn,
-        returnTouchdowns: p.stats?.returnTouchdowns,
-      })));
+      console.log(
+        '🐛 원본 DB 선수 stats 구조:',
+        players
+          .filter((p) => p.positions.includes('DB'))
+          .map((p) => ({
+            name: p.name,
+            positions: p.positions,
+            dbStats: p.stats?.DB,
+            totalStats: p.stats,
+          })),
+      );
+
+      console.log(
+        '🐛 API 응답 - DB 선수들:',
+        dbPlayers.map((p) => ({
+          name: p.name,
+          position: p.position,
+          kickReturns: p.stats?.kickReturns,
+          kickReturnYards: p.stats?.kickReturnYards,
+          yardsPerKickReturn: p.stats?.yardsPerKickReturn,
+          puntReturns: p.stats?.puntReturns,
+          puntReturnYards: p.stats?.puntReturnYards,
+          yardsPerPuntReturn: p.stats?.yardsPerPuntReturn,
+          returnTouchdowns: p.stats?.returnTouchdowns,
+        })),
+      );
     }
 
     return {
@@ -509,8 +533,13 @@ export class PlayerService {
 
     // 2. 새로운 3-tier 스탯 저장 (gameData가 있는 경우)
     if (gameData) {
-      await this.savePlayerStatsWithNewStructure(player, analyzedStats, gameData, playerClips);
-      
+      await this.savePlayerStatsWithNewStructure(
+        player,
+        analyzedStats,
+        gameData,
+        playerClips,
+      );
+
       return {
         success: true,
         message: `등번호 ${playerNumber}번 ${position} 선수의 스탯이 3-tier 시스템에 저장되었습니다.`,
@@ -519,7 +548,9 @@ export class PlayerService {
         processedClips: playerClips.length,
         newStructureSaved: true,
         gameKey: gameData.gameKey,
-        season: gameData.date ? gameData.date.substring(0, 4) : new Date().getFullYear().toString(),
+        season: gameData.date
+          ? gameData.date.substring(0, 4)
+          : new Date().getFullYear().toString(),
       };
     }
 
@@ -788,10 +819,14 @@ export class PlayerService {
 
         if (hasTFL || hasSAFETY) {
           backRushYard += gainYard;
-          console.log(`  📉 BackRushYard: +${gainYard} (TFL/SAFETY) 총 ${backRushYard}야드`);
+          console.log(
+            `  📉 BackRushYard: +${gainYard} (TFL/SAFETY) 총 ${backRushYard}야드`,
+          );
         } else {
           frontRushYard += gainYard;
-          console.log(`  📈 FrontRushYard: +${gainYard} 총 ${frontRushYard}야드`);
+          console.log(
+            `  📈 FrontRushYard: +${gainYard} 총 ${frontRushYard}야드`,
+          );
         }
 
         // 최장 러싱 업데이트
@@ -834,10 +869,12 @@ export class PlayerService {
 
     // Total rushing yards = FrontRushYard - BackRushYard
     const totalRushingYards = frontRushYard - backRushYard;
-    
+
     // Yards per carry 계산
-    const yardsPerCarry = rushingAttempts > 0 ? 
-      Math.round((totalRushingYards / rushingAttempts) * 100) / 100 : 0;
+    const yardsPerCarry =
+      rushingAttempts > 0
+        ? Math.round((totalRushingYards / rushingAttempts) * 100) / 100
+        : 0;
 
     const finalStats = {
       gamesPlayed: 1,
@@ -876,25 +913,27 @@ export class PlayerService {
     let receivingTouchdowns = 0;
     let longestReception = 0;
     let receivingFirstDowns = 0;
-    
+
     // 러싱 스탯
     let rushingAttempts = 0;
     let rushingYards = 0;
     let rushingTouchdowns = 0;
     let longestRush = 0;
-    
+
     // 스페셜팀 스탯
     let kickoffReturn = 0;
     let kickoffReturnYard = 0;
     let puntReturn = 0;
     let puntReturnYard = 0;
     let returnTouchdown = 0;
-    
+
     // 펌블
     let fumbles = 0;
     let fumblesLost = 0;
 
-    console.log(`🎯 ${playerName} ${jerseyNumber}번 WR 통계 계산 시작 (${clips.length}개 클립)`);
+    console.log(
+      `🎯 ${playerName} ${jerseyNumber}번 WR 통계 계산 시작 (${clips.length}개 클립)`,
+    );
 
     for (const clip of clips) {
       const isPlayerInCar = clip.car?.num === jerseyNumber;
@@ -908,12 +947,14 @@ export class PlayerService {
       // PASS 플레이 처리 (타겟/리시빙)
       if (clip.playType === 'PASS') {
         receivingTargets++;
-        
+
         if (!significantPlays.includes('INCOMPLETE')) {
           receptions++;
           receivingYards += gainYard;
-          console.log(`  🎯 리시빙: ${gainYard}야드 (총 ${receptions}캐치, ${receivingYards}야드)`);
-          
+          console.log(
+            `  🎯 리시빙: ${gainYard}야드 (총 ${receptions}캐치, ${receivingYards}야드)`,
+          );
+
           if (gainYard > longestReception) {
             longestReception = gainYard;
           }
@@ -926,8 +967,10 @@ export class PlayerService {
       if (clip.playType === 'RUN') {
         rushingAttempts++;
         rushingYards += gainYard;
-        console.log(`  🏃 러싱: ${gainYard}야드 (총 ${rushingAttempts}시도, ${rushingYards}야드)`);
-        
+        console.log(
+          `  🏃 러싱: ${gainYard}야드 (총 ${rushingAttempts}시도, ${rushingYards}야드)`,
+        );
+
         if (gainYard > longestRush) {
           longestRush = gainYard;
         }
@@ -935,19 +978,23 @@ export class PlayerService {
 
       // 스페셜팀 리턴 처리
       if (clip.playType === 'RETURN') {
-        const hasKickoff = significantPlays.some(play => play === 'KICKOFF');
-        const hasPunt = significantPlays.some(play => play === 'PUNT');
+        const hasKickoff = significantPlays.some((play) => play === 'KICKOFF');
+        const hasPunt = significantPlays.some((play) => play === 'PUNT');
 
         if (hasKickoff) {
           kickoffReturn++;
           kickoffReturnYard += gainYard;
-          console.log(`  🟡 킥오프 리턴: ${gainYard}야드 (총 ${kickoffReturn}회, ${kickoffReturnYard}야드)`);
+          console.log(
+            `  🟡 킥오프 리턴: ${gainYard}야드 (총 ${kickoffReturn}회, ${kickoffReturnYard}야드)`,
+          );
         }
 
         if (hasPunt) {
           puntReturn++;
           puntReturnYard += gainYard;
-          console.log(`  🟡 펀트 리턴: ${gainYard}야드 (총 ${puntReturn}회, ${puntReturnYard}야드)`);
+          console.log(
+            `  🟡 펀트 리턴: ${gainYard}야드 (총 ${puntReturn}회, ${puntReturnYard}야드)`,
+          );
         }
       }
 
@@ -978,10 +1025,18 @@ export class PlayerService {
     }
 
     // 평균 계산
-    const yardsPerReception = receptions > 0 ? Math.round((receivingYards / receptions) * 10) / 10 : 0;
-    const yardsPerCarry = rushingAttempts > 0 ? Math.round((rushingYards / rushingAttempts) * 10) / 10 : 0;
-    const yardPerKickoffReturn = kickoffReturn > 0 ? Math.round((kickoffReturnYard / kickoffReturn) * 10) / 10 : 0;
-    const yardPerPuntReturn = puntReturn > 0 ? Math.round((puntReturnYard / puntReturn) * 10) / 10 : 0;
+    const yardsPerReception =
+      receptions > 0 ? Math.round((receivingYards / receptions) * 10) / 10 : 0;
+    const yardsPerCarry =
+      rushingAttempts > 0
+        ? Math.round((rushingYards / rushingAttempts) * 10) / 10
+        : 0;
+    const yardPerKickoffReturn =
+      kickoffReturn > 0
+        ? Math.round((kickoffReturnYard / kickoffReturn) * 10) / 10
+        : 0;
+    const yardPerPuntReturn =
+      puntReturn > 0 ? Math.round((puntReturnYard / puntReturn) * 10) / 10 : 0;
 
     const finalStats = {
       gamesPlayed: 1,
@@ -1013,7 +1068,7 @@ export class PlayerService {
     };
 
     console.log(
-      `🎯 ${teamName} ${jerseyNumber}번 WR: 타겟 ${receivingTargets}회, 캐치 ${receptions}회, 리시빙 ${receivingYards}야드, 러싱 ${rushingYards}야드, 리턴 ${kickoffReturn + puntReturn}회`
+      `🎯 ${teamName} ${jerseyNumber}번 WR: 타겟 ${receivingTargets}회, 캐치 ${receptions}회, 리시빙 ${receivingYards}야드, 러싱 ${rushingYards}야드, 리턴 ${kickoffReturn + puntReturn}회`,
     );
 
     return finalStats;
@@ -1034,18 +1089,20 @@ export class PlayerService {
     let receivingYards = 0;
     let receivingTouchdowns = 0;
     let longestReception = 0;
-    
+
     // 러싱 스탯
     let rushingAttempts = 0;
     let rushingYards = 0;
     let rushingTouchdowns = 0;
     let longestRush = 0;
-    
+
     // 펌블
     let fumbles = 0;
     let fumblesLost = 0;
 
-    console.log(`🎯 ${playerName} ${jerseyNumber}번 TE 통계 계산 시작 (${clips.length}개 클립)`);
+    console.log(
+      `🎯 ${playerName} ${jerseyNumber}번 TE 통계 계산 시작 (${clips.length}개 클립)`,
+    );
 
     for (const clip of clips) {
       const isPlayerInCar = clip.car?.num === jerseyNumber;
@@ -1059,12 +1116,14 @@ export class PlayerService {
       // PASS 플레이 처리 (타겟/리시빙)
       if (clip.playType === 'PASS') {
         receivingTargets++;
-        
+
         if (!significantPlays.includes('INCOMPLETE')) {
           receptions++;
           receivingYards += gainYard;
-          console.log(`  🎯 리시빙: ${gainYard}야드 (총 ${receptions}캐치, ${receivingYards}야드)`);
-          
+          console.log(
+            `  🎯 리시빙: ${gainYard}야드 (총 ${receptions}캐치, ${receivingYards}야드)`,
+          );
+
           if (gainYard > longestReception) {
             longestReception = gainYard;
           }
@@ -1077,8 +1136,10 @@ export class PlayerService {
       if (clip.playType === 'RUN') {
         rushingAttempts++;
         rushingYards += gainYard;
-        console.log(`  🏃 러싱: ${gainYard}야드 (총 ${rushingAttempts}시도, ${rushingYards}야드)`);
-        
+        console.log(
+          `  🏃 러싱: ${gainYard}야드 (총 ${rushingAttempts}시도, ${rushingYards}야드)`,
+        );
+
         if (gainYard > longestRush) {
           longestRush = gainYard;
         }
@@ -1105,8 +1166,12 @@ export class PlayerService {
     }
 
     // 평균 계산
-    const yardsPerReception = receptions > 0 ? Math.round((receivingYards / receptions) * 10) / 10 : 0;
-    const yardsPerCarry = rushingAttempts > 0 ? Math.round((rushingYards / rushingAttempts) * 10) / 10 : 0;
+    const yardsPerReception =
+      receptions > 0 ? Math.round((receivingYards / receptions) * 10) / 10 : 0;
+    const yardsPerCarry =
+      rushingAttempts > 0
+        ? Math.round((rushingYards / rushingAttempts) * 10) / 10
+        : 0;
 
     const finalStats = {
       gamesPlayed: 1,
@@ -1129,7 +1194,7 @@ export class PlayerService {
     };
 
     console.log(
-      `🎯 ${teamName} ${jerseyNumber}번 TE: 타겟 ${receivingTargets}회, 캐치 ${receptions}회, 리시빙 ${receivingYards}야드, 러싱 ${rushingYards}야드`
+      `🎯 ${teamName} ${jerseyNumber}번 TE: 타겟 ${receivingTargets}회, 캐치 ${receptions}회, 리시빙 ${receivingYards}야드, 러싱 ${rushingYards}야드`,
     );
 
     return finalStats;
@@ -1150,11 +1215,15 @@ export class PlayerService {
     let extraPointsAttempted = 0;
     let extraPointsMade = 0;
 
-    console.log(`🦶 ${playerName} ${jerseyNumber}번 K 통계 계산 시작 (${clips.length}개 클립)`);
+    console.log(
+      `🦶 ${playerName} ${jerseyNumber}번 K 통계 계산 시작 (${clips.length}개 클립)`,
+    );
 
     for (const clip of clips) {
-      const isPlayerInCar = clip.car?.num === jerseyNumber && clip.car?.pos === 'K';
-      const isPlayerInCar2 = clip.car2?.num === jerseyNumber && clip.car2?.pos === 'K';
+      const isPlayerInCar =
+        clip.car?.num === jerseyNumber && clip.car?.pos === 'K';
+      const isPlayerInCar2 =
+        clip.car2?.num === jerseyNumber && clip.car2?.pos === 'K';
 
       if (!isPlayerInCar && !isPlayerInCar2) continue;
 
@@ -1165,7 +1234,7 @@ export class PlayerService {
       if (clip.playType === 'FG') {
         fieldGoalsAttempted++;
         const actualDistance = gainYard + 17; // 실제 필드골 거리
-        
+
         if (significantPlays.includes('FIELDGOAL_GOOD')) {
           fieldGoalsMade++;
           if (actualDistance > longestFieldGoal) {
@@ -1180,7 +1249,7 @@ export class PlayerService {
       // PAT 플레이 처리
       if (clip.playType === 'PAT') {
         extraPointsAttempted++;
-        
+
         if (significantPlays.includes('PAT_GOOD')) {
           extraPointsMade++;
           console.log(`  ✅ PAT 성공`);
@@ -1191,8 +1260,10 @@ export class PlayerService {
     }
 
     // 필드골 성공률 계산
-    const fieldGoalPercentage = fieldGoalsAttempted > 0 ?
-      Math.round((fieldGoalsMade / fieldGoalsAttempted) * 100) : 0;
+    const fieldGoalPercentage =
+      fieldGoalsAttempted > 0
+        ? Math.round((fieldGoalsMade / fieldGoalsAttempted) * 100)
+        : 0;
 
     const finalStats = {
       gamesPlayed: 1,
@@ -1205,7 +1276,7 @@ export class PlayerService {
     };
 
     console.log(
-      `🦶 ${teamName} ${jerseyNumber}번 K: 필드골 ${fieldGoalsMade}/${fieldGoalsAttempted} (${fieldGoalPercentage}%), 최장 ${longestFieldGoal}야드, PAT ${extraPointsMade}/${extraPointsAttempted}`
+      `🦶 ${teamName} ${jerseyNumber}번 K: 필드골 ${fieldGoalsMade}/${fieldGoalsAttempted} (${fieldGoalPercentage}%), 최장 ${longestFieldGoal}야드, PAT ${extraPointsMade}/${extraPointsAttempted}`,
     );
 
     return finalStats;
@@ -1218,8 +1289,10 @@ export class PlayerService {
     try {
       console.log('🗑️ 모든 선수 데이터 삭제 시작...');
       const result = await this.playerModel.deleteMany({});
-      
-      console.log(`✅ ${result.deletedCount}명의 선수 데이터가 삭제되었습니다.`);
+
+      console.log(
+        `✅ ${result.deletedCount}명의 선수 데이터가 삭제되었습니다.`,
+      );
       return {
         success: true,
         message: `${result.deletedCount}명의 선수 데이터가 삭제되었습니다.`,
@@ -1238,10 +1311,12 @@ export class PlayerService {
     player: PlayerDocument,
     analyzedStats: any,
     gameData: any,
-    playerClips: any[]
+    playerClips: any[],
   ) {
     try {
-      const season = gameData.date ? gameData.date.substring(0, 4) : new Date().getFullYear().toString();
+      const season = gameData.date
+        ? gameData.date.substring(0, 4)
+        : new Date().getFullYear().toString();
       const schoolCode = this.mapTeamNameToSchoolCode(player.teamName);
       const playerId = `${season}_${schoolCode}_${player.jerseyNumber}`;
       const gameKey = gameData.gameKey;
@@ -1262,15 +1337,27 @@ export class PlayerService {
           opponent: this.getOpponentTeam(gameData, player.teamName),
           isHomeGame: gameData.homeTeam === player.teamName,
         },
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       console.log(`✅ 경기별 스탯 저장 완료: ${playerId} - ${gameKey}`);
 
       // 2. 시즌별 스탯 업데이트
-      await this.updateSeasonStats(playerId, season, player, analyzedStats, gameKey);
+      await this.updateSeasonStats(
+        playerId,
+        season,
+        player,
+        analyzedStats,
+        gameKey,
+      );
 
       // 3. 통합 스탯 업데이트
-      await this.updateTotalStats(playerId, player, analyzedStats, season, date);
+      await this.updateTotalStats(
+        playerId,
+        player,
+        analyzedStats,
+        season,
+        date,
+      );
 
       // 4. User 컬렉션 업데이트 (playerId로 연결)
       await this.updateUserStatsReferences(player.playerId);
@@ -1295,10 +1382,13 @@ export class PlayerService {
     season: string,
     player: PlayerDocument,
     gameStats: any,
-    gameKey: string
+    gameKey: string,
   ) {
     // 기존 시즌 스탯 조회
-    let seasonStats = await this.playerSeasonStatsModel.findOne({ playerId, season });
+    let seasonStats = await this.playerSeasonStatsModel.findOne({
+      playerId,
+      season,
+    });
 
     if (!seasonStats) {
       // 첫 경기인 경우
@@ -1314,19 +1404,25 @@ export class PlayerService {
       });
     } else {
       // 기존 스탯에 합산
-      const updatedStats = this.aggregateStats(seasonStats.stats, gameStats, player.primaryPosition || player.positions[0]);
-      
+      const updatedStats = this.aggregateStats(
+        seasonStats.stats,
+        gameStats,
+        player.primaryPosition || player.positions[0],
+      );
+
       // gameKey가 이미 있는지 확인 (중복 방지)
       if (!seasonStats.gameKeys.includes(gameKey)) {
         seasonStats.gameKeys.push(gameKey);
         seasonStats.gamesPlayed = seasonStats.gameKeys.length;
       }
-      
+
       seasonStats.stats = updatedStats;
       await seasonStats.save();
     }
-    
-    console.log(`✅ 시즌별 스탯 업데이트 완료: ${playerId} - ${season} (${seasonStats.gamesPlayed}경기)`);
+
+    console.log(
+      `✅ 시즌별 스탯 업데이트 완료: ${playerId} - ${season} (${seasonStats.gamesPlayed}경기)`,
+    );
   }
 
   /**
@@ -1337,7 +1433,7 @@ export class PlayerService {
     player: PlayerDocument,
     gameStats: any,
     season: string,
-    date: string
+    date: string,
   ) {
     // 기존 통합 스탯 조회
     let totalStats = await this.playerTotalStatsModel.findOne({ playerId });
@@ -1357,105 +1453,183 @@ export class PlayerService {
       });
     } else {
       // 기존 스탯에 합산
-      const updatedStats = this.aggregateStats(totalStats.stats, gameStats, player.primaryPosition || player.positions[0]);
-      
+      const updatedStats = this.aggregateStats(
+        totalStats.stats,
+        gameStats,
+        player.primaryPosition || player.positions[0],
+      );
+
       // 시즌 추가 (중복 제거)
       if (!totalStats.seasons.includes(season)) {
         totalStats.seasons.push(season);
       }
-      
+
       // 모든 시즌의 경기 수 합계
-      const allSeasonStats = await this.playerSeasonStatsModel.find({ playerId });
-      totalStats.totalGamesPlayed = allSeasonStats.reduce((sum, s) => sum + s.gamesPlayed, 0);
-      
+      const allSeasonStats = await this.playerSeasonStatsModel.find({
+        playerId,
+      });
+      totalStats.totalGamesPlayed = allSeasonStats.reduce(
+        (sum, s) => sum + s.gamesPlayed,
+        0,
+      );
+
       totalStats.stats = updatedStats;
       totalStats.lastGameDate = date;
       await totalStats.save();
     }
-    
-    console.log(`✅ 통합 스탯 업데이트 완료: ${playerId} (총 ${totalStats.totalGamesPlayed}경기)`);
+
+    console.log(
+      `✅ 통합 스탯 업데이트 완료: ${playerId} (총 ${totalStats.totalGamesPlayed}경기)`,
+    );
   }
 
   /**
    * 스탯 합산 로직 (포지션별)
    */
-  private aggregateStats(existingStats: any, newStats: any, position: string): any {
+  private aggregateStats(
+    existingStats: any,
+    newStats: any,
+    position: string,
+  ): any {
     const aggregated = { ...existingStats };
 
     switch (position) {
       case 'QB':
         // QB 스탯 합산
-        aggregated.passingYards = (aggregated.passingYards || 0) + (newStats.passingYards || 0);
-        aggregated.passingTouchdowns = (aggregated.passingTouchdowns || 0) + (newStats.passingTouchdowns || 0);
-        aggregated.passingCompletions = (aggregated.passingCompletions || 0) + (newStats.passingCompletions || 0);
-        aggregated.passingAttempts = (aggregated.passingAttempts || 0) + (newStats.passingAttempts || 0);
-        aggregated.passingInterceptions = (aggregated.passingInterceptions || 0) + (newStats.passingInterceptions || 0);
-        aggregated.rushingYards = (aggregated.rushingYards || 0) + (newStats.rushingYards || 0);
-        aggregated.rushingTouchdowns = (aggregated.rushingTouchdowns || 0) + (newStats.rushingTouchdowns || 0);
+        aggregated.passingYards =
+          (aggregated.passingYards || 0) + (newStats.passingYards || 0);
+        aggregated.passingTouchdowns =
+          (aggregated.passingTouchdowns || 0) +
+          (newStats.passingTouchdowns || 0);
+        aggregated.passingCompletions =
+          (aggregated.passingCompletions || 0) +
+          (newStats.passingCompletions || 0);
+        aggregated.passingAttempts =
+          (aggregated.passingAttempts || 0) + (newStats.passingAttempts || 0);
+        aggregated.passingInterceptions =
+          (aggregated.passingInterceptions || 0) +
+          (newStats.passingInterceptions || 0);
+        aggregated.rushingYards =
+          (aggregated.rushingYards || 0) + (newStats.rushingYards || 0);
+        aggregated.rushingTouchdowns =
+          (aggregated.rushingTouchdowns || 0) +
+          (newStats.rushingTouchdowns || 0);
         aggregated.sacks = (aggregated.sacks || 0) + (newStats.sacks || 0);
-        
+
         // 평균/퍼센트 재계산
         if (aggregated.passingAttempts > 0) {
-          aggregated.completionPercentage = Math.round((aggregated.passingCompletions / aggregated.passingAttempts) * 100);
+          aggregated.completionPercentage = Math.round(
+            (aggregated.passingCompletions / aggregated.passingAttempts) * 100,
+          );
         }
-        
+
         // 최장 기록 업데이트
-        aggregated.longestPass = Math.max(aggregated.longestPass || 0, newStats.longestPass || 0);
-        aggregated.longestRush = Math.max(aggregated.longestRush || 0, newStats.longestRush || 0);
+        aggregated.longestPass = Math.max(
+          aggregated.longestPass || 0,
+          newStats.longestPass || 0,
+        );
+        aggregated.longestRush = Math.max(
+          aggregated.longestRush || 0,
+          newStats.longestRush || 0,
+        );
         break;
 
       case 'RB':
         // RB 스탯 합산
-        aggregated.rbRushingYards = (aggregated.rbRushingYards || 0) + (newStats.rbRushingYards || 0);
-        aggregated.rbRushingTouchdowns = (aggregated.rbRushingTouchdowns || 0) + (newStats.rbRushingTouchdowns || 0);
-        aggregated.rbRushingAttempts = (aggregated.rbRushingAttempts || 0) + (newStats.rbRushingAttempts || 0);
-        aggregated.rbReceivingTargets = (aggregated.rbReceivingTargets || 0) + (newStats.rbReceivingTargets || 0);
-        aggregated.rbReceptions = (aggregated.rbReceptions || 0) + (newStats.rbReceptions || 0);
-        aggregated.rbReceivingYards = (aggregated.rbReceivingYards || 0) + (newStats.rbReceivingYards || 0);
-        aggregated.rbReceivingTouchdowns = (aggregated.rbReceivingTouchdowns || 0) + (newStats.rbReceivingTouchdowns || 0);
-        
+        aggregated.rbRushingYards =
+          (aggregated.rbRushingYards || 0) + (newStats.rbRushingYards || 0);
+        aggregated.rbRushingTouchdowns =
+          (aggregated.rbRushingTouchdowns || 0) +
+          (newStats.rbRushingTouchdowns || 0);
+        aggregated.rbRushingAttempts =
+          (aggregated.rbRushingAttempts || 0) +
+          (newStats.rbRushingAttempts || 0);
+        aggregated.rbReceivingTargets =
+          (aggregated.rbReceivingTargets || 0) +
+          (newStats.rbReceivingTargets || 0);
+        aggregated.rbReceptions =
+          (aggregated.rbReceptions || 0) + (newStats.rbReceptions || 0);
+        aggregated.rbReceivingYards =
+          (aggregated.rbReceivingYards || 0) + (newStats.rbReceivingYards || 0);
+        aggregated.rbReceivingTouchdowns =
+          (aggregated.rbReceivingTouchdowns || 0) +
+          (newStats.rbReceivingTouchdowns || 0);
+
         // 평균 재계산
         if (aggregated.rbRushingAttempts > 0) {
-          aggregated.rbYardsPerCarry = Math.round(aggregated.rbRushingYards / aggregated.rbRushingAttempts * 10) / 10;
+          aggregated.rbYardsPerCarry =
+            Math.round(
+              (aggregated.rbRushingYards / aggregated.rbRushingAttempts) * 10,
+            ) / 10;
         }
-        
+
         // 최장 기록 업데이트
-        aggregated.rbLongestRush = Math.max(aggregated.rbLongestRush || 0, newStats.rbLongestRush || 0);
-        aggregated.rbLongestReception = Math.max(aggregated.rbLongestReception || 0, newStats.rbLongestReception || 0);
+        aggregated.rbLongestRush = Math.max(
+          aggregated.rbLongestRush || 0,
+          newStats.rbLongestRush || 0,
+        );
+        aggregated.rbLongestReception = Math.max(
+          aggregated.rbLongestReception || 0,
+          newStats.rbLongestReception || 0,
+        );
         break;
 
       case 'WR':
       case 'TE':
         // WR/TE 스탯 합산
-        aggregated.targets = (aggregated.targets || 0) + (newStats.targets || 0);
-        aggregated.receptions = (aggregated.receptions || 0) + (newStats.receptions || 0);
-        aggregated.receivingYards = (aggregated.receivingYards || 0) + (newStats.receivingYards || 0);
-        aggregated.receivingTouchdowns = (aggregated.receivingTouchdowns || 0) + (newStats.receivingTouchdowns || 0);
-        aggregated.receivingFirstDowns = (aggregated.receivingFirstDowns || 0) + (newStats.receivingFirstDowns || 0);
-        
+        aggregated.targets =
+          (aggregated.targets || 0) + (newStats.targets || 0);
+        aggregated.receptions =
+          (aggregated.receptions || 0) + (newStats.receptions || 0);
+        aggregated.receivingYards =
+          (aggregated.receivingYards || 0) + (newStats.receivingYards || 0);
+        aggregated.receivingTouchdowns =
+          (aggregated.receivingTouchdowns || 0) +
+          (newStats.receivingTouchdowns || 0);
+        aggregated.receivingFirstDowns =
+          (aggregated.receivingFirstDowns || 0) +
+          (newStats.receivingFirstDowns || 0);
+
         // 평균 재계산
         if (aggregated.receptions > 0) {
-          aggregated.yardsPerCatch = Math.round(aggregated.receivingYards / aggregated.receptions * 10) / 10;
+          aggregated.yardsPerCatch =
+            Math.round(
+              (aggregated.receivingYards / aggregated.receptions) * 10,
+            ) / 10;
         }
-        
+
         // 최장 기록 업데이트
-        aggregated.longestReception = Math.max(aggregated.longestReception || 0, newStats.longestReception || 0);
+        aggregated.longestReception = Math.max(
+          aggregated.longestReception || 0,
+          newStats.longestReception || 0,
+        );
         break;
 
       case 'K':
         // K 스탯 합산
-        aggregated.fieldGoalsAttempted = (aggregated.fieldGoalsAttempted || 0) + (newStats.fieldGoalsAttempted || 0);
-        aggregated.fieldGoalsMade = (aggregated.fieldGoalsMade || 0) + (newStats.fieldGoalsMade || 0);
-        aggregated.extraPointsAttempted = (aggregated.extraPointsAttempted || 0) + (newStats.extraPointsAttempted || 0);
-        aggregated.extraPointsMade = (aggregated.extraPointsMade || 0) + (newStats.extraPointsMade || 0);
-        
+        aggregated.fieldGoalsAttempted =
+          (aggregated.fieldGoalsAttempted || 0) +
+          (newStats.fieldGoalsAttempted || 0);
+        aggregated.fieldGoalsMade =
+          (aggregated.fieldGoalsMade || 0) + (newStats.fieldGoalsMade || 0);
+        aggregated.extraPointsAttempted =
+          (aggregated.extraPointsAttempted || 0) +
+          (newStats.extraPointsAttempted || 0);
+        aggregated.extraPointsMade =
+          (aggregated.extraPointsMade || 0) + (newStats.extraPointsMade || 0);
+
         // 퍼센트 재계산
         if (aggregated.fieldGoalsAttempted > 0) {
-          aggregated.fieldGoalPercentage = Math.round((aggregated.fieldGoalsMade / aggregated.fieldGoalsAttempted) * 100);
+          aggregated.fieldGoalPercentage = Math.round(
+            (aggregated.fieldGoalsMade / aggregated.fieldGoalsAttempted) * 100,
+          );
         }
-        
+
         // 최장 기록 업데이트
-        aggregated.longestFieldGoal = Math.max(aggregated.longestFieldGoal || 0, newStats.longestFieldGoal || 0);
+        aggregated.longestFieldGoal = Math.max(
+          aggregated.longestFieldGoal || 0,
+          newStats.longestFieldGoal || 0,
+        );
         break;
     }
 
@@ -1487,20 +1661,28 @@ export class PlayerService {
       }
 
       // 해당 선수의 모든 스탯 ID 가져오기
-      const gameStats = await this.playerGameStatsModel.find({ playerId }).select('_id');
-      const seasonStats = await this.playerSeasonStatsModel.find({ playerId }).select('_id');
-      const totalStats = await this.playerTotalStatsModel.findOne({ playerId }).select('_id');
+      const gameStats = await this.playerGameStatsModel
+        .find({ playerId })
+        .select('_id');
+      const seasonStats = await this.playerSeasonStatsModel
+        .find({ playerId })
+        .select('_id');
+      const totalStats = await this.playerTotalStatsModel
+        .findOne({ playerId })
+        .select('_id');
 
       // User 프로필 업데이트
       await this.userModel.updateOne(
         { playerId },
         {
           $set: {
-            'profile.gameStats': gameStats.map(stat => stat._id.toString()),
-            'profile.seasonStats': seasonStats.map(stat => stat._id.toString()),
+            'profile.gameStats': gameStats.map((stat) => stat._id.toString()),
+            'profile.seasonStats': seasonStats.map((stat) =>
+              stat._id.toString(),
+            ),
             'profile.totalStats': totalStats ? totalStats._id.toString() : null,
-          }
-        }
+          },
+        },
       );
 
       console.log(`✅ User 스탯 참조 업데이트 완료: ${user.username}`);
@@ -1516,7 +1698,9 @@ export class PlayerService {
     try {
       // 1. playerId 확인
       if (!user.profile?.playerKey) {
-        throw new Error('playerId가 배정되지 않았습니다. 관리자에게 문의하세요.');
+        throw new Error(
+          'playerId가 배정되지 않았습니다. 관리자에게 문의하세요.',
+        );
       }
 
       const playerId = user.profile?.playerKey;
@@ -1545,13 +1729,18 @@ export class PlayerService {
         .findOne({
           $or: [
             { playerId: playerId },
-            { teamName: user.teamName, jerseyNumber: parseInt(playerId.split('_')[2]) }
-          ]
+            {
+              teamName: user.teamName,
+              jerseyNumber: parseInt(playerId.split('_')[2]),
+            },
+          ],
         })
         .select('name teamName jerseyNumber primaryPosition positions')
         .lean();
 
-      console.log(`✅ 스탯 조회 완료: 경기별 ${gameStats.length}개, 시즌별 ${seasonStats.length}개`);
+      console.log(
+        `✅ 스탯 조회 완료: 경기별 ${gameStats.length}개, 시즌별 ${seasonStats.length}개`,
+      );
 
       return {
         success: true,
@@ -1562,10 +1751,14 @@ export class PlayerService {
             username: user.username,
             teamName: user.teamName,
             name: playerInfo?.name || '미등록',
-            jerseyNumber: playerInfo?.jerseyNumber || parseInt(playerId.split('_')[2]),
-            position: playerInfo?.primaryPosition || playerInfo?.positions?.[0] || '미등록',
+            jerseyNumber:
+              playerInfo?.jerseyNumber || parseInt(playerId.split('_')[2]),
+            position:
+              playerInfo?.primaryPosition ||
+              playerInfo?.positions?.[0] ||
+              '미등록',
           },
-          gameStats: gameStats.map(game => ({
+          gameStats: gameStats.map((game) => ({
             gameKey: game.gameKey,
             date: game.date,
             season: game.season,
@@ -1580,23 +1773,25 @@ export class PlayerService {
             };
             return acc;
           }, {}),
-          totalStats: totalStats ? {
-            totalGamesPlayed: totalStats.totalGamesPlayed,
-            seasons: totalStats.seasons,
-            stats: totalStats.stats,
-            firstGameDate: totalStats.firstGameDate,
-            lastGameDate: totalStats.lastGameDate,
-          } : null,
+          totalStats: totalStats
+            ? {
+                totalGamesPlayed: totalStats.totalGamesPlayed,
+                seasons: totalStats.seasons,
+                stats: totalStats.stats,
+                firstGameDate: totalStats.firstGameDate,
+                lastGameDate: totalStats.lastGameDate,
+              }
+            : null,
           summary: {
             totalGames: gameStats.length,
             seasonsPlayed: seasonStats.length,
             hasStats: gameStats.length > 0,
-          }
+          },
         },
       };
     } catch (error) {
       console.error(`❌ 스탯 조회 실패 (${user.username}):`, error.message);
-      
+
       if (error.message.includes('playerId가 배정되지')) {
         return {
           success: false,

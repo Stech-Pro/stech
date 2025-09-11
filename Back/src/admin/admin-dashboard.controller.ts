@@ -18,8 +18,14 @@ import { AdminGuard } from '../common/guards/admin.guard';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
-import { PlayerGameStats, PlayerGameStatsDocument } from '../schemas/player-game-stats.schema';
-import { PlayerSeasonStats, PlayerSeasonStatsDocument } from '../schemas/player-season-stats.schema';
+import {
+  PlayerGameStats,
+  PlayerGameStatsDocument,
+} from '../schemas/player-game-stats.schema';
+import {
+  PlayerSeasonStats,
+  PlayerSeasonStatsDocument,
+} from '../schemas/player-season-stats.schema';
 import { GameInfo, GameInfoDocument } from '../schemas/game-info.schema';
 import { GameService } from '../game/game.service';
 import { PlayerService } from '../player/player.service';
@@ -31,8 +37,10 @@ import { PlayerService } from '../player/player.service';
 export class AdminDashboardController {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(PlayerGameStats.name) private playerGameStatsModel: Model<PlayerGameStatsDocument>,
-    @InjectModel(PlayerSeasonStats.name) private playerSeasonStatsModel: Model<PlayerSeasonStatsDocument>,
+    @InjectModel(PlayerGameStats.name)
+    private playerGameStatsModel: Model<PlayerGameStatsDocument>,
+    @InjectModel(PlayerSeasonStats.name)
+    private playerSeasonStatsModel: Model<PlayerSeasonStatsDocument>,
     @InjectModel(GameInfo.name) private gameInfoModel: Model<GameInfoDocument>,
     private readonly gameService: GameService,
     private readonly playerService: PlayerService,
@@ -91,28 +99,28 @@ export class AdminDashboardController {
     // 전체 게임 통계
     const totalGames = await this.gameInfoModel.countDocuments();
     const allGames = await this.gameInfoModel.find();
-    
+
     // 팀별 통계 계산
     const teamStats = new Map();
-    allGames.forEach(game => {
+    allGames.forEach((game) => {
       // 홈팀 처리
       if (!teamStats.has(game.homeTeam)) {
-        teamStats.set(game.homeTeam, { 
-          teamName: game.homeTeam, 
-          totalGames: 0, 
-          wins: 0, 
-          losses: 0 
+        teamStats.set(game.homeTeam, {
+          teamName: game.homeTeam,
+          totalGames: 0,
+          wins: 0,
+          losses: 0,
         });
       }
       teamStats.get(game.homeTeam).totalGames++;
-      
+
       // 어웨이팀 처리
       if (!teamStats.has(game.awayTeam)) {
-        teamStats.set(game.awayTeam, { 
-          teamName: game.awayTeam, 
-          totalGames: 0, 
-          wins: 0, 
-          losses: 0 
+        teamStats.set(game.awayTeam, {
+          teamName: game.awayTeam,
+          totalGames: 0,
+          wins: 0,
+          losses: 0,
         });
       }
       teamStats.get(game.awayTeam).totalGames++;
@@ -130,14 +138,14 @@ export class AdminDashboardController {
     ]);
 
     // 팀 통계에 선수 수 추가
-    playersByTeam.forEach(item => {
+    playersByTeam.forEach((item) => {
       if (teamStats.has(item._id)) {
         teamStats.get(item._id).totalPlayers = item.playerCount;
       }
     });
 
     const roleStats: any = {};
-    usersByRole.forEach(item => {
+    usersByRole.forEach((item) => {
       roleStats[item._id || 'unknown'] = item.count;
     });
 
@@ -212,21 +220,18 @@ export class AdminDashboardController {
     // 모든 게임에서 팀 목록 추출
     const games = await this.gameInfoModel.find();
     const teams = new Set<string>();
-    
-    games.forEach(game => {
+
+    games.forEach((game) => {
       if (game.homeTeam) teams.add(game.homeTeam);
       if (game.awayTeam) teams.add(game.awayTeam);
     });
 
     const teamStatsArray = [];
-    
+
     for (const teamName of teams) {
       // 팀의 모든 게임 찾기
       const teamGames = await this.gameInfoModel.find({
-        $or: [
-          { homeTeam: teamName },
-          { awayTeam: teamName },
-        ],
+        $or: [{ homeTeam: teamName }, { awayTeam: teamName }],
       });
 
       // 팀의 모든 선수 찾기
@@ -239,7 +244,7 @@ export class AdminDashboardController {
         teamName,
         totalGames: teamGames.length,
         totalPlayers: teamPlayers.length,
-        gameKeys: teamGames.map(g => g.gameKey),
+        gameKeys: teamGames.map((g) => g.gameKey),
       });
     }
 
@@ -303,13 +308,16 @@ export class AdminDashboardController {
           seasonStats: seasonStats || null,
         });
       } catch (error) {
-        console.error(`Error fetching stats for player ${player.profile?.playerKey}:`, error);
+        console.error(
+          `Error fetching stats for player ${player.profile?.playerKey}:`,
+          error,
+        );
       }
     }
 
     // 포지션 필터링
     const filteredStats = position
-      ? playerStatsArray.filter(p => p.position === position)
+      ? playerStatsArray.filter((p) => p.position === position)
       : playerStatsArray;
 
     return {
@@ -353,13 +361,13 @@ export class AdminDashboardController {
       success: true,
       message: '시스템 로그 조회 성공',
       data: {
-        recentGames: recentGames.map(game => ({
+        recentGames: recentGames.map((game) => ({
           gameKey: game.gameKey,
           date: game.date,
           teams: `${game.homeTeam} vs ${game.awayTeam}`,
           uploadedAt: (game as any).createdAt || new Date(),
         })),
-        recentUsers: recentUsers.map(user => ({
+        recentUsers: recentUsers.map((user) => ({
           username: user.username,
           role: user.role,
           team: user.teamName,

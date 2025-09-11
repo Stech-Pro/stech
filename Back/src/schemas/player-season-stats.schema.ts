@@ -33,7 +33,8 @@ export class PlayerSeasonStats {
   gameKeys: string[]; // 이 시즌에 출전한 경기 목록
 }
 
-export const PlayerSeasonStatsSchema = SchemaFactory.createForClass(PlayerSeasonStats);
+export const PlayerSeasonStatsSchema =
+  SchemaFactory.createForClass(PlayerSeasonStats);
 
 // 인덱스 설정
 PlayerSeasonStatsSchema.index({ playerId: 1 });

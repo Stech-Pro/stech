@@ -1,23 +1,22 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
 
 @Injectable()
 export class AdminService {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-  ) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   /**
    * PlayerId가 배정되지 않은 유저 목록 조회
    */
   async getUnassignedUsers(teamName?: string, role?: string) {
     const filter: any = {
-      $or: [
-        { playerId: null },
-        { playerId: { $exists: false } }
-      ]
+      $or: [{ playerId: null }, { playerId: { $exists: false } }],
     };
 
     // 팀명 필터
@@ -55,15 +54,17 @@ export class AdminService {
     // 2. 이미 playerId가 배정되었는지 확인
     if (user.profile?.playerKey) {
       throw new BadRequestException(
-        `해당 사용자는 이미 playerId "${user.profile?.playerKey}"가 배정되어 있습니다.`
+        `해당 사용자는 이미 playerId "${user.profile?.playerKey}"가 배정되어 있습니다.`,
       );
     }
 
     // 3. playerId 중복 확인
-    const existingUser = await this.userModel.findOne({ 'profile.playerKey': playerId });
+    const existingUser = await this.userModel.findOne({
+      'profile.playerKey': playerId,
+    });
     if (existingUser) {
       throw new BadRequestException(
-        `playerId "${playerId}"는 이미 다른 사용자(${existingUser.username})에게 배정되었습니다.`
+        `playerId "${playerId}"는 이미 다른 사용자(${existingUser.username})에게 배정되었습니다.`,
       );
     }
 
@@ -71,7 +72,7 @@ export class AdminService {
     const playerIdPattern = /^\d{4}_[A-Z]{2,3}_\d+$/;
     if (!playerIdPattern.test(playerId)) {
       throw new BadRequestException(
-        'playerId 형식이 올바르지 않습니다. (예: 2025_KK_10)'
+        'playerId 형식이 올바르지 않습니다. (예: 2025_KK_10)',
       );
     }
 
@@ -99,7 +100,7 @@ export class AdminService {
    */
   async getAssignedUsers(teamName?: string, role?: string) {
     const filter: any = {
-      playerId: { $ne: null, $exists: true }
+      playerId: { $ne: null, $exists: true },
     };
 
     // 팀명 필터
@@ -134,7 +135,9 @@ export class AdminService {
       .lean();
 
     if (!user) {
-      throw new NotFoundException(`playerId "${playerId}"에 해당하는 사용자를 찾을 수 없습니다.`);
+      throw new NotFoundException(
+        `playerId "${playerId}"에 해당하는 사용자를 찾을 수 없습니다.`,
+      );
     }
 
     return user;
@@ -155,7 +158,9 @@ export class AdminService {
     }
     await user.save();
 
-    console.log(`🔄 PlayerId 배정 해제: ${user.username} (${oldPlayerId} → null)`);
+    console.log(
+      `🔄 PlayerId 배정 해제: ${user.username} (${oldPlayerId} → null)`,
+    );
 
     return {
       userId: user._id,

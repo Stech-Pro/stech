@@ -30,14 +30,14 @@ export class S3Service {
       };
 
       const data = await this.s3.listObjectsV2(params).promise();
-      
+
       if (!data.Contents || data.Contents.length === 0) {
         console.log(`❌ videos/${gameKey} 폴더에 파일이 없습니다`);
         return [];
       }
 
       // 비디오 파일만 필터링 (mp4, avi, mov 등)
-      const videoFiles = data.Contents.filter(obj => {
+      const videoFiles = data.Contents.filter((obj) => {
         const key = obj.Key || '';
         return /\.(mp4|avi|mov|mkv|flv|wmv)$/i.test(key);
       });
@@ -49,10 +49,13 @@ export class S3Service {
         return dateA - dateB; // 오래된 것부터 (업로드 순서)
       });
 
-      const fileKeys = sortedFiles.map(file => file.Key).filter(key => key) as string[];
-      
-      console.log(`✅ videos/${gameKey}에서 ${fileKeys.length}개 비디오 파일 발견:`, fileKeys);
-      
+      const fileKeys = sortedFiles.map((file) => file.Key).filter((key) => key);
+
+      console.log(
+        `✅ videos/${gameKey}에서 ${fileKeys.length}개 비디오 파일 발견:`,
+        fileKeys,
+      );
+
       return fileKeys;
     } catch (error) {
       console.error(`❌ S3 파일 조회 실패 (${gameKey}):`, error.message);
@@ -63,7 +66,10 @@ export class S3Service {
   /**
    * S3 파일의 Signed URL 생성 (1시간 유효)
    */
-  async getSignedUrl(fileKey: string, expiresIn: number = 3600): Promise<string> {
+  async getSignedUrl(
+    fileKey: string,
+    expiresIn: number = 3600,
+  ): Promise<string> {
     try {
       const params = {
         Bucket: this.bucketName,
@@ -83,10 +89,13 @@ export class S3Service {
   /**
    * 게임 클립들에 대해 순서대로 Signed URL 생성
    */
-  async generateClipUrls(gameKey: string, clipCount: number): Promise<string[]> {
+  async generateClipUrls(
+    gameKey: string,
+    clipCount: number,
+  ): Promise<string[]> {
     try {
       const fileKeys = await this.getVideoFilesByGameKey(gameKey);
-      
+
       if (fileKeys.length === 0) {
         console.log(`⚠️ ${gameKey}에 비디오 파일이 없습니다`);
         return [];
@@ -101,10 +110,14 @@ export class S3Service {
         signedUrls.push(signedUrl);
       }
 
-      console.log(`✅ ${gameKey}에서 ${signedUrls.length}개 클립 URL 생성 완료`);
-      
+      console.log(
+        `✅ ${gameKey}에서 ${signedUrls.length}개 클립 URL 생성 완료`,
+      );
+
       if (clipCount > fileKeys.length) {
-        console.log(`⚠️ 클립 개수(${clipCount})가 파일 개수(${fileKeys.length})보다 많습니다`);
+        console.log(
+          `⚠️ 클립 개수(${clipCount})가 파일 개수(${fileKeys.length})보다 많습니다`,
+        );
       }
 
       return signedUrls;

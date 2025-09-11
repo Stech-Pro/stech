@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { API_CONFIG } from '../../../config/api';
+import { normalizeTeamName } from '../../../data/TEAMS';
 import './index.css';
 
 /**
@@ -122,6 +123,8 @@ export default function JsonEx() {
   const handleFileUpload = useCallback(
     async (file) => {
       try {
+        console.log('🔵 파일 업로드 시작:', file.name, file.size, file.type);
+        
         if (!validateFile(file)) return;
 
         setResultData(null);
@@ -129,8 +132,12 @@ export default function JsonEx() {
         setUploadStatus("uploading");
 
         // 1) 파일 읽기 & 파싱
+        console.log('🔵 파일 읽기 시작...');
         const text = await file.text();
+        console.log('🔵 파일 텍스트 읽기 완료, 길이:', text.length);
+        
         const gameData = JSON.parse(text);
+        console.log('🔵 JSON 파싱 완료:', Object.keys(gameData));
 
         // 2) 초깃값 세팅 (클립수/선수수)
         const { totalClips, playersFound, uniquePlayers } =
@@ -150,14 +157,22 @@ export default function JsonEx() {
         const payload = {
           gameKey: gameData.gameKey,
           date: gameData.date,
-          homeTeam: gameData.homeTeam,
-          awayTeam: gameData.awayTeam,
+          homeTeam: normalizeTeamName(gameData.homeTeam),
+          awayTeam: normalizeTeamName(gameData.awayTeam),
           location: gameData.location,
           score: gameData.score,
           Clips: Array.isArray(gameData.Clips) ? gameData.Clips : [],
         };
 
         // 4) axios 호출 
+        console.log('🔵 API 호출 시작:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.JSON_EX}`);
+        console.log('🔵 페이로드:', {
+          gameKey: payload.gameKey,
+          homeTeam: payload.homeTeam,
+          awayTeam: payload.awayTeam,
+          clipsCount: payload.Clips.length
+        });
+        
         abortRef.current = new AbortController();
         const response = await axios.post(
           `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.JSON_EX}`,
@@ -167,6 +182,8 @@ export default function JsonEx() {
             signal: abortRef.current.signal,
           }
         );
+        
+        console.log('🔵 API 응답 성공:', response.status);
 
         // 5) 성공 처리
         stopSimulateProcessing();

@@ -500,7 +500,8 @@ export class GameController {
   @Get('team/:teamName')
   @ApiOperation({
     summary: '🏈 팀별 경기 정보 조회',
-    description: '특정 팀이 홈팀 또는 어웨이팀으로 참여한 모든 경기 정보를 조회합니다.',
+    description:
+      '특정 팀이 홈팀 또는 어웨이팀으로 참여한 모든 경기 정보를 조회합니다.',
   })
   @ApiParam({
     name: 'teamName',
@@ -531,7 +532,7 @@ export class GameController {
   })
   async getGamesByTeam(@Param('teamName') teamName: string) {
     const games = await this.gameService.findGamesByTeam(teamName);
-    
+
     if (!games || games.length === 0) {
       throw new HttpException(
         {
@@ -556,7 +557,8 @@ export class GameController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: '📋 모든 경기 정보 조회',
-    description: '저장된 모든 경기 정보를 조회합니다. Admin은 모든 경기, 일반 사용자는 자기 팀 경기만 조회 가능합니다.',
+    description:
+      '저장된 모든 경기 정보를 조회합니다. Admin은 모든 경기, 일반 사용자는 자기 팀 경기만 조회 가능합니다.',
   })
   @ApiResponse({
     status: 200,
@@ -564,7 +566,7 @@ export class GameController {
   })
   async getAllGames(@Req() req: any) {
     const { role, team: userTeam } = req.user;
-    
+
     if (role === 'admin') {
       // Admin은 모든 경기 조회
       const games = await this.gameService.findAllGames();
@@ -593,7 +595,8 @@ export class GameController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: '🎥 코치용 하이라이트 클립 조회',
-    description: 'significantPlays가 있거나 gainYard가 10야드 이상인 중요한 플레이를 조회합니다.',
+    description:
+      'significantPlays가 있거나 gainYard가 10야드 이상인 중요한 플레이를 조회합니다.',
   })
   @ApiResponse({
     status: 200,
@@ -628,19 +631,21 @@ export class GameController {
   async getCoachHighlights(@Req() req: any) {
     console.log('전체 request.user:', req.user);
     const { team: teamName, role } = req.user;
-    
+
     if (role === 'admin') {
       console.log('🎥 Admin - 모든 팀 하이라이트 조회');
       // Admin은 모든 팀의 하이라이트를 조회
       const allTeams = await this.gameService.findAllGames();
-      const uniqueTeams = [...new Set(allTeams.flatMap(game => [game.homeTeam, game.awayTeam]))];
-      
+      const uniqueTeams = [
+        ...new Set(allTeams.flatMap((game) => [game.homeTeam, game.awayTeam])),
+      ];
+
       const allHighlights = [];
       for (const team of uniqueTeams) {
         const teamHighlights = await this.gameService.getCoachHighlights(team);
         allHighlights.push(...teamHighlights);
       }
-      
+
       return {
         success: true,
         message: '모든 팀 하이라이트 클립 조회 성공 (Admin)',
@@ -707,16 +712,19 @@ export class GameController {
   })
   async getPlayerHighlights(@Req() req: any) {
     const { playerId, team: teamName, role } = req.user;
-    
+
     if (role === 'admin') {
       console.log('🏃 Admin - 모든 선수 하이라이트 조회');
       // Admin은 모든 선수의 하이라이트를 조회할 수 있음
       // 쿼리 파라미터로 특정 선수를 지정할 수 있음
       const targetPlayerId = req.query.playerId || playerId;
       const targetTeam = req.query.team;
-      
+
       if (targetPlayerId && targetTeam) {
-        const highlights = await this.gameService.getPlayerHighlights(targetPlayerId, targetTeam);
+        const highlights = await this.gameService.getPlayerHighlights(
+          targetPlayerId,
+          targetTeam,
+        );
         return {
           success: true,
           message: `${targetTeam} 팀 ${targetPlayerId} 선수 하이라이트 조회 성공 (Admin)`,
@@ -729,14 +737,16 @@ export class GameController {
       } else {
         return {
           success: true,
-          message: 'Admin 권한: 쿼리 파라미터로 ?playerId=선수ID&team=팀명을 지정하세요',
+          message:
+            'Admin 권한: 쿼리 파라미터로 ?playerId=선수ID&team=팀명을 지정하세요',
           accessLevel: 'admin',
-          example: '/api/game/highlights/player?playerId=2025_KK_10&team=HYLions',
+          example:
+            '/api/game/highlights/player?playerId=2025_KK_10&team=HYLions',
         };
       }
     } else {
       console.log('🏃 선수용 하이라이트 조회:', { playerId, teamName });
-      
+
       if (!playerId) {
         throw new HttpException(
           {
@@ -748,7 +758,10 @@ export class GameController {
         );
       }
 
-      const highlights = await this.gameService.getPlayerHighlights(playerId, teamName);
+      const highlights = await this.gameService.getPlayerHighlights(
+        playerId,
+        teamName,
+      );
 
       return {
         success: true,
@@ -793,13 +806,13 @@ export class GameController {
               playType: 'PASSING',
               gainYard: 15,
               car: { num: 12, pos: 'QB' },
-              significantPlays: ['TOUCHDOWN', null, null, null]
-            }
-          ]
+              significantPlays: ['TOUCHDOWN', null, null, null],
+            },
+          ],
         },
-        totalClips: 45
-      }
-    }
+        totalClips: 45,
+      },
+    },
   })
   @ApiResponse({
     status: 404,
@@ -807,7 +820,7 @@ export class GameController {
   })
   async getGameClips(@Param('gameKey') gameKey: string) {
     const clips = await this.gameService.getGameClipsByKey(gameKey);
-    
+
     if (!clips) {
       throw new HttpException(
         {
@@ -821,10 +834,15 @@ export class GameController {
 
     try {
       // S3에서 비디오 URL들 가져오기
-      console.log(`🎬 ${gameKey}의 ${clips.Clips.length}개 클립에 대한 비디오 URL 생성 시작`);
-      
-      const videoUrls = await this.s3Service.generateClipUrls(gameKey, clips.Clips.length);
-      
+      console.log(
+        `🎬 ${gameKey}의 ${clips.Clips.length}개 클립에 대한 비디오 URL 생성 시작`,
+      );
+
+      const videoUrls = await this.s3Service.generateClipUrls(
+        gameKey,
+        clips.Clips.length,
+      );
+
       // 클립 데이터에 videoUrl 추가
       const clipsWithUrls = clips.Clips.map((clip, index) => ({
         ...clip,
@@ -837,7 +855,9 @@ export class GameController {
         Clips: clipsWithUrls,
       };
 
-      console.log(`✅ ${gameKey} 클립 URL 매핑 완료: ${videoUrls.length}/${clips.Clips.length}`);
+      console.log(
+        `✅ ${gameKey} 클립 URL 매핑 완료: ${videoUrls.length}/${clips.Clips.length}`,
+      );
 
       return {
         success: true,
@@ -848,7 +868,7 @@ export class GameController {
       };
     } catch (error) {
       console.error(`❌ ${gameKey} 비디오 URL 생성 실패:`, error);
-      
+
       // S3 오류가 있어도 클립 데이터는 반환 (clipUrl 없이)
       return {
         success: true,
@@ -863,7 +883,8 @@ export class GameController {
   @Delete(':gameKey')
   @ApiOperation({
     summary: '🗑️ 경기 데이터 완전 삭제',
-    description: '게임 키로 경기와 관련된 모든 데이터를 삭제합니다 (GameInfo, GameClips, TeamGameStats, TeamTotalStats)',
+    description:
+      '게임 키로 경기와 관련된 모든 데이터를 삭제합니다 (GameInfo, GameClips, TeamGameStats, TeamTotalStats)',
   })
   @ApiParam({
     name: 'gameKey',
@@ -881,10 +902,10 @@ export class GameController {
           gameInfo: 1,
           gameClips: 1,
           teamGameStats: 2,
-          teamTotalStats: 5
-        }
-      }
-    }
+          teamTotalStats: 5,
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 404,
@@ -892,7 +913,7 @@ export class GameController {
   })
   async deleteGameByKey(@Param('gameKey') gameKey: string) {
     const result = await this.gameService.deleteGameInfo(gameKey);
-    
+
     return {
       success: true,
       message: `${gameKey} 경기 관련 모든 데이터가 삭제되었습니다`,
@@ -920,7 +941,7 @@ export class GameController {
   })
   async getGameByKey(@Param('gameKey') gameKey: string) {
     const game = await this.gameService.findGameByKey(gameKey);
-    
+
     if (!game) {
       throw new HttpException(
         {
