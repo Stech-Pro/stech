@@ -12,6 +12,7 @@ export interface OLStats {
   gamesPlayed: number;
   penalties: number;
   sacksAllowed: number;
+  fumbles: number; // 런 펌블 추가
 }
 
 @Injectable()
@@ -47,6 +48,7 @@ export class OlAnalyzerService extends BaseAnalyzerService {
       );
       console.log(`   반칙 수: ${olStats.penalties}`);
       console.log(`   색 허용 수: ${olStats.sacksAllowed}`);
+      console.log(`   런 펌블: ${olStats.fumbles}`);
 
       // 데이터베이스에 저장
       const saveResult = await this.savePlayerStats(
@@ -57,6 +59,7 @@ export class OlAnalyzerService extends BaseAnalyzerService {
           gamesPlayed: olStats.gamesPlayed,
           penalties: olStats.penalties,
           sacksAllowed: olStats.sacksAllowed,
+          fumbles: olStats.fumbles, // 런 펌블 추가
         },
         gameData,
       );
@@ -141,6 +144,16 @@ export class OlAnalyzerService extends BaseAnalyzerService {
         console.log(`   🔴 OL 색 허용!`);
       }
     }
+
+    // 런 펌블 처리 (playType이 RUN이고 significantPlay에 FUMBLE이 있을 때)
+    if (playType === 'RUN') {
+      const hasFumble = significantPlays.includes('FUMBLE');
+
+      if (hasFumble) {
+        olStats.fumbles++;
+        console.log(`   🏈 OL 런 펌블 (스냅 미스)!`);
+      }
+    }
   }
 
   /**
@@ -168,6 +181,7 @@ export class OlAnalyzerService extends BaseAnalyzerService {
       gamesPlayed: 1,
       penalties: 0,
       sacksAllowed: 0,
+      fumbles: 0, // 런 펌블 초기화
     };
   }
 
