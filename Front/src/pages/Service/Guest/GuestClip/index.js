@@ -506,9 +506,7 @@ export default function GuestClipPage() {
                   />
                 </div>
               )}
-              <span className="clip-team-name">
-                {homeMeta?.name}
-              </span>
+              <span className="clip-team-name">{homeMeta?.name}</span>
             </div>
 
             <div className="clip-vs">VS</div>
@@ -525,9 +523,7 @@ export default function GuestClipPage() {
                   />
                 </div>
               )}
-              <span className="clip-team-name">
-                {awayMeta?.name}
-              </span>
+              <span className="clip-team-name">{awayMeta?.name}</span>
             </div>
           </div>
           <div className="clip-list">
@@ -578,24 +574,24 @@ export default function GuestClipPage() {
                 <div className="pc-run">
                   <div className="pc-row1">
                     <div>런</div>
-                    <div>{rpStats.home.runPct}%</div>
+                    <div>31.6%</div>
                   </div>
                   <div className="pc-row2">
                     <div
                       className="bar bar-run"
-                      style={{ width: `${rpStats.home.runPct}%` }}
+                      style={{ width: `31.6%` }}
                     />
                   </div>
                 </div>
                 <div className="pc-pass">
                   <div className="pc-row1">
                     <div>패스</div>
-                    <div>{rpStats.home.passPct}%</div>
+                    <div>68.4%</div>
                   </div>
                   <div className="pc-row2">
                     <div
                       className="bar bar-pass"
-                      style={{ width: `${rpStats.home.passPct}%` }}
+                      style={{ width: `68.4%` }}
                     />
                   </div>
                 </div>
@@ -606,32 +602,87 @@ export default function GuestClipPage() {
                 <div className="pc-run">
                   <div className="pc-row1">
                     <div>런</div>
-                    <div>{rpStats.away.runPct}%</div>
+                    <div>46.7%</div>
                   </div>
                   <div className="pc-row2">
                     <div
                       className="bar bar-run"
-                      style={{ width: `${rpStats.away.runPct}%` }}
+                      style={{ width: `46.7%` }}
                     />
                   </div>
                 </div>
                 <div className="pc-pass">
                   <div className="pc-row1">
                     <div>패스</div>
-                    <div>{rpStats.away.passPct}%</div>
+                    <div>53.3%</div>
                   </div>
                   <div className="pc-row2">
                     <div
                       className="bar bar-pass"
-                      style={{ width: `${rpStats.away.passPct}%` }}
+                      style={{ width: `53.3%` }}
                     />
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          <div className="clip-teamstats">
+            <div className="tsc-header">
+              <div className="tsc-team tsc-left">
+                {homeMeta?.logo && (
+                  <img
+                    className="tsc-logo"
+                    src={homeMeta.logo}
+                    alt={homeMeta?.name}
+                  />
+                )}
+                <span className="tsc-pill">{homeMeta?.name}</span>
+              </div>
+              <div className="tsc-team tsc-right">
+                {awayMeta?.logo && (
+                  <img
+                    className="tsc-logo"
+                    src={awayMeta.logo}
+                    alt={awayMeta?.name}
+                  />
+                )}
+                <span className="tsc-pill">{awayMeta?.name}</span>
+              </div>
+            </div>
 
-          {/* 팀 스탯 박스는 게스트에선 데이터 없으면 숨겨도 됨 */}
+            <>
+              <div className="tsc-row">
+                <div>126</div>
+                <div className="tsc-label">총 야드</div>
+                <div>185</div>
+              </div>
+              <div className="tsc-row">
+                <div>100</div>
+                <div className="tsc-label">패싱 야드</div>
+                <div>148</div>
+              </div>
+              <div className="tsc-row">
+                <div>26</div>
+                <div className="tsc-label">러싱 야드</div>
+                <div>37</div>
+              </div>
+              <div className="tsc-row">
+                <div>20%</div>
+                <div className="tsc-label">3rd Down %</div>
+                <div>36.4%</div>
+              </div>
+              <div className="tsc-row">
+                <div>3</div>
+                <div className="tsc-label">턴오버</div>
+                <div>3</div>
+              </div>
+              <div className="tsc-row">
+                <div>15</div>
+                <div className="tsc-label">페널티 야드</div>
+                <div>30</div>
+              </div>
+            </>
+          </div>{' '}
         </div>
       </div>
     </div>

@@ -672,7 +672,7 @@ export default function ClipPage() {
                   />
                 </div>
               )}
-              <span className="cip-team-name">
+              <span className="clip-team-name">
                 {awayMeta?.name}
               </span>
             </div>
@@ -842,7 +842,6 @@ export default function ClipPage() {
             )}
           </div>
 
-          <div className="clip-datas"></div>
         </div>
       </div>
     </div>
