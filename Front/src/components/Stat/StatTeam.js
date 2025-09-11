@@ -392,7 +392,7 @@ export default function StatTeam({
       <div className="table-wrapper">
         <div className="stat-table">
           <div className="table-head">
-            <div className="table-row">
+            <div className="team-table-row">
               <div className="team-table-row1">
                 <div className="team-table-header-cell rank-column">순위</div>
                 <div className="team-table-header-cell team-column">팀</div>
@@ -400,7 +400,7 @@ export default function StatTeam({
               <div
                 className="team-table-row2"
                 style={{
-                  '--cols': currentColumns.length,
+                  '--cols': String(currentColumns.length),
                   whiteSpace: 'pre-line',
                 }}
               >
@@ -476,7 +476,7 @@ export default function StatTeam({
                   </div>
                   <div
                     className="team-table-row2"
-                    style={{ '--cols': TEAM_COLUMNS[playType]?.length || 0 }}
+                      style={{ '--cols': String(TEAM_COLUMNS[playType]?.length || 0) }}
                   >
                     {(TEAM_COLUMNS[playType] || []).map((col) => {
                       const v = row[col.key];
