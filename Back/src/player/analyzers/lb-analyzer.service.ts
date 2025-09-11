@@ -80,7 +80,8 @@ export class LbAnalyzerService extends BaseAnalyzerService {
           comboTackles: lbStats.comboTackles,
           att: lbStats.att,
           longestInterception: lbStats.longestInterception,
-        }
+        },
+        gameData
       );
 
       if (saveResult.success) {

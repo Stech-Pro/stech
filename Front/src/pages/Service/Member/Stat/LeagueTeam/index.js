@@ -11,28 +11,37 @@ const LeagueTeamPage = () => {
     const fetchTeamStats = async () => {
       try {
         setLoading(true);
-        const token = getToken();
+        // const token = getToken();  // 팀 스탯은 공개 정보로 변경
         
-        if (!token) {
-          console.error('JWT 토큰이 없습니다. 로그인이 필요합니다.');
-          setTeamStatsData([]);
-          setLoading(false);
-          return;
-        }
+        // if (!token) {
+        //   console.error('JWT 토큰이 없습니다. 로그인이 필요합니다.');
+        //   setTeamStatsData([]);
+        //   setLoading(false);
+        //   return;
+        // }
 
+        // 환경별 API URL 설정
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+        console.log('🌐 사용 중인 API URL:', apiUrl);
+        
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/team/total-stats`,
+          `${apiUrl}/team/total-stats`,
           {
             headers: {
-              'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
           }
         );
 
+        console.log('API 응답 상태:', response.status);
+        
         if (response.ok) {
-          const result = await response.json();
-          console.log('🏆 팀 스탯 API 응답:', result);
+          const text = await response.text();
+          console.log('API 응답 텍스트:', text);
+          
+          try {
+            const result = JSON.parse(text);
+            console.log('🏆 팀 스탯 API 응답:', result);
 
           if (result.success && result.data) {
             // 백엔드 팀명을 프론트엔드 팀명으로 매핑
@@ -111,6 +120,11 @@ const LeagueTeamPage = () => {
             setTeamStatsData(transformedData);
           } else {
             console.error('팀 스탯 데이터 구조 오류:', result);
+            setTeamStatsData([]);
+          }
+          } catch (parseError) {
+            console.error('JSON 파싱 에러:', parseError);
+            console.error('응답 텍스트:', text);
             setTeamStatsData([]);
           }
         } else {

@@ -605,12 +605,13 @@ export class TeamStatsAnalyzerService {
     };
   }
 
-  async getAllTeamTotalStats() {
-    console.log('모든 팀 누적 스탯 조회');
+  async getAllTeamTotalStats(league?: string) {
+    console.log(`팀 누적 스탯 조회 - 리그: ${league || '전체'}`);
     
     try {
-      // team_total_stats 컬렉션 사용
-      const teamTotalStats = await this.teamTotalStatsModel.find({});
+      // team_total_stats 컬렉션 사용 (리그 필터링 지원)
+      const filter = league ? { league } : {};
+      const teamTotalStats = await this.teamTotalStatsModel.find(filter);
       
       if (teamTotalStats.length > 0) {
         console.log(`✅ ${teamTotalStats.length}개 팀의 team_total_stats 데이터 조회`);

@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -15,6 +16,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { TeamService } from './team.service';
 import { TeamStatsAnalyzerService } from './team-stats-analyzer.service';
@@ -55,28 +57,34 @@ export class TeamController {
   }
 
   @Get('total-stats')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)  // 팀 스탯은 공개 정보로 변경
+  // @ApiBearerAuth()
   @ApiOperation({
     summary: '🏆 팀 누적 스탯 순위 조회',
-    description: '모든 팀의 누적 스탯을 totalYards 기준으로 정렬하여 조회합니다.',
+    description: '모든 팀의 누적 스탯을 totalYards 기준으로 정렬하여 조회합니다. league 파라미터로 1부/2부 필터링 가능합니다.',
+  })
+  @ApiQuery({
+    name: 'league',
+    required: false,
+    description: '리그 구분 (1부 또는 2부)',
+    enum: ['1부', '2부'],
   })
   @ApiResponse({
     status: 200,
     description: '✅ 팀 누적 스탯 조회 성공',
   })
-  async getAllTeamTotalStats(@User() user: any) {
+  async getAllTeamTotalStats(@User() user: any = null, @Query('league') league?: string) {
     try {
-      const { role } = user;
+      const role = user?.role || 'guest';
       
       if (role === 'admin') {
-        // Admin은 모든 팀 스탯 조회
-        const teamStats = await this.teamStatsService.getAllTeamTotalStats();
+        // Admin은 모든 팀 스탯 조회 (리그 필터링 지원)
+        const teamStats = await this.teamStatsService.getAllTeamTotalStats(league);
 
         if (!teamStats || teamStats.length === 0) {
           return {
             success: false,
-            message: '팀 누적 스탯을 찾을 수 없습니다',
+            message: league ? `${league} 팀 누적 스탯을 찾을 수 없습니다` : '팀 누적 스탯을 찾을 수 없습니다',
             data: [],
             timestamp: new Date().toISOString(),
           };
@@ -84,20 +92,22 @@ export class TeamController {
 
         return {
           success: true,
-          message: '모든 팀 누적 스탯 조회가 완료되었습니다 (Admin)',
+          message: league ? `${league} 팀 누적 스탯 조회가 완료되었습니다 (Admin)` : '모든 팀 누적 스탯 조회가 완료되었습니다 (Admin)',
           data: teamStats,
           accessLevel: 'admin',
+          league: league || 'all',
           timestamp: new Date().toISOString(),
         };
       } else {
         // 일반 사용자도 모든 팀 스탯 조회 가능 (리그 순위표는 공개 정보)
-        const teamStats = await this.teamStatsService.getAllTeamTotalStats();
+        const teamStats = await this.teamStatsService.getAllTeamTotalStats(league);
 
         return {
           success: true,
-          message: '팀 누적 스탯 조회가 완료되었습니다',
+          message: league ? `${league} 팀 누적 스탯 조회가 완료되었습니다` : '팀 누적 스탯 조회가 완료되었습니다',
           data: teamStats,
           accessLevel: 'public',
+          league: league || 'all',
           timestamp: new Date().toISOString(),
         };
       }

@@ -88,7 +88,8 @@ export class KAnalyzerService extends BaseAnalyzerService {
             // PAT 스탯
             extraPointsAttempted: kStats.extraPointsAttempted,
             extraPointsMade: kStats.extraPointsMade,
-          }
+          },
+          gameData
         );
 
         if (saveResult.success) {

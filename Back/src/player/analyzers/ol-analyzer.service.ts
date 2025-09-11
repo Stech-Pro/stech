@@ -52,7 +52,8 @@ export class OlAnalyzerService extends BaseAnalyzerService {
           gamesPlayed: olStats.gamesPlayed,
           penalties: olStats.penalties,
           sacksAllowed: olStats.sacksAllowed,
-        }
+        },
+        gameData
       );
 
       if (saveResult.success) {

@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Player, PlayerDocument } from '../../schemas/player.schema';
+import type { PlayerService } from '../player.service';
 
 // 클립 데이터 기본 인터페이스
 export interface ClipData {
@@ -39,6 +40,8 @@ export interface GameData {
 export abstract class BaseAnalyzerService {
   constructor(
     @InjectModel(Player.name) protected playerModel: Model<PlayerDocument>,
+    @Inject(forwardRef(() => require('../player.service').PlayerService))
+    protected playerService: PlayerService,
   ) {}
 
   /**
@@ -115,6 +118,7 @@ export abstract class BaseAnalyzerService {
     teamName: string,
     position: string,
     stats: any,
+    gameData?: GameData,
   ): Promise<any> {
     try {
       const playerId = `${teamName}_${jerseyNumber}`;
@@ -164,6 +168,22 @@ export abstract class BaseAnalyzerService {
         await existingPlayer.save();
         console.log(`✅ ${position} 선수 멀티포지션 스탯 업데이트 성공`);
         
+        // gameData가 있으면 4개 컬렉션에도 저장 (기존 선수)
+        if (gameData && this.playerService) {
+          try {
+            const playerClips = []; // TODO: 해당 선수의 클립들만 필터링
+            await this.playerService.savePlayerStatsWithNewStructure(
+              existingPlayer, 
+              stats, 
+              gameData, 
+              playerClips
+            );
+            console.log(`✅ ${position} 기존선수 4개 컬렉션 저장 완료: ${playerId}`);
+          } catch (error) {
+            console.error(`❌ ${position} 기존선수 4개 컬렉션 저장 실패:`, error.message);
+          }
+        }
+
         // DB 스페셜팀 저장 확인
         if (position === 'DB') {
           const saved = await this.playerModel.findOne({ teamName, jerseyNumber });
@@ -199,6 +219,22 @@ export abstract class BaseAnalyzerService {
 
         await newPlayer.save();
         console.log(`✅ ${position} 선수 저장 성공: ${playerId}`);
+        
+        // gameData가 있으면 4개 컬렉션에도 저장 (신규 선수)
+        if (gameData && this.playerService) {
+          try {
+            const playerClips = []; // TODO: 해당 선수의 클립들만 필터링
+            await this.playerService.savePlayerStatsWithNewStructure(
+              newPlayer, 
+              stats, 
+              gameData, 
+              playerClips
+            );
+            console.log(`✅ ${position} 신규선수 4개 컬렉션 저장 완료: ${playerId}`);
+          } catch (error) {
+            console.error(`❌ ${position} 신규선수 4개 컬렉션 저장 실패:`, error.message);
+          }
+        }
         
         // DB 스페셜팀 저장 확인 (신규)
         if (position === 'DB') {

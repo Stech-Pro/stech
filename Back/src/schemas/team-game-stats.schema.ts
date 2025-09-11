@@ -20,6 +20,10 @@ export class TeamGameStats {
   @Prop({ required: true })
   season: string; // date에서 추출한 연도
 
+  // 리그 구분 추가
+  @Prop({ enum: ['1부', '2부'], default: '1부' })
+  league: string;
+
   @Prop({ required: true })
   opponent: string;
 

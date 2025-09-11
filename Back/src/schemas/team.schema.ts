@@ -111,6 +111,10 @@ export class Team {
   @Prop({ type: TeamStatsDetail, default: () => ({}) })
   stats: TeamStatsDetail; // 팀 통계
 
+  // 리그 구분 추가
+  @Prop({ enum: ['1부', '2부'], default: '1부' })
+  league: string;
+
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   ownerId: Types.ObjectId;
 }

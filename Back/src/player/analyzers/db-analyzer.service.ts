@@ -99,7 +99,8 @@ export class DbAnalyzerService extends BaseAnalyzerService {
           puntReturnYards: dbStats.puntReturnYard,
           yardsPerPuntReturn: dbStats.yardPerPuntReturn,
           returnTouchdowns: dbStats.kickoffReturnTouchdowns + dbStats.puntReturnTouchdowns,
-        }
+        },
+        gameData
       );
 
       if (saveResult.success) {

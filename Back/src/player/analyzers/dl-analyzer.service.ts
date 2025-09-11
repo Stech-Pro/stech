@@ -80,7 +80,8 @@ export class DlAnalyzerService extends BaseAnalyzerService {
           comboTackles: dlStats.comboTackles,
           att: dlStats.att,
           longestInterception: dlStats.longestInterception,
-        }
+        },
+        gameData
       );
 
       if (saveResult.success) {

@@ -89,7 +89,7 @@ export class RbAnalyzerService extends BaseAnalyzerService {
       console.log(`   킥오프 리턴: ${rbStats.kickoffReturn}, 야드: ${rbStats.kickoffReturnYard}`);
       console.log(`   펀트 리턴: ${rbStats.puntReturn}, 야드: ${rbStats.puntReturnYard}`);
 
-      // 데이터베이스에 저장
+      // 데이터베이스에 저장 (gameData 포함)
       const saveResult = await this.savePlayerStats(
         rbStats.jerseyNumber,
         rbStats.teamName,
@@ -125,7 +125,8 @@ export class RbAnalyzerService extends BaseAnalyzerService {
           yardsPerPuntReturn: rbStats.yardPerPuntReturn,
           returnTouchdowns: rbStats.returnTouchdown,
           puntReturnTouchdowns: rbStats.puntReturnTouchdowns,
-        }
+        },
+        gameData
       );
 
       if (saveResult.success) {
@@ -200,7 +201,7 @@ export class RbAnalyzerService extends BaseAnalyzerService {
           rbStats.receivingYards += gainYard;
 
           // 가장 긴 리셉션 업데이트
-          if (gainYard > rbStats.longestReception) {
+          if (rbStats.receptions === 1 || gainYard > rbStats.longestReception) {
             rbStats.longestReception = gainYard;
           }
 
@@ -238,7 +239,7 @@ export class RbAnalyzerService extends BaseAnalyzerService {
         const hasSAFETY = significantPlays.some(play => play === 'SAFETY');
 
         if (hasTFL || hasSAFETY) {
-          rbStats.backRushYard += gainYard;
+          rbStats.backRushYard += Math.abs(gainYard);  // 절댓값으로 저장
         } else {
           rbStats.frontRushYard += gainYard;
         }

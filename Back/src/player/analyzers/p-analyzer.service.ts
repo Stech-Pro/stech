@@ -68,7 +68,8 @@ export class PAnalyzerService extends BaseAnalyzerService {
           touchbackPercentage: pStats.touchbackPercentage,
           inside20: pStats.inside20,
           inside20Percentage: pStats.inside20Percentage,
-        }
+        },
+        gameData
       );
 
       if (saveResult.success) {

@@ -50,12 +50,13 @@ export class QbAnalyzerService extends BaseAnalyzerService {
       // 계산된 스탯 완성
       this.calculateFinalStats(qbStats);
 
-      // 데이터베이스에 저장
+      // 데이터베이스에 저장 (gameData 포함)
       const saveResult = await this.savePlayerStats(
         qbStats.jerseyNumber,
         qbStats.teamName,
         'QB',
         qbStats,
+        gameData,
       );
       results.push(saveResult);
 
@@ -162,15 +163,22 @@ export class QbAnalyzerService extends BaseAnalyzerService {
     } 
     // === 러싱 플레이 처리 ===
     else if (playType === 'RUN') {
-      // QB 러시: QB가 직접 공을 들고 뛰는 플레이
-      qbStats.rushingAttempts++;
-      qbStats.rushingYards += gainYard;
+      // FUMBLERECOFF는 러싱 시도 아님 (리커버리 상황)
+      const hasFumbleRecOff = clip.significantPlays?.includes('FUMBLERECOFF');
+      
+      if (!hasFumbleRecOff) {
+        // QB 러시: QB가 직접 공을 들고 뛰는 플레이
+        qbStats.rushingAttempts++;
+        qbStats.rushingYards += gainYard;
 
-      // 최장 러시 업데이트
-      console.log(`🏃 러시 거리 비교: 현재 ${gainYard}야드 vs 기존 최장 ${qbStats.longestRush}야드`);
-      if (gainYard > qbStats.longestRush) {
-        console.log(`✅ 최장 러시 업데이트: ${qbStats.longestRush} → ${gainYard}`);
-        qbStats.longestRush = gainYard;
+        // 최장 러시 업데이트
+        console.log(`🏃 러시 거리 비교: 현재 ${gainYard}야드 vs 기존 최장 ${qbStats.longestRush}야드`);
+        if (gainYard > qbStats.longestRush) {
+          console.log(`✅ 최장 러시 업데이트: ${qbStats.longestRush} → ${gainYard}`);
+          qbStats.longestRush = gainYard;
+        }
+      } else {
+        console.log(`🔄 FUMBLERECOFF 감지: 러싱 스탯에서 제외`);
       }
     }
 

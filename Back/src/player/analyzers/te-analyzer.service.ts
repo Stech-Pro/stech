@@ -90,7 +90,8 @@ export class TeAnalyzerService extends BaseAnalyzerService {
           teLongestRush: teStats.longestRush,
           fumbles: teStats.fumbles,
           fumblesLost: teStats.fumblesLost,
-        }
+        },
+        gameData
       );
 
       if (saveResult.success) {
@@ -155,7 +156,7 @@ export class TeAnalyzerService extends BaseAnalyzerService {
         teStats.receivingYards += gainYard;
 
         // 가장 긴 리셉션 업데이트
-        if (gainYard > teStats.longestReception) {
+        if (teStats.receptions === 1 || gainYard > teStats.longestReception) {
           teStats.longestReception = gainYard;
         }
 
@@ -164,6 +165,13 @@ export class TeAnalyzerService extends BaseAnalyzerService {
           teStats.receivingFirstDowns++;
         }
       }
+    }
+
+    // NOPASS 플레이 처리 (패스 시도했지만 캐치 못함)
+    if (playType === 'NOPASS') {
+      teStats.receivingTargets++;
+      console.log(`   📊 TE NOPASS 타겟 +1 (총: ${teStats.receivingTargets})`);
+      // NOPASS는 리셉션 카운트 안 함
     }
 
     // RUN 플레이 처리
@@ -175,7 +183,7 @@ export class TeAnalyzerService extends BaseAnalyzerService {
       const hasSAFETY = significantPlays.some(play => play === 'SAFETY');
 
       if (hasTFL || hasSAFETY) {
-        teStats.backRushYard += gainYard;
+        teStats.backRushYard += Math.abs(gainYard);  // 절댓값으로 저장
       } else {
         teStats.frontRushYard += gainYard;
       }
