@@ -194,4 +194,7 @@ export const TEAMS = [
   { id: 'RH',    name: '인천 라이노스',        logo: '/assets/images/svg/teams/Rhinos.png',             region: 'Amateur' },
 
 
+
+  //경기강원협회 /게스트용
+  { id: 'GCF',        name: '경기강원올스타',      logo: '/assets/images/svg/teams/gcf.png',                region: 'Gyeonggi-Gangwon'}
 ];

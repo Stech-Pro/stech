@@ -9,7 +9,6 @@ import UploadVideoModal from '../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../assets/images/logos/Stechlogo.svg';
 import { useAuth } from '../../../../context/AuthContext';
 
-
 /* ========== 공용 드롭다운 ========== */
 function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
   const ref = useRef(null);
@@ -122,7 +121,9 @@ const findTeamMeta = (raw) => {
   if (!raw) return { name: '', logo: null, display: '' };
   const key = normTeam(raw);
   const hit =
-    TEAMS.find((t) => [t.name, t.enName, t.code].some((v) => normTeam(v) === key)) || null;
+    TEAMS.find((t) =>
+      [t.name, t.enName, t.code].some((v) => normTeam(v) === key),
+    ) || null;
   if (hit) return { ...hit, display: compactTeam(hit.name || raw) };
   // 매칭 실패 시에도 표시명은 붙여쓰기 강제
   return { name: String(raw), logo: null, display: compactTeam(raw) };
@@ -138,7 +139,7 @@ export default function GuestClipPage() {
   const { user } = useAuth();
 
   // 상단 팀 표기 (게스트: 기본값)
-  const MY_TEAM_ID = user?.teamName || user?.team;
+  const MY_TEAM_ID = 'GCF';
   const selfTeam = useMemo(
     () => (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || TEAMS[0] || null,
     [MY_TEAM_ID],
@@ -167,17 +168,28 @@ export default function GuestClipPage() {
   const teamOptions = useMemo(() => {
     const arr = [];
     if (homeMeta?.display)
-      arr.push({ value: homeMeta.display, label: homeMeta.display, logo: homeMeta.logo });
+      arr.push({
+        value: homeMeta.display,
+        label: homeMeta.display,
+        logo: homeMeta.logo,
+      });
     if (awayMeta?.display)
-      arr.push({ value: awayMeta.display, label: awayMeta.display, logo: awayMeta.logo });
+      arr.push({
+        value: awayMeta.display,
+        label: awayMeta.display,
+        logo: awayMeta.logo,
+      });
     // 중복 제거
-    return arr.filter((v, i, a) => a.findIndex((x) => x.value === v.value) === i);
+    return arr.filter(
+      (v, i, a) => a.findIndex((x) => x.value === v.value) === i,
+    );
   }, [homeMeta?.display, homeMeta?.logo, awayMeta?.display, awayMeta?.logo]);
 
   // 드롭다운 상태
   const [openMenu, setOpenMenu] = useState(null);
   const closeAll = () => setOpenMenu(null);
-  const handleMenuToggle = (menuName) => setOpenMenu(openMenu === menuName ? null : menuName);
+  const handleMenuToggle = (menuName) =>
+    setOpenMenu(openMenu === menuName ? null : menuName);
 
   // ↓↓↓ 엑셀에서 변환해온 클립 배열 사용 (fetch 없음) — 팀명 붙여쓰기 통일
   const rawClips = useMemo(() => {
@@ -189,7 +201,9 @@ export default function GuestClipPage() {
         playType: String(clip.playType ?? '').toUpperCase(),
         down: clip.down ?? null,
         yardsToGo: clip.yardsToGo ?? null,
-        significantPlay: Array.isArray(clip.significantPlay) ? clip.significantPlay : [],
+        significantPlay: Array.isArray(clip.significantPlay)
+          ? clip.significantPlay
+          : [],
         offensiveTeam: compactTeam(ot),
         gainYard: clip.gainYard ?? null,
         clipUrl: clip.clipUrl ?? null,
@@ -199,20 +213,29 @@ export default function GuestClipPage() {
 
   // useClipFilter 훅
   const persistKey = `clipFilters:${game?.gameKey || gameKey || 'guest'}`;
-  const { filters, setFilters, summaries, clips, handleFilterChange, clearAllFilters } =
-    useClipFilter({
-      persistKey,
-      rawClips,
-      teamOptions,
-      opposites: OPPOSITES,
-    });
+  const {
+    filters,
+    setFilters,
+    summaries,
+    clips,
+    handleFilterChange,
+    clearAllFilters,
+  } = useClipFilter({
+    persistKey,
+    rawClips,
+    teamOptions,
+    opposites: OPPOSITES,
+  });
 
   // 버튼 요약 텍스트
   const teamSummary = summaries.team; // 이미 붙여쓰기 형태
   const quarterSummary = summaries.quarter;
-  const playTypeSummary = filters.playType ? PT_LABEL[filters.playType] || filters.playType : '유형';
+  const playTypeSummary = filters.playType
+    ? PT_LABEL[filters.playType] || filters.playType
+    : '유형';
   const significantSummary = summaries.significant;
-  const clearSignificant = () => setFilters((prev) => ({ ...prev, significantPlay: [] }));
+  const clearSignificant = () =>
+    setFilters((prev) => ({ ...prev, significantPlay: [] }));
 
   // 리스트 클릭 → 비디오 플레이어로 이동
   const onClickClip = (c) => {
@@ -239,7 +262,9 @@ export default function GuestClipPage() {
       const arr = clips.filter(
         (c) =>
           c.offensiveTeam === teamName &&
-          (c.playType === 'RUN' || c.playType === 'PASS' || c.playType === 'PASS_INCOMPLETE'),
+          (c.playType === 'RUN' ||
+            c.playType === 'PASS' ||
+            c.playType === 'PASS_INCOMPLETE'),
       );
       const run = arr.filter((c) => c.playType === 'RUN').length;
       const pass = arr.length - run;
@@ -259,7 +284,9 @@ export default function GuestClipPage() {
   // down 표기
   const SPECIAL_DOWN_MAP = { TPT: '2PT', KICKOFF: '킥오프', PAT: 'PAT' };
   const getDownDisplay = (c) => {
-    const pt = String(c.playType || '').trim().toUpperCase();
+    const pt = String(c.playType || '')
+      .trim()
+      .toUpperCase();
     const downRaw = c.down;
     const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
     if (SPECIAL_DOWN_MAP[downStr]) return SPECIAL_DOWN_MAP[downStr];
@@ -288,7 +315,9 @@ export default function GuestClipPage() {
               <img
                 src={logoSrc}
                 alt={label}
-                className={`header-team-logo-img ${logoSrc?.endsWith?.('.svg') ? 'svg-logo' : 'png-logo'}`}
+                className={`header-team-logo-img ${
+                  logoSrc?.endsWith?.('.svg') ? 'svg-logo' : 'png-logo'
+                }`}
               />
             </div>
             <span className="header-team-name">{label}</span>
@@ -318,13 +347,17 @@ export default function GuestClipPage() {
                   {teamOptions.map((opt) => (
                     <button
                       key={opt.value}
-                      className={`ff-dd-item ${filters.team === opt.value ? 'selected' : ''}`}
+                      className={`ff-dd-item ${
+                        filters.team === opt.value ? 'selected' : ''
+                      }`}
                       onClick={() => {
                         handleFilterChange('team', opt.value);
                         closeAll();
                       }}
                     >
-                      {opt.logo && <img className="ff-dd-avatar" src={opt.logo} alt="" />}
+                      {opt.logo && (
+                        <img className="ff-dd-avatar" src={opt.logo} alt="" />
+                      )}
                       {opt.label || opt.value}
                     </button>
                   ))}
@@ -339,7 +372,9 @@ export default function GuestClipPage() {
                   onClose={closeAll}
                 >
                   <button
-                    className={`ff-dd-item ${!filters.quarter ? 'selected' : ''}`}
+                    className={`ff-dd-item ${
+                      !filters.quarter ? 'selected' : ''
+                    }`}
                     onClick={() => {
                       handleFilterChange('quarter', null);
                       closeAll();
@@ -350,7 +385,9 @@ export default function GuestClipPage() {
                   {[1, 2, 3, 4].map((q) => (
                     <button
                       key={q}
-                      className={`ff-dd-item ${filters.quarter === q ? 'selected' : ''}`}
+                      className={`ff-dd-item ${
+                        filters.quarter === q ? 'selected' : ''
+                      }`}
                       onClick={() => {
                         handleFilterChange('quarter', q);
                         closeAll();
@@ -370,7 +407,9 @@ export default function GuestClipPage() {
                   onClose={closeAll}
                 >
                   <button
-                    className={`ff-dd-item ${!filters.playType ? 'selected' : ''}`}
+                    className={`ff-dd-item ${
+                      !filters.playType ? 'selected' : ''
+                    }`}
                     onClick={() => {
                       handleFilterChange('playType', null);
                       closeAll();
@@ -381,7 +420,9 @@ export default function GuestClipPage() {
                   {Object.entries(PLAY_TYPES).map(([code]) => (
                     <button
                       key={code}
-                      className={`ff-dd-item ${filters.playType === code ? 'selected' : ''}`}
+                      className={`ff-dd-item ${
+                        filters.playType === code ? 'selected' : ''
+                      }`}
                       onClick={() => {
                         handleFilterChange('playType', code);
                         closeAll();
@@ -409,7 +450,9 @@ export default function GuestClipPage() {
                         <button
                           key={label}
                           className={`ff-dd-item ${selected ? 'selected' : ''}`}
-                          onClick={() => handleFilterChange('significantPlay', label)}
+                          onClick={() =>
+                            handleFilterChange('significantPlay', label)
+                          }
                         >
                           {label}
                         </button>
@@ -427,7 +470,11 @@ export default function GuestClipPage() {
                 </Dropdown>
 
                 {/* RESET */}
-                <button type="button" className="resetButton" onClick={clearAllFilters}>
+                <button
+                  type="button"
+                  className="resetButton"
+                  onClick={clearAllFilters}
+                >
                   초기화
                 </button>
               </div>
@@ -445,33 +492,81 @@ export default function GuestClipPage() {
 
       {/* ===== 본문 ===== */}
       <div className="clip-page-container">
-        <div className="clip-list">
-          {clips.map((c) => (
-            <div key={c.id} className="clip-row" onClick={() => onClickClip(c)}>
-              <div className="quarter-name">
-                <div>{c.quarter}Q</div>
-              </div>
-              <div className="clip-rows">
-                <div className="clip-row1">
-                  <div className="clip-down">{getDownDisplay(c)}</div>
-                  <div className="clip-type">#{PT_LABEL[c.playType] || c.playType}</div>
+        <div className="clip-left">
+          <div className="clip-header">
+            <div className="clip-team left">
+              {homeMeta?.logo && (
+                <div className="clip-team-logo">
+                  <img
+                    src={homeMeta.logo}
+                    alt={`${homeMeta.name} 로고`}
+                    className={`clip-team-logo-img ${
+                      homeMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                    }`}
+                  />
                 </div>
-                <div className="clip-row2">
-                  <div className="clip-oT">{c.offensiveTeam}</div>
-                  {Array.isArray(c.significantPlay) && c.significantPlay.length > 0 ? (
-                    <div className="clip-sig">
-                      {c.significantPlay.map((t, idx) => (
-                        <span key={`${c.id}-sig-${idx}`}>#{t}</span>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="clip-sig" />
-                  )}
-                </div>
-              </div>
+              )}
+              <span className="clip-team-name">
+                {homeMeta?.name}
+              </span>
             </div>
-          ))}
-          {clips.length === 0 && <div className="empty">일치하는 플레이가 없습니다.</div>}
+
+            <div className="clip-vs">VS</div>
+
+            <div className="clip-team right">
+              {awayMeta?.logo && (
+                <div className="clip-team-logo">
+                  <img
+                    src={awayMeta.logo}
+                    alt={`${awayMeta.name} 로고`}
+                    className={`clip-team-logo-img ${
+                      awayMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                    }`}
+                  />
+                </div>
+              )}
+              <span className="clip-team-name">
+                {awayMeta?.name}
+              </span>
+            </div>
+          </div>
+          <div className="clip-list">
+            {clips.map((c) => (
+              <div
+                key={c.id}
+                className="clip-row"
+                onClick={() => onClickClip(c)}
+              >
+                <div className="quarter-name">
+                  <div>{c.quarter}Q</div>
+                </div>
+                <div className="clip-rows">
+                  <div className="clip-row1">
+                    <div className="clip-down">{getDownDisplay(c)}</div>
+                    <div className="clip-type">
+                      #{PT_LABEL[c.playType] || c.playType}
+                    </div>
+                  </div>
+                  <div className="clip-row2">
+                    <div className="clip-oT">{c.offensiveTeam}</div>
+                    {Array.isArray(c.significantPlay) &&
+                    c.significantPlay.length > 0 ? (
+                      <div className="clip-sig">
+                        {c.significantPlay.map((t, idx) => (
+                          <span key={`${c.id}-sig-${idx}`}>#{t}</span>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="clip-sig" />
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {clips.length === 0 && (
+              <div className="empty">일치하는 플레이가 없습니다.</div>
+            )}
+          </div>
         </div>
 
         <div className="clip-data">
@@ -486,7 +581,10 @@ export default function GuestClipPage() {
                     <div>{rpStats.home.runPct}%</div>
                   </div>
                   <div className="pc-row2">
-                    <div className="bar bar-run" style={{ width: `${rpStats.home.runPct}%` }} />
+                    <div
+                      className="bar bar-run"
+                      style={{ width: `${rpStats.home.runPct}%` }}
+                    />
                   </div>
                 </div>
                 <div className="pc-pass">
@@ -495,7 +593,10 @@ export default function GuestClipPage() {
                     <div>{rpStats.home.passPct}%</div>
                   </div>
                   <div className="pc-row2">
-                    <div className="bar bar-pass" style={{ width: `${rpStats.home.passPct}%` }} />
+                    <div
+                      className="bar bar-pass"
+                      style={{ width: `${rpStats.home.passPct}%` }}
+                    />
                   </div>
                 </div>
               </div>
@@ -508,7 +609,10 @@ export default function GuestClipPage() {
                     <div>{rpStats.away.runPct}%</div>
                   </div>
                   <div className="pc-row2">
-                    <div className="bar bar-run" style={{ width: `${rpStats.away.runPct}%` }} />
+                    <div
+                      className="bar bar-run"
+                      style={{ width: `${rpStats.away.runPct}%` }}
+                    />
                   </div>
                 </div>
                 <div className="pc-pass">
@@ -517,7 +621,10 @@ export default function GuestClipPage() {
                     <div>{rpStats.away.passPct}%</div>
                   </div>
                   <div className="pc-row2">
-                    <div className="bar bar-pass" style={{ width: `${rpStats.away.passPct}%` }} />
+                    <div
+                      className="bar bar-pass"
+                      style={{ width: `${rpStats.away.passPct}%` }}
+                    />
                   </div>
                 </div>
               </div>

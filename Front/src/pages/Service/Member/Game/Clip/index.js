@@ -639,6 +639,44 @@ export default function ClipPage() {
 
       {/* ===== 본문 ===== */}
       <div className="clip-page-container">
+<div className='clip-left'>
+          <div className="clip-header">
+            <div className="clip-team left">
+              {homeMeta?.logo && (
+                <div className="clip-team-logo">
+                  <img
+                    src={homeMeta.logo}
+                    alt={`${homeMeta.name} 로고`}
+                    className={`clip-team-logo-img ${
+                      homeMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                    }`}
+                  />
+                </div>
+              )}
+              <span className="clip-team-name">
+                {homeMeta?.name}
+              </span>
+            </div>
+
+            <div className="clip-vs">VS</div>
+
+            <div className="clip-team right">
+              {awayMeta?.logo && (
+                <div className="clip-team-logo">
+                  <img
+                    src={awayMeta.logo}
+                    alt={`${awayMeta.name} 로고`}
+                    className={`clip-team-logo-img ${
+                      awayMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                    }`}
+                  />
+                </div>
+              )}
+              <span className="cip-team-name">
+                {awayMeta?.name}
+              </span>
+            </div>
+          </div>
         <div className="clip-list">
           {clips.map((c) => (
             <div key={c.id} className="clip-row" onClick={() => onClickClip(c)}>
@@ -807,6 +845,7 @@ export default function ClipPage() {
           <div className="clip-datas"></div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
