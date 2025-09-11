@@ -50,10 +50,14 @@
   padding-top: 3.125rem;
 }
 .group-section {
-  width: 45.625rem;
+  border-radius: 0.5rem;
+  width: 590px;
 }
 .no-group-img {
+  height: 400px;
   width: 100%;
+  margin: 0 auto;
+  object-fit: cover;
 }
 
 .group-header,

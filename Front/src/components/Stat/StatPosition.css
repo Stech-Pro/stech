@@ -22,11 +22,12 @@
 
 .table-row {
   display: grid;
-  grid-template-columns: 28rem 1fr;
+  grid-template-columns: 21rem 1fr;
   align-items: stretch;
   padding: 1rem 0rem;
   color: #a5a5a5;
   font-weight: 700;
+  white-space: nowrap;
 }
 .table-rows {
   height: 3.75rem;
@@ -34,17 +35,17 @@
   border: 0.236px solid #6e6e6e;
   background: rgba(255, 255, 255, 0.4);
   display: grid;
-  grid-template-columns: 28rem 1fr;
+  grid-template-columns: 20rem 1fr;
   align-items: center;
-    font-weight: 700;
+  font-weight: 700;
 }
-.table-rows.is-division2{
-  background: rgba(110, 110, 110, 0.20);
+.table-rows.is-division2 {
+  background: rgba(110, 110, 110, 0.2);
 }
 .table-row1 {
-  width: 28rem;
+  width: 20rem;
   display: grid;
-  grid-template-columns: 5rem 7rem 1fr;
+  grid-template-columns: 5rem 5rem 1fr;
   align-items: center;
 }
 
@@ -118,8 +119,8 @@
   color: #3b82f6;
   font-weight: 700;
 }
-.chev.active-blue{
-  color:#3b82f6;
+.chev.active-blue {
+  color: #3b82f6;
 }
 
 .team-logo {
@@ -152,13 +153,16 @@
   transition: transform 150ms ease, opacity 150ms ease;
 }
 .sort-toggle.one.desc .chev,
-.sort-toggle.one.asc .chev { opacity: 1; }
-.sort-toggle.one .chev.asc { transform: rotate(180deg); }
+.sort-toggle.one.asc .chev {
+  opacity: 1;
+}
+.sort-toggle.one .chev.asc {
+  transform: rotate(180deg);
+}
 
 .sort-toggle.one {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   background: transparent;
   border: none;
   padding: 0;
@@ -170,13 +174,14 @@
 /* 표 레이아웃 안정화 */
 .stat-table {
   width: 100%;
-  table-layout: fixed;   /* 라벨+아이콘 줄바꿈/몫 흔들림 방지 */
+  table-layout: fixed; /* 라벨+아이콘 줄바꿈/몫 흔들림 방지 */
   border-collapse: separate;
   border-spacing: 0;
 }
-.team-name{
+.team-name {
   display: grid;
   align-items: center;
-  grid-template-columns: minmax(0,1fr) auto;
-gap: 0.625rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.625rem;
+  font-size: 16px !important;
 }
