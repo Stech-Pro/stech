@@ -5,7 +5,15 @@ import { FaChevronDown } from 'react-icons/fa';
 import './StatTeam.css';
 
 /* ─────────────────────────  공통 드롭다운  ───────────────────────── */
-function Dropdown({ value, options, onChange, label, placeholder, onTouch, disabled = false }) {
+function Dropdown({
+  value,
+  options,
+  onChange,
+  label,
+  placeholder,
+  onTouch,
+  disabled = false,
+}) {
   const [open, setOpen] = useState(false);
   const [touched, setTouched] = useState(false);
   const ref = useRef(null);
@@ -22,7 +30,9 @@ function Dropdown({ value, options, onChange, label, placeholder, onTouch, disab
     <div className="dropdown-container" ref={ref} aria-label={label}>
       <button
         type="button"
-        className={`dropdown-trigger ${open ? 'open' : ''} ${!touched ? 'placeholder' : ''}`}
+        className={`dropdown-trigger ${open ? 'open' : ''} ${
+          !touched ? 'placeholder' : ''
+        }`}
         onClick={() => {
           if (disabled) return;
           setOpen((o) => !o);
@@ -30,8 +40,13 @@ function Dropdown({ value, options, onChange, label, placeholder, onTouch, disab
         }}
         disabled={disabled}
       >
-        <span className="dropdown-text">{touched ? value : (placeholder ?? value)}</span>
-        <FaChevronDown size={16} className={`dropdown-arrow ${open ? 'rotated' : ''}`} />
+        <span className="dropdown-text">
+          {touched ? value : placeholder ?? value}
+        </span>
+        <FaChevronDown
+          size={16}
+          className={`dropdown-arrow ${open ? 'rotated' : ''}`}
+        />
       </button>
 
       {open && !disabled && (
@@ -40,7 +55,9 @@ function Dropdown({ value, options, onChange, label, placeholder, onTouch, disab
             {options.map((opt) => (
               <li key={opt}>
                 <button
-                  className={`dropdown-option ${value === opt ? 'selected' : ''}`}
+                  className={`dropdown-option ${
+                    value === opt ? 'selected' : ''
+                  }`}
                   onClick={() => {
                     onChange(opt);
                     setTouched(true);
@@ -63,20 +80,53 @@ function Dropdown({ value, options, onChange, label, placeholder, onTouch, disab
 
 /* ─────────────────────────  리그 매핑/옵션  ───────────────────────── */
 const TEAM_TO_LEAGUE = {
-  '연세대 이글스': '서울', '서울대 그린테러스': '서울', '한양대 라이온스': '서울', '국민대 레이저백스': '서울',
-  '서울시립대 시티혹스': '서울', '한국외대 블랙나이츠': '서울', '건국대 레이징불스': '서울', '홍익대 카우보이스': '서울',
-  '동국대 터스커스': '서울', '고려대 타이거스': '서울', '중앙대 블루드래곤스': '서울', '숭실대 크루세이더스': '서울',
-  '서강대 알바트로스': '서울', '경희대 커맨더스': '서울',
-  '강원대 카프라스': '경기강원','단국대 코디악베어스': '경기강원','성균관대 로얄스': '경기강원','용인대 화이트타이거스': '경기강원',
-  '인하대 틸 드래곤스': '경기강원','한림대 피닉스': '경기강원','한신대 킬러웨일스': '경기강원',
-  '경북대 오렌지파이터스': '대구경북','경일대 블랙베어스': '대구경북','계명대 슈퍼라이온스': '대구경북','금오공과대 레이븐스': '대구경북',
-  '대구가톨릭대 스커드엔젤스': '대구경북','대구대 플라잉타이거스': '대구경북','대구한의대 라이노스': '대구경북',
-  '동국대 화이트엘리펀츠': '대구경북','영남대 페가수스': '대구경북','한동대 홀리램스': '대구경북',
-  '경성대 드래곤스': '부산경남','동서대 블루돌핀스': '부산경남','동아대 레오파즈': '부산경남','동의대 터틀파이터스': '부산경남',
-  '부산대 이글스': '부산경남','부산외국어대 토네이도': '부산경남','신라대 데빌스': '부산경남','울산대 유니콘스': '부산경남',
+  '연세대 이글스': '서울',
+  '서울대 그린테러스': '서울',
+  '한양대 라이온스': '서울',
+  '국민대 레이저백스': '서울',
+  '서울시립대 시티혹스': '서울',
+  '한국외대 블랙나이츠': '서울',
+  '건국대 레이징불스': '서울',
+  '홍익대 카우보이스': '서울',
+  '동국대 터스커스': '서울',
+  '고려대 타이거스': '서울',
+  '중앙대 블루드래곤스': '서울',
+  '숭실대 크루세이더스': '서울',
+  '서강대 알바트로스': '서울',
+  '경희대 커맨더스': '서울',
+  '강원대 카프라스': '경기강원',
+  '단국대 코디악베어스': '경기강원',
+  '성균관대 로얄스': '경기강원',
+  '용인대 화이트타이거스': '경기강원',
+  '인하대 틸 드래곤스': '경기강원',
+  '한림대 피닉스': '경기강원',
+  '한신대 킬러웨일스': '경기강원',
+  '경북대 오렌지파이터스': '대구경북',
+  '경일대 블랙베어스': '대구경북',
+  '계명대 슈퍼라이온스': '대구경북',
+  '금오공과대 레이븐스': '대구경북',
+  '대구가톨릭대 스커드엔젤스': '대구경북',
+  '대구대 플라잉타이거스': '대구경북',
+  '대구한의대 라이노스': '대구경북',
+  '동국대 화이트엘리펀츠': '대구경북',
+  '영남대 페가수스': '대구경북',
+  '한동대 홀리램스': '대구경북',
+  '경성대 드래곤스': '부산경남',
+  '동서대 블루돌핀스': '부산경남',
+  '동아대 레오파즈': '부산경남',
+  '동의대 터틀파이터스': '부산경남',
+  '부산대 이글스': '부산경남',
+  '부산외국어대 토네이도': '부산경남',
+  '신라대 데빌스': '부산경남',
+  '울산대 유니콘스': '부산경남',
   '한국해양대 바이킹스': '부산경남',
-  '군위 피닉스': '사회인','부산 그리폰즈': '사회인','삼성 블루스톰': '사회인','서울 골든이글스': '사회인',
-  '서울 디펜더스': '사회인','서울 바이킹스': '사회인','인천 라이노스': '사회인',
+  '군위 피닉스': '사회인',
+  '부산 그리폰즈': '사회인',
+  '삼성 블루스톰': '사회인',
+  '서울 골든이글스': '사회인',
+  '서울 디펜더스': '사회인',
+  '서울 바이킹스': '사회인',
+  '인천 라이노스': '사회인',
 };
 
 const LEAGUE_OPTIONS = [...Array.from(new Set(Object.values(TEAM_TO_LEAGUE)))];
@@ -85,13 +135,25 @@ const PLAY_TYPES = ['득점/경기', '런', '패스', '스페셜팀', '기타'];
 
 /* ─────────────────────────  정렬/컬럼 정의  ───────────────────────── */
 const LOWER_IS_BETTER = new Set([
-  'interceptions','sacks','fumbles','fumbles_lost','penalties','sacks_allowed',
-  'touchback_percentage','fumble-turnover','turnover_per_game','turnover_rate',
-  'penalty-pen_yards','pen_yards_per_game',
+  'interceptions',
+  'sacks',
+  'fumbles',
+  'fumbles_lost',
+  'penalties',
+  'sacks_allowed',
+  'touchback_percentage',
+  'fumble-turnover',
+  'turnover_per_game',
+  'turnover_rate',
+  'penalty-pen_yards',
+  'pen_yards_per_game',
 ]);
 
 const PAIR_FIRST_DESC = new Set([
-  'pass_completions-attempts','field_goal_completions-attempts','fumble-turnover','penalty-pen_yards',
+  'pass_completions-attempts',
+  'field_goal_completions-attempts',
+  'fumble-turnover',
+  'penalty-pen_yards',
 ]);
 
 const parsePair = (str) => {
@@ -187,7 +249,12 @@ const TEAM_COLUMNS = {
  *  - fixedLeague: "서울"        // 게스트 고정 리그
  *  - fixedDivision: "1부"       // 게스트 고정 디비전
  */
-export default function StatTeam({ data, teams = [], fixedLeague, fixedDivision }) {
+export default function StatTeam({
+  data,
+  teams = [],
+  fixedLeague,
+  fixedDivision,
+}) {
   const isGuestFixed = Boolean(fixedLeague && fixedDivision);
 
   const [league, setLeague] = useState(fixedLeague || '서울');
@@ -195,11 +262,17 @@ export default function StatTeam({ data, teams = [], fixedLeague, fixedDivision 
   const [playType, setPlayType] = useState('득점/경기');
   const [leagueSelected, setLeagueSelected] = useState(false);
 
-  useEffect(() => { if (fixedLeague) setLeague(fixedLeague); }, [fixedLeague]);
-  useEffect(() => { if (fixedDivision) setDivision(fixedDivision); }, [fixedDivision]);
+  useEffect(() => {
+    if (fixedLeague) setLeague(fixedLeague);
+  }, [fixedLeague]);
+  useEffect(() => {
+    if (fixedDivision) setDivision(fixedDivision);
+  }, [fixedDivision]);
 
   // 게스트 고정이면 디비전 드롭다운을 항상 노출(단일 옵션)
-  const showDivision = isGuestFixed ? true : (league !== '사회인' && leagueSelected);
+  const showDivision = isGuestFixed
+    ? true
+    : league !== '사회인' && leagueSelected;
   const currentColumns = TEAM_COLUMNS[playType] || [];
 
   const [currentSort, setCurrentSort] = useState(null);
@@ -223,7 +296,8 @@ export default function StatTeam({ data, teams = [], fixedLeague, fixedDivision 
     const rows = source.filter((d) => {
       const teamLeague = TEAM_TO_LEAGUE[d.team] || '';
       if (targetLeague !== '전체' && teamLeague !== targetLeague) return false;
-      if (targetLeague !== '사회인' && d.division !== targetDivision) return false;
+      if (targetLeague !== '사회인' && d.division !== targetDivision)
+        return false;
       return true;
     });
 
@@ -249,7 +323,15 @@ export default function StatTeam({ data, teams = [], fixedLeague, fixedDivision 
       return direction === 'asc' ? diff : -diff;
     };
     return [...rows].sort(cmp);
-  }, [data, league, division, currentSort, isGuestFixed, fixedLeague, fixedDivision]);
+  }, [
+    data,
+    league,
+    division,
+    currentSort,
+    isGuestFixed,
+    fixedLeague,
+    fixedDivision,
+  ]);
 
   const rankedTeams = useMemo(() => {
     if (!sortedTeams.length || !currentSort)
@@ -312,8 +394,8 @@ export default function StatTeam({ data, teams = [], fixedLeague, fixedDivision 
           <thead className="table-head">
             <tr className="table-row">
               <div className="team-table-row1">
-                <th className="team-table-header-cell rank-column">순위</th>
-                <th className="team-table-header-cell team-column">팀</th>
+                <div className="team-table-header-cell rank-column">순위</div>
+                <div className="team-table-header-cell team-column">팀</div>
               </div>
               <div
                 className="team-table-row2"
@@ -327,24 +409,34 @@ export default function StatTeam({ data, teams = [], fixedLeague, fixedDivision 
                   const direction = isActive ? currentSort.direction : null;
                   const isPrimary = PRIMARY_TEAM_METRIC[playType] === col.key;
                   return (
-                    <th
+                    <div
                       key={col.key}
                       className={`team-table-header-cell stat-column sortable
-                        ${isActive ? 'active-blue' : ''} ${isPrimary && !isActive ? 'primary-orange' : ''}`}
+                        ${isActive ? 'active-blue' : ''} ${
+                        isPrimary && !isActive ? 'primary-orange' : ''
+                      }`}
                     >
                       <button
                         type="button"
                         className={`sort-toggle one ${direction ?? 'none'}`}
                         onClick={() => toggleSort(col.key)}
-                        title={direction ? `정렬: ${direction === 'desc' ? '내림차순' : '오름차순'}` : '정렬 적용'}
+                        title={
+                          direction
+                            ? `정렬: ${
+                                direction === 'desc' ? '내림차순' : '오름차순'
+                              }`
+                            : '정렬 적용'
+                        }
                       >
                         <span className="column-label">{col.label}</span>
                         <RxTriangleDown
-                          className={`chev ${direction === 'asc' ? 'asc' : ''} ${isActive ? 'active-blue' : ''}`}
+                          className={`chev ${
+                            direction === 'asc' ? 'asc' : ''
+                          } ${isActive ? 'active-blue' : ''}`}
                           size={30}
                         />
                       </button>
-                    </th>
+                    </div>
                   );
                 })}
               </div>
@@ -354,33 +446,59 @@ export default function StatTeam({ data, teams = [], fixedLeague, fixedDivision 
           <tbody className="table-body">
             {rankedTeams.map((row) => {
               const teamInfo = teams.find((t) => t.name === row.team);
-              const isSecondDiv = (isGuestFixed ? fixedDivision : division) === '2부';
+              const isSecondDiv =
+                (isGuestFixed ? fixedDivision : division) === '2부';
               return (
-                <tr key={row.id || row.team} className={`team-table-rows ${isSecondDiv ? 'is-division2' : ''}`}>
+                <tr
+                  key={row.id || row.team}
+                  className={`team-table-rows ${
+                    isSecondDiv ? 'is-division2' : ''
+                  }`}
+                >
                   <div className="team-table-row1">
-                    <td className="team-table-cell">{row.__rank}위</td>
-                    <td className="team-table-cell team-name">
+                    <div className="team-table-cell">{row.__rank}위</div>
+                    <div className="team-table-cell team-name">
                       {teamInfo?.logo && (
                         <div className="team-logo">
                           <img
                             src={teamInfo.logo}
                             alt={`${row.team} 로고`}
-                            className={`team-logo-img ${teamInfo.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'}`}
+                            className={`team-logo-img ${
+                              teamInfo.logo.endsWith('.svg')
+                                ? 'svg-logo'
+                                : 'png-logo'
+                            }`}
                           />
                         </div>
                       )}
                       <span>{row.team}</span>
-                    </td>
+                    </div>
                   </div>
-                  <div className="team-table-row2" style={{ '--cols': TEAM_COLUMNS[playType]?.length || 0 }}>
+                  <div
+                    className="team-table-row2"
+                    style={{ '--cols': TEAM_COLUMNS[playType]?.length || 0 }}
+                  >
                     {(TEAM_COLUMNS[playType] || []).map((col) => {
                       const v = row[col.key];
                       if (typeof v === 'number') {
                         const isPct = String(col.key).includes('percentage');
-                        const shown = v % 1 !== 0 || isPct ? (isPct ? `${v.toFixed(1)}` : v.toFixed(1)) : v;
-                        return <td key={col.key} className="team-table-cell">{shown}</td>;
+                        const shown =
+                          v % 1 !== 0 || isPct
+                            ? isPct
+                              ? `${v.toFixed(1)}`
+                              : v.toFixed(1)
+                            : v;
+                        return (
+                          <div key={col.key} className="team-table-cell">
+                            {shown}
+                          </div>
+                        );
                       }
-                      return <td key={col.key} className="team-table-cell">{v ?? '0'}</td>;
+                      return (
+                        <div key={col.key} className="team-table-cell">
+                          {v ?? '0'}
+                        </div>
+                      );
                     })}
                   </div>
                 </tr>
