@@ -34,8 +34,8 @@ const MOCK_GAMES = [
     dateText: '2025.06.01 11:00',
     // 필터/정렬용 ISO (KST 기준이면 +09:00)
     dateISO: '2025-06-01T11:00:00+09:00',
-    homeId: '경기강원올스타',
-    awayId: '서울 바이킹스',
+    homeId: 'GCF',
+    awayId: 'VI',
     homeScore: 6,
     awayScore: 24,
     type: 'Friendly match',
@@ -50,7 +50,7 @@ export default function GuestGamePage() {
   const navigate = useNavigate();
 
   /* 내 팀 표기(게스트용이니 대충 기본값) */
-  const MY_TEAM_ID = null;
+  const MY_TEAM_ID = 'GCF'; // 경기강원협회
   const selfTeam = (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || TEAMS[0] || null;
   const logoSrc = selfTeam?.logo || defaultLogo;
   const label = selfTeam?.name || 'Choose Team';
