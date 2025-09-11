@@ -228,13 +228,40 @@ function PlayerCore({ stateData }) {
   const [openMenu, setOpenMenu] = useState(null);
   const [showMagicPencil, setShowMagicPencil] = useState(false);
   const [showMemo, setShowMemo] = useState(false);
-  const [memos, setMemos] = useState({});
+  const [memos, setMemos] = useState(() => {
+    const savedMemos = localStorage.getItem(`videoMemos:${teamMeta?.gameId}`);
+    return savedMemos ? JSON.parse(savedMemos) : {};
+  });
+
   const [contextMenu, setContextMenu] = useState({
     visible: false,
     x: 0,
     y: 0,
   });
   const [showGameDataModal, setShowGameDataModal] = useState(false);
+
+  const handleSaveMemo = (clipId, memoData, playerID) => {
+    setMemos((prev) => {
+      // playerID별로 메모를 저장
+      const playerMemos = prev[playerID] || {};
+      const memoKey = `memo_${clipId}`;
+
+      const updated = {
+        ...prev,
+        [playerID]: {
+          ...playerMemos,
+          [memoKey]: memoData,
+        },
+      };
+
+      // localStorage에 저장
+      localStorage.setItem(
+        `videoMemos:${teamMeta?.gameId}`,
+        JSON.stringify(updated),
+      );
+      return updated;
+    });
+  };
 
   // 컨텍스트 메뉴 관련 함수
   const handleVideoContextMenu = useCallback((e) => {
@@ -936,9 +963,7 @@ function PlayerCore({ stateData }) {
         onClose={() => setShowMemo(false)}
         clipId={selectedId}
         memos={memos}
-        onSaveMemo={(id, content) => {
-          setMemos((prev) => ({ ...prev, [id]: content }));
-        }}
+        onSaveMemo={handleSaveMemo}
         clipInfo={{
           quarter,
           down,
@@ -946,6 +971,8 @@ function PlayerCore({ stateData }) {
           playType: selected?.playType,
           time: formatTime(currentTime),
         }}
+        // teamPlayers={teamPlayers}
+        // currentUser={currentUser}
       />
     </div>
   );

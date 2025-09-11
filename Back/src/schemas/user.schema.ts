@@ -27,7 +27,6 @@ export class User {
   @Prop({ default: true })
   isActive: boolean; // 계정 활성화 상태
 
-
   @Prop({ default: null })
   passwordResetCode: string | null; // 패스워드 리셋 인증코드
 
@@ -37,21 +36,25 @@ export class User {
   @Prop({ default: 0 })
   passwordResetAttempts: number; // 재시도 횟수 (보안)
 
-  @Prop({ 
-    type: [{
-      gameKey: String,
-      clipKey: String
-    }],
-    default: []
+  @Prop({
+    type: [
+      {
+        gameKey: String,
+        clipKey: String,
+      },
+    ],
+    default: [],
   })
   memos: { gameKey: string; clipKey: string }[]; // 사용자가 메모한 클립들
 
-  @Prop({ 
-    type: [{
-      gameKey: String,
-      clipKey: String
-    }],
-    default: []
+  @Prop({
+    type: [
+      {
+        gameKey: String,
+        clipKey: String,
+      },
+    ],
+    default: [],
   })
   highlights: { gameKey: string; clipKey: string }[]; // 사용자가 하이라이트한 클립들
 

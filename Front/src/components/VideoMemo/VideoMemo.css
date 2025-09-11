@@ -1,179 +1,651 @@
-.memoOverlay {
+/* VideoMemo.css - Dark Theme matching Video Settings Modal */
+
+.video-memo-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 9999;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.memoContainer {
-  background: white;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 80vh;
+.video-memo-modal {
+  width: min(600px, 95vw);
+  max-height: 85vh;
+  background: linear-gradient(145deg, #1a1d23 0%, #16191e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  color: #ffffff;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.memoHeader {
-  padding: 20px;
-  border-bottom: 1px solid #e0e0e0;
+.video-memo-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  padding: 24px 32px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.memoHeader h3 {
+.video-memo-header h3 {
   margin: 0;
-  font-size: 20px;
-  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+  color: #f1f5f9;
+  letter-spacing: -0.025em;
 }
 
-.memoCloseBtn {
-  background: none;
-  border: none;
+.video-memo-header button {
+  width: 32px;
+  height: 32px;
+  color: #94a3b8;
   cursor: pointer;
-  color: #666;
-  padding: 4px;
-}
-
-.memoCloseBtn:hover {
-  color: #000;
-}
-
-.memoClipInfo {
-  padding: 10px 20px;
-  background: #f5f5f5;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
   display: flex;
-  gap: 15px;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.video-memo-header button:hover {
+  color: #ffffff;
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.05);
+}
+
+/* 메모 콘텐츠 영역 */
+.memoContent {
+  padding: 32px;
+  overflow-y: auto;
+  max-height: calc(85vh - 100px);
+}
+
+/* 클립 정보 표시 */
+.memoClipInfo {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
   font-size: 14px;
-  color: #666;
+  color: #cbd5e1;
+  flex-wrap: wrap;
+}
+
+.memoClipInfo span {
+  padding: 6px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  color: #93c5fd;
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .memoTime {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-left: auto;
+  gap: 6px;
+  color: #f1f5f9 !important;
+  background: rgba(34, 197, 94, 0.1) !important;
+  border-color: rgba(34, 197, 94, 0.2) !important;
 }
 
-.memoContent {
-  padding: 20px;
-  overflow-y: auto;
-  flex: 1;
+/* 메모 입력 영역 */
+.memoInput {
+  margin-bottom: 24px;
+  position: relative;
 }
 
 .memoInput textarea {
   width: 100%;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 14px;
+  min-height: 120px;
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   resize: vertical;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
 }
 
 .memoInput textarea:focus {
-  outline: none;
-  border-color: #0066ff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.memoActions {
-  margin-top: 12px;
+.memoInput textarea::placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* 멘션 드롭다운 */
+.mentionDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #1a1d23;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
+    0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+.mentionItem {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.mentionItem:last-child {
+  border-bottom: none;
+}
+
+.mentionItem:hover,
+.mentionItem.active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mentionItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.mentionItem:hover::before,
+.mentionItem.active::before {
+  opacity: 1;
+}
+
+.mentionName {
+  font-weight: 600;
+  color: #f1f5f9;
+  font-size: 15px;
+}
+
+.mentionMeta {
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* 메모 액션 버튼들 */
+.memoActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .memoSaveBtn {
-  background: #0066ff;
-  color: white;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #ffffff;
   border: none;
-  padding: 8px 20px;
-  border-radius: 6px;
+  padding: 10px 20px;
+  border-radius: 10px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
+  gap: 8px;
 }
 
 .memoSaveBtn:hover:not(:disabled) {
-  background: #0052cc;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
 .memoSaveBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
+/* 저장된 메모 목록 */
 .memoList {
-  margin-top: 20px;
-  border-top: 1px solid #e0e0e0;
-  padding-top: 20px;
+  margin-top: 32px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .memoListHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .memoListHeader h4 {
   margin: 0;
   font-size: 16px;
-  color: #333;
+  font-weight: 600;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.memoListHeader h4::before {
+  content: '';
+  width: 3px;
+  height: 16px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 2px;
 }
 
 .memoExportBtn {
-  background: #28a745;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.memoExportBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 .memoItem {
-  background: #f9f9f9;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 10px;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.memoItem:last-child {
+  border-bottom: none;
 }
 
 .memoItemHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
 .memoDate {
-  font-size: 12px;
-  color: #999;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 .memoDeleteBtn {
-  background: none;
-  border: none;
-  color: #dc3545;
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 6px;
+  border-radius: 6px;
   cursor: pointer;
-  padding: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .memoDeleteBtn:hover {
-  color: #c82333;
+  background: rgba(239, 68, 68, 0.2);
+  color: #ffffff;
 }
 
 .memoItemContent {
-  color: #333;
-  line-height: 1.5;
+  color: #e2e8f0;
+  font-size: 14px;
+  line-height: 1.6;
   white-space: pre-wrap;
+}
+
+/* 멘션 하이라이트 (메모 목록에서) */
+.memoMention {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  display: inline-block;
+  margin: 0 2px;
+}
+
+/* 나만 보기 옵션 */
+.memo-options {
+  margin-bottom: 24px;
+}
+
+.private-memo-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.private-memo-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.private-memo-toggle input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.private-icon {
+  font-size: 16px;
+  color: #fbbf24;
+}
+
+.private-memo-toggle span:last-child {
+  color: #e2e8f0;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* 메모 입력 컨테이너 (두 번째 textarea용) */
+.memo-input-container {
+  position: relative;
+  margin-bottom: 28px;
+}
+
+.memo-textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  resize: vertical;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.memo-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.memo-textarea::placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* 플레이어 멘션 리스트 */
+.player-mention-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #1a1d23;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
+    0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+.player-mention-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.player-mention-item:last-child {
+  border-bottom: none;
+}
+
+.player-mention-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.player-mention-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.player-mention-item:hover::before {
+  opacity: 1;
+}
+
+.player-mention-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.player-mention-item:hover img {
+  border-color: #3b82f6;
+}
+
+.player-mention-item div {
+  flex: 1;
+}
+
+.player-name {
+  font-weight: 600;
+  color: #f1f5f9;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.player-id {
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* 메모 액션 버튼들 (하단) */
+.memo-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.save-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* 스크롤바 */
+.memoInput textarea::-webkit-scrollbar,
+.memo-textarea::-webkit-scrollbar,
+.mentionDropdown::-webkit-scrollbar,
+.player-mention-list::-webkit-scrollbar,
+.memoContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.memoInput textarea::-webkit-scrollbar-track,
+.memo-textarea::-webkit-scrollbar-track,
+.mentionDropdown::-webkit-scrollbar-track,
+.player-mention-list::-webkit-scrollbar-track,
+.memoContent::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.memoInput textarea::-webkit-scrollbar-thumb,
+.memo-textarea::-webkit-scrollbar-thumb,
+.mentionDropdown::-webkit-scrollbar-thumb,
+.player-mention-list::-webkit-scrollbar-thumb,
+.memoContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.memoInput textarea::-webkit-scrollbar-thumb:hover,
+.memo-textarea::-webkit-scrollbar-thumb:hover,
+.mentionDropdown::-webkit-scrollbar-thumb:hover,
+.player-mention-list::-webkit-scrollbar-thumb:hover,
+.memoContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .video-memo-modal {
+    width: 95vw;
+    border-radius: 16px;
+  }
+
+  .video-memo-header {
+    padding: 20px 24px;
+  }
+
+  .memoContent {
+    padding: 24px 20px;
+  }
+
+  .memoClipInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .memo-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .cancel-btn,
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .memoListHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }

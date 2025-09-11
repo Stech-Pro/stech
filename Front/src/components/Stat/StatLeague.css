@@ -50,10 +50,14 @@
   padding-top: 3.125rem;
 }
 .group-section {
-  width: 45.625rem;
+  border-radius: 0.5rem;
+  width: 590px;
 }
 .no-group-img {
+  height: 400px;
   width: 100%;
+  margin: 0 auto;
+  object-fit: cover;
 }
 
 .group-header,
@@ -79,7 +83,7 @@
 /* 헤더 행 */
 .standings-header {
   display: grid;
-  grid-template-columns: 3.75rem 3.75rem 1fr 3.75rem 3.75rem 3.75rem 5rem 3.75rem 3.75rem;
+  grid-template-columns: 3.75rem 1fr 3.75rem 3.75rem 3.75rem 5rem 3.75rem 3.75rem;
   font-weight: bold;
   color: #a5a5a5;
   padding-top: 0.5rem;
@@ -88,7 +92,7 @@
 /* 데이터 행 */
 .standings-row {
   display: grid;
-  grid-template-columns: 3.75rem 3.75rem 1fr 3.75rem 3.75rem 3.75rem 5rem 3.75rem 3.75rem;
+  grid-template-columns: 2.5rem 2rem 1fr 3.75rem 3.75rem 3.75rem 5rem 3.75rem 3.75rem;
   border-radius: 0.5rem;
   background-color: rgba(255, 255, 255, 0.4);
   transition: transform-color 0.2s;
@@ -108,12 +112,13 @@
 
 /* 각 셀 공통 스타일 */
 .standings-cell {
-  padding: 0.75rem 0.5rem;
+  padding: 0.75rem 0;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #a5a5a5;
+  font-size: 16px;
 }
 
 /* 순위 셀 */
@@ -121,11 +126,7 @@
   font-weight: bold;
   font-size: 18px;
   color: #ffffff;
-}
-
-/* 로고 셀 */
-.logo-cell {
-  padding: 0.5rem;
+  width: 40px;
 }
 
 .team-logo {
@@ -150,11 +151,27 @@
 }
 /* 팀명 셀 */
 .team-cell {
+  /* 기존 스타일 */
   text-align: left;
-  justify-content: flex-start;
+  justify-content: center;
   font-weight: 500;
-  padding-left: 0.75rem;
   color: #ffffff;
+
+  /* 추가할 스타일 */
+  flex-wrap: nowrap; /* 텍스트가 줄 바꿈되지 않도록 설정 */
+  white-space: nowrap; /* 텍스트가 한 줄로 표시되도록 설정 */
+  text-overflow: ellipsis; /* 숨겨진 텍스트를 말줄임표로 표시 */
+  flex: 1; /* 로고를 제외한 나머지 공간을 모두 차지하도록 설정 */
+  min-width: 0; /* flex 아이템의 크기가 내용물보다 작아질 수 있도록 허용 */
+}
+
+.logo-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  padding: 0; /* 로고 셀의 패딩 제거 */
+  margin: 0; /* 로고 셀의 마진 제거 */
 }
 .team-cell.title {
   color: #a5a5a5;
@@ -243,6 +260,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: nowrap;
 }
 
 .home-team {
@@ -250,6 +268,7 @@
   gap: 0.625rem;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: nowrap;
 }
 
 .away-team {
@@ -257,6 +276,8 @@
   justify-content: flex-start;
   align-items: center;
   gap: 0.625rem;
+  flex-wrap: nowrap;
+  width: 100%;
 }
 
 .promotion-matches-container .match-row,
@@ -465,12 +486,11 @@
   padding-left: 1rem;
   display: flex;
   gap: 0.8rem;
-  width: 12.5rem;
+  width: 15rem;
   height: 2.25rem;
   align-items: center;
   background-color: #6e6e6e;
   color: #f5f5f5;
-  font-size: 0.8rem;
 }
 .knockout-team-score {
   width: 2.25rem;

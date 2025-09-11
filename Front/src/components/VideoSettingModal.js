@@ -132,24 +132,32 @@ export default function VideoSettingModal({ onClose }) {
                 </div>
               </div>
               <div className="settings-row">
-                <div className="setting-item">
+                <div
+                  className="setting-item"
+                  style={{ display: 'flex', gap: '25px' }}
+                >
                   <label>언어 설정</label>
                   <select
                     value={settings.language}
                     onChange={(e) => updateSetting('language', e.target.value)}
+                    style={{ padding: '20px 30px', textSize: '24px' }}
                   >
                     <option value="ko">한국어</option>
                     <option value="en">English</option>
                   </select>
                 </div>
 
-                <div className="setting-item">
+                <div
+                  className="setting-item"
+                  style={{ display: 'flex', gap: '25px' }}
+                >
                   <label>화면 비율 설정</label>
                   <select
                     value={settings.screenRatio}
                     onChange={(e) =>
                       updateSetting('screenRatio', e.target.value)
                     }
+                    style={{ padding: '20px 30px', textSize: '24px' }}
                   >
                     <option value="1920:1080">1920:1080</option>
                     <option value="1280:720">1280:720</option>
