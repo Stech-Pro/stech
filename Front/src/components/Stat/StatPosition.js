@@ -50,7 +50,9 @@ function Dropdown({
             {options.map((opt) => (
               <li key={opt}>
                 <button
-                  className={`dropdown-option ${value === opt ? 'selected' : ''}`}
+                  className={`dropdown-option ${
+                    value === opt ? 'selected' : ''
+                  }`}
                   onClick={() => {
                     onChange(opt);
                     setTouched(true);
@@ -135,7 +137,18 @@ const TEAM_TO_LEAGUE = {
 // const BACKEND_TO_FRONTEND_TEAM = { ... };
 
 /* ─────────────────────────  상수  ───────────────────────── */
-const POSITION_OPTIONS = ['QB', 'RB', 'WR', 'TE', 'K', 'P', 'OL', 'DL', 'LB', 'DB'];
+const POSITION_OPTIONS = [
+  'QB',
+  'RB',
+  'WR',
+  'TE',
+  'K',
+  'P',
+  'OL',
+  'DL',
+  'LB',
+  'DB',
+];
 
 const LOWER_IS_BETTER = new Set([
   'interceptions',
@@ -158,8 +171,16 @@ const parsePair = (str) => {
 /* 포지션/카테고리 기본 정렬 키(주황 표시용) */
 const PRIMARY_METRIC = {
   QB: { 패스: 'passing_yards', 런: 'rushing_yards' },
-  RB: { 런: 'rushing_yards', 패스: 'receiving_yards', 스페셜팀: 'kick_return_yards' },
-  WR: { 패스: 'receiving_yards', 런: 'rushing_yards', 스페셜팀: 'kick_return_yards' },
+  RB: {
+    런: 'rushing_yards',
+    패스: 'receiving_yards',
+    스페셜팀: 'kick_return_yards',
+  },
+  WR: {
+    패스: 'receiving_yards',
+    런: 'rushing_yards',
+    스페셜팀: 'kick_return_yards',
+  },
   TE: { 패스: 'receiving_yards', 런: 'rushing_yards' },
   K: { 스페셜팀: 'field_goal_percentage' },
   P: { 스페셜팀: 'average_punt_yard' },
@@ -440,7 +461,7 @@ export default function StatPosition({ data = [], teams = [] }) {
 
   const divisionOptions = useMemo(() => {
     const rows = (Array.isArray(data) ? data : []).filter(
-      (r) => TEAM_TO_LEAGUE[r.team] === league
+      (r) => TEAM_TO_LEAGUE[r.team] === league,
     );
     const set = new Set(rows.map((r) => r.division).filter(Boolean));
     return Array.from(set);
@@ -457,11 +478,13 @@ export default function StatPosition({ data = [], teams = [] }) {
   // 카테고리/정렬 초기화
   const categories = useMemo(
     () => POSITION_CATEGORIES[position] || ['default'],
-    [position]
+    [position],
   );
 
   useEffect(() => {
-    const nextCategory = categories.includes(category) ? category : categories[0];
+    const nextCategory = categories.includes(category)
+      ? category
+      : categories[0];
     setCategory(nextCategory);
     const baseKey =
       PRIMARY_METRIC[position]?.[nextCategory] ??
@@ -471,7 +494,9 @@ export default function StatPosition({ data = [], teams = [] }) {
   }, [position]);
 
   useEffect(() => {
-    const safeCategory = categories.includes(category) ? category : categories[0];
+    const safeCategory = categories.includes(category)
+      ? category
+      : categories[0];
     if (safeCategory !== category) setCategory(safeCategory);
     const baseKey =
       PRIMARY_METRIC[position]?.[safeCategory] ??
@@ -593,7 +618,7 @@ export default function StatPosition({ data = [], teams = [] }) {
             options={POSITION_OPTIONS}
             onChange={setPosition}
           />
-          { (POSITION_CATEGORIES[position] || []).length > 1 && (
+          {(POSITION_CATEGORIES[position] || []).length > 1 && (
             <Dropdown
               label="Category"
               placeholder="유형"
@@ -646,15 +671,17 @@ export default function StatPosition({ data = [], teams = [] }) {
                         onClick={() => toggleSort(col.key)}
                         title={
                           direction
-                            ? `정렬: ${direction === 'desc' ? '내림차순' : '오름차순'}`
+                            ? `정렬: ${
+                                direction === 'desc' ? '내림차순' : '오름차순'
+                              }`
                             : '정렬 적용'
                         }
                       >
                         <span className="column-label">{col.label}</span>
                         <RxTriangleDown
-                          className={`chev ${direction === 'asc' ? 'asc' : ''} ${
-                            isActive ? 'active-blue' : ''
-                          }`}
+                          className={`chev ${
+                            direction === 'asc' ? 'asc' : ''
+                          } ${isActive ? 'active-blue' : ''}`}
                           size={30}
                         />
                       </button>
@@ -668,13 +695,20 @@ export default function StatPosition({ data = [], teams = [] }) {
           <div className="table-body">
             {rankedPlayers.map((row, idx) => {
               const teamInfo = teams.find((t) => t.name === row.team);
-              const rowClass = `table-rows ${division === '2부' ? 'is-division2' : ''}`;
+              const rowClass = `table-rows ${
+                division === '2부' ? 'is-division2' : ''
+              }`;
 
               return (
-                <div key={row.id || row.name || idx} className={`table-rows ${rowClass}`}>
+                <div
+                  key={row.id || row.name || idx}
+                  className={`table-rows ${rowClass}`}
+                >
                   <div className="table-row1">
                     <div className="table-cell">{row.__rank}위</div>
-                    <div className="table-cell player-name clickable">{row.name}</div>
+                    <div className="table-cell player-name clickable">
+                      {row.name}
+                    </div>
                     <div className="table-cell team-name">
                       {teamInfo?.logo && (
                         <div className="team-logo">
@@ -682,7 +716,9 @@ export default function StatPosition({ data = [], teams = [] }) {
                             src={teamInfo.logo}
                             alt={`${row.team} 로고`}
                             className={`team-logo-img ${
-                              teamInfo.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                              teamInfo.logo.endsWith('.svg')
+                                ? 'svg-logo'
+                                : 'png-logo'
                             }`}
                           />
                         </div>
@@ -691,7 +727,10 @@ export default function StatPosition({ data = [], teams = [] }) {
                     </div>
                   </div>
 
-                  <div className="table-row2" style={{ '--cols': currentColumns.length }}>
+                  <div
+                    className="table-row2"
+                    style={{ '--cols': currentColumns.length }}
+                  >
                     {currentColumns.map((col) => (
                       <div key={col.key} className="table-cell">
                         {fmt(col.key, row[col.key])}
