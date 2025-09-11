@@ -12,14 +12,14 @@ export class TeamStatsDetail {
   @Prop({ default: 0 }) totalTouchdowns?: number;
   @Prop({ default: 0 }) totalOffenseYards?: number;
   @Prop({ default: 0 }) averageOffenseYardsPerGame?: number;
-  
+
   // 런
   @Prop({ default: 0 }) rushingAttempts?: number;
   @Prop({ default: 0 }) rushingYards?: number;
   @Prop({ default: 0 }) yardsPerCarry?: number;
   @Prop({ default: 0 }) averageRushingYardsPerGame?: number;
   @Prop({ default: 0 }) rushingTouchdowns?: number;
-  
+
   // 패스
   @Prop({ default: 0 }) passingCompletions?: number;
   @Prop({ default: 0 }) passingAttempts?: number;
@@ -28,7 +28,7 @@ export class TeamStatsDetail {
   @Prop({ default: 0 }) averagePassingYardsPerGame?: number;
   @Prop({ default: 0 }) passingTouchdowns?: number;
   @Prop({ default: 0 }) interceptions?: number;
-  
+
   // 스페셜팀
   @Prop({ default: 0 }) totalPuntYards?: number;
   @Prop({ default: 0 }) averagePuntYards?: number;
@@ -38,7 +38,7 @@ export class TeamStatsDetail {
   @Prop({ default: 0 }) averageKickReturnYards?: number;
   @Prop({ default: 0 }) averagePuntReturnYards?: number;
   @Prop({ default: 0 }) totalReturnYards?: number;
-  
+
   // 기타
   @Prop({ default: 0 }) fumbles?: number;
   @Prop({ default: 0 }) fumblesLost?: number;
@@ -47,7 +47,7 @@ export class TeamStatsDetail {
   @Prop({ default: 0 }) totalPenalties?: number;
   @Prop({ default: 0 }) totalPenaltyYards?: number;
   @Prop({ default: 0 }) averagePenaltyYardsPerGame?: number;
-  
+
   // 게임 수
   @Prop({ default: 0 }) gamesPlayed?: number;
 }
@@ -58,7 +58,8 @@ export class TeamPlayer {
   @Prop({ required: true }) name: string;
   @Prop({ required: true }) jerseyNumber: number;
   @Prop({ required: true, type: [String] }) positions: string[];
-  @Prop({ enum: ['Active', 'Military', 'Graduate'], default: 'Active' }) status: string;
+  @Prop({ enum: ['Active', 'Military', 'Graduate'], default: 'Active' })
+  status: string;
 }
 
 @Schema()

@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { BaseAnalyzerService, ClipData, GameData } from './base-analyzer.service';
+import {
+  BaseAnalyzerService,
+  ClipData,
+  GameData,
+} from './base-analyzer.service';
 
 // 키커 스탯 인터페이스
 export interface KStats {
@@ -25,20 +29,19 @@ export interface KStats {
   fieldGoalsAttempted30To39: number;
   fieldGoalsAttempted40To49: number;
   fieldGoalsAttempted50Plus: number;
-  // PAT 스탯  
+  // PAT 스탯
   extraPointsAttempted: number;
   extraPointsMade: number;
 }
 
 @Injectable()
 export class KAnalyzerService extends BaseAnalyzerService {
-
   /**
    * 키커 클립 분석 메인 메서드
    */
   async analyzeClips(clips: ClipData[], gameData: GameData): Promise<any> {
     console.log(`\n🦶 키커 분석 시작 - ${clips.length}개 클립`);
-    
+
     if (clips.length === 0) {
       console.log('⚠️ 키커 클립이 없습니다.');
       return { kCount: 0, message: '키커 클립이 없습니다.' };
@@ -58,22 +61,40 @@ export class KAnalyzerService extends BaseAnalyzerService {
     for (const [kKey, kStats] of kStatsMap) {
       // 최종 계산
       this.calculateFinalStats(kStats);
-      
-      console.log(`🦶 키커 ${kStats.jerseyNumber}번 (${kStats.teamName}) 최종 스탯:`);
-      console.log(`   필드골: ${kStats.fieldGoalsMade}/${kStats.fieldGoalsAttempted} (${kStats.fieldGoalPercentage}%)`);
+
+      console.log(
+        `🦶 키커 ${kStats.jerseyNumber}번 (${kStats.teamName}) 최종 스탯:`,
+      );
+      console.log(
+        `   필드골: ${kStats.fieldGoalsMade}/${kStats.fieldGoalsAttempted} (${kStats.fieldGoalPercentage}%)`,
+      );
       console.log(`   가장 긴 필드골: ${kStats.longestFieldGoal}야드`);
       console.log(`   평균 필드골: ${kStats.averageFieldGoalYard}야드`);
-      console.log(`   PAT: ${kStats.extraPointsMade}/${kStats.extraPointsAttempted}`);
+      console.log(
+        `   PAT: ${kStats.extraPointsMade}/${kStats.extraPointsAttempted}`,
+      );
       console.log(`   거리별 필드골 (성공-시도):`);
-      console.log(`     1-19야드: ${kStats.fieldGoals1To19}-${kStats.fieldGoalsAttempted1To19}`);
-      console.log(`     20-29야드: ${kStats.fieldGoals20To29}-${kStats.fieldGoalsAttempted20To29}`);
-      console.log(`     30-39야드: ${kStats.fieldGoals30To39}-${kStats.fieldGoalsAttempted30To39}`);
-      console.log(`     40-49야드: ${kStats.fieldGoals40To49}-${kStats.fieldGoalsAttempted40To49}`);
-      console.log(`     50+야드: ${kStats.fieldGoals50Plus}-${kStats.fieldGoalsAttempted50Plus}`);
+      console.log(
+        `     1-19야드: ${kStats.fieldGoals1To19}-${kStats.fieldGoalsAttempted1To19}`,
+      );
+      console.log(
+        `     20-29야드: ${kStats.fieldGoals20To29}-${kStats.fieldGoalsAttempted20To29}`,
+      );
+      console.log(
+        `     30-39야드: ${kStats.fieldGoals30To39}-${kStats.fieldGoalsAttempted30To39}`,
+      );
+      console.log(
+        `     40-49야드: ${kStats.fieldGoals40To49}-${kStats.fieldGoalsAttempted40To49}`,
+      );
+      console.log(
+        `     50+야드: ${kStats.fieldGoals50Plus}-${kStats.fieldGoalsAttempted50Plus}`,
+      );
 
       // 데이터베이스에 저장
       try {
-        console.log(`💾 키커 ${kStats.jerseyNumber}번 (${kStats.teamName}) 저장 시도 시작...`);
+        console.log(
+          `💾 키커 ${kStats.jerseyNumber}번 (${kStats.teamName}) 저장 시도 시작...`,
+        );
         const saveResult = await this.savePlayerStats(
           kStats.jerseyNumber,
           kStats.teamName,
@@ -89,7 +110,7 @@ export class KAnalyzerService extends BaseAnalyzerService {
             extraPointsAttempted: kStats.extraPointsAttempted,
             extraPointsMade: kStats.extraPointsMade,
           },
-          gameData
+          gameData,
         );
 
         if (saveResult.success) {
@@ -113,17 +134,21 @@ export class KAnalyzerService extends BaseAnalyzerService {
     return {
       kCount: savedCount,
       message: `${savedCount}명의 키커 스탯이 분석되었습니다.`,
-      results
+      results,
     };
   }
 
   /**
    * 개별 클립을 키커 관점에서 처리
    */
-  private processClipForK(clip: ClipData, kStatsMap: Map<string, KStats>, gameData: GameData): void {
+  private processClipForK(
+    clip: ClipData,
+    kStatsMap: Map<string, KStats>,
+    gameData: GameData,
+  ): void {
     // 키커는 car나 car2에서 pos가 'K'인 경우
     const kPlayers = [];
-    
+
     if (clip.car?.pos === 'K') {
       kPlayers.push({ number: clip.car.num, role: 'car' });
     }
@@ -133,9 +158,12 @@ export class KAnalyzerService extends BaseAnalyzerService {
 
     for (const kPlayer of kPlayers) {
       const kKey = this.getKKey(kPlayer.number, clip.offensiveTeam, gameData);
-      
+
       if (!kStatsMap.has(kKey)) {
-        kStatsMap.set(kKey, this.initializeKStats(kPlayer.number, clip.offensiveTeam, gameData));
+        kStatsMap.set(
+          kKey,
+          this.initializeKStats(kPlayer.number, clip.offensiveTeam, gameData),
+        );
       }
 
       const kStats = kStatsMap.get(kKey);
@@ -154,18 +182,18 @@ export class KAnalyzerService extends BaseAnalyzerService {
     // FG 플레이 처리
     if (playType === 'FG') {
       kStats.fieldGoalsAttempted++;
-      
+
       // 실제 필드골 거리 = gainYard + 17 (엔드존 10야드 + 홀더 위치 7야드)
       const actualFieldGoalDistance = gainYard + 17;
-      
+
       // 거리별 시도 횟수 증가
       this.categorizeFieldGoalAttempt(actualFieldGoalDistance, kStats);
-      
+
       // 필드골 성공 여부 체크
       if (significantPlays.includes('FIELDGOALGOOD')) {
         kStats.fieldGoalsMade++;
         kStats.totalFieldGoalYard += actualFieldGoalDistance;
-        
+
         // 가장 긴 필드골 업데이트
         if (actualFieldGoalDistance > kStats.longestFieldGoal) {
           kStats.longestFieldGoal = actualFieldGoalDistance;
@@ -173,17 +201,21 @@ export class KAnalyzerService extends BaseAnalyzerService {
 
         // 거리별 필드골 성공 카운트
         this.categorizeFieldGoalMade(actualFieldGoalDistance, kStats);
-        
-        console.log(`   🎯 필드골 성공: ${actualFieldGoalDistance}야드 (라인: ${gainYard}야드)`);
+
+        console.log(
+          `   🎯 필드골 성공: ${actualFieldGoalDistance}야드 (라인: ${gainYard}야드)`,
+        );
       } else {
-        console.log(`   ❌ 필드골 실패: ${actualFieldGoalDistance}야드 (라인: ${gainYard}야드)`);
+        console.log(
+          `   ❌ 필드골 실패: ${actualFieldGoalDistance}야드 (라인: ${gainYard}야드)`,
+        );
       }
     }
 
     // PAT 플레이 처리
     if (playType === 'PAT') {
       kStats.extraPointsAttempted++;
-      
+
       // PAT 성공 여부 체크
       if (significantPlays.includes('PATGOOD')) {
         kStats.extraPointsMade++;
@@ -243,14 +275,17 @@ export class KAnalyzerService extends BaseAnalyzerService {
    */
   private calculateFinalStats(kStats: KStats): void {
     // 필드골 성공률 계산
-    kStats.fieldGoalPercentage = kStats.fieldGoalsAttempted > 0 
-      ? Math.round((kStats.fieldGoalsMade / kStats.fieldGoalsAttempted) * 100) 
-      : 0;
+    kStats.fieldGoalPercentage =
+      kStats.fieldGoalsAttempted > 0
+        ? Math.round((kStats.fieldGoalsMade / kStats.fieldGoalsAttempted) * 100)
+        : 0;
 
     // 평균 필드골 거리 계산
-    kStats.averageFieldGoalYard = kStats.fieldGoalsMade > 0 
-      ? Math.round((kStats.totalFieldGoalYard / kStats.fieldGoalsMade) * 10) / 10 
-      : 0;
+    kStats.averageFieldGoalYard =
+      kStats.fieldGoalsMade > 0
+        ? Math.round((kStats.totalFieldGoalYard / kStats.fieldGoalsMade) * 10) /
+          10
+        : 0;
 
     // 게임 수는 1로 설정 (하나의 게임 데이터이므로)
     kStats.gamesPlayed = 1;
@@ -259,9 +294,14 @@ export class KAnalyzerService extends BaseAnalyzerService {
   /**
    * 키커 스탯 초기화
    */
-  private initializeKStats(jerseyNumber: number, offensiveTeam: string, gameData: GameData): KStats {
-    const teamName = offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
-    
+  private initializeKStats(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): KStats {
+    const teamName =
+      offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
+
     return {
       jerseyNumber,
       teamName,
@@ -294,8 +334,13 @@ export class KAnalyzerService extends BaseAnalyzerService {
   /**
    * 키커 키 생성
    */
-  private getKKey(jerseyNumber: number, offensiveTeam: string, gameData: GameData): string {
-    const teamName = offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
+  private getKKey(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): string {
+    const teamName =
+      offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
     return `${teamName}_K_${jerseyNumber}`;
   }
 }

@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { API_CONFIG } from '../../../config/api';
+import { normalizeTeamName } from '../../../data/TEAMS';
 import './index.css';
 
 /**
@@ -156,8 +157,8 @@ export default function JsonEx() {
         const payload = {
           gameKey: gameData.gameKey,
           date: gameData.date,
-          homeTeam: gameData.homeTeam,
-          awayTeam: gameData.awayTeam,
+          homeTeam: normalizeTeamName(gameData.homeTeam),
+          awayTeam: normalizeTeamName(gameData.awayTeam),
           location: gameData.location,
           score: gameData.score,
           Clips: Array.isArray(gameData.Clips) ? gameData.Clips : [],

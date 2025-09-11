@@ -1,31 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { BaseAnalyzerService, ClipData, GameData } from './base-analyzer.service';
+import {
+  BaseAnalyzerService,
+  ClipData,
+  GameData,
+} from './base-analyzer.service';
 
 // QB 전용 스탯 인터페이스
 export interface QBStats {
   jerseyNumber: number;
   teamName: string;
   gamesPlayed: number;
-  
+
   // === 패싱 스탯 ===
-  passingAttempts: number;        // 패스 시도 수
-  passingCompletions: number;     // 패스 성공 수  
-  completionPercentage: number;   // 패스 성공률 (%)
-  passingYards: number;           // 패싱 야드
-  passingTouchdowns: number;      // 패싱 터치다운
-  passingInterceptions: number;   // 인터셉트
-  longestPass: number;            // 가장 긴 패스
-  
+  passingAttempts: number; // 패스 시도 수
+  passingCompletions: number; // 패스 성공 수
+  completionPercentage: number; // 패스 성공률 (%)
+  passingYards: number; // 패싱 야드
+  passingTouchdowns: number; // 패싱 터치다운
+  passingInterceptions: number; // 인터셉트
+  longestPass: number; // 가장 긴 패스
+
   // === 러싱 스탯 ===
-  rushingAttempts: number;        // 러싱 시도 수
-  rushingYards: number;           // 러싱 야드
-  yardsPerCarry: number;          // 볼 캐리 당 러싱 야드
-  rushingTouchdowns: number;      // 러싱 터치다운
-  longestRush: number;            // 가장 긴 러싱
+  rushingAttempts: number; // 러싱 시도 수
+  rushingYards: number; // 러싱 야드
+  yardsPerCarry: number; // 볼 캐리 당 러싱 야드
+  rushingTouchdowns: number; // 러싱 터치다운
+  longestRush: number; // 가장 긴 러싱
 
   // === 기타 스탯 ===
-  sacks: number;                  // 색 허용 수
-  fumbles: number;                // 펌블 수
+  sacks: number; // 색 허용 수
+  fumbles: number; // 펌블 수
 }
 
 @Injectable()
@@ -35,7 +39,7 @@ export class QbAnalyzerService extends BaseAnalyzerService {
    */
   async analyzeClips(clips: ClipData[], gameData: GameData): Promise<any> {
     console.log(`\n🏈 QB 분석 시작 - 총 클립 수: ${clips.length}`);
-    
+
     // QB별 스탯 누적을 위한 Map
     const qbStatsMap = new Map<string, QBStats>();
 
@@ -69,15 +73,11 @@ export class QbAnalyzerService extends BaseAnalyzerService {
       console.log(
         `   패싱야드: ${qbStats.passingYards}, TD: ${qbStats.passingTouchdowns}, INT: ${qbStats.passingInterceptions}`,
       );
-      console.log(
-        `   최장패스: ${qbStats.longestPass}야드`,
-      );
+      console.log(`   최장패스: ${qbStats.longestPass}야드`);
       console.log(
         `   러싱: ${qbStats.rushingAttempts}시도, ${qbStats.rushingYards}야드, TD: ${qbStats.rushingTouchdowns}`,
       );
-      console.log(
-        `   최장러싱: ${qbStats.longestRush}야드`,
-      );
+      console.log(`   최장러싱: ${qbStats.longestRush}야드`);
       console.log(`   색: ${qbStats.sacks}, 펌블: ${qbStats.fumbles}`);
     }
 
@@ -107,7 +107,7 @@ export class QbAnalyzerService extends BaseAnalyzerService {
     if (clip.car?.pos === 'QB') {
       qb = clip.car;
     } else if (clip.car2?.pos === 'QB') {
-      qb = { num: clip.car2.num!, pos: clip.car2.pos! };
+      qb = { num: clip.car2.num, pos: clip.car2.pos };
     }
 
     if (!qb) return; // QB가 없으면 스킵
@@ -118,7 +118,7 @@ export class QbAnalyzerService extends BaseAnalyzerService {
       qbStatsMap.set(qbKey, this.createEmptyQBStats(qb.num, offensiveTeam));
     }
 
-    const qbStats = qbStatsMap.get(qbKey)!;
+    const qbStats = qbStatsMap.get(qbKey);
 
     // 플레이 타입별 스탯 처리
     this.processPlay(clip, qbStats);
@@ -140,41 +140,49 @@ export class QbAnalyzerService extends BaseAnalyzerService {
       // 패스 시도 및 성공 카운트
       qbStats.passingAttempts++;
       qbStats.passingCompletions++;
-      
+
       // 패싱 야드 누적
       qbStats.passingYards += gainYard;
 
       // 최장 패스 업데이트
-      console.log(`🔍 패스 거리 비교: 현재 ${gainYard}야드 vs 기존 최장 ${qbStats.longestPass}야드`);
+      console.log(
+        `🔍 패스 거리 비교: 현재 ${gainYard}야드 vs 기존 최장 ${qbStats.longestPass}야드`,
+      );
       if (gainYard > qbStats.longestPass) {
-        console.log(`✅ 최장 패스 업데이트: ${qbStats.longestPass} → ${gainYard}`);
+        console.log(
+          `✅ 최장 패스 업데이트: ${qbStats.longestPass} → ${gainYard}`,
+        );
         qbStats.longestPass = gainYard;
       }
-    } 
+    }
     // === 패스 실패 처리 ===
     else if (playType === 'NOPASS') {
       // 패스 시도했지만 실패 (완주되지 않음)
       qbStats.passingAttempts++;
-    } 
+    }
     // === 색 처리 ===
     else if (playType === 'SACK') {
       // QB가 색당함
       qbStats.sacks++;
-    } 
+    }
     // === 러싱 플레이 처리 ===
     else if (playType === 'RUN') {
       // FUMBLERECOFF는 러싱 시도 아님 (리커버리 상황)
       const hasFumbleRecOff = clip.significantPlays?.includes('FUMBLERECOFF');
-      
+
       if (!hasFumbleRecOff) {
         // QB 러시: QB가 직접 공을 들고 뛰는 플레이
         qbStats.rushingAttempts++;
         qbStats.rushingYards += gainYard;
 
         // 최장 러시 업데이트
-        console.log(`🏃 러시 거리 비교: 현재 ${gainYard}야드 vs 기존 최장 ${qbStats.longestRush}야드`);
+        console.log(
+          `🏃 러시 거리 비교: 현재 ${gainYard}야드 vs 기존 최장 ${qbStats.longestRush}야드`,
+        );
         if (gainYard > qbStats.longestRush) {
-          console.log(`✅ 최장 러시 업데이트: ${qbStats.longestRush} → ${gainYard}`);
+          console.log(
+            `✅ 최장 러시 업데이트: ${qbStats.longestRush} → ${gainYard}`,
+          );
           qbStats.longestRush = gainYard;
         }
       } else {
@@ -240,7 +248,7 @@ export class QbAnalyzerService extends BaseAnalyzerService {
       jerseyNumber,
       teamName,
       gamesPlayed: 0,
-      
+
       // 패싱 스탯 초기화
       passingAttempts: 0,
       passingCompletions: 0,
@@ -249,14 +257,14 @@ export class QbAnalyzerService extends BaseAnalyzerService {
       passingTouchdowns: 0,
       passingInterceptions: 0,
       longestPass: 0,
-      
+
       // 러싱 스탯 초기화
       rushingAttempts: 0,
       rushingYards: 0,
       yardsPerCarry: 0,
       rushingTouchdowns: 0,
       longestRush: 0,
-      
+
       // 기타 스탯 초기화
       sacks: 0,
       fumbles: 0,

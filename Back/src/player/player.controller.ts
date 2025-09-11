@@ -46,7 +46,7 @@ export class PlayerController {
   @HttpCode(HttpStatus.OK)
   async resetAllPlayers() {
     console.log('🔄 모든 선수 데이터 초기화 요청');
-    
+
     try {
       const result = await this.playerService.resetAllPlayerData();
       return {
@@ -190,7 +190,7 @@ export class PlayerController {
     try {
       if (analyzeNewClipsDto.clips && analyzeNewClipsDto.clips.length > 0) {
         const gameKey = analyzeNewClipsDto.clips[0]?.clipKey || 'unknown';
-        
+
         // clipKey에서 시즌(연도) 추출 (예: HFHY20240907 → 2024)
         let season = '2024'; // 기본값
         if (gameKey && gameKey.length >= 8) {
@@ -203,8 +203,10 @@ export class PlayerController {
         // DTO에서 팀 정보 가져오기
         const homeTeam = analyzeNewClipsDto.homeTeam;
         const awayTeam = analyzeNewClipsDto.awayTeam;
-        
-        console.log(`📊 팀 스탯 업데이트 - 홈팀: ${homeTeam}, 어웨이팀: ${awayTeam}`);
+
+        console.log(
+          `📊 팀 스탯 업데이트 - 홈팀: ${homeTeam}, 어웨이팀: ${awayTeam}`,
+        );
 
         // 팀 시즌 스탯 업데이트 - 시즌별 스탯 제거로 임시 비활성화
         /*
@@ -252,14 +254,19 @@ export class PlayerController {
     };
 
     try {
-      // ClipAnalyzer를 사용한 올바른 QB 분석
+      // ClipAnalyzer를 사용한 전체 선수 분석
       const clipResult = await this.playerService.analyzeGameData(gameData);
+      console.log('🔍 ClipAnalyzer 결과:', {
+        success: clipResult.success,
+        qbCount: clipResult.qbCount,
+        totalAnalyzed: clipResult.results?.length || 0
+      });
       if (clipResult.success) {
-        results.playerStatsUpdated = clipResult.qbCount || 0;
+        results.playerStatsUpdated = clipResult.results?.length || 0;
         results.teamStatsUpdated = true;
       }
 
-      // 기존 로직은 주석 처리
+      // 개별 선수 업데이트는 clipAnalyzer에서 처리하므로 주석 처리
       /*if (gameData.Clips && gameData.Clips.length > 0) {
         const allPlayers = new Set<number>();
 
@@ -349,22 +356,36 @@ export class PlayerController {
             );
           }
         }
-      } */
+      }*/
 
       // 팀 스탯 처리 추가
       console.log('📊 팀 스탯 계산 및 저장 시작...');
 
-      require('fs').appendFileSync('/tmp/team-stats-debug.log', `팀 스탯 분석 시작: gameKey=${gameData.gameKey}\n`);
-      
-      const teamStatsResult = await this.teamStatsService.analyzeTeamStats(gameData);
-      require('fs').appendFileSync('/tmp/team-stats-debug.log', `팀 스탯 분석 결과: ${JSON.stringify(teamStatsResult)}\n`);
-      
-      await this.teamStatsService.saveTeamStats(gameData.gameKey, teamStatsResult, gameData);
-      
+      require('fs').appendFileSync(
+        '/tmp/team-stats-debug.log',
+        `팀 스탯 분석 시작: gameKey=${gameData.gameKey}\n`,
+      );
+
+      const teamStatsResult =
+        await this.teamStatsService.analyzeTeamStats(gameData);
+      require('fs').appendFileSync(
+        '/tmp/team-stats-debug.log',
+        `팀 스탯 분석 결과: ${JSON.stringify(teamStatsResult)}\n`,
+      );
+
+      await this.teamStatsService.saveTeamStats(
+        gameData.gameKey,
+        teamStatsResult,
+        gameData,
+      );
+
       console.log('✅ 팀 스탯 업데이트 완료');
     } catch (error) {
       console.error('게임 데이터 분석 중 전체 오류:', error);
-      require('fs').appendFileSync('/tmp/team-stats-debug.log', `오류 발생: ${error.message}\n`);
+      require('fs').appendFileSync(
+        '/tmp/team-stats-debug.log',
+        `오류 발생: ${error.message}\n`,
+      );
       results.errors.push(`전체 분석: ${error.message}`);
     }
 
@@ -547,7 +568,8 @@ export class PlayerController {
   @Post('reset-team-stats/all')
   @ApiOperation({
     summary: '🔄 모든 팀 누적 스탯 초기화',
-    description: '시즌 관계없이 모든 팀의 누적 스탯을 초기화합니다. (개발/테스트용)',
+    description:
+      '시즌 관계없이 모든 팀의 누적 스탯을 초기화합니다. (개발/테스트용)',
   })
   @ApiResponse({ status: 200, description: '팀 누적 스탯 초기화 성공' })
   async resetTeamStats() {
@@ -582,11 +604,12 @@ export class PlayerController {
   @Post('reset-team-game-stats')
   @ApiOperation({
     summary: '🗑️ 팀 경기별 스탯 전체 삭제',
-    description: 'team_game_stats 컬렉션의 모든 데이터를 삭제합니다. (개발/테스트용)',
+    description:
+      'team_game_stats 컬렉션의 모든 데이터를 삭제합니다. (개발/테스트용)',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: '팀 경기별 스탯 삭제 성공'
+  @ApiResponse({
+    status: 200,
+    description: '팀 경기별 스탯 삭제 성공',
   })
   async resetTeamGameStats() {
     try {
@@ -612,16 +635,17 @@ export class PlayerController {
   @Post('reset-all-data')
   @ApiOperation({
     summary: '🚨 모든 데이터 완전 삭제',
-    description: '선수, 게임정보, 클립, 팀통계 등 모든 데이터를 삭제합니다. (개발/테스트용 - 주의!)',
+    description:
+      '선수, 게임정보, 클립, 팀통계 등 모든 데이터를 삭제합니다. (개발/테스트용 - 주의!)',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: '모든 데이터 삭제 성공'
+  @ApiResponse({
+    status: 200,
+    description: '모든 데이터 삭제 성공',
   })
   async resetAllData() {
     try {
       console.log('🚨 모든 데이터 완전 삭제 시작...');
-      
+
       const results = await Promise.all([
         this.playerService.resetAllPlayerData(),
         this.statsManagementService.resetPlayerStats(),
@@ -634,7 +658,7 @@ export class PlayerController {
       const deletedCounts = {
         players: results[0].deletedCount,
         playerStats: results[1],
-        teamTotalStats: results[2].deletedCount, 
+        teamTotalStats: results[2].deletedCount,
         teamGameStats: results[3].deletedCount,
         gameInfos: results[4].deletedCount,
         gameClips: results[5].deletedCount,
@@ -698,29 +722,29 @@ export class PlayerController {
             playerId: '2024_HY_7',
             username: 'kim_chulsu',
             teamName: '한양대 라이온스',
-            position: 'QB'
+            position: 'QB',
           },
           gameStats: [
             {
               gameKey: 'HYKU241115',
               date: '2024-11-15',
               opponent: '고려대 타이거스',
-              stats: { passingYards: 245, passingTouchdowns: 2 }
-            }
+              stats: { passingYards: 245, passingTouchdowns: 2 },
+            },
           ],
           seasonStats: {
             '2024': {
               gamesPlayed: 8,
-              stats: { passingYards: 1856, passingTouchdowns: 12 }
-            }
+              stats: { passingYards: 1856, passingTouchdowns: 12 },
+            },
           },
           totalStats: {
             totalGamesPlayed: 8,
-            stats: { passingYards: 1856, passingTouchdowns: 12 }
-          }
-        }
-      }
-    }
+            stats: { passingYards: 1856, passingTouchdowns: 12 },
+          },
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 401,
@@ -729,9 +753,9 @@ export class PlayerController {
       example: {
         success: false,
         message: '로그인이 필요합니다.',
-        code: 'UNAUTHORIZED'
-      }
-    }
+        code: 'UNAUTHORIZED',
+      },
+    },
   })
   @ApiResponse({
     status: 403,
@@ -740,11 +764,14 @@ export class PlayerController {
       example: {
         success: false,
         message: 'playerId가 배정되지 않았습니다. 관리자에게 문의하세요.',
-        code: 'PLAYER_ID_NOT_ASSIGNED'
-      }
-    }
+        code: 'PLAYER_ID_NOT_ASSIGNED',
+      },
+    },
   })
-  async getMyStats(@User() user: any, @Query('playerId') queryPlayerId?: string) {
+  async getMyStats(
+    @User() user: any,
+    @Query('playerId') queryPlayerId?: string,
+  ) {
     // Admin은 쿼리 파라미터로 특정 선수 조회 가능
     if (user.role === 'admin' && queryPlayerId) {
       console.log(`Admin이 ${queryPlayerId} 선수 스탯 조회`);
@@ -756,7 +783,7 @@ export class PlayerController {
         queriedPlayerId: queryPlayerId,
       };
     }
-    
+
     // 일반 사용자는 자기 스탯만 조회
     return await this.playerService.getPlayerStats(user);
   }

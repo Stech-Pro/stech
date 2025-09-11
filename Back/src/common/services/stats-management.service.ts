@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { PlayerGameStats, PlayerGameStatsDocument } from '../../schemas/player-game-stats.schema';
+import {
+  PlayerGameStats,
+  PlayerGameStatsDocument,
+} from '../../schemas/player-game-stats.schema';
 import {
   PlayerSeasonStats,
   PlayerSeasonStatsDocument,
@@ -11,8 +14,14 @@ import {
   PlayerTotalStatsDocument,
 } from '../../schemas/player-total-stats.schema';
 import { Player, PlayerDocument } from '../../schemas/player.schema';
-import { TeamTotalStats, TeamTotalStatsDocument } from '../../schemas/team-total-stats.schema';
-import { TeamGameStats, TeamGameStatsDocument } from '../../schemas/team-game-stats.schema';
+import {
+  TeamTotalStats,
+  TeamTotalStatsDocument,
+} from '../../schemas/team-total-stats.schema';
+import {
+  TeamGameStats,
+  TeamGameStatsDocument,
+} from '../../schemas/team-game-stats.schema';
 import { GameInfo, GameInfoDocument } from '../../schemas/game-info.schema';
 import { GameClips, GameClipsDocument } from '../../schemas/game-clips.schema';
 import { NewClipDto } from '../dto/new-clip.dto';
@@ -67,7 +76,8 @@ export class StatsManagementService {
           gameDate: gameDate,
           homeTeam: homeTeam,
           awayTeam: awayTeam,
-          position: player.primaryPosition || player.positions?.[0] || 'Unknown',
+          position:
+            player.primaryPosition || player.positions?.[0] || 'Unknown',
           gamesPlayed: 1,
           ...analyzedStats,
         },
@@ -526,11 +536,13 @@ export class StatsManagementService {
   }
 
   /**
-   * 팀 경기별 스탯 초기화 
+   * 팀 경기별 스탯 초기화
    */
   async resetTeamGameStats() {
     const result = await this.teamGameStatsModel.deleteMany({});
-    console.log(`🗑️ ${result.deletedCount}개 팀의 경기별 스탯이 삭제되었습니다`);
+    console.log(
+      `🗑️ ${result.deletedCount}개 팀의 경기별 스탯이 삭제되었습니다`,
+    );
     return { deletedCount: result.deletedCount };
   }
 
@@ -559,13 +571,15 @@ export class StatsManagementService {
     const gameStatsResult = await this.playerGameStatsModel.deleteMany({});
     const seasonStatsResult = await this.playerSeasonStatsModel.deleteMany({});
     const totalStatsResult = await this.playerTotalStatsModel.deleteMany({});
-    
-    console.log(`🗑️ 선수 스탯 삭제: Game(${gameStatsResult.deletedCount}), Season(${seasonStatsResult.deletedCount}), Total(${totalStatsResult.deletedCount})`);
-    
+
+    console.log(
+      `🗑️ 선수 스탯 삭제: Game(${gameStatsResult.deletedCount}), Season(${seasonStatsResult.deletedCount}), Total(${totalStatsResult.deletedCount})`,
+    );
+
     return {
       gameStats: gameStatsResult.deletedCount,
-      seasonStats: seasonStatsResult.deletedCount, 
-      totalStats: totalStatsResult.deletedCount
+      seasonStats: seasonStatsResult.deletedCount,
+      totalStats: totalStatsResult.deletedCount,
     };
   }
 }

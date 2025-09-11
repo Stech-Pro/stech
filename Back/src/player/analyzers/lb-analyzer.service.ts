@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { BaseAnalyzerService, ClipData, GameData } from './base-analyzer.service';
+import {
+  BaseAnalyzerService,
+  ClipData,
+  GameData,
+} from './base-analyzer.service';
 
 // LB 스탯 인터페이스
 export interface LBStats {
@@ -25,13 +29,12 @@ export interface LBStats {
 
 @Injectable()
 export class LbAnalyzerService extends BaseAnalyzerService {
-
   /**
    * LB 클립 분석 메인 메서드
    */
   async analyzeClips(clips: ClipData[], gameData: GameData): Promise<any> {
     console.log(`\n🛡️ LB 분석 시작 - ${clips.length}개 클립`);
-    
+
     if (clips.length === 0) {
       console.log('⚠️ LB 클립이 없습니다.');
       return { lbCount: 0, message: 'LB 클립이 없습니다.' };
@@ -51,8 +54,10 @@ export class LbAnalyzerService extends BaseAnalyzerService {
     for (const [lbKey, lbStats] of lbStatsMap) {
       // 최종 계산
       this.calculateFinalStats(lbStats);
-      
-      console.log(`🛡️ LB ${lbStats.jerseyNumber}번 (${lbStats.teamName}) 최종 스탯:`);
+
+      console.log(
+        `🛡️ LB ${lbStats.jerseyNumber}번 (${lbStats.teamName}) 최종 스탯:`,
+      );
       console.log(`   태클 수: ${lbStats.tackles}`);
       console.log(`   TFL: ${lbStats.tfl}`);
       console.log(`   색: ${lbStats.sacks}`);
@@ -81,7 +86,7 @@ export class LbAnalyzerService extends BaseAnalyzerService {
           att: lbStats.att,
           longestInterception: lbStats.longestInterception,
         },
-        gameData
+        gameData,
       );
 
       if (saveResult.success) {
@@ -95,17 +100,21 @@ export class LbAnalyzerService extends BaseAnalyzerService {
     return {
       lbCount: savedCount,
       message: `${savedCount}명의 LB 스탯이 분석되었습니다.`,
-      results
+      results,
     };
   }
 
   /**
    * 개별 클립을 LB 관점에서 처리
    */
-  private processClipForLB(clip: ClipData, lbStatsMap: Map<string, LBStats>, gameData: GameData): void {
+  private processClipForLB(
+    clip: ClipData,
+    lbStatsMap: Map<string, LBStats>,
+    gameData: GameData,
+  ): void {
     // LB는 tkl나 tkl2에서 pos가 'LB'인 경우
     const lbPlayers = [];
-    
+
     if (clip.tkl?.pos === 'LB') {
       lbPlayers.push({ number: clip.tkl.num, role: 'tkl' });
     }
@@ -114,10 +123,17 @@ export class LbAnalyzerService extends BaseAnalyzerService {
     }
 
     for (const lbPlayer of lbPlayers) {
-      const lbKey = this.getLBKey(lbPlayer.number, clip.offensiveTeam, gameData);
-      
+      const lbKey = this.getLBKey(
+        lbPlayer.number,
+        clip.offensiveTeam,
+        gameData,
+      );
+
       if (!lbStatsMap.has(lbKey)) {
-        lbStatsMap.set(lbKey, this.initializeLBStats(lbPlayer.number, clip.offensiveTeam, gameData));
+        lbStatsMap.set(
+          lbKey,
+          this.initializeLBStats(lbPlayer.number, clip.offensiveTeam, gameData),
+        );
       }
 
       const lbStats = lbStatsMap.get(lbKey);
@@ -136,7 +152,7 @@ export class LbAnalyzerService extends BaseAnalyzerService {
     if (playType === 'RUN' || playType === 'PASS') {
       const hasTkl = clip.tkl?.pos === 'LB';
       const hasTkl2 = clip.tkl2?.pos === 'LB';
-      
+
       if (hasTkl && hasTkl2) {
         // 콤보 태클 (두 명 다 LB)
         lbStats.comboTackles++;
@@ -161,7 +177,10 @@ export class LbAnalyzerService extends BaseAnalyzerService {
     }
 
     // TFL 처리 (PASS, RUN 플레이에서 TFL significantPlay가 있을 때)
-    if ((playType === 'PASS' || playType === 'RUN') && significantPlays.includes('TFL')) {
+    if (
+      (playType === 'PASS' || playType === 'RUN') &&
+      significantPlays.includes('TFL')
+    ) {
       lbStats.tfl++;
       console.log(`   ⚡ LB TFL!`);
     }
@@ -170,7 +189,7 @@ export class LbAnalyzerService extends BaseAnalyzerService {
     if (significantPlays.includes('SACK')) {
       const hasTkl = clip.tkl?.pos === 'LB';
       const hasTkl2 = clip.tkl2?.pos === 'LB';
-      
+
       if (hasTkl && hasTkl2) {
         // 두 명이 함께 색한 경우 각자 0.5씩
         lbStats.sacks += 0.5;
@@ -180,11 +199,11 @@ export class LbAnalyzerService extends BaseAnalyzerService {
         lbStats.sacks++;
         console.log(`   💥 LB 색!`);
       }
-      
+
       // SACK일 때 자동으로 TFL 추가
       lbStats.tfl++;
       console.log(`   ⚡ LB SACK-TFL 자동 추가!`);
-      
+
       // SACK일 때도 태클 수 추가
       lbStats.tackles++;
       console.log(`   🏈 LB 태클! (SACK)`);
@@ -195,12 +214,16 @@ export class LbAnalyzerService extends BaseAnalyzerService {
       lbStats.interceptions++;
       console.log(`   🛡️ LB 인터셉션!`);
     }
-    
+
     // 인터셉션 야드 처리 (RETURN 플레이에서 TURNOVER가 있고 FUMBLERECDEF가 없을 때)
-    if (playType === 'RETURN' && significantPlays.includes('TURNOVER') && !significantPlays.includes('FUMBLERECDEF')) {
+    if (
+      playType === 'RETURN' &&
+      significantPlays.includes('TURNOVER') &&
+      !significantPlays.includes('FUMBLERECDEF')
+    ) {
       const returnYards = Math.abs(clip.gainYard || 0);
       lbStats.interceptionYards += returnYards;
-      
+
       // 가장 긴 인터셉션 업데이트
       if (returnYards > lbStats.longestInterception) {
         lbStats.longestInterception = returnYards;
@@ -217,10 +240,16 @@ export class LbAnalyzerService extends BaseAnalyzerService {
     }
 
     // 펌블 리커버리 처리 (RETURN 플레이에서 FUMBLERECDEF && TURNOVER가 있을 때)
-    if (playType === 'RETURN' && significantPlays.includes('FUMBLERECDEF') && significantPlays.includes('TURNOVER')) {
+    if (
+      playType === 'RETURN' &&
+      significantPlays.includes('FUMBLERECDEF') &&
+      significantPlays.includes('TURNOVER')
+    ) {
       lbStats.fumbleRecoveries++;
       lbStats.fumbleRecoveryYards += Math.abs(clip.gainYard || 0);
-      console.log(`   🟢 LB 펌블 리커버리: ${Math.abs(clip.gainYard || 0)}야드`);
+      console.log(
+        `   🟢 LB 펌블 리커버리: ${Math.abs(clip.gainYard || 0)}야드`,
+      );
     }
 
     // 패스 디펜드 처리 (NOPASS 플레이에서 INTERCEPT가 아닐 때만)
@@ -230,7 +259,11 @@ export class LbAnalyzerService extends BaseAnalyzerService {
     }
 
     // 수비 터치다운 처리 (RETURN 플레이에서 TURNOVER && TOUCHDOWN이 있을 때)
-    if (playType === 'RETURN' && significantPlays.includes('TURNOVER') && significantPlays.includes('TOUCHDOWN')) {
+    if (
+      playType === 'RETURN' &&
+      significantPlays.includes('TURNOVER') &&
+      significantPlays.includes('TOUCHDOWN')
+    ) {
       lbStats.defensiveTouchdowns++;
       console.log(`   🏆 LB 수비 터치다운!`);
     }
@@ -242,7 +275,7 @@ export class LbAnalyzerService extends BaseAnalyzerService {
   private calculateFinalStats(lbStats: LBStats): void {
     // 게임 수는 1로 설정 (하나의 게임 데이터이므로)
     lbStats.gamesPlayed = 1;
-    
+
     // ATT 계산 (SACK + SOLO + COMBO)
     lbStats.att = lbStats.sacks + lbStats.soloTackles + lbStats.comboTackles;
   }
@@ -250,10 +283,15 @@ export class LbAnalyzerService extends BaseAnalyzerService {
   /**
    * LB 스탯 초기화
    */
-  private initializeLBStats(jerseyNumber: number, offensiveTeam: string, gameData: GameData): LBStats {
+  private initializeLBStats(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): LBStats {
     // 수비팀 결정 (공격팀의 반대)
-    const defensiveTeam = offensiveTeam === 'Home' ? gameData.awayTeam : gameData.homeTeam;
-    
+    const defensiveTeam =
+      offensiveTeam === 'Home' ? gameData.awayTeam : gameData.homeTeam;
+
     return {
       jerseyNumber,
       teamName: defensiveTeam,
@@ -279,8 +317,13 @@ export class LbAnalyzerService extends BaseAnalyzerService {
   /**
    * LB 키 생성
    */
-  private getLBKey(jerseyNumber: number, offensiveTeam: string, gameData: GameData): string {
-    const defensiveTeam = offensiveTeam === 'Home' ? gameData.awayTeam : gameData.homeTeam;
+  private getLBKey(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): string {
+    const defensiveTeam =
+      offensiveTeam === 'Home' ? gameData.awayTeam : gameData.homeTeam;
     return `${defensiveTeam}_LB_${jerseyNumber}`;
   }
 }

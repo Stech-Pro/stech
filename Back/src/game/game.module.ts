@@ -8,8 +8,14 @@ import { PlayerModule } from '../player/player.module';
 import { TeamModule } from '../team/team.module';
 import { GameInfo, GameInfoSchema } from '../schemas/game-info.schema';
 import { GameClips, GameClipsSchema } from '../schemas/game-clips.schema';
-import { TeamGameStats, TeamGameStatsSchema } from '../schemas/team-game-stats.schema';
-import { TeamTotalStats, TeamTotalStatsSchema } from '../schemas/team-total-stats.schema';
+import {
+  TeamGameStats,
+  TeamGameStatsSchema,
+} from '../schemas/team-game-stats.schema';
+import {
+  TeamTotalStats,
+  TeamTotalStatsSchema,
+} from '../schemas/team-total-stats.schema';
 import { S3Service } from '../common/services/s3.service';
 import { ConfigModule } from '@nestjs/config';
 

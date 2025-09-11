@@ -39,7 +39,7 @@ export class VideoController {
   ) {
     // S3에 비디오 업로드
     const uploadResult = await this.s3UploadService.uploadToS3(file, 'videos');
-    
+
     if (!uploadResult.success) {
       return {
         success: false,

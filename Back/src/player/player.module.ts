@@ -23,11 +23,26 @@ import { AuthModule } from '../auth/auth.module';
 import { Player, PlayerSchema } from '../schemas/player.schema';
 import { Team, TeamSchema } from '../schemas/team.schema';
 import { User, UserSchema } from '../schemas/user.schema';
-import { PlayerGameStats, PlayerGameStatsSchema } from '../schemas/player-game-stats.schema';
-import { PlayerSeasonStats, PlayerSeasonStatsSchema } from '../schemas/player-season-stats.schema';
-import { PlayerTotalStats, PlayerTotalStatsSchema } from '../schemas/player-total-stats.schema';
-import { TeamGameStats, TeamGameStatsSchema } from '../schemas/team-game-stats.schema';
-import { TeamTotalStats, TeamTotalStatsSchema } from '../schemas/team-total-stats.schema';
+import {
+  PlayerGameStats,
+  PlayerGameStatsSchema,
+} from '../schemas/player-game-stats.schema';
+import {
+  PlayerSeasonStats,
+  PlayerSeasonStatsSchema,
+} from '../schemas/player-season-stats.schema';
+import {
+  PlayerTotalStats,
+  PlayerTotalStatsSchema,
+} from '../schemas/player-total-stats.schema';
+import {
+  TeamGameStats,
+  TeamGameStatsSchema,
+} from '../schemas/team-game-stats.schema';
+import {
+  TeamTotalStats,
+  TeamTotalStatsSchema,
+} from '../schemas/team-total-stats.schema';
 import { GameInfo, GameInfoSchema } from '../schemas/game-info.schema';
 import { GameClips, GameClipsSchema } from '../schemas/game-clips.schema';
 
@@ -48,7 +63,10 @@ import { GameClips, GameClipsSchema } from '../schemas/game-clips.schema';
     forwardRef(() => TeamModule),
     forwardRef(() => AuthModule),
   ],
-  controllers: [PlayerController, /* PlayerNewController, */ QbAnalyzerController],
+  controllers: [
+    PlayerController,
+    /* PlayerNewController, */ QbAnalyzerController,
+  ],
   providers: [
     PlayerService,
     // PlayerNewService,

@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { BaseAnalyzerService, ClipData, GameData } from './base-analyzer.service';
+import {
+  BaseAnalyzerService,
+  ClipData,
+  GameData,
+} from './base-analyzer.service';
 
 // RB 스탯 인터페이스
 export interface RBStats {
@@ -17,8 +21,8 @@ export interface RBStats {
   // 러싱 스탯
   rushingAttempts: number;
   frontRushYard: number; // TFL/SAFETY 없을 때의 러싱야드
-  backRushYard: number;  // TFL/SAFETY 있을 때의 러싱야드
-  rushingYards: number;  // frontRushYard - backRushYard
+  backRushYard: number; // TFL/SAFETY 있을 때의 러싱야드
+  rushingYards: number; // frontRushYard - backRushYard
   yardsPerCarry: number;
   rushingTouchdowns: number;
   longestRush: number;
@@ -42,13 +46,12 @@ export interface RBStats {
 
 @Injectable()
 export class RbAnalyzerService extends BaseAnalyzerService {
-
   /**
    * RB 클립 분석 메인 메서드
    */
   async analyzeClips(clips: ClipData[], gameData: GameData): Promise<any> {
     console.log(`\n🏃‍♂️ RB 분석 시작 - ${clips.length}개 클립`);
-    
+
     if (clips.length === 0) {
       console.log('⚠️ RB 클립이 없습니다.');
       return { rbCount: 0, message: 'RB 클립이 없습니다.' };
@@ -69,8 +72,10 @@ export class RbAnalyzerService extends BaseAnalyzerService {
     for (const [rbKey, rbStats] of rbStatsMap) {
       // 최종 계산
       this.calculateFinalStats(rbStats);
-      
-      console.log(`🏈 RB ${rbStats.jerseyNumber}번 (${rbStats.teamName}) 최종 스탯:`);
+
+      console.log(
+        `🏈 RB ${rbStats.jerseyNumber}번 (${rbStats.teamName}) 최종 스탯:`,
+      );
       console.log(`   === 패스 유형 ===`);
       console.log(`   리시빙 타겟: ${rbStats.receivingTargets}`);
       console.log(`   리셉션: ${rbStats.receptions}`);
@@ -82,12 +87,18 @@ export class RbAnalyzerService extends BaseAnalyzerService {
       console.log(`   패스 펌블: ${rbStats.passingFumbles}`);
       console.log(`   패스 펌블 턴오버: ${rbStats.passingFumblesLost}`);
       console.log(`   === 런 유형 ===`);
-      console.log(`   러싱 시도: ${rbStats.rushingAttempts}, 야드: ${rbStats.rushingYards}`);
+      console.log(
+        `   러싱 시도: ${rbStats.rushingAttempts}, 야드: ${rbStats.rushingYards}`,
+      );
       console.log(`   런 펌블: ${rbStats.rushingFumbles}`);
       console.log(`   런 펌블 턴오버: ${rbStats.rushingFumblesLost}`);
       console.log(`   === 스페셜팀 ===`);
-      console.log(`   킥오프 리턴: ${rbStats.kickoffReturn}, 야드: ${rbStats.kickoffReturnYard}`);
-      console.log(`   펀트 리턴: ${rbStats.puntReturn}, 야드: ${rbStats.puntReturnYard}`);
+      console.log(
+        `   킥오프 리턴: ${rbStats.kickoffReturn}, 야드: ${rbStats.kickoffReturnYard}`,
+      );
+      console.log(
+        `   펀트 리턴: ${rbStats.puntReturn}, 야드: ${rbStats.puntReturnYard}`,
+      );
 
       // 데이터베이스에 저장 (gameData 포함)
       const saveResult = await this.savePlayerStats(
@@ -126,7 +137,7 @@ export class RbAnalyzerService extends BaseAnalyzerService {
           returnTouchdowns: rbStats.returnTouchdown,
           puntReturnTouchdowns: rbStats.puntReturnTouchdowns,
         },
-        gameData
+        gameData,
       );
 
       if (saveResult.success) {
@@ -140,17 +151,22 @@ export class RbAnalyzerService extends BaseAnalyzerService {
     return {
       rbCount: savedCount,
       message: `${savedCount}명의 RB 스탯이 분석되었습니다.`,
-      results
+      results,
     };
   }
 
   /**
    * 개별 클립을 RB 관점에서 처리
    */
-  private processClipForRB(clip: ClipData, rbStatsMap: Map<string, RBStats>, gameData: GameData, processedClipKeys: Set<string>): void {
+  private processClipForRB(
+    clip: ClipData,
+    rbStatsMap: Map<string, RBStats>,
+    gameData: GameData,
+    processedClipKeys: Set<string>,
+  ): void {
     // RB는 car나 car2에서 pos가 'RB'인 경우
     const rbPlayers = [];
-    
+
     if (clip.car?.pos === 'RB') {
       rbPlayers.push({ number: clip.car.num, role: 'car' });
     }
@@ -158,13 +174,22 @@ export class RbAnalyzerService extends BaseAnalyzerService {
       rbPlayers.push({ number: clip.car2.num, role: 'car2' });
     }
 
-    console.log(`🔍 RB 클립 분석: playType=${clip.playType}, RB선수=${rbPlayers.length}명, significantPlays=${clip.significantPlays?.join(',')}`);
+    console.log(
+      `🔍 RB 클립 분석: playType=${clip.playType}, RB선수=${rbPlayers.length}명, significantPlays=${clip.significantPlays?.join(',')}`,
+    );
 
     for (const rbPlayer of rbPlayers) {
-      const rbKey = this.getRBKey(rbPlayer.number, clip.offensiveTeam, gameData);
-      
+      const rbKey = this.getRBKey(
+        rbPlayer.number,
+        clip.offensiveTeam,
+        gameData,
+      );
+
       if (!rbStatsMap.has(rbKey)) {
-        rbStatsMap.set(rbKey, this.initializeRBStats(rbPlayer.number, clip.offensiveTeam, gameData));
+        rbStatsMap.set(
+          rbKey,
+          this.initializeRBStats(rbPlayer.number, clip.offensiveTeam, gameData),
+        );
       }
 
       const rbStats = rbStatsMap.get(rbKey);
@@ -176,7 +201,11 @@ export class RbAnalyzerService extends BaseAnalyzerService {
   /**
    * 개별 플레이 처리
    */
-  private processPlay(clip: ClipData, rbStats: RBStats, processedClipKeys: Set<string>): void {
+  private processPlay(
+    clip: ClipData,
+    rbStats: RBStats,
+    processedClipKeys: Set<string>,
+  ): void {
     const playType = clip.playType?.toUpperCase();
     const gainYard = clip.gainYard || 0;
     const significantPlays = clip.significantPlays || [];
@@ -186,15 +215,17 @@ export class RbAnalyzerService extends BaseAnalyzerService {
       // FUMBLERECOFF는 패스 플레이 아님 (리커버리 상황)
       // FUMBLERECDEF + TURNOVER는 패스 플레이 아님 (턴오버 상황)
       const hasFumbleRecOff = significantPlays.includes('FUMBLERECOFF');
-      const hasTurnover = significantPlays.includes('FUMBLERECDEF') && significantPlays.includes('TURNOVER');
-      
+      const hasTurnover =
+        significantPlays.includes('FUMBLERECDEF') &&
+        significantPlays.includes('TURNOVER');
+
       if (!hasFumbleRecOff && !hasTurnover) {
         rbStats.receivingTargets++;
         console.log(`   📊 RB 패스 타겟 +1 (총: ${rbStats.receivingTargets})`);
 
         // 패스 성공 여부 체크 (INCOMP가 없으면 캐치 성공)
         const isIncomplete = significantPlays.includes('INCOMP');
-        
+
         if (!isIncomplete) {
           // 패스 캐치 성공 (FUMBLE+FUMBLERECDEF도 캐치는 성공)
           rbStats.receptions++;
@@ -209,8 +240,10 @@ export class RbAnalyzerService extends BaseAnalyzerService {
           if (clip.toGoYard && gainYard >= clip.toGoYard) {
             rbStats.receivingFirstDowns++;
           }
-          
-          console.log(`   📡 RB 패스 캐치 +1: ${gainYard}야드 (리셉션: ${rbStats.receptions}, 총야드: ${rbStats.receivingYards})`);
+
+          console.log(
+            `   📡 RB 패스 캐치 +1: ${gainYard}야드 (리셉션: ${rbStats.receptions}, 총야드: ${rbStats.receivingYards})`,
+          );
         } else {
           console.log(`   ❌ RB 패스 인컴플리트`);
         }
@@ -229,17 +262,19 @@ export class RbAnalyzerService extends BaseAnalyzerService {
       // FUMBLERECOFF는 러싱 시도 아님 (리커버리 상황)
       // FUMBLERECDEF + TURNOVER는 러싱 시도 아님 (턴오버 상황)
       const hasFumbleRecOff = significantPlays.includes('FUMBLERECOFF');
-      const hasTurnover = significantPlays.includes('FUMBLERECDEF') && significantPlays.includes('TURNOVER');
-      
+      const hasTurnover =
+        significantPlays.includes('FUMBLERECDEF') &&
+        significantPlays.includes('TURNOVER');
+
       if (!hasFumbleRecOff && !hasTurnover) {
         rbStats.rushingAttempts++;
 
         // TFL(Tackle For Loss)나 SAFETY 체크
-        const hasTFL = significantPlays.some(play => play === 'TFL');
-        const hasSAFETY = significantPlays.some(play => play === 'SAFETY');
+        const hasTFL = significantPlays.some((play) => play === 'TFL');
+        const hasSAFETY = significantPlays.some((play) => play === 'SAFETY');
 
         if (hasTFL || hasSAFETY) {
-          rbStats.backRushYard += Math.abs(gainYard);  // 절댓값으로 저장
+          rbStats.backRushYard += Math.abs(gainYard); // 절댓값으로 저장
         } else {
           rbStats.frontRushYard += gainYard;
         }
@@ -249,14 +284,14 @@ export class RbAnalyzerService extends BaseAnalyzerService {
           rbStats.longestRush = gainYard;
         }
       }
-      
+
       // 러싱 펌블 처리는 공통 processSignificantPlays에서 처리
     }
 
     // 스페셜팀 리턴 처리 (playType이 RETURN이고 significantPlays에 KICKOFF/PUNT가 있을 때)
     if (playType === 'RETURN') {
-      const hasKickoff = significantPlays.some(play => play === 'KICKOFF');
-      const hasPunt = significantPlays.some(play => play === 'PUNT');
+      const hasKickoff = significantPlays.some((play) => play === 'KICKOFF');
+      const hasPunt = significantPlays.some((play) => play === 'PUNT');
 
       if (hasKickoff) {
         rbStats.kickoffReturn++;
@@ -266,7 +301,7 @@ export class RbAnalyzerService extends BaseAnalyzerService {
       if (hasPunt) {
         rbStats.puntReturn++;
         rbStats.puntReturnYard += gainYard;
-        
+
         // 가장 긴 펀트 리턴 업데이트
         if (gainYard > (rbStats.longestPuntReturn || 0)) {
           rbStats.longestPuntReturn = gainYard;
@@ -274,10 +309,11 @@ export class RbAnalyzerService extends BaseAnalyzerService {
         } else {
           console.log(`   🟡 RB 펀트 리턴: ${gainYard}야드`);
         }
-        
+
         // 펀트 리턴 터치다운 처리
         if (significantPlays.includes('TOUCHDOWN')) {
-          rbStats.puntReturnTouchdowns = (rbStats.puntReturnTouchdowns || 0) + 1;
+          rbStats.puntReturnTouchdowns =
+            (rbStats.puntReturnTouchdowns || 0) + 1;
           console.log(`   🏆 RB 펀트 리턴 터치다운!`);
         }
       }
@@ -285,16 +321,24 @@ export class RbAnalyzerService extends BaseAnalyzerService {
 
     // 공통 변수 정의
     const fumbleKey = `${clip.clipKey}_FUMBLE`;
-    const hasFumble = significantPlays.some(play => play?.trim() === 'FUMBLE');
-    const hasFumbleRecOff = significantPlays.some(play => play?.trim() === 'FUMBLERECOFF');
-    const hasFumbleRecDef = significantPlays.some(play => play?.trim() === 'FUMBLERECDEF');
+    const hasFumble = significantPlays.some(
+      (play) => play?.trim() === 'FUMBLE',
+    );
+    const hasFumbleRecOff = significantPlays.some(
+      (play) => play?.trim() === 'FUMBLERECOFF',
+    );
+    const hasFumbleRecDef = significantPlays.some(
+      (play) => play?.trim() === 'FUMBLERECDEF',
+    );
 
     // 펌블 직접 처리 (clipKey별로 한 번만 카운트, 패스/런 유형별로 분류)
     if (hasFumble && !hasFumbleRecOff && !processedClipKeys.has(fumbleKey)) {
       processedClipKeys.add(fumbleKey);
-      
-      console.log(`   🔥 펌블 카운트: clipKey=${clip.clipKey}, playType=${playType}`);
-      
+
+      console.log(
+        `   🔥 펌블 카운트: clipKey=${clip.clipKey}, playType=${playType}`,
+      );
+
       if (playType === 'PASS') {
         rbStats.passingFumbles++;
         console.log(`   📡 패스 펌블 +1 (총: ${rbStats.passingFumbles})`);
@@ -347,25 +391,31 @@ export class RbAnalyzerService extends BaseAnalyzerService {
 
     // 총 펌블 계산
     rbStats.fumbles = rbStats.passingFumbles + rbStats.rushingFumbles;
-    rbStats.fumblesLost = rbStats.passingFumblesLost + rbStats.rushingFumblesLost;
+    rbStats.fumblesLost =
+      rbStats.passingFumblesLost + rbStats.rushingFumblesLost;
 
     // 평균 야드 계산
-    rbStats.yardsPerCarry = rbStats.rushingAttempts > 0 
-      ? Math.round((rbStats.rushingYards / rbStats.rushingAttempts) * 10) / 10 
-      : 0;
+    rbStats.yardsPerCarry =
+      rbStats.rushingAttempts > 0
+        ? Math.round((rbStats.rushingYards / rbStats.rushingAttempts) * 10) / 10
+        : 0;
 
-    rbStats.yardsPerReception = rbStats.receptions > 0 
-      ? Math.round((rbStats.receivingYards / rbStats.receptions) * 10) / 10 
-      : 0;
+    rbStats.yardsPerReception =
+      rbStats.receptions > 0
+        ? Math.round((rbStats.receivingYards / rbStats.receptions) * 10) / 10
+        : 0;
 
     // 스페셜팀 평균 야드 계산
-    rbStats.yardPerKickoffReturn = rbStats.kickoffReturn > 0 
-      ? Math.round((rbStats.kickoffReturnYard / rbStats.kickoffReturn) * 10) / 10 
-      : 0;
+    rbStats.yardPerKickoffReturn =
+      rbStats.kickoffReturn > 0
+        ? Math.round((rbStats.kickoffReturnYard / rbStats.kickoffReturn) * 10) /
+          10
+        : 0;
 
-    rbStats.yardPerPuntReturn = rbStats.puntReturn > 0 
-      ? Math.round((rbStats.puntReturnYard / rbStats.puntReturn) * 10) / 10 
-      : 0;
+    rbStats.yardPerPuntReturn =
+      rbStats.puntReturn > 0
+        ? Math.round((rbStats.puntReturnYard / rbStats.puntReturn) * 10) / 10
+        : 0;
 
     // 게임 수는 1로 설정 (하나의 게임 데이터이므로)
     rbStats.gamesPlayed = 1;
@@ -374,9 +424,14 @@ export class RbAnalyzerService extends BaseAnalyzerService {
   /**
    * RB 스탯 초기화
    */
-  private initializeRBStats(jerseyNumber: number, offensiveTeam: string, gameData: GameData): RBStats {
-    const teamName = offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
-    
+  private initializeRBStats(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): RBStats {
+    const teamName =
+      offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
+
     return {
       jerseyNumber,
       teamName,
@@ -419,15 +474,18 @@ export class RbAnalyzerService extends BaseAnalyzerService {
   /**
    * 수비수의 강제 펌블 처리 (RB 클립에서 tkl 필드의 수비수)
    */
-  private processDefensiveFumbleForces(clip: ClipData, gameData: GameData): void {
+  private processDefensiveFumbleForces(
+    clip: ClipData,
+    gameData: GameData,
+  ): void {
     // FUMBLE이 있고 tkl 필드에 수비수가 있으면 강제 펌블로 기록
     if (!clip.significantPlays?.includes('FUMBLE')) return;
 
     const defensiveTeam = clip.offensiveTeam === 'Home' ? 'Away' : 'Home';
-    
+
     // tkl 필드의 수비수들 처리
-    const tacklers = [clip.tkl, clip.tkl2].filter(t => t?.num && t?.pos);
-    
+    const tacklers = [clip.tkl, clip.tkl2].filter((t) => t?.num && t?.pos);
+
     for (const tackler of tacklers) {
       if (tackler.pos && ['DL', 'LB', 'DB'].includes(tackler.pos)) {
         console.log(`   💪 ${tackler.pos} ${tackler.num}번이 펌블 강제 유도`);
@@ -439,8 +497,13 @@ export class RbAnalyzerService extends BaseAnalyzerService {
   /**
    * RB 키 생성
    */
-  private getRBKey(jerseyNumber: number, offensiveTeam: string, gameData: GameData): string {
-    const teamName = offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
+  private getRBKey(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): string {
+    const teamName =
+      offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
     return `${teamName}_RB_${jerseyNumber}`;
   }
 }

@@ -116,10 +116,10 @@ export class TeamTotalStats {
 
   @Prop()
   createdAt: Date;
-
 }
 
-export const TeamTotalStatsSchema = SchemaFactory.createForClass(TeamTotalStats);
+export const TeamTotalStatsSchema =
+  SchemaFactory.createForClass(TeamTotalStats);
 
 // 인덱스 설정
 TeamTotalStatsSchema.index({ teamName: 1 });
