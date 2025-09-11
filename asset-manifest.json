@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.8490a50a.css",
-    "main.js": "/static/js/main.1f87330b.js",
+    "main.css": "/static/css/main.a7bd62f5.css",
+    "main.js": "/static/js/main.9db9793a.js",
     "static/media/HD.png": "/static/media/HD.6849a9fc423dc19d6350.png",
     "static/media/headimg.png": "/static/media/headimg.08a64629290141cfd3f2.png",
     "static/media/DW.png": "/static/media/DW.396463aae2bbdaf327da.png",
@@ -54,7 +54,6 @@
     "static/media/TP4.png": "/static/media/TP4.dafc0703eeadf171082b.png",
     "static/media/Kyunghee-Commanders.png": "/static/media/Kyunghee-Commanders.bc5bde5891e211fbdce8.png",
     "static/media/DU.png": "/static/media/DU.6422b14a5bd8c652a243.png",
-    "static/media/NoGroup.png": "/static/media/NoGroup.474baf66ba78d0e988db.png",
     "static/media/Component.png": "/static/media/Component.6255d5b4d11720e57eb2.png",
     "static/media/HI.png": "/static/media/HI.c94ff13918931938159c.png",
     "static/media/Korea-Univeristy-Tigers.png": "/static/media/Korea-Univeristy-Tigers.4bea4554d06378923da3.png",
@@ -74,6 +73,7 @@
     "static/media/Seoul-Vikings.png": "/static/media/Seoul-Vikings.0ef1fd5c1d464370004b.png",
     "static/media/Hanyang-Lions.png": "/static/media/Hanyang-Lions.416d43287313ee9517dd.png",
     "static/media/Google_for_Startups_logo.jpg": "/static/media/Google_for_Startups_logo.ebc2919b667b87769256.jpg",
+    "static/media/NoGroup.png": "/static/media/NoGroup.3fa4c6d4baef5fa809da.png",
     "static/media/detail.png": "/static/media/detail.e04927d03313fa93c765.png",
     "static/media/Sogang-Albatross.png": "/static/media/Sogang-Albatross.726d09837a629b1039e2.png",
     "static/media/SNU-Green-Terrors.png": "/static/media/SNU-Green-Terrors.0a7e5d54ea3fcf4b1a1e.png",
@@ -86,11 +86,11 @@
     "static/media/Stechlogo.svg": "/static/media/Stechlogo.2515ff7fa7a75b8f8e85a718db911acc.svg",
     "static/media/teamLogo.png": "/static/media/teamLogo.1cbc0faa7edd66f0a77c.png",
     "index.html": "/index.html",
-    "main.8490a50a.css.map": "/static/css/main.8490a50a.css.map",
-    "main.1f87330b.js.map": "/static/js/main.1f87330b.js.map"
+    "main.a7bd62f5.css.map": "/static/css/main.a7bd62f5.css.map",
+    "main.9db9793a.js.map": "/static/js/main.9db9793a.js.map"
   },
   "entrypoints": [
-    "static/css/main.8490a50a.css",
-    "static/js/main.1f87330b.js"
+    "static/css/main.a7bd62f5.css",
+    "static/js/main.9db9793a.js"
   ]
 }
