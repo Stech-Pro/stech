@@ -263,6 +263,8 @@ display: flex;
   font-size: 0.875rem;
   font-style: normal;
   font-weight: 500;
+  display: flex;
+  gap: 0.5rem;
 }
 
 .clip-data {

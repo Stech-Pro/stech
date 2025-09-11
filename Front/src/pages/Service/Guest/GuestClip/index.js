@@ -56,21 +56,20 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
 export const PT_LABEL = {
   RUN: '런',
   PASS: '패스',
-  PASS_INCOMPLETE: '패스 실패',
   KICKOFF: '킥오프',
   RETURN: '리턴',
   PUNT: '펀트',
   PAT: 'PAT',
-  TWOPT: '2PT',
-  FIELDGOAL: 'FG',
+  TPT: '2PT',
+  FG: 'FG',
   SACK: '색',
+  RETURN: '리턴',
   NOPASS: '노패스', // 데이터에 존재하므로 표기 추가
 };
 
 const PLAY_TYPES = {
   RUN: 'RUN',
   PASS: 'PASS',
-  PASS_INCOMPLETE: 'PASS_INCOMPLETE',
   KICKOFF: 'KICKOFF',
   RETURN: 'RETURN',
   PUNT: 'PUNT',
@@ -85,15 +84,20 @@ const SIGNIFICANT_PLAYS = {
   TOUCHDOWN: '터치다운',
   TWOPTCONVGOOD: '2PT 성공',
   TWOPTCONVNOGOOD: '2PT 실패',
-  PATSUCCESS: 'PAT 성공',
-  PATFAIL: 'PAT 실패',
+  PATGOOD: 'PAT 성공',
+  PATNOGOOD: 'PAT 실패',
   FIELDGOALGOOD: 'FG 성공',
   FIELDGOALNOGOOD: 'FG 실패',
-  PENALTY: '페널티',
+  "PENALTY.HOME": '홈 페널티',
+  "PENALTY.AWAY": '원정 페널티',
   SACK: '색',
   TFL: 'TFL',
+  KICKOFF: '킥오프',
+  PUNT: '펀트',
   FUMBLE: '펌블',
-  INTERCEPTION: '인터셉트',
+  FUMBLERECOFF: '공격 펌블 리커버리',
+  FUMBLERECDEF: '수비 펌블 리커버리',
+INTERCEPT: '인터셉트',
   TURNOVER: '턴오버',
   SAFETY: '세이프티',
 };
@@ -303,6 +307,26 @@ export default function GuestClipPage() {
     }
     return '';
   };
+const renderPlayType = (v) => {
+  const pt = (v ?? '').toString().trim().toUpperCase();
+  return pt ? `#${PT_LABEL[pt] ?? pt}` : null;
+};
+const labelSignificant = (token) => {
+  const raw = (token ?? '').toString().trim();
+  if (!raw) return '';            // 빈 값이면 그냥 빈 문자열(숨김 아님)
+
+  const key = raw.toUpperCase();
+
+
+  // 매핑된 한글 라벨이 있으면 사용(빈문자여도 숨기지 않음)
+  if (Object.prototype.hasOwnProperty.call(SIGNIFICANT_PLAYS, key)) {
+    const mapped = SIGNIFICANT_PLAYS[key];
+    return mapped === '' ? key : mapped;  // ''면 숨기지 말고 원문 토큰 노출
+  }
+
+  // 매핑 없으면 원문 노출
+  return key;
+};
 
   return (
     <div className="clip-root">
@@ -540,7 +564,7 @@ export default function GuestClipPage() {
                   <div className="clip-row1">
                     <div className="clip-down">{getDownDisplay(c)}</div>
                     <div className="clip-type">
-                      #{PT_LABEL[c.playType] || c.playType}
+                     {renderPlayType(c.playType)}
                     </div>
                   </div>
                   <div className="clip-row2">
@@ -549,7 +573,7 @@ export default function GuestClipPage() {
                     c.significantPlay.length > 0 ? (
                       <div className="clip-sig">
                         {c.significantPlay.map((t, idx) => (
-                          <span key={`${c.id}-sig-${idx}`}>#{t}</span>
+                          <span key={`${c.id}-sig-${idx}`}>#{labelSignificant(t)}</span>
                         ))}
                       </div>
                     ) : (
