@@ -390,9 +390,9 @@ export default function StatTeam({
       </div>
 
       <div className="table-wrapper">
-        <table className="stat-table">
-          <thead className="table-head">
-            <tr className="table-row">
+        <div className="stat-table">
+          <div className="table-head">
+            <div className="table-row">
               <div className="team-table-row1">
                 <div className="team-table-header-cell rank-column">순위</div>
                 <div className="team-table-header-cell team-column">팀</div>
@@ -440,16 +440,16 @@ export default function StatTeam({
                   );
                 })}
               </div>
-            </tr>
-          </thead>
+            </div>
+          </div>
 
-          <tbody className="table-body">
+          <div className="table-body">
             {rankedTeams.map((row) => {
               const teamInfo = teams.find((t) => t.name === row.team);
               const isSecondDiv =
                 (isGuestFixed ? fixedDivision : division) === '2부';
               return (
-                <tr
+                <div
                   key={row.id || row.team}
                   className={`team-table-rows ${
                     isSecondDiv ? 'is-division2' : ''
@@ -501,11 +501,11 @@ export default function StatTeam({
                       );
                     })}
                   </div>
-                </tr>
+                </div>
               );
             })}
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
     </div>
   );
