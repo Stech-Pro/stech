@@ -402,8 +402,8 @@ export default function StatTeam({ data, teams = [] }) {
           <thead className="table-head">
             <tr className="table-row">
               <div className="team-table-row1">
-                <th className="team-table-header-cell rank-column">순위</th>
-                <th className="team-table-header-cell team-column">팀</th>
+                <div className="team-table-header-cell rank-column">순위</div>
+                <div className="team-table-header-cell team-column">팀</div>
               </div>
               <div
                 className="team-table-row2"
@@ -417,7 +417,7 @@ export default function StatTeam({ data, teams = [] }) {
                   const direction = isActive ? currentSort.direction : null;
                   const isPrimary = PRIMARY_TEAM_METRIC[playType] === col.key;
                   return (
-                    <th
+                    <div
                       key={col.key}
                       className={`team-table-header-cell stat-column sortable
                         ${isActive ? 'active-blue' : ''}
@@ -443,7 +443,7 @@ export default function StatTeam({ data, teams = [] }) {
                           size={30}
                         />
                       </button>
-                    </th>
+                    </div>
                   );
                 })}
               </div>
@@ -465,9 +465,9 @@ export default function StatTeam({ data, teams = [] }) {
                   }`}
                 >
                   <div className="team-table-row1">
-                    <td className="team-table-cell">{row.__rank}위</td>
+                    <div className="team-table-cell">{row.__rank}위</div>
 
-                    <td className="team-table-cell team-name">
+                    <div className="team-table-cell team-name">
                       {teamInfo?.logo && (
                         <div className="team-logo">
                           <img
@@ -482,7 +482,7 @@ export default function StatTeam({ data, teams = [] }) {
                         </div>
                       )}
                       <span>{row.team}</span>
-                    </td>
+                    </div>
                   </div>
                   <div
                     className="team-table-row2"
@@ -499,15 +499,15 @@ export default function StatTeam({ data, teams = [] }) {
                               : v.toFixed(1)
                             : v;
                         return (
-                          <td key={col.key} className="team-table-cell">
+                          <div key={col.key} className="team-table-cell">
                             {shown}
-                          </td>
+                          </div>
                         );
                       }
                       return (
-                        <td key={col.key} className="team-table-cell">
+                        <div key={col.key} className="team-table-cell">
                           {v ?? '0'}
-                        </td>
+                        </div>
                       );
                     })}
                   </div>
