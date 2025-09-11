@@ -2,22 +2,69 @@
 
 // 팀명 정규화 매핑 (JSON에서 오는 팀명 → 표준 팀명)
 const TEAM_NAME_MAPPING = {
-  // 소문자/비표준 형태 → 표준 형태
-  'HYlions': 'HYLions',
-  'KMrazorbacks': 'KMRazorbacks', 
-  'DGtuskers': 'DGTuskers',
+  // 서울
   'YSeagles': 'YSEagles',
+  'SNgreenterrors': 'SNGreenTerrors',
   'SNgreenTerrors': 'SNGreenTerrors',
+  'HYlions': 'HYLions',
+  'KMrazorbacks': 'KMRazorbacks',
   'UScityhawks': 'USCityhawks',
+  'HFblackknights': 'HFBlackKnights',
   'HFblackKnights': 'HFBlackKnights',
+  'KKragingbulls': 'KKRagingBulls',
   'KKragingBulls': 'KKRagingBulls',
   'HIcowboys': 'HICowboys',
   'KUtigers': 'KUTigers',
+  'DongkukTuskers': 'DGTuskers',
+  'DGtuskers': 'DGTuskers',
   'SScrusaders': 'SSCrusaders',
+  'CAbluedragons': 'CABlueDragons',
   'KHcommanders': 'KHCommanders',
-  'GSDragons': 'GSDragons',
-  'DSblueDolphons': 'DSBlueDolphons',
-  // 기타 발견되는 비표준 팀명들 추가 가능
+  'SGalbatross': 'SGAlbatross',
+  
+  // 경기강원권
+  'SKroyals': 'SKRoyals',
+  'KWcapra': 'KWCapras',
+  'DKkodiakbears': 'DKKodiakBears',
+  'YIwhitetigers': 'YIWhiteTigers',
+  'IHtealdragons': 'IHTealDragons',
+  'HLphoenix': 'HLPhoenix',
+  'HSkillerwhales': 'HSKillerWhales',
+  'KAmavericks': 'KAMavericks',
+  
+  // 대구경북권
+  'KPorangefighters': 'KBOrangeFighters',
+  'KIblackbears': 'KIBlackBears',
+  'KeimyungSuperlions': 'KMSuperLions',
+  'KOravens': 'KOTRavens',
+  'DCscudangels': 'DCUScudAngels',
+  'DGflyingtigers': 'DUFlyingTigers',
+  'DHrhinos': 'DHURhinos',
+  'DongkukWhiteelephants': 'DGWhiteElephants',
+  'YNpegasus': 'YNPegasus',
+  'HDholyrams': 'HDHolyRams',
+  
+  // 부산경남권
+  'GSdrangons': 'GSDragons',
+  'BSeagles': 'PNUEagles',
+  'HHvikings': 'KMOUVikings',
+  'SLdevils': 'SUDevils',
+  'BKmadmobydicks': 'BKMadMobyDicks',
+  'DUturtlefighters': 'DEUTurtleFighters',
+  'DAleopards': 'DALeopards',
+  'DSbluedolphins': 'DSBlueDolphins',
+  'DSblueDolphons': 'DSBlueDolphins',
+  'BFtornado': 'BUFSTornados',
+  'UUunicorns': 'UOUUnicorns',
+  
+  // 사회인
+  'GunwiPheonix': 'GunwiPhoenix',
+  'BusanGryphons': 'BusanGryphons',
+  'samsungBT': 'SamsungBlueStorm',
+  'seoulGE': 'SeoulGoldenEagles',
+  'seoulDF': 'SeoulDefenders',
+  'seoulVI': 'SeoulVikings',
+  'incheonRH': 'IncheonRhinos'
 };
 
 /**

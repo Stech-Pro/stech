@@ -69,6 +69,7 @@ const LeagueTeamPage = () => {
               'UScityhawks': '서울시립대 시티혹스',
               'HFblackKnights': '한국외대 블랙나이츠',
               'KKragingBulls': '건국대 레이징불스',
+              'KKragingbulls': '건국대 레이징불스',
               'HIcowboys': '홍익대 카우보이스',
               'KUtigers': '고려대 타이거스',
               'SScrusaders': '숭실대 크루세이더스',
