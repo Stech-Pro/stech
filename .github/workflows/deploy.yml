@@ -21,6 +21,8 @@ jobs:
           node-version: '20'
 
       - name: Install and Build Frontend
+        env:
+          REACT_APP_API_URL: https://api.stechpro.ai/api
         run: |
           cd Front
           npm install --legacy-peer-deps
@@ -32,31 +34,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./Front/build
           publish_branch: gh-pages
-
-  # deploy-backend:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Deploy to EC2
-  #       uses: appleboy/ssh-action@v1.0.3
-  #       with:
-  #         host: ${{ secrets.EC2_HOST }}
-  #         username: ${{ secrets.EC2_USERNAME }}
-  #         key: ${{ secrets.EC2_SSH_KEY }}
-  #         port: 22
-  #         script: |
-  #           cd /home/ec2-user/stech_1.0
-  #           git pull origin main
-  #           cd Back
-  #           npm install
-  #           npm install @aws-sdk/client-ssm
-  #           npm run build
-  #           pm2 restart stech-backend || pm2 start dist/main.js --name stech-backend
-
-  #     - name: Health Check
-  #       run: |
-  #         sleep 30
-  #         curl -f http://${{ secrets.EC2_HOST }}:4000/health || exit 1
