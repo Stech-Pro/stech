@@ -21,7 +21,7 @@ const LeagueTeamPage = () => {
         // }
 
         // 환경별 API URL 설정
-        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+        const apiUrl = process.env.REACT_APP_API_URL || 'https://api.stechpro.ai/api';
         console.log('🌐 사용 중인 API URL:', apiUrl);
         
         const response = await fetch(
