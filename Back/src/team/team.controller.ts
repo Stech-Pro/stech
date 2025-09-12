@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -15,6 +16,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { TeamService } from './team.service';
 import { TeamStatsAnalyzerService } from './team-stats-analyzer.service';
@@ -22,7 +24,10 @@ import { GameService } from '../game/game.service';
 import { CreateTeamDto, UpdateTeamDto } from '../common/dto/team.dto';
 import { TeamStatsSuccessDto, TeamStatsErrorDto } from './dto/team-stats.dto';
 import { TeamRankingResponseDto } from './dto/team-season-stats.dto';
-import { GameAnalysisRequestDto, GameAnalysisResponseDto } from './dto/game-analysis.dto';
+import {
+  GameAnalysisRequestDto,
+  GameAnalysisResponseDto,
+} from './dto/game-analysis.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { User } from '../common/decorators/user.decorator';
 
@@ -55,28 +60,41 @@ export class TeamController {
   }
 
   @Get('total-stats')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)  // 팀 스탯은 공개 정보로 변경
+  // @ApiBearerAuth()
   @ApiOperation({
     summary: '🏆 팀 누적 스탯 순위 조회',
-    description: '모든 팀의 누적 스탯을 totalYards 기준으로 정렬하여 조회합니다.',
+    description:
+      '모든 팀의 누적 스탯을 totalYards 기준으로 정렬하여 조회합니다. league 파라미터로 1부/2부 필터링 가능합니다.',
+  })
+  @ApiQuery({
+    name: 'league',
+    required: false,
+    description: '리그 구분 (1부 또는 2부)',
+    enum: ['1부', '2부'],
   })
   @ApiResponse({
     status: 200,
     description: '✅ 팀 누적 스탯 조회 성공',
   })
-  async getAllTeamTotalStats(@User() user: any) {
+  async getAllTeamTotalStats(
+    @User() user: any = null,
+    @Query('league') league?: string,
+  ) {
     try {
-      const { role } = user;
-      
+      const role = user?.role || 'guest';
+
       if (role === 'admin') {
-        // Admin은 모든 팀 스탯 조회
-        const teamStats = await this.teamStatsService.getAllTeamTotalStats();
+        // Admin은 모든 팀 스탯 조회 (리그 필터링 지원)
+        const teamStats =
+          await this.teamStatsService.getAllTeamTotalStats(league);
 
         if (!teamStats || teamStats.length === 0) {
           return {
             success: false,
-            message: '팀 누적 스탯을 찾을 수 없습니다',
+            message: league
+              ? `${league} 팀 누적 스탯을 찾을 수 없습니다`
+              : '팀 누적 스탯을 찾을 수 없습니다',
             data: [],
             timestamp: new Date().toISOString(),
           };
@@ -84,20 +102,27 @@ export class TeamController {
 
         return {
           success: true,
-          message: '모든 팀 누적 스탯 조회가 완료되었습니다 (Admin)',
+          message: league
+            ? `${league} 팀 누적 스탯 조회가 완료되었습니다 (Admin)`
+            : '모든 팀 누적 스탯 조회가 완료되었습니다 (Admin)',
           data: teamStats,
           accessLevel: 'admin',
+          league: league || 'all',
           timestamp: new Date().toISOString(),
         };
       } else {
         // 일반 사용자도 모든 팀 스탯 조회 가능 (리그 순위표는 공개 정보)
-        const teamStats = await this.teamStatsService.getAllTeamTotalStats();
+        const teamStats =
+          await this.teamStatsService.getAllTeamTotalStats(league);
 
         return {
           success: true,
-          message: '팀 누적 스탯 조회가 완료되었습니다',
+          message: league
+            ? `${league} 팀 누적 스탯 조회가 완료되었습니다`
+            : '팀 누적 스탯 조회가 완료되었습니다',
           data: teamStats,
           accessLevel: 'public',
+          league: league || 'all',
           timestamp: new Date().toISOString(),
         };
       }
@@ -174,7 +199,7 @@ export class TeamController {
   async analyzeGame(@Body() body: GameAnalysisRequestDto) {
     try {
       console.log('받은 요청 body:', body);
-      
+
       if (!body || !body.gameKey) {
         return {
           success: false,
@@ -182,25 +207,29 @@ export class TeamController {
           timestamp: new Date().toISOString(),
         };
       }
-      
+
       // 먼저 모든 gameKey 조회해서 확인
       const allGames = await this.gameService.findAllGames();
-      console.log('저장된 모든 gameKey들:', allGames.map(game => game.gameKey));
-      
+      console.log(
+        '저장된 모든 gameKey들:',
+        allGames.map((game) => game.gameKey),
+      );
+
       // gameKey로 저장된 경기 데이터 조회
       const gameData = await this.gameService.getGameClipsByKey(body.gameKey);
       console.log('조회된 gameData:', gameData ? '있음' : '없음');
-      
+
       if (!gameData) {
         return {
           success: false,
-          message: `${body.gameKey}에 해당하는 경기 데이터를 찾을 수 없습니다. 저장된 gameKey들: ${allGames.map(g => g.gameKey).join(', ')}`,
+          message: `${body.gameKey}에 해당하는 경기 데이터를 찾을 수 없습니다. 저장된 gameKey들: ${allGames.map((g) => g.gameKey).join(', ')}`,
           timestamp: new Date().toISOString(),
         };
       }
 
-      const result = await this.teamStatsService.analyzeGameForDisplay(gameData);
-      
+      const result =
+        await this.teamStatsService.analyzeGameForDisplay(gameData);
+
       return {
         success: true,
         message: '경기 분석이 완료되었습니다',
@@ -485,5 +514,4 @@ export class TeamController {
     }
   }
   */
-
 }

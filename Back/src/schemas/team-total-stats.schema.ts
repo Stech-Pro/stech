@@ -11,6 +11,10 @@ export class TeamTotalStats {
   @Prop({ required: true, unique: true })
   teamName: string; // 예: "건국대 레이징불스"
 
+  // 리그 구분 추가
+  @Prop({ enum: ['1부', '2부'], default: '1부' })
+  league: string;
+
   @Prop({ default: 0 })
   totalPoints: number;
 
@@ -112,10 +116,10 @@ export class TeamTotalStats {
 
   @Prop()
   createdAt: Date;
-
 }
 
-export const TeamTotalStatsSchema = SchemaFactory.createForClass(TeamTotalStats);
+export const TeamTotalStatsSchema =
+  SchemaFactory.createForClass(TeamTotalStats);
 
 // 인덱스 설정
 TeamTotalStatsSchema.index({ teamName: 1 });

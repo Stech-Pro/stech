@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { BaseAnalyzerService, ClipData, GameData } from './base-analyzer.service';
+import {
+  BaseAnalyzerService,
+  ClipData,
+  GameData,
+} from './base-analyzer.service';
 
 // TE 스탯 인터페이스
 export interface TEStats {
@@ -28,13 +32,12 @@ export interface TEStats {
 
 @Injectable()
 export class TeAnalyzerService extends BaseAnalyzerService {
-
   /**
    * TE 클립 분석 메인 메서드
    */
   async analyzeClips(clips: ClipData[], gameData: GameData): Promise<any> {
     console.log(`\n🎯 TE 분석 시작 - ${clips.length}개 클립`);
-    
+
     if (clips.length === 0) {
       console.log('⚠️ TE 클립이 없습니다.');
       return { teCount: 0, message: 'TE 클립이 없습니다.' };
@@ -54,8 +57,10 @@ export class TeAnalyzerService extends BaseAnalyzerService {
     for (const [teKey, teStats] of teStatsMap) {
       // 최종 계산
       this.calculateFinalStats(teStats);
-      
-      console.log(`🎯 TE ${teStats.jerseyNumber}번 (${teStats.teamName}) 최종 스탯:`);
+
+      console.log(
+        `🎯 TE ${teStats.jerseyNumber}번 (${teStats.teamName}) 최종 스탯:`,
+      );
       console.log(`   리시빙 타겟: ${teStats.receivingTargets}`);
       console.log(`   리셉션: ${teStats.receptions}`);
       console.log(`   리시빙야드: ${teStats.receivingYards}`);
@@ -63,7 +68,9 @@ export class TeAnalyzerService extends BaseAnalyzerService {
       console.log(`   리시빙TD: ${teStats.receivingTouchdowns}`);
       console.log(`   가장 긴 리셉션: ${teStats.longestReception}`);
       console.log(`   1다운: ${teStats.receivingFirstDowns}`);
-      console.log(`   러싱 시도: ${teStats.rushingAttempts}, 야드: ${teStats.rushingYards}`);
+      console.log(
+        `   러싱 시도: ${teStats.rushingAttempts}, 야드: ${teStats.rushingYards}`,
+      );
 
       // 데이터베이스에 저장
       const saveResult = await this.savePlayerStats(
@@ -90,7 +97,8 @@ export class TeAnalyzerService extends BaseAnalyzerService {
           teLongestRush: teStats.longestRush,
           fumbles: teStats.fumbles,
           fumblesLost: teStats.fumblesLost,
-        }
+        },
+        gameData,
       );
 
       if (saveResult.success) {
@@ -104,17 +112,21 @@ export class TeAnalyzerService extends BaseAnalyzerService {
     return {
       teCount: savedCount,
       message: `${savedCount}명의 TE 스탯이 분석되었습니다.`,
-      results
+      results,
     };
   }
 
   /**
    * 개별 클립을 TE 관점에서 처리
    */
-  private processClipForTE(clip: ClipData, teStatsMap: Map<string, TEStats>, gameData: GameData): void {
+  private processClipForTE(
+    clip: ClipData,
+    teStatsMap: Map<string, TEStats>,
+    gameData: GameData,
+  ): void {
     // TE는 car나 car2에서 pos가 'TE'인 경우
     const tePlayers = [];
-    
+
     if (clip.car?.pos === 'TE') {
       tePlayers.push({ number: clip.car.num, role: 'car' });
     }
@@ -123,10 +135,17 @@ export class TeAnalyzerService extends BaseAnalyzerService {
     }
 
     for (const tePlayer of tePlayers) {
-      const teKey = this.getTEKey(tePlayer.number, clip.offensiveTeam, gameData);
-      
+      const teKey = this.getTEKey(
+        tePlayer.number,
+        clip.offensiveTeam,
+        gameData,
+      );
+
       if (!teStatsMap.has(teKey)) {
-        teStatsMap.set(teKey, this.initializeTEStats(tePlayer.number, clip.offensiveTeam, gameData));
+        teStatsMap.set(
+          teKey,
+          this.initializeTEStats(tePlayer.number, clip.offensiveTeam, gameData),
+        );
       }
 
       const teStats = teStatsMap.get(teKey);
@@ -148,14 +167,14 @@ export class TeAnalyzerService extends BaseAnalyzerService {
 
       // 패스 성공 여부 체크 (INCOMP가 없으면 성공으로 간주)
       const isIncomplete = significantPlays.includes('INCOMP');
-      
+
       if (!isIncomplete) {
         // 패스 성공
         teStats.receptions++;
         teStats.receivingYards += gainYard;
 
         // 가장 긴 리셉션 업데이트
-        if (gainYard > teStats.longestReception) {
+        if (teStats.receptions === 1 || gainYard > teStats.longestReception) {
           teStats.longestReception = gainYard;
         }
 
@@ -166,16 +185,23 @@ export class TeAnalyzerService extends BaseAnalyzerService {
       }
     }
 
+    // NOPASS 플레이 처리 (패스 시도했지만 캐치 못함)
+    if (playType === 'NOPASS') {
+      teStats.receivingTargets++;
+      console.log(`   📊 TE NOPASS 타겟 +1 (총: ${teStats.receivingTargets})`);
+      // NOPASS는 리셉션 카운트 안 함
+    }
+
     // RUN 플레이 처리
     if (playType === 'RUN') {
       teStats.rushingAttempts++;
 
       // TFL(Tackle For Loss)나 SAFETY 체크
-      const hasTFL = significantPlays.some(play => play === 'TFL');
-      const hasSAFETY = significantPlays.some(play => play === 'SAFETY');
+      const hasTFL = significantPlays.some((play) => play === 'TFL');
+      const hasSAFETY = significantPlays.some((play) => play === 'SAFETY');
 
       if (hasTFL || hasSAFETY) {
-        teStats.backRushYard += gainYard;
+        teStats.backRushYard += Math.abs(gainYard); // 절댓값으로 저장
       } else {
         teStats.frontRushYard += gainYard;
       }
@@ -216,13 +242,15 @@ export class TeAnalyzerService extends BaseAnalyzerService {
     teStats.rushingYards = teStats.frontRushYard - teStats.backRushYard;
 
     // 평균 야드 계산
-    teStats.yardsPerCarry = teStats.rushingAttempts > 0 
-      ? Math.round((teStats.rushingYards / teStats.rushingAttempts) * 10) / 10 
-      : 0;
+    teStats.yardsPerCarry =
+      teStats.rushingAttempts > 0
+        ? Math.round((teStats.rushingYards / teStats.rushingAttempts) * 10) / 10
+        : 0;
 
-    teStats.yardsPerReception = teStats.receptions > 0 
-      ? Math.round((teStats.receivingYards / teStats.receptions) * 10) / 10 
-      : 0;
+    teStats.yardsPerReception =
+      teStats.receptions > 0
+        ? Math.round((teStats.receivingYards / teStats.receptions) * 10) / 10
+        : 0;
 
     // 게임 수는 1로 설정 (하나의 게임 데이터이므로)
     teStats.gamesPlayed = 1;
@@ -231,9 +259,14 @@ export class TeAnalyzerService extends BaseAnalyzerService {
   /**
    * TE 스탯 초기화
    */
-  private initializeTEStats(jerseyNumber: number, offensiveTeam: string, gameData: GameData): TEStats {
-    const teamName = offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
-    
+  private initializeTEStats(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): TEStats {
+    const teamName =
+      offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
+
     return {
       jerseyNumber,
       teamName,
@@ -262,8 +295,13 @@ export class TeAnalyzerService extends BaseAnalyzerService {
   /**
    * TE 키 생성
    */
-  private getTEKey(jerseyNumber: number, offensiveTeam: string, gameData: GameData): string {
-    const teamName = offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
+  private getTEKey(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): string {
+    const teamName =
+      offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
     return `${teamName}_TE_${jerseyNumber}`;
   }
 }

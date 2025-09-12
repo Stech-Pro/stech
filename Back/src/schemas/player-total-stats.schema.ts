@@ -42,7 +42,8 @@ export class PlayerTotalStats {
   totalSeasons?: number;
 }
 
-export const PlayerTotalStatsSchema = SchemaFactory.createForClass(PlayerTotalStats);
+export const PlayerTotalStatsSchema =
+  SchemaFactory.createForClass(PlayerTotalStats);
 
 // 인덱스 설정
 PlayerTotalStatsSchema.index({ playerId: 1 });

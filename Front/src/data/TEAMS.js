@@ -1,4 +1,82 @@
 // src/data/TEAMS.js
+
+// 팀명 정규화 매핑 (JSON에서 오는 팀명 → 표준 팀명)
+const TEAM_NAME_MAPPING = {
+  // 서울
+  'YSeagles': 'YSEagles',
+  'SNgreenterrors': 'SNGreenTerrors',
+  'SNgreenTerrors': 'SNGreenTerrors',
+  'HYlions': 'HYLions',
+  'KMrazorbacks': 'KMRazorbacks',
+  'UScityhawks': 'USCityhawks',
+  'HFblackknights': 'HFBlackKnights',
+  'HFblackKnights': 'HFBlackKnights',
+  'KKragingbulls': 'KKRagingBulls',
+  'KKragingBulls': 'KKRagingBulls',
+  'HIcowboys': 'HICowboys',
+  'KUtigers': 'KUTigers',
+  'DongkukTuskers': 'DGTuskers',
+  'DGtuskers': 'DGTuskers',
+  'SScrusaders': 'SSCrusaders',
+  'CAbluedragons': 'CABlueDragons',
+  'KHcommanders': 'KHCommanders',
+  'SGalbatross': 'SGAlbatross',
+  
+  // 경기강원권
+  'SKroyals': 'SKRoyals',
+  'KWcapra': 'KWCapras',
+  'DKkodiakbears': 'DKKodiakBears',
+  'YIwhitetigers': 'YIWhiteTigers',
+  'IHtealdragons': 'IHTealDragons',
+  'HLphoenix': 'HLPhoenix',
+  'HSkillerwhales': 'HSKillerWhales',
+  'KAmavericks': 'KAMavericks',
+  
+  // 대구경북권
+  'KPorangefighters': 'KBOrangeFighters',
+  'KIblackbears': 'KIBlackBears',
+  'KeimyungSuperlions': 'KMSuperLions',
+  'KOravens': 'KOTRavens',
+  'DCscudangels': 'DCUScudAngels',
+  'DGflyingtigers': 'DUFlyingTigers',
+  'DHrhinos': 'DHURhinos',
+  'DongkukWhiteelephants': 'DGWhiteElephants',
+  'YNpegasus': 'YNPegasus',
+  'HDholyrams': 'HDHolyRams',
+  
+  // 부산경남권
+  'GSdrangons': 'GSDragons',
+  'BSeagles': 'PNUEagles',
+  'HHvikings': 'KMOUVikings',
+  'SLdevils': 'SUDevils',
+  'BKmadmobydicks': 'BKMadMobyDicks',
+  'DUturtlefighters': 'DEUTurtleFighters',
+  'DAleopards': 'DALeopards',
+  'DSbluedolphins': 'DSBlueDolphins',
+  'DSblueDolphons': 'DSBlueDolphins',
+  'BFtornado': 'BUFSTornados',
+  'UUunicorns': 'UOUUnicorns',
+  
+  // 사회인
+  'GunwiPheonix': 'GunwiPhoenix',
+  'BusanGryphons': 'BusanGryphons',
+  'samsungBT': 'SamsungBlueStorm',
+  'seoulGE': 'SeoulGoldenEagles',
+  'seoulDF': 'SeoulDefenders',
+  'seoulVI': 'SeoulVikings',
+  'incheonRH': 'IncheonRhinos'
+};
+
+/**
+ * 팀명을 표준 형태로 정규화
+ * @param {string} teamName - 정규화할 팀명
+ * @returns {string} 표준 형태의 팀명
+ */
+export const normalizeTeamName = (teamName) => {
+  if (!teamName) return teamName;
+  return TEAM_NAME_MAPPING[teamName] || teamName;
+};
+
 export const TEAMS = [
   // Seoul
   { id: 'YSEagles',        name: '연세대 이글스',        logo: '/assets/images/svg/teams/Yonsei.png',              region: 'Seoul' },
@@ -116,4 +194,7 @@ export const TEAMS = [
   { id: 'RH',    name: '인천 라이노스',        logo: '/assets/images/svg/teams/Rhinos.png',             region: 'Amateur' },
 
 
+
+  //경기강원협회 /게스트용
+  { id: 'GCF',        name: '경기강원올스타',      logo: '/assets/images/svg/teams/gcf.png',                region: 'Gyeonggi-Gangwon'}
 ];

@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Player, PlayerDocument } from '../../schemas/player.schema';
+import type { PlayerService } from '../player.service';
 
 // 클립 데이터 기본 인터페이스
 export interface ClipData {
@@ -39,6 +40,8 @@ export interface GameData {
 export abstract class BaseAnalyzerService {
   constructor(
     @InjectModel(Player.name) protected playerModel: Model<PlayerDocument>,
+    @Inject(forwardRef(() => require('../player.service').PlayerService))
+    protected playerService: PlayerService,
   ) {}
 
   /**
@@ -108,66 +111,97 @@ export abstract class BaseAnalyzerService {
   }
 
   /**
-   * 멀티포지션 지원: 선수 데이터베이스 저장
+   * 멀티포지션 지원: 선수 데이터베이스 저장 (게임별 덮어쓰기)
    */
   protected async savePlayerStats(
     jerseyNumber: number,
     teamName: string,
     position: string,
     stats: any,
+    gameData?: GameData,
   ): Promise<any> {
     try {
       const playerId = `${teamName}_${jerseyNumber}`;
-      console.log(`💾 선수 저장/업데이트 시도: playerId = ${playerId}, position = ${position}`);
-      
+      const gameKey = gameData?.gameKey;
+
+      console.log(
+        `💾 선수 저장/업데이트 시도: playerId = ${playerId}, position = ${position}, gameKey = ${gameKey}`,
+      );
+
       // 팀명+등번호로 기존 선수 찾기 (멀티포지션 지원)
-      let existingPlayer = await this.playerModel.findOne({ 
-        teamName, 
-        jerseyNumber 
+      const existingPlayer = await this.playerModel.findOne({
+        teamName,
+        jerseyNumber,
       });
 
       if (existingPlayer) {
-        console.log(`🔄 기존 선수 발견 (멀티포지션 스탯 추가): ${existingPlayer.name}`);
-        
-        // DB 스페셜팀 스탯 디버깅
-        if (position === 'DB') {
-          console.log(`🐛 DB 저장할 스탯:`, stats);
-          console.log(`🐛 DB 기존 포지션 스탯:`, existingPlayer.stats[position]);
-        }
-        
+        console.log(`🔄 기존 선수 발견: ${existingPlayer.name}`);
+
         // 포지션이 기존 리스트에 없으면 추가
         if (!existingPlayer.positions.includes(position)) {
           existingPlayer.positions.push(position);
-          console.log(`📍 새 포지션 추가: ${position} -> 총 포지션: ${existingPlayer.positions.join(', ')}`);
+          console.log(
+            `📍 새 포지션 추가: ${position} -> 총 포지션: ${existingPlayer.positions.join(', ')}`,
+          );
         }
-        
-        // 해당 포지션의 스탯을 추가/업데이트
-        if (!existingPlayer.stats[position]) {
-          existingPlayer.stats[position] = {};
+
+        // 게임별 스탯 구조 초기화
+        if (!existingPlayer.stats.gameStats) {
+          existingPlayer.stats.gameStats = {};
         }
-        
-        // 포지션별 스탯 업데이트
-        const positionStats = existingPlayer.stats[position] || {};
-        
-        // 새로운 스탯 필드들을 모두 명시적으로 설정
-        for (const [key, value] of Object.entries(stats)) {
-          if (typeof value === 'number') {
-            positionStats[key] = (positionStats[key] || 0) + value;
-          } else {
-            positionStats[key] = value;
+
+        if (gameKey) {
+          // 게임별 스탯 덮어쓰기
+          if (!existingPlayer.stats.gameStats[gameKey]) {
+            existingPlayer.stats.gameStats[gameKey] = {};
           }
+          existingPlayer.stats.gameStats[gameKey][position] = { ...stats };
+          console.log(`🔄 ${gameKey} 게임의 ${position} 스탯 덮어쓰기 완료`);
+
+          // 전체 스탯 재계산
+          this.recalculateTotalStats(existingPlayer, position);
+        } else {
+          // 기존 방식 (gameKey가 없는 경우)
+          if (!existingPlayer.stats[position]) {
+            existingPlayer.stats[position] = {};
+          }
+
+          const positionStats = existingPlayer.stats[position] || {};
+          for (const [key, value] of Object.entries(stats)) {
+            if (typeof value === 'number') {
+              positionStats[key] = (positionStats[key] || 0) + value;
+            } else {
+              positionStats[key] = value;
+            }
+          }
+          existingPlayer.stats[position] = positionStats;
+          existingPlayer.stats.totalGamesPlayed =
+            (existingPlayer.stats.totalGamesPlayed || 0) +
+            (stats.gamesPlayed || 0);
         }
-        
-        existingPlayer.stats[position] = positionStats;
-        existingPlayer.stats.totalGamesPlayed = (existingPlayer.stats.totalGamesPlayed || 0) + (stats.gamesPlayed || 0);
-        
+
         await existingPlayer.save();
-        console.log(`✅ ${position} 선수 멀티포지션 스탯 업데이트 성공`);
-        
-        // DB 스페셜팀 저장 확인
-        if (position === 'DB') {
-          const saved = await this.playerModel.findOne({ teamName, jerseyNumber });
-          console.log(`🐛 DB 저장 후 확인:`, saved?.stats?.DB);
+        console.log(`✅ ${position} 선수 스탯 업데이트 성공`);
+
+        // gameData가 있으면 4개 컬렉션에도 저장 (기존 선수)
+        if (gameData && this.playerService) {
+          try {
+            const playerClips = []; // TODO: 해당 선수의 클립들만 필터링
+            await this.playerService.savePlayerStatsWithNewStructure(
+              existingPlayer,
+              stats,
+              gameData,
+              playerClips,
+            );
+            console.log(
+              `✅ ${position} 기존선수 4개 컬렉션 저장 완료: ${playerId}`,
+            );
+          } catch (error) {
+            console.error(
+              `❌ ${position} 기존선수 4개 컬렉션 저장 실패:`,
+              error.message,
+            );
+          }
         }
 
         return {
@@ -179,12 +213,25 @@ export abstract class BaseAnalyzerService {
         // 새 선수 생성
         console.log(`🆕 새 선수 생성: ${playerId}`);
         console.log(`📊 저장할 스탯:`, stats);
-        
-        const initialStats = {
-          [position]: { ...stats },  // 스프레드로 명시적 복사
-          totalGamesPlayed: stats.gamesPlayed || 0
+
+        const initialStats: any = {
+          totalGamesPlayed: stats.gamesPlayed || 0,
         };
-        
+
+        if (gameKey) {
+          // 게임별 스탯 구조로 저장
+          initialStats.gameStats = {
+            [gameKey]: {
+              [position]: { ...stats },
+            },
+          };
+          // 전체 스탯도 동일하게 설정
+          initialStats[position] = { ...stats };
+        } else {
+          // 기존 방식
+          initialStats[position] = { ...stats };
+        }
+
         const newPlayer = new this.playerModel({
           name: `${jerseyNumber}번`,
           playerId,
@@ -199,11 +246,26 @@ export abstract class BaseAnalyzerService {
 
         await newPlayer.save();
         console.log(`✅ ${position} 선수 저장 성공: ${playerId}`);
-        
-        // DB 스페셜팀 저장 확인 (신규)
-        if (position === 'DB') {
-          const saved = await this.playerModel.findOne({ teamName, jerseyNumber });
-          console.log(`🐛 DB 신규 저장 후 확인:`, saved?.stats?.DB);
+
+        // gameData가 있으면 4개 컬렉션에도 저장 (신규 선수)
+        if (gameData && this.playerService) {
+          try {
+            const playerClips = []; // TODO: 해당 선수의 클립들만 필터링
+            await this.playerService.savePlayerStatsWithNewStructure(
+              newPlayer,
+              stats,
+              gameData,
+              playerClips,
+            );
+            console.log(
+              `✅ ${position} 신규선수 4개 컬렉션 저장 완료: ${playerId}`,
+            );
+          } catch (error) {
+            console.error(
+              `❌ ${position} 신규선수 4개 컬렉션 저장 실패:`,
+              error.message,
+            );
+          }
         }
 
         return {
@@ -219,6 +281,37 @@ export abstract class BaseAnalyzerService {
         message: `${position} ${jerseyNumber}번 스탯 저장 실패: ${error.message}`,
       };
     }
+  }
+
+  /**
+   * 게임별 스탯에서 전체 스탯 재계산
+   */
+  private recalculateTotalStats(player: any, position: string): void {
+    if (!player.stats.gameStats) return;
+
+    const totalStats: any = {};
+    let totalGames = 0;
+
+    // 모든 게임의 해당 포지션 스탯을 합산
+    for (const [gameKey, gameStats] of Object.entries(player.stats.gameStats)) {
+      const positionStats = (gameStats as any)[position];
+      if (positionStats) {
+        totalGames++;
+        for (const [key, value] of Object.entries(positionStats)) {
+          if (typeof value === 'number') {
+            totalStats[key] = (totalStats[key] || 0) + value;
+          } else {
+            totalStats[key] = value;
+          }
+        }
+      }
+    }
+
+    // 전체 스탯 업데이트
+    player.stats[position] = totalStats;
+    player.stats.totalGamesPlayed = totalGames;
+
+    console.log(`🔄 ${position} 전체 스탯 재계산 완료: ${totalGames}게임`);
   }
 
   /**

@@ -42,7 +42,8 @@ export class PlayerGameStats {
   gameResult?: string; // "W" or "L"
 }
 
-export const PlayerGameStatsSchema = SchemaFactory.createForClass(PlayerGameStats);
+export const PlayerGameStatsSchema =
+  SchemaFactory.createForClass(PlayerGameStats);
 
 // 인덱스 설정
 PlayerGameStatsSchema.index({ playerId: 1 });

@@ -263,6 +263,10 @@ export class PlayerStats {
   @Prop({ type: DefensiveStats, default: null })
   Defense?: DefensiveStats;
 
+  // 게임별 스탯 저장 (덮어쓰기용)
+  @Prop({ type: Object, default: {} })
+  gameStats?: { [gameKey: string]: { [position: string]: any } };
+
   // 공통 정보
   @Prop({ default: 0 })
   totalGamesPlayed?: number;

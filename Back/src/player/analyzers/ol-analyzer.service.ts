@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { BaseAnalyzerService, ClipData, GameData } from './base-analyzer.service';
+import {
+  BaseAnalyzerService,
+  ClipData,
+  GameData,
+} from './base-analyzer.service';
 
 // OL 스탯 인터페이스
 export interface OLStats {
@@ -8,17 +12,17 @@ export interface OLStats {
   gamesPlayed: number;
   penalties: number;
   sacksAllowed: number;
+  fumbles: number; // 런 펌블 추가
 }
 
 @Injectable()
 export class OlAnalyzerService extends BaseAnalyzerService {
-
   /**
    * OL 클립 분석 메인 메서드
    */
   async analyzeClips(clips: ClipData[], gameData: GameData): Promise<any> {
     console.log(`\n🛡️ OL 분석 시작 - ${clips.length}개 클립`);
-    
+
     if (clips.length === 0) {
       console.log('⚠️ OL 클립이 없습니다.');
       return { olCount: 0, message: 'OL 클립이 없습니다.' };
@@ -38,10 +42,13 @@ export class OlAnalyzerService extends BaseAnalyzerService {
     for (const [olKey, olStats] of olStatsMap) {
       // 최종 계산
       this.calculateFinalStats(olStats);
-      
-      console.log(`🛡️ OL ${olStats.jerseyNumber}번 (${olStats.teamName}) 최종 스탯:`);
+
+      console.log(
+        `🛡️ OL ${olStats.jerseyNumber}번 (${olStats.teamName}) 최종 스탯:`,
+      );
       console.log(`   반칙 수: ${olStats.penalties}`);
       console.log(`   색 허용 수: ${olStats.sacksAllowed}`);
+      console.log(`   런 펌블: ${olStats.fumbles}`);
 
       // 데이터베이스에 저장
       const saveResult = await this.savePlayerStats(
@@ -52,7 +59,9 @@ export class OlAnalyzerService extends BaseAnalyzerService {
           gamesPlayed: olStats.gamesPlayed,
           penalties: olStats.penalties,
           sacksAllowed: olStats.sacksAllowed,
-        }
+          fumbles: olStats.fumbles, // 런 펌블 추가
+        },
+        gameData,
       );
 
       if (saveResult.success) {
@@ -66,17 +75,21 @@ export class OlAnalyzerService extends BaseAnalyzerService {
     return {
       olCount: savedCount,
       message: `${savedCount}명의 OL 스탯이 분석되었습니다.`,
-      results
+      results,
     };
   }
 
   /**
    * 개별 클립을 OL 관점에서 처리
    */
-  private processClipForOL(clip: ClipData, olStatsMap: Map<string, OLStats>, gameData: GameData): void {
+  private processClipForOL(
+    clip: ClipData,
+    olStatsMap: Map<string, OLStats>,
+    gameData: GameData,
+  ): void {
     // OL은 car나 car2에서 pos가 'OL'인 경우
     const olPlayers = [];
-    
+
     if (clip.car?.pos === 'OL') {
       olPlayers.push({ number: clip.car.num, role: 'car' });
     }
@@ -85,10 +98,17 @@ export class OlAnalyzerService extends BaseAnalyzerService {
     }
 
     for (const olPlayer of olPlayers) {
-      const olKey = this.getOLKey(olPlayer.number, clip.offensiveTeam, gameData);
-      
+      const olKey = this.getOLKey(
+        olPlayer.number,
+        clip.offensiveTeam,
+        gameData,
+      );
+
       if (!olStatsMap.has(olKey)) {
-        olStatsMap.set(olKey, this.initializeOLStats(olPlayer.number, clip.offensiveTeam, gameData));
+        olStatsMap.set(
+          olKey,
+          this.initializeOLStats(olPlayer.number, clip.offensiveTeam, gameData),
+        );
       }
 
       const olStats = olStatsMap.get(olKey);
@@ -105,10 +125,10 @@ export class OlAnalyzerService extends BaseAnalyzerService {
 
     // 반칙 처리 (playType이 NONE이고 significantPlays에 penalty가 있을 때)
     if (playType === 'NONE') {
-      const hasPenalty = significantPlays.some(play => 
-        play === 'penalty.home' || play === 'penalty.away'
+      const hasPenalty = significantPlays.some(
+        (play) => play === 'penalty.home' || play === 'penalty.away',
       );
-      
+
       if (hasPenalty) {
         olStats.penalties++;
         console.log(`   🚩 OL 반칙!`);
@@ -118,10 +138,20 @@ export class OlAnalyzerService extends BaseAnalyzerService {
     // 색 허용 처리 (playType이 SACK이고 significantPlay에 SACK이 있을 때)
     if (playType === 'SACK') {
       const hasSack = significantPlays.includes('SACK');
-      
+
       if (hasSack) {
         olStats.sacksAllowed++;
         console.log(`   🔴 OL 색 허용!`);
+      }
+    }
+
+    // 런 펌블 처리 (playType이 RUN이고 significantPlay에 FUMBLE이 있을 때)
+    if (playType === 'RUN') {
+      const hasFumble = significantPlays.includes('FUMBLE');
+
+      if (hasFumble) {
+        olStats.fumbles++;
+        console.log(`   🏈 OL 런 펌블 (스냅 미스)!`);
       }
     }
   }
@@ -137,23 +167,34 @@ export class OlAnalyzerService extends BaseAnalyzerService {
   /**
    * OL 스탯 초기화
    */
-  private initializeOLStats(jerseyNumber: number, offensiveTeam: string, gameData: GameData): OLStats {
-    const teamName = offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
-    
+  private initializeOLStats(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): OLStats {
+    const teamName =
+      offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
+
     return {
       jerseyNumber,
       teamName,
       gamesPlayed: 1,
       penalties: 0,
       sacksAllowed: 0,
+      fumbles: 0, // 런 펌블 초기화
     };
   }
 
   /**
    * OL 키 생성
    */
-  private getOLKey(jerseyNumber: number, offensiveTeam: string, gameData: GameData): string {
-    const teamName = offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
+  private getOLKey(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): string {
+    const teamName =
+      offensiveTeam === 'Home' ? gameData.homeTeam : gameData.awayTeam;
     return `${teamName}_OL_${jerseyNumber}`;
   }
 }

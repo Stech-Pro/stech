@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { BaseAnalyzerService, ClipData, GameData } from './base-analyzer.service';
+import {
+  BaseAnalyzerService,
+  ClipData,
+  GameData,
+} from './base-analyzer.service';
 
 // DL 스탯 인터페이스
 export interface DLStats {
@@ -25,13 +29,12 @@ export interface DLStats {
 
 @Injectable()
 export class DlAnalyzerService extends BaseAnalyzerService {
-
   /**
    * DL 클립 분석 메인 메서드
    */
   async analyzeClips(clips: ClipData[], gameData: GameData): Promise<any> {
     console.log(`\n⚔️ DL 분석 시작 - ${clips.length}개 클립`);
-    
+
     if (clips.length === 0) {
       console.log('⚠️ DL 클립이 없습니다.');
       return { dlCount: 0, message: 'DL 클립이 없습니다.' };
@@ -51,8 +54,10 @@ export class DlAnalyzerService extends BaseAnalyzerService {
     for (const [dlKey, dlStats] of dlStatsMap) {
       // 최종 계산
       this.calculateFinalStats(dlStats);
-      
-      console.log(`⚔️ DL ${dlStats.jerseyNumber}번 (${dlStats.teamName}) 최종 스탯:`);
+
+      console.log(
+        `⚔️ DL ${dlStats.jerseyNumber}번 (${dlStats.teamName}) 최종 스탯:`,
+      );
       console.log(`   태클 수: ${dlStats.tackles}`);
       console.log(`   TFL: ${dlStats.tfl}`);
       console.log(`   색: ${dlStats.sacks}`);
@@ -80,7 +85,8 @@ export class DlAnalyzerService extends BaseAnalyzerService {
           comboTackles: dlStats.comboTackles,
           att: dlStats.att,
           longestInterception: dlStats.longestInterception,
-        }
+        },
+        gameData,
       );
 
       if (saveResult.success) {
@@ -94,17 +100,21 @@ export class DlAnalyzerService extends BaseAnalyzerService {
     return {
       dlCount: savedCount,
       message: `${savedCount}명의 DL 스탯이 분석되었습니다.`,
-      results
+      results,
     };
   }
 
   /**
    * 개별 클립을 DL 관점에서 처리
    */
-  private processClipForDL(clip: ClipData, dlStatsMap: Map<string, DLStats>, gameData: GameData): void {
+  private processClipForDL(
+    clip: ClipData,
+    dlStatsMap: Map<string, DLStats>,
+    gameData: GameData,
+  ): void {
     // DL은 tkl나 tkl2에서 pos가 'DL'인 경우
     const dlPlayers = [];
-    
+
     if (clip.tkl?.pos === 'DL') {
       dlPlayers.push({ number: clip.tkl.num, role: 'tkl' });
     }
@@ -113,10 +123,17 @@ export class DlAnalyzerService extends BaseAnalyzerService {
     }
 
     for (const dlPlayer of dlPlayers) {
-      const dlKey = this.getDLKey(dlPlayer.number, clip.offensiveTeam, gameData);
-      
+      const dlKey = this.getDLKey(
+        dlPlayer.number,
+        clip.offensiveTeam,
+        gameData,
+      );
+
       if (!dlStatsMap.has(dlKey)) {
-        dlStatsMap.set(dlKey, this.initializeDLStats(dlPlayer.number, clip.offensiveTeam, gameData));
+        dlStatsMap.set(
+          dlKey,
+          this.initializeDLStats(dlPlayer.number, clip.offensiveTeam, gameData),
+        );
       }
 
       const dlStats = dlStatsMap.get(dlKey);
@@ -135,7 +152,7 @@ export class DlAnalyzerService extends BaseAnalyzerService {
     if (playType === 'RUN' || playType === 'PASS') {
       const hasTkl = clip.tkl?.pos === 'DL';
       const hasTkl2 = clip.tkl2?.pos === 'DL';
-      
+
       if (hasTkl && hasTkl2) {
         // 콤보 태클 (두 명 다 DL)
         dlStats.comboTackles++;
@@ -160,7 +177,10 @@ export class DlAnalyzerService extends BaseAnalyzerService {
     }
 
     // TFL 처리 (PASS, RUN 플레이에서 TFL significantPlay가 있을 때)
-    if ((playType === 'PASS' || playType === 'RUN') && significantPlays.includes('TFL')) {
+    if (
+      (playType === 'PASS' || playType === 'RUN') &&
+      significantPlays.includes('TFL')
+    ) {
       dlStats.tfl++;
       console.log(`   ⚡ DL TFL!`);
     }
@@ -169,7 +189,7 @@ export class DlAnalyzerService extends BaseAnalyzerService {
     if (significantPlays.includes('SACK')) {
       const hasTkl = clip.tkl?.pos === 'DL';
       const hasTkl2 = clip.tkl2?.pos === 'DL';
-      
+
       if (hasTkl && hasTkl2) {
         // 두 명이 함께 색한 경우 각자 0.5씩
         dlStats.sacks += 0.5;
@@ -179,11 +199,11 @@ export class DlAnalyzerService extends BaseAnalyzerService {
         dlStats.sacks++;
         console.log(`   💥 DL 색!`);
       }
-      
+
       // SACK일 때 자동으로 TFL 추가
       dlStats.tfl++;
       console.log(`   ⚡ DL SACK-TFL 자동 추가!`);
-      
+
       // SACK일 때도 태클 수 추가
       dlStats.tackles++;
       console.log(`   🏈 DL 태클! (SACK)`);
@@ -194,12 +214,16 @@ export class DlAnalyzerService extends BaseAnalyzerService {
       dlStats.interceptions++;
       console.log(`   🛡️ DL 인터셉션!`);
     }
-    
+
     // 인터셉션 야드 처리 (RETURN 플레이에서 TURNOVER가 있고 FUMBLERECDEF가 없을 때)
-    if (playType === 'RETURN' && significantPlays.includes('TURNOVER') && !significantPlays.includes('FUMBLERECDEF')) {
+    if (
+      playType === 'RETURN' &&
+      significantPlays.includes('TURNOVER') &&
+      !significantPlays.includes('FUMBLERECDEF')
+    ) {
       const returnYards = Math.abs(clip.gainYard || 0);
       dlStats.interceptionYards += returnYards;
-      
+
       // 가장 긴 인터셉션 업데이트
       if (returnYards > dlStats.longestInterception) {
         dlStats.longestInterception = returnYards;
@@ -216,10 +240,16 @@ export class DlAnalyzerService extends BaseAnalyzerService {
     }
 
     // 펌블 리커버리 처리 (RETURN 플레이에서 FUMBLERECDEF && TURNOVER가 있을 때)
-    if (playType === 'RETURN' && significantPlays.includes('FUMBLERECDEF') && significantPlays.includes('TURNOVER')) {
+    if (
+      playType === 'RETURN' &&
+      significantPlays.includes('FUMBLERECDEF') &&
+      significantPlays.includes('TURNOVER')
+    ) {
       dlStats.fumbleRecoveries++;
       dlStats.fumbleRecoveryYards += Math.abs(clip.gainYard || 0);
-      console.log(`   🟢 DL 펌블 리커버리: ${Math.abs(clip.gainYard || 0)}야드`);
+      console.log(
+        `   🟢 DL 펌블 리커버리: ${Math.abs(clip.gainYard || 0)}야드`,
+      );
     }
 
     // 패스 디펜드 처리 (NOPASS 플레이에서 INTERCEPT가 아닐 때만)
@@ -229,7 +259,11 @@ export class DlAnalyzerService extends BaseAnalyzerService {
     }
 
     // 수비 터치다운 처리 (RETURN 플레이에서 TURNOVER && TOUCHDOWN이 있을 때)
-    if (playType === 'RETURN' && significantPlays.includes('TURNOVER') && significantPlays.includes('TOUCHDOWN')) {
+    if (
+      playType === 'RETURN' &&
+      significantPlays.includes('TURNOVER') &&
+      significantPlays.includes('TOUCHDOWN')
+    ) {
       dlStats.defensiveTouchdowns++;
       console.log(`   🏆 DL 수비 터치다운!`);
     }
@@ -241,7 +275,7 @@ export class DlAnalyzerService extends BaseAnalyzerService {
   private calculateFinalStats(dlStats: DLStats): void {
     // 게임 수는 1로 설정 (하나의 게임 데이터이므로)
     dlStats.gamesPlayed = 1;
-    
+
     // ATT 계산 (SACK + SOLO + COMBO)
     dlStats.att = dlStats.sacks + dlStats.soloTackles + dlStats.comboTackles;
   }
@@ -249,10 +283,15 @@ export class DlAnalyzerService extends BaseAnalyzerService {
   /**
    * DL 스탯 초기화
    */
-  private initializeDLStats(jerseyNumber: number, offensiveTeam: string, gameData: GameData): DLStats {
+  private initializeDLStats(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): DLStats {
     // 수비팀 결정 (공격팀의 반대)
-    const defensiveTeam = offensiveTeam === 'Home' ? gameData.awayTeam : gameData.homeTeam;
-    
+    const defensiveTeam =
+      offensiveTeam === 'Home' ? gameData.awayTeam : gameData.homeTeam;
+
     return {
       jerseyNumber,
       teamName: defensiveTeam,
@@ -278,8 +317,13 @@ export class DlAnalyzerService extends BaseAnalyzerService {
   /**
    * DL 키 생성
    */
-  private getDLKey(jerseyNumber: number, offensiveTeam: string, gameData: GameData): string {
-    const defensiveTeam = offensiveTeam === 'Home' ? gameData.awayTeam : gameData.homeTeam;
+  private getDLKey(
+    jerseyNumber: number,
+    offensiveTeam: string,
+    gameData: GameData,
+  ): string {
+    const defensiveTeam =
+      offensiveTeam === 'Home' ? gameData.awayTeam : gameData.homeTeam;
     return `${defensiveTeam}_DL_${jerseyNumber}`;
   }
 }

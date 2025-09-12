@@ -11,28 +11,37 @@ const LeagueTeamPage = () => {
     const fetchTeamStats = async () => {
       try {
         setLoading(true);
-        const token = getToken();
+        // const token = getToken();  // 팀 스탯은 공개 정보로 변경
         
-        if (!token) {
-          console.error('JWT 토큰이 없습니다. 로그인이 필요합니다.');
-          setTeamStatsData([]);
-          setLoading(false);
-          return;
-        }
+        // if (!token) {
+        //   console.error('JWT 토큰이 없습니다. 로그인이 필요합니다.');
+        //   setTeamStatsData([]);
+        //   setLoading(false);
+        //   return;
+        // }
 
+        // 환경별 API URL 설정
+        const apiUrl = process.env.REACT_APP_API_URL || 'https://api.stechpro.ai/api';
+        console.log('🌐 사용 중인 API URL:', apiUrl);
+        
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/team/total-stats`,
+          `${apiUrl}/team/total-stats`,
           {
             headers: {
-              'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
           }
         );
 
+        console.log('API 응답 상태:', response.status);
+        
         if (response.ok) {
-          const result = await response.json();
-          console.log('🏆 팀 스탯 API 응답:', result);
+          const text = await response.text();
+          console.log('API 응답 텍스트:', text);
+          
+          try {
+            const result = JSON.parse(text);
+            console.log('🏆 팀 스탯 API 응답:', result);
 
           if (result.success && result.data) {
             // 백엔드 팀명을 프론트엔드 팀명으로 매핑
@@ -51,6 +60,22 @@ const LeagueTeamPage = () => {
               HFBlackKnights: '한국외대 블랙나이츠',
               GSDragons: '경성대 드래곤스',
               DSBlueDolphons: '동서대 블루돌핀스',
+              // 소문자 형태도 매핑에 추가
+              'HYlions': '한양대 라이온스',
+              'KMrazorbacks': '국민대 레이저백스',
+              'DGtuskers': '동국대 터스커스',
+              'YSeagles': '연세대 이글스',
+              'SNgreenTerrors': '서울대 그린테러스',
+              'UScityhawks': '서울시립대 시티혹스',
+              'HFblackKnights': '한국외대 블랙나이츠',
+              'KKragingBulls': '건국대 레이징불스',
+              'KKragingbulls': '건국대 레이징불스',
+              'HIcowboys': '홍익대 카우보이스',
+              'KUtigers': '고려대 타이거스',
+              'SScrusaders': '숭실대 크루세이더스',
+              'KHcommanders': '경희대 커맨더스',
+              'GSDragons': '경성대 드래곤스',
+              'DSblueDolphons': '동서대 블루돌핀스',
             };
 
             // 백엔드 데이터를 프론트엔드 형식으로 변환
@@ -111,6 +136,11 @@ const LeagueTeamPage = () => {
             setTeamStatsData(transformedData);
           } else {
             console.error('팀 스탯 데이터 구조 오류:', result);
+            setTeamStatsData([]);
+          }
+          } catch (parseError) {
+            console.error('JSON 파싱 에러:', parseError);
+            console.error('응답 텍스트:', text);
             setTeamStatsData([]);
           }
         } else {

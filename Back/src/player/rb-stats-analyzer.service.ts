@@ -124,7 +124,10 @@ export class RbStatsAnalyzerService {
     }
 
     // 계산된 스탯 업데이트
-    rbStats.gamesPlayed = ((player.stats?.RB as any)?.gamesPlayed || player.stats?.totalGamesPlayed || 0) + 1; // 기존 경기 수에 +1 추가
+    rbStats.gamesPlayed =
+      ((player.stats?.RB as any)?.gamesPlayed ||
+        player.stats?.totalGamesPlayed ||
+        0) + 1; // 기존 경기 수에 +1 추가
     rbStats.yardsPerCarry =
       rbStats.rushingAttempts > 0
         ? Math.round((rbStats.rushingYards / rbStats.rushingAttempts) * 10) / 10
