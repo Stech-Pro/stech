@@ -28,7 +28,7 @@ export const GUEST_CLIPS = [
     "down": 2,
     "yardsToGo": 8,
     "significantPlay": [
-      "PENALTY.경기강원올스타"
+      "수비팀 페널티"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
@@ -76,7 +76,7 @@ export const GUEST_CLIPS = [
     "down": 1,
     "yardsToGo": 10,
     "significantPlay": [
-      "PENALTY.서울 바이킹스"
+      "수비팀 페널티"
     ],
     "offensiveTeam": "경기강원올스타",
     "gainYard": 0,
@@ -89,7 +89,7 @@ export const GUEST_CLIPS = [
     "down": 1,
     "yardsToGo": 5,
     "significantPlay": [
-      "PENALTY.경기강원올스타"
+      "공격팀 페널티"
     ],
     "offensiveTeam": "경기강원올스타",
     "gainYard": 0,
@@ -148,7 +148,7 @@ export const GUEST_CLIPS = [
     "down": 1,
     "yardsToGo": 10,
     "significantPlay": [
-      "PENALTY.서울 바이킹스"
+      "공격팀 페널티"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
@@ -265,7 +265,7 @@ export const GUEST_CLIPS = [
     "down": 2,
     "yardsToGo": 10,
     "significantPlay": [
-      "PENALTY.서울 바이킹스"
+      "공격팀 페널티"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
@@ -279,7 +279,7 @@ export const GUEST_CLIPS = [
     "yardsToGo": 10,
     "significantPlay": [
       "FUMBLE",
-      "FUMBLERECDEF"
+      "TURNOVER"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": -7,
@@ -418,7 +418,7 @@ export const GUEST_CLIPS = [
     "down": 2,
     "yardsToGo": 15,
     "significantPlay": [
-      "PENALTY.서울 바이킹스"
+      "공격팀 페널티"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
@@ -503,7 +503,7 @@ export const GUEST_CLIPS = [
     "yardsToGo": 15,
     "significantPlay": [
       "FUMBLE",
-      "FUMBLERECDEF"
+      "TURNOVER"
     ],
     "offensiveTeam": "경기강원올스타",
     "gainYard": 0,
@@ -516,7 +516,7 @@ export const GUEST_CLIPS = [
     "down": 1,
     "yardsToGo": 8,
     "significantPlay": [
-      "PENALTY.경기강원올스타"
+      "수비팀 페널티"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,
@@ -710,7 +710,7 @@ export const GUEST_CLIPS = [
     "yardsToGo": 10,
     "significantPlay": [
       "FUMBLE",
-      "FUMBLERECDEF"
+      "TURNOVER"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 14,
@@ -960,7 +960,7 @@ export const GUEST_CLIPS = [
     "down": 2,
     "yardsToGo": 10,
     "significantPlay": [
-      "PENALTY.서울 바이킹스"
+      "공격팀 페널티"
     ],
     "offensiveTeam": "서울 바이킹스",
     "gainYard": 0,

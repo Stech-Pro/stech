@@ -63,8 +63,7 @@ export const PT_LABEL = {
   TPT: '2PT',
   FG: 'FG',
   SACK: '색',
-  RETURN: '리턴',
-  NOPASS: '노패스', // 데이터에 존재하므로 표기 추가
+  NOPASS: '패스 실패', // 데이터에 존재하므로 표기 추가
 };
 
 const PLAY_TYPES = {
@@ -80,16 +79,15 @@ const PLAY_TYPES = {
   NOPASS: 'NOPASS',
 };
 
+/* 고정 라벨 — PENALTY.*는 동적으로 처리 (공/수 판단) */
 const SIGNIFICANT_PLAYS = {
   TOUCHDOWN: '터치다운',
-  "TWOPTCONV.GOOD": '2PT 성공',
-  "TWOPTCONV.NOGOOD": '2PT 실패',
+  'TWOPTCONV.GOOD': '2PT 성공',
+  'TWOPTCONV.NOGOOD': '2PT 실패',
   PATGOOD: 'PAT 성공',
   PATNOGOOD: 'PAT 실패',
   FIELDGOALGOOD: 'FG 성공',
   FIELDGOALNOGOOD: 'FG 실패',
-  "PENALTY.HOME": '홈 페널티',
-  "PENALTY.AWAY": '원정 페널티',
   SACK: '색',
   TFL: 'TFL',
   KICKOFF: '킥오프',
@@ -97,7 +95,7 @@ const SIGNIFICANT_PLAYS = {
   FUMBLE: '펌블',
   FUMBLERECOFF: '공격 펌블 리커버리',
   FUMBLERECDEF: '수비 펌블 리커버리',
-INTERCEPT: '인터셉트',
+  INTERCEPT: '인터셉트',
   TURNOVER: '턴오버',
   SAFETY: '세이프티',
 };
@@ -307,26 +305,47 @@ export default function GuestClipPage() {
     }
     return '';
   };
-const renderPlayType = (v) => {
-  const pt = (v ?? '').toString().trim().toUpperCase();
-  return pt ? `#${PT_LABEL[pt] ?? pt}` : null;
-};
-const labelSignificant = (token) => {
-  const raw = (token ?? '').toString().trim();
-  if (!raw) return '';            // 빈 값이면 그냥 빈 문자열(숨김 아님)
 
-  const key = raw.toUpperCase();
+  const renderPlayType = (v) => {
+    const pt = (v ?? '').toString().trim().toUpperCase();
+    return pt ? `#${PT_LABEL[pt] ?? pt}` : null;
+  };
 
+  /* ========= 페널티 동적 라벨링 ========= */
+  const getPenaltyLabel = (c, key, homeDisplay, awayDisplay) => {
+    // offensiveTeam은 붙여쓰기 display 사용
+    const offenseIsHome =
+      homeDisplay && c?.offensiveTeam ? c.offensiveTeam === homeDisplay : null;
 
-  // 매핑된 한글 라벨이 있으면 사용(빈문자여도 숨기지 않음)
-  if (Object.prototype.hasOwnProperty.call(SIGNIFICANT_PLAYS, key)) {
-    const mapped = SIGNIFICANT_PLAYS[key];
-    return mapped === '' ? key : mapped;  // ''면 숨기지 말고 원문 토큰 노출
-  }
+    // PENALTY.HOME / PENALTY.AWAY
+    const penalizedIsHome = key.endsWith('.HOME')
+      ? true
+      : key.endsWith('.AWAY')
+      ? false
+      : null;
 
-  // 매핑 없으면 원문 노출
-  return key;
-};
+    if (offenseIsHome === null || penalizedIsHome === null) {
+      return '페널티'; // 정보 부족 시 일반 표기
+    }
+    // 같은 사이드면 "공격팀 페널티", 아니면 "수비팀 페널티"
+    return penalizedIsHome === offenseIsHome ? '공격팀 페널티' : '수비팀 페널티';
+  };
+
+  const labelSignificant = (c, token, homeDisplay, awayDisplay) => {
+    const raw = (token ?? '').toString().trim();
+    if (!raw) return '';
+    const key = raw.toUpperCase();
+
+    if (key.startsWith('PENALTY.')) {
+      return getPenaltyLabel(c, key, homeDisplay, awayDisplay);
+    }
+
+    if (Object.prototype.hasOwnProperty.call(SIGNIFICANT_PLAYS, key)) {
+      const mapped = SIGNIFICANT_PLAYS[key];
+      return mapped === '' ? key : mapped;
+    }
+    return key;
+  };
 
   return (
     <div className="clip-root">
@@ -466,19 +485,19 @@ const labelSignificant = (token) => {
                   onClose={closeAll}
                 >
                   <div className="ff-dd-section">
-                    {Object.values(SIGNIFICANT_PLAYS).map((label) => {
+                    {Object.values(SIGNIFICANT_PLAYS).map((lab) => {
                       const selected =
                         Array.isArray(filters.significantPlay) &&
-                        filters.significantPlay.includes(label);
+                        filters.significantPlay.includes(lab);
                       return (
                         <button
-                          key={label}
+                          key={lab}
                           className={`ff-dd-item ${selected ? 'selected' : ''}`}
                           onClick={() =>
-                            handleFilterChange('significantPlay', label)
+                            handleFilterChange('significantPlay', lab)
                           }
                         >
-                          {label}
+                          {lab}
                         </button>
                       );
                     })}
@@ -563,9 +582,7 @@ const labelSignificant = (token) => {
                 <div className="clip-rows">
                   <div className="clip-row1">
                     <div className="clip-down">{getDownDisplay(c)}</div>
-                    <div className="clip-type">
-                     {renderPlayType(c.playType)}
-                    </div>
+                    <div className="clip-type">{renderPlayType(c.playType)}</div>
                   </div>
                   <div className="clip-row2">
                     <div className="clip-oT">{c.offensiveTeam}</div>
@@ -573,7 +590,15 @@ const labelSignificant = (token) => {
                     c.significantPlay.length > 0 ? (
                       <div className="clip-sig">
                         {c.significantPlay.map((t, idx) => (
-                          <span key={`${c.id}-sig-${idx}`}>#{labelSignificant(t)}</span>
+                          <span key={`${c.id}-sig-${idx}`}>
+                            #
+                            {labelSignificant(
+                              c,
+                              t,
+                              homeMeta?.display,
+                              awayMeta?.display
+                            )}
+                          </span>
                         ))}
                       </div>
                     ) : (
@@ -601,10 +626,7 @@ const labelSignificant = (token) => {
                     <div>31.6%</div>
                   </div>
                   <div className="pc-row2">
-                    <div
-                      className="bar bar-run"
-                      style={{ width: `31.6%` }}
-                    />
+                    <div className="bar bar-run" style={{ width: `31.6%` }} />
                   </div>
                 </div>
                 <div className="pc-pass">
@@ -613,10 +635,7 @@ const labelSignificant = (token) => {
                     <div>68.4%</div>
                   </div>
                   <div className="pc-row2">
-                    <div
-                      className="bar bar-pass"
-                      style={{ width: `68.4%` }}
-                    />
+                    <div className="bar bar-pass" style={{ width: `68.4%` }} />
                   </div>
                 </div>
               </div>
@@ -629,10 +648,7 @@ const labelSignificant = (token) => {
                     <div>46.7%</div>
                   </div>
                   <div className="pc-row2">
-                    <div
-                      className="bar bar-run"
-                      style={{ width: `46.7%` }}
-                    />
+                    <div className="bar bar-run" style={{ width: `46.7%` }} />
                   </div>
                 </div>
                 <div className="pc-pass">
@@ -641,10 +657,7 @@ const labelSignificant = (token) => {
                     <div>53.3%</div>
                   </div>
                   <div className="pc-row2">
-                    <div
-                      className="bar bar-pass"
-                      style={{ width: `53.3%` }}
-                    />
+                    <div className="bar bar-pass" style={{ width: `53.3%` }} />
                   </div>
                 </div>
               </div>
@@ -654,21 +667,13 @@ const labelSignificant = (token) => {
             <div className="tsc-header">
               <div className="tsc-team tsc-left">
                 {homeMeta?.logo && (
-                  <img
-                    className="tsc-logo"
-                    src={homeMeta.logo}
-                    alt={homeMeta?.name}
-                  />
+                  <img className="tsc-logo" src={homeMeta.logo} alt={homeMeta?.name} />
                 )}
                 <span className="tsc-pill">{homeMeta?.name}</span>
               </div>
               <div className="tsc-team tsc-right">
                 {awayMeta?.logo && (
-                  <img
-                    className="tsc-logo"
-                    src={awayMeta.logo}
-                    alt={awayMeta?.name}
-                  />
+                  <img className="tsc-logo" src={awayMeta.logo} alt={awayMeta?.name} />
                 )}
                 <span className="tsc-pill">{awayMeta?.name}</span>
               </div>
