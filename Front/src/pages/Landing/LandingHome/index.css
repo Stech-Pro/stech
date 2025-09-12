@@ -218,8 +218,8 @@ p {
 
 .slider-track img {
   flex-shrink: 0; /* 이미지들이 줄어들지 않도록 고정 */
-  width: 100px; /* 너비를 80px로 고정 */
-  height: auto; /* 이미지 비율에 맞춰 높이를 자동으로 조절 */
+  width: 130px; /* 너비를 80px로 고정 */
+  height: 130px; /* 이미지 비율에 맞춰 높이를 자동으로 조절 */
   display: block; /* 이미지 하단 여백 제거 */
 }
 
