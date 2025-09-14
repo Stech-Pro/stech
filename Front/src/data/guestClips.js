@@ -1,4 +1,4 @@
-export const GUEST_CLIPS = [
+export const BASE_GUEST_CLIPS = [
   {
     "id": "1",
     "quarter": 1,
@@ -1342,4 +1342,76 @@ export const GUEST_CLIPS = [
     "clipUrl": "https://res.cloudinary.com/dxtwujk7a/video/upload/v1757528230/Wide_-_Clip_130_drc4py.mp4"
   }
 ];
+
+const norm = (s) => String(s || '').replace(/\s+/g, '').toLowerCase();
+
+// 3) 스타트 스코어 주입 함수
+function addStartScore(clips, homeTeamDisplay, awayTeamDisplay) {
+  const HOME = norm(homeTeamDisplay);   // '경기강원올스타' (공백 제거)
+  const AWAY = norm(awayTeamDisplay);   // '서울바이킹스'
+
+  let scoreHome = 0;
+  let scoreAway = 0;
+
+  // 헬퍼: 어느 팀이 공격인지 → 홈/어웨이 구분
+  const sideOf = (offTeam) => {
+    const n = norm(offTeam);
+    if (n === HOME) return 'home';
+    if (n === AWAY) return 'away';
+    // 혹시 철자 차이 대응
+    if (n.includes(norm(homeTeamDisplay))) return 'home';
+    if (n.includes(norm(awayTeamDisplay))) return 'away';
+    return null;
+  };
+
+  // 결과 배열 생성
+  const withScore = clips.map((c) => {
+    // 현재 플레이 "시작" 시점 점수 기록
+    const startScore = [{ Home: scoreHome, Away: scoreAway }];
+
+    // 이번 플레이 결과에 따라 점수 가산
+    // (플레이 종료 후 다음 플레이의 StartScore에 반영)
+    const sig = Array.isArray(c.significantPlay) ? c.significantPlay : [];
+    const offense = sideOf(c.offensiveTeam);
+
+    const addHome = (n) => (scoreHome += n);
+    const addAway = (n) => (scoreAway += n);
+
+    // 터치다운 6점
+    if (sig.some((v) => String(v).toUpperCase().includes('TOUCHDOWN'))) {
+      if (offense === 'home') addHome(6);
+      else if (offense === 'away') addAway(6);
+    }
+
+    // 필드골 성공 3점
+    if (sig.some((v) => String(v).toUpperCase().includes('FIELDGOALGOOD'))) {
+      if (offense === 'home') addHome(3);
+      else if (offense === 'away') addAway(3);
+    }
+
+    // PAT 성공 1점 (PATNOGOOD은 0점)
+    if (sig.some((v) => String(v).toUpperCase().includes('PATGOOD'))) {
+      if (offense === 'home') addHome(1);
+      else if (offense === 'away') addAway(1);
+    }
+    // TWOPT (2PT) 성공/실패도 혹시 쓸 수 있게 확장
+    if (sig.some((v) => String(v).toUpperCase().includes('TWOPT') && String(v).toUpperCase().includes('GOOD'))) {
+      if (offense === 'home') addHome(2);
+      else if (offense === 'away') addAway(2);
+    }
+
+    // 현재 클립 객체에 StartScore 주입
+    return { ...c, StartScore: startScore };
+  });
+
+  return withScore;
+}
+
+// 4) 실제 export: 스타트 스코어를 주입한 배열
+export const GUEST_CLIPS = addStartScore(
+  BASE_GUEST_CLIPS,
+  '경기강원올스타',   // Home (게스트 페이지와 동일 표기)
+  '서울 바이킹스'     // Away
+);
+
 export default GUEST_CLIPS;

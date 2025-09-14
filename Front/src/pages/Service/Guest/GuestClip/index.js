@@ -194,24 +194,50 @@ export default function GuestClipPage() {
     setOpenMenu(openMenu === menuName ? null : menuName);
 
   // ↓↓↓ 엑셀에서 변환해온 클립 배열 사용 (fetch 없음) — 팀명 붙여쓰기 통일
-  const rawClips = useMemo(() => {
-    return (GUEST_CLIPS || []).map((clip, idx) => {
-      const ot = clip.offensiveTeam ?? homeMeta?.display ?? '홈팀';
-      return {
-        id: String(clip.id ?? `row${idx + 1}`),
-        quarter: Number(clip.quarter ?? 0),
-        playType: String(clip.playType ?? '').toUpperCase(),
-        down: clip.down ?? null,
-        yardsToGo: clip.yardsToGo ?? null,
-        significantPlay: Array.isArray(clip.significantPlay)
-          ? clip.significantPlay
-          : [],
-        offensiveTeam: compactTeam(ot),
-        gainYard: clip.gainYard ?? null,
-        clipUrl: clip.clipUrl ?? null,
-      };
-    });
-  }, [homeMeta?.display]);
+const rawClips = useMemo(() => {
+  return (GUEST_CLIPS || []).map((clip, idx) => {
+    const ot = clip.offensiveTeam ?? homeMeta?.display ?? '홈팀';
+
+    // startScore 정규화: 배열 형태 보장
+    const startScoreSrc = clip.StartScore ?? clip.startScore ?? null;
+    const startScoreArray = Array.isArray(startScoreSrc)
+      ? startScoreSrc
+      : startScoreSrc && typeof startScoreSrc === 'object'
+      ? [startScoreSrc]
+      : clip.Home != null && clip.Away != null
+      ? [{ Home: Number(clip.Home) || 0, Away: Number(clip.Away) || 0 }]
+      : null;
+
+    const scoreHome =
+      clip.scoreHome ??
+      (Array.isArray(startScoreArray) ? Number(startScoreArray[0]?.Home) || 0 : 0);
+
+    const scoreAway =
+      clip.scoreAway ??
+      (Array.isArray(startScoreArray) ? Number(startScoreArray[0]?.Away) || 0 : 0);
+
+    return {
+      id: String(clip.id ?? `row${idx + 1}`),
+      quarter: Number(clip.quarter ?? 0),
+      playType: String(clip.playType ?? '').toUpperCase(),
+      down: clip.down ?? clip.Down ?? null,
+      yardsToGo: clip.yardsToGo ?? clip.RemainYard ?? null,
+      significantPlay: Array.isArray(clip.significantPlay)
+        ? clip.significantPlay
+        : [],
+      offensiveTeam: compactTeam(ot),
+      gainYard: clip.gainYard ?? null,
+
+      // 비디오 URL 키 확정
+      videoUrl: clip.videoUrl ?? clip.clipUrl ?? clip.ClipUrl ?? null,
+
+      // 점수 정보(플레이어에서 읽음)
+      startScore: startScoreArray,
+      scoreHome,
+      scoreAway,
+    };
+  });
+}, [homeMeta?.display]);
 
   // useClipFilter 훅
   const persistKey = `clipFilters:${game?.gameKey || gameKey || 'guest'}`;
@@ -240,22 +266,23 @@ export default function GuestClipPage() {
     setFilters((prev) => ({ ...prev, significantPlay: [] }));
 
   // 리스트 클릭 → 비디오 플레이어로 이동
-  const onClickClip = (c) => {
-    navigate('/service/video', {
-      state: {
-        rawClips,
-        initialFilters: filters,
-        teamOptions,
-        initialPlayId: String(c.id),
-        teamMeta: {
-          homeName: homeMeta?.display,
-          awayName: awayMeta?.display,
-          homeLogo: homeMeta?.logo,
-          awayLogo: awayMeta?.logo,
-        },
+const onClickClip = (c) => {
+  navigate('/service/video', {
+    state: {
+      rawClips,
+      initialFilters: filters,
+      teamOptions,
+      initialPlayId: String(c.id),
+      teamMeta: {
+        homeName: homeMeta?.display,
+        awayName: awayMeta?.display,
+        homeLogo: homeMeta?.logo,
+        awayLogo: awayMeta?.logo,
+        gameId: game?.gameKey || gameKey || 'guest-game',
       },
-    });
-  };
+    },
+  });
+};
 
   // 플레이콜 비율 계산 (RUN vs PASS 계열)
   const rpStats = useMemo(() => {
