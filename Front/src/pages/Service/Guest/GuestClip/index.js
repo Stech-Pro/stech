@@ -215,9 +215,6 @@ const rawClips = useMemo(() => {
       clip.scoreAway ??
       (Array.isArray(startScoreArray) ? Number(startScoreArray[0]?.Away) || 0 : 0);
 
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    // ★★★ 여기가 수정된 부분입니다. VideoPlayer와 구조를 통일합니다. ★★★
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
     return {
       id: String(clip.id ?? `row${idx + 1}`),
       quarter: Number(clip.quarter ?? 0),
@@ -233,7 +230,7 @@ const rawClips = useMemo(() => {
       startScore: startScoreArray,
       scoreHome,
       scoreAway,
-      raw: clip, // ★★★ 원본 데이터를 'raw' 속성에 추가! ★★★
+      raw: clip, // ★★★ 이 부분이 가장 중요합니다! 원본 데이터를 'raw' 속성에 추가합니다. ★★★
     };
   });
 }, [homeMeta?.display]);

@@ -869,7 +869,8 @@ function PlayerCore({ stateData }) {
 export default function VideoPlayer() {
   const location = useLocation();
   const navigate = useNavigate();
-
+console.log('--- VideoPlayer: 페이지 렌더링 시작 ---');
+  console.log('수신한 location.state:', location.state);
   if (!location.state) {
     return (
       <div className="videoPlayerPage">
