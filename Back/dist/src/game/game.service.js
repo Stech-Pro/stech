@@ -32,6 +32,15 @@ let GameService = class GameService {
         this.teamTotalStatsModel = teamTotalStatsModel;
     }
     async createGameInfo(gameData) {
+        console.log('🔍 createGameInfo 호출됨, gameData 필드들:');
+        console.log('  gameKey:', gameData.gameKey);
+        console.log('  date:', gameData.date);
+        console.log('  type:', gameData.type);
+        console.log('  score:', gameData.score);
+        console.log('  region:', gameData.region);
+        console.log('  location:', gameData.location);
+        console.log('  homeTeam:', gameData.homeTeam);
+        console.log('  awayTeam:', gameData.awayTeam);
         const gameInfo = {
             gameKey: gameData.gameKey,
             date: gameData.date,
@@ -42,8 +51,18 @@ let GameService = class GameService {
             homeTeam: gameData.homeTeam,
             awayTeam: gameData.awayTeam,
         };
-        const createdGameInfo = new this.gameInfoModel(gameInfo);
-        return createdGameInfo.save();
+        console.log('📝 저장할 gameInfo 객체:', JSON.stringify(gameInfo, null, 2));
+        try {
+            const createdGameInfo = new this.gameInfoModel(gameInfo);
+            const result = await createdGameInfo.save();
+            console.log('✅ GameInfo 저장 성공:', result._id);
+            return result;
+        }
+        catch (error) {
+            console.error('❌ GameInfo 저장 실패:', error.message);
+            console.error('❌ 상세 에러:', error);
+            throw error;
+        }
     }
     async findGamesByTeam(teamName) {
         return this.gameInfoModel
