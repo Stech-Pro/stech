@@ -198,7 +198,6 @@ const rawClips = useMemo(() => {
   return (GUEST_CLIPS || []).map((clip, idx) => {
     const ot = clip.offensiveTeam ?? homeMeta?.display ?? '홈팀';
 
-    // startScore 정규화: 배열 형태 보장
     const startScoreSrc = clip.StartScore ?? clip.startScore ?? null;
     const startScoreArray = Array.isArray(startScoreSrc)
       ? startScoreSrc
@@ -216,6 +215,9 @@ const rawClips = useMemo(() => {
       clip.scoreAway ??
       (Array.isArray(startScoreArray) ? Number(startScoreArray[0]?.Away) || 0 : 0);
 
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+    // ★★★ 여기가 수정된 부분입니다. VideoPlayer와 구조를 통일합니다. ★★★
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
     return {
       id: String(clip.id ?? `row${idx + 1}`),
       quarter: Number(clip.quarter ?? 0),
@@ -227,18 +229,14 @@ const rawClips = useMemo(() => {
         : [],
       offensiveTeam: compactTeam(ot),
       gainYard: clip.gainYard ?? null,
-
-      // 비디오 URL 키 확정
       videoUrl: clip.videoUrl ?? clip.clipUrl ?? clip.ClipUrl ?? null,
-
-      // 점수 정보(플레이어에서 읽음)
       startScore: startScoreArray,
       scoreHome,
       scoreAway,
+      raw: clip, // ★★★ 원본 데이터를 'raw' 속성에 추가! ★★★
     };
   });
 }, [homeMeta?.display]);
-
   // useClipFilter 훅
   const persistKey = `clipFilters:${game?.gameKey || gameKey || 'guest'}`;
   const {

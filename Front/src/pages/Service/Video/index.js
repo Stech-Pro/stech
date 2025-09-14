@@ -1,4 +1,5 @@
 // src/pages/Service/Video/index.js
+
 import React, {
   useEffect,
   useMemo,
@@ -82,22 +83,50 @@ const OPPOSITES = {
 
 const normalizeClips = (clips = []) =>
   clips.map((c, idx) => {
-    const startScoreArr = c?.StartScore || c?.startScore;
-    const startScore = Array.isArray(startScoreArr) ? startScoreArr[0] : null;
-    const id = c?.id ?? c?.ClipKey ?? c?.clipKey ?? c?.key ?? `idx-${idx}`;
-    const url = c?.videoUrl ?? c?.clipUrl ?? c?.ClipUrl ?? null;
+    const id =
+      c?.id ??
+      c?.clipId ??
+      c?.clipKey ??
+      c?.ClipKey ??
+      c?.key ??
+      String(idx + 1);
+
+    const url =
+      c?.videoUrl ??
+      c?.clipUrl ??
+      c?.ClipUrl ??
+      c?.url ??
+      c?.video?.url ??
+      null;
+
     const quarter = Number(c?.quarter ?? c?.Quarter) || 1;
     const downRaw = c?.down ?? c?.Down;
-    const down =
-      typeof downRaw === 'number' ? downRaw : parseInt(downRaw, 10) || null;
-    const yardsToGo = c?.yardsToGo ?? c?.RemainYard ?? c?.remainYard ?? null;
-    const playType = c?.playType ?? c?.PlayType ?? null;
+    const down = typeof downRaw === 'number' ? downRaw : parseInt(downRaw, 10) || null;
+
+    const yardsToGo =
+      c?.yardsToGo ??
+      c?.RemainYard ??
+      c?.remainYard ??
+      c?.toGoYard ??
+      null;
+      
+    const ptRaw = c?.playType ?? c?.PlayType ?? '';
+    const playType = String(ptRaw).toUpperCase() === 'PASSING' ? 'PASS' : String(ptRaw).toUpperCase();
+
     const offensiveTeam = c?.offensiveTeam ?? c?.OffensiveTeam ?? null;
-    const significant = Array.isArray(c?.significantPlay)
-      ? c.significantPlay
-      : Array.isArray(c?.SignificantPlays)
-      ? c.SignificantPlays.map((sp) => sp?.label || sp?.key).filter(Boolean)
-      : [];
+
+    const significant =
+      Array.isArray(c?.significantPlay)
+        ? c.significantPlay
+        : Array.isArray(c?.significantPlays)
+        ? c.significantPlays.filter(Boolean)
+        : Array.isArray(c?.SignificantPlays)
+        ? c.SignificantPlays.map((sp) => sp?.label || sp?.key).filter(Boolean)
+        : [];
+
+    const startScoreArr = c?.StartScore || c?.startScore;
+    const startScore = Array.isArray(startScoreArr) ? startScoreArr[0] : null;
+
     return {
       id: String(id),
       videoUrl: url,
@@ -109,11 +138,7 @@ const normalizeClips = (clips = []) =>
       playType,
       startYard: c?.startYard ?? c?.StartYard ?? null,
       endYard: c?.endYard ?? c?.EndYard ?? null,
-      carriers: Array.isArray(c?.carriers)
-        ? c.carriers
-        : Array.isArray(c?.Carrier)
-        ? c.Carrier
-        : [],
+      carriers: Array.isArray(c?.carriers) ? c.carriers : Array.isArray(c?.Carrier) ? c.Carrier : [],
       significant,
       scoreHome: startScore?.Home ?? c?.scoreHome ?? 0,
       scoreAway: startScore?.Away ?? c?.scoreAway ?? 0,
@@ -125,6 +150,7 @@ const getOrdinal = (n) => (n===1?'st':n===2?'nd':n===3?'rd':'th');
 const SPECIAL_DOWN_MAP = { TPT: '2PT', KICKOFF: '킥오프', PAT: 'PAT' };
 
 const getDownDisplay = (c) => {
+  if (!c) return '';
   const pt = String(c.playType || '').trim().toUpperCase();
   const downRaw = c.raw?.down ?? c.down;
   const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
@@ -194,35 +220,7 @@ function PlayerCore({ stateData }) {
 
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
   const [showGameDataModal, setShowGameDataModal] = useState(false);
-
-  /* ===== selection helpers ===== */
-  const indexById = useMemo(() => {
-    const map = new Map();
-    normalized.forEach((c, i) => map.set(String(c.id), i));
-    return map;
-  }, [normalized]);
-
-  const goNextClip = useCallback(() => {
-    if (!selectedId || normalized.length === 0) return;
-    const idx = indexById.get(String(selectedId));
-    if (idx == null) return;
-    const next = normalized[idx + 1];
-    if (next) {
-      selectPlay(next.id, { autoplay: true });
-    }
-  }, [selectedId, normalized, indexById]);
-
-  const goPrevClip = useCallback(() => {
-    if (!selectedId || normalized.length === 0) return;
-    const idx = indexById.get(String(selectedId));
-    if (idx == null) return;
-    const prev = normalized[idx - 1];
-    if (prev) {
-      selectPlay(prev.id, { autoplay: true });
-    }
-  }, [selectedId, normalized, indexById]);
-
-  /* ===== memos ===== */
+  
   const handleSaveMemo = (clipId, memoData, playerID) => {
     setMemos((prev) => {
       const playerMemos = prev[playerID] || {};
@@ -239,17 +237,19 @@ function PlayerCore({ stateData }) {
     });
   };
 
-  /* ===== context menu ===== */
   const handleVideoContextMenu = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ visible: true, x: e.clientX, y: e.clientY });
   }, []);
+
   const closeContextMenu = useCallback(() => setContextMenu({ visible: false, x: 0, y: 0 }), []);
+  
   const handleSystemSettings = useCallback(() => {
     navigate('../Member/Settings');
     closeContextMenu();
   }, [closeContextMenu, navigate]);
+
   const handleEditGameData = useCallback(() => {
     setShowGameDataModal(true);
     closeContextMenu();
@@ -274,19 +274,18 @@ function PlayerCore({ stateData }) {
 
   const selected = useMemo(
     () =>
-      (normalized || []).find((p) => p.id === selectedId) ||
+      (normalized || []).find((p) => String(p.id) === selectedId) ||
       (normalized || [])[0] ||
       null,
     [normalized, selectedId],
   );
 
   const hasNoVideo = !!selected && !selected.videoUrl;
-  const isPlaySelected = useCallback((id) => id === selectedId, [selectedId]);
+  const isPlaySelected = useCallback((id) => String(id) === selectedId, [selectedId]);
 
-  /* ===== selectPlay with autoplay intent ===== */
   const selectPlay = useCallback((id, { autoplay = false } = {}) => {
     pendingAutoplayRef.current = autoplay;
-    setSelectedId(id || null);
+    setSelectedId(String(id) || null);
     setIsPlaying(false);
     setHasError(false);
     setIsLoading(true);
@@ -294,12 +293,11 @@ function PlayerCore({ stateData }) {
     setDuration(0);
   }, []);
 
-  /* ===== initial clip selection ===== */
   useEffect(() => {
     const isInitialClipAvailable =
       initialPlayId && clips.some((c) => String(c.id) === String(initialPlayId));
     if (isInitialClipAvailable) {
-      if (selectedId !== initialPlayId) selectPlay(String(initialPlayId));
+      if (selectedId !== String(initialPlayId)) selectPlay(String(initialPlayId));
     } else if (clips.length > 0) {
       const inList = selectedId && clips.some((c) => String(c.id) === selectedId);
       if (!inList) selectPlay(String(clips[0].id));
@@ -308,17 +306,34 @@ function PlayerCore({ stateData }) {
     }
   }, [clips, initialPlayId, selectedId, selectPlay]);
 
-  /* ===== playback rate per clip ===== */
   useEffect(() => {
     const video = videoRef.current;
     if (video) video.playbackRate = settings.playbackRate;
   }, [settings.playbackRate, selectedId]);
+  
+  const goNextClip = useCallback(() => {
+    if (!selectedId || normalized.length === 0) return;
+    const cur = normalized.findIndex((c) => String(c.id) === String(selectedId));
+    if (cur < 0 || cur === normalized.length - 1) return;
+    const next = normalized[cur + 1];
+    if (next) selectPlay(next.id, { autoplay: true });
+  }, [selectedId, normalized, selectPlay]);
 
+  const goPrevClip = useCallback(() => {
+    if (!selectedId || normalized.length === 0) return;
+    const cur = normalized.findIndex((c) => String(c.id) === String(selectedId));
+    if (cur <= 0) return;
+    const prev = normalized[cur - 1];
+    if (prev) selectPlay(prev.id, { autoplay: true });
+  }, [selectedId, normalized, selectPlay]);
 
-  /* ===== wire video events (single binding) ===== */
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // ★★★ 여기가 수정된 핵심 부분입니다 ★★★
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    
     const onLoadedMetadata = () => {
       setDuration(video.duration || 0);
       setIsLoading(false);
@@ -328,8 +343,9 @@ function PlayerCore({ stateData }) {
     const onTimeUpdate = () => setCurrentTime(video.currentTime || 0);
     const onEnded = () => {
       setIsPlaying(false);
-      // 자동으로 다음 클립으로
-      goNextClip();
+      if(settings.autoNext) {
+        goNextClip();
+      }
     };
     const onError = () => {
       setHasError(true);
@@ -342,7 +358,7 @@ function PlayerCore({ stateData }) {
         video
           .play()
           .then(() => setIsPlaying(true))
-          .catch(() => {/* 브라우저 자동재생 정책으로 막힐 수 있음 */});
+          .catch(() => {/* Browser autoplay policy might block this */});
       }
     };
     const onLoadStart = () => setIsLoading(true);
@@ -353,6 +369,7 @@ function PlayerCore({ stateData }) {
     video.addEventListener('error', onError);
     video.addEventListener('canplay', onCanPlay);
     video.addEventListener('loadstart', onLoadStart);
+    
     return () => {
       video.removeEventListener('loadedmetadata', onLoadedMetadata);
       video.removeEventListener('timeupdate', onTimeUpdate);
@@ -361,9 +378,8 @@ function PlayerCore({ stateData }) {
       video.removeEventListener('canplay', onCanPlay);
       video.removeEventListener('loadstart', onLoadStart);
     };
-  }, [goNextClip]);
+  }, [selectedId, goNextClip, settings.autoNext]); // ★★★ 수정된 부분: selectedId를 의존성 배열에 추가 ★★★
 
-  /* ===== controls ===== */
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
     if (!video || hasError || !selected) return;
@@ -421,7 +437,6 @@ function PlayerCore({ stateData }) {
     [duration, hasError, handleTimelineClick],
   );
 
-  /* ===== hotkeys (A/D/N/M) ===== */
   useEffect(() => {
     const onKey = (e) => {
       if (showMagicPencil || showMemo) return;
@@ -459,10 +474,9 @@ function PlayerCore({ stateData }) {
     const s = Math.floor(sec % 60);
     return `${m}:${String(s).padStart(2, '0')}`;
   };
-
+  
   const downLabel = useMemo(() => (selected ? getDownDisplay(selected) : ''), [selected]);
 
-  /* ===== UI Data ===== */
   const homeName = teamMeta?.homeName || 'Home';
   const awayName = teamMeta?.awayName || 'Away';
   const homeLogo = teamMeta?.homeLogo || null;
@@ -477,8 +491,6 @@ function PlayerCore({ stateData }) {
   const quarterSummary = summaries.quarter;
   const playTypeSummary = filters.playType ? PT_LABEL[filters.playType] : '유형';
   const significantSummary = summaries.significant;
-  const clearSignificant = () =>
-    setFilters((prev) => ({ ...prev, significantPlay: [] }));
 
   return (
     <div className="videoPlayerPage">
@@ -490,7 +502,6 @@ function PlayerCore({ stateData }) {
           <HiOutlineMenuAlt3 size={24} />
         </button>
 
-        {/* ===== Scoreboard ===== */}
         <div className="videoScoreboard">
           <div className="scoreTeam leftTeam">
             {awayLogo ? (
@@ -506,10 +517,7 @@ function PlayerCore({ stateData }) {
           <div className="scoreCenter">
             <div className="scoreQuarter">Q{quarter}</div>
             <div className="scoreDown">
-              {downLabel ||
-                (typeof down === 'number'
-                  ? `${down}${getOrdinal(down)} & ${ytg ?? 0}`
-                  : '--')}
+              {downLabel || (typeof down === 'number' ? `${down}${getOrdinal(down)} & ${ytg ?? 0}` : '--')}
             </div>
           </div>
           <div className="scoreTeam rightTeam">
@@ -525,7 +533,6 @@ function PlayerCore({ stateData }) {
           </div>
         </div>
 
-        {/* ===== Video ===== */}
         <div className="videoScreen">
           <div className="videoPlaceholder">
             <div className="videoContent">
@@ -551,25 +558,24 @@ function PlayerCore({ stateData }) {
                     </div>
                   )}
                   <video
-  key={selected?.id}              // 선택 바뀔 때 리마운트
-  ref={videoRef}
-  className={`videoElement ${isLoading || hasError ? 'hidden' : ''}`}
-  src={selected?.videoUrl || ''}  // ★ src 직접 바인딩
-  preload="metadata"
-  controls={false}
-  crossOrigin="anonymous"
-  muted
-  playsInline
-  autoPlay={false}
-  onContextMenu={handleVideoContextMenu}
-/>
+                    key={selected?.id}
+                    ref={videoRef}
+                    className={`videoElement ${isLoading || hasError ? 'hidden' : ''}`}
+                    src={selected?.videoUrl || ''}
+                    preload="metadata"
+                    controls={false}
+                    crossOrigin="anonymous"
+                    muted
+                    playsInline
+                    autoPlay={false}
+                    onContextMenu={handleVideoContextMenu}
+                  />
                 </>
               )}
             </div>
           </div>
         </div>
 
-        {/* ===== Floating tools ===== */}
         <div className="floatingToolButtons">
           <button className="floatingToolBtn memoBtn" onClick={() => setShowMemo(true)} title="메모 작성">
             <FaStickyNote size={24} />
@@ -585,7 +591,6 @@ function PlayerCore({ stateData }) {
           </button>
         </div>
 
-        {/* ===== Editor controls ===== */}
         <div className="videoEditorControls">
           <div className="videoControlsTop">
             <button
@@ -603,24 +608,24 @@ function PlayerCore({ stateData }) {
             <div className="videoFrameNavigation">
               <button
                 className="videoFrameStepButton"
-                onClick={() => stepTime(-0.5)}
+                onClick={() => stepTime(-settings.skipTime)}
                 disabled={hasError || !selected}
-                title="Previous 0.5s"
+                title={`Previous ${settings.skipTime}s (A)`}
               >
-                ◀ 0.5s
+                ◀ {settings.skipTime}s
               </button>
               <button
                 className="videoFrameStepButton"
-                onClick={() => stepTime(0.5)}
+                onClick={() => stepTime(settings.skipTime)}
                 disabled={hasError || !selected}
-                title="Next 0.5s"
+                title={`Next ${settings.skipTime}s (D)`}
               >
-                0.5s ▶
+                {settings.skipTime}s ▶
               </button>
-              <button className="videoFrameStepButton" onClick={goPrevClip} disabled={!selected}>
+              <button className="videoFrameStepButton" onClick={goPrevClip} disabled={!selected} title="Previous Clip (M)">
                 이전 클립
               </button>
-              <button className="videoFrameStepButton" onClick={goNextClip} disabled={!selected}>
+              <button className="videoFrameStepButton" onClick={goNextClip} disabled={!selected} title="Next Clip (N)">
                 다음 클립
               </button>
             </div>
@@ -643,7 +648,6 @@ function PlayerCore({ stateData }) {
         </div>
       </div>
 
-      {/* ===== Right side modal (list & filters) ===== */}
       <div className={`videoSideModal ${isModalOpen ? 'open' : ''}`}>
         <div className="videoModalClose">
           <button className="videoCloseButton" onClick={() => setIsModalOpen(false)}>
@@ -782,7 +786,6 @@ function PlayerCore({ stateData }) {
             </div>
           </div>
 
-          {/* ===== Play list ===== */}
           <div className="videoPlaysList">
             {normalized.length > 0 ? (
               normalized.map((p) => (
