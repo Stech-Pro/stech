@@ -1,15 +1,18 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-// import './ClipPage.css';
 import { TEAMS } from '../../../../data/TEAMS';
 import { GUEST_CLIPS } from '../../../../data/guestClips';
-
 import { useClipFilter } from '../../../../hooks/useClipFilter';
 import UploadVideoModal from '../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../assets/images/logos/Stechlogo.svg';
 import { useAuth } from '../../../../context/AuthContext';
 
-/* ========== 공용 드롭다운 ========== */
 function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -52,7 +55,6 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
   );
 }
 
-/* ========== 라벨 ========== */
 export const PT_LABEL = {
   RUN: '런',
   PASS: '패스',
@@ -63,9 +65,8 @@ export const PT_LABEL = {
   TPT: '2PT',
   FG: 'FG',
   SACK: '색',
-  NOPASS: '패스 실패', // 데이터에 존재하므로 표기 추가
+  NOPASS: '패스 실패',
 };
-
 const PLAY_TYPES = {
   RUN: 'RUN',
   PASS: 'PASS',
@@ -78,8 +79,6 @@ const PLAY_TYPES = {
   SACK: 'SACK',
   NOPASS: 'NOPASS',
 };
-
-/* 고정 라벨 — PENALTY.*는 동적으로 처리 (공/수 판단) */
 const SIGNIFICANT_PLAYS = {
   TOUCHDOWN: '터치다운',
   'TWOPTCONV.GOOD': '2PT 성공',
@@ -99,7 +98,6 @@ const SIGNIFICANT_PLAYS = {
   TURNOVER: '턴오버',
   SAFETY: '세이프티',
 };
-
 const OPPOSITES = {
   '2PT 성공': '2PT 실패',
   '2PT 실패': '2PT 성공',
@@ -109,16 +107,12 @@ const OPPOSITES = {
   'FG 실패': 'FG 성공',
 };
 
-/* ================= 팀 이름 정규화/표시 ================= */
-// 공백/중점/하이픈/점 제거 → 소문자 (비교용)
 const normTeam = (s) =>
   String(s ?? '')
     .replace(/[.\-·\s]/g, '')
     .toLowerCase();
-// 공백/중점/하이픈/점 제거 (표시용: 붙여쓰기 강제)
 const compactTeam = (s) => String(s ?? '').replace(/[.\-·\s]/g, '');
 
-/* TEAMS에서 이름/영문/코드로 팀 찾기 (정규화 비교) */
 const findTeamMeta = (raw) => {
   if (!raw) return { name: '', logo: null, display: '' };
   const key = normTeam(raw);
@@ -127,20 +121,17 @@ const findTeamMeta = (raw) => {
       [t.name, t.enName, t.code].some((v) => normTeam(v) === key),
     ) || null;
   if (hit) return { ...hit, display: compactTeam(hit.name || raw) };
-  // 매칭 실패 시에도 표시명은 붙여쓰기 강제
   return { name: String(raw), logo: null, display: compactTeam(raw) };
 };
 
 const TEAM_BY_ID = TEAMS.reduce((m, t) => ((m[t.id] = t), m), {});
 
-/* ======== Guest Clip Page (fetch 없음) ======== */
 export default function GuestClipPage() {
   const { gameKey } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // 상단 팀 표기 (게스트: 기본값)
   const MY_TEAM_ID = 'GCF';
   const selfTeam = useMemo(
     () => (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || TEAMS[0] || null,
@@ -151,22 +142,19 @@ export default function GuestClipPage() {
 
   const [showUpload, setShowUpload] = useState(false);
 
-  // Game 정보 (부모 state 우선)
   const gameFromState = location.state?.game || null;
   const [game] = useState(
     gameFromState || {
       gameKey: gameKey || 'guest-game',
-      home: '경기강원 올스타', // 원본에 공백 있어도 정규화로 처리됨
+      home: '경기강원 올스타',
       away: '서울 바이킹스',
       date: 'N/A',
     },
   );
 
-  // 홈/원정 메타 (필터용)
   const homeMeta = useMemo(() => findTeamMeta(game?.home), [game?.home]);
   const awayMeta = useMemo(() => findTeamMeta(game?.away), [game?.away]);
 
-  // 팀 드롭다운 옵션 (붙여쓰기 display 사용)
   const teamOptions = useMemo(() => {
     const arr = [];
     if (homeMeta?.display)
@@ -181,40 +169,37 @@ export default function GuestClipPage() {
         label: awayMeta.display,
         logo: awayMeta.logo,
       });
-    // 중복 제거
     return arr.filter(
       (v, i, a) => a.findIndex((x) => x.value === v.value) === i,
     );
   }, [homeMeta?.display, homeMeta?.logo, awayMeta?.display, awayMeta?.logo]);
 
-  // 드롭다운 상태
   const [openMenu, setOpenMenu] = useState(null);
   const closeAll = () => setOpenMenu(null);
   const handleMenuToggle = (menuName) =>
     setOpenMenu(openMenu === menuName ? null : menuName);
 
-  // ↓↓↓ 엑셀에서 변환해온 클립 배열 사용 (fetch 없음) — 팀명 붙여쓰기 통일
-  const rawClips = useMemo(() => {
-    return (GUEST_CLIPS || []).map((clip, idx) => {
-      const ot = clip.offensiveTeam ?? homeMeta?.display ?? '홈팀';
-      return {
-        id: String(clip.id ?? `row${idx + 1}`),
-        quarter: Number(clip.quarter ?? 0),
-        playType: String(clip.playType ?? '').toUpperCase(),
-        down: clip.down ?? null,
-        yardsToGo: clip.yardsToGo ?? null,
-        significantPlay: Array.isArray(clip.significantPlay)
-          ? clip.significantPlay
-          : [],
-        offensiveTeam: compactTeam(ot),
-        gainYard: clip.gainYard ?? null,
-        clipUrl: clip.clipUrl ?? null,
-      };
-    });
-  }, [homeMeta?.display]);
+const rawClips = useMemo(() => {
+  return (GUEST_CLIPS || []).map((clip, idx) => {
+    const ot = clip.offensiveTeam ?? homeMeta?.display ?? '홈팀';
+    return {
+      id: String(clip.id ?? `row${idx + 1}`),
+      quarter: Number(clip.quarter ?? 0),
+      playType: String(clip.playType ?? '').toUpperCase(),
+      down: clip.down ?? clip.Down ?? null,
+      yardsToGo: clip.yardsToGo ?? clip.RemainYard ?? null,
+      significantPlay: Array.isArray(clip.significantPlay) ? clip.significantPlay : [],
+      offensiveTeam: compactTeam(ot),
+      gainYard: clip.gainYard ?? null,
+      videoUrl: clip.videoUrl ?? clip.clipUrl ?? clip.ClipUrl ?? null,
+      // 점수 정보 추가
+      scoreHome: clip.StartScore?.[0]?.Home ?? 0,
+      scoreAway: clip.StartScore?.[0]?.Away ?? 0,
+      raw: clip,
+    };
+  });
+}, [homeMeta?.display]);
 
-  // useClipFilter 훅
-  const persistKey = `clipFilters:${game?.gameKey || gameKey || 'guest'}`;
   const {
     filters,
     setFilters,
@@ -223,14 +208,13 @@ export default function GuestClipPage() {
     handleFilterChange,
     clearAllFilters,
   } = useClipFilter({
-    persistKey,
+    persistKey: `clipFilters:${game?.gameKey || gameKey || 'guest'}`,
     rawClips,
     teamOptions,
     opposites: OPPOSITES,
   });
 
-  // 버튼 요약 텍스트
-  const teamSummary = summaries.team; // 이미 붙여쓰기 형태
+  const teamSummary = summaries.team;
   const quarterSummary = summaries.quarter;
   const playTypeSummary = filters.playType
     ? PT_LABEL[filters.playType] || filters.playType
@@ -239,51 +223,65 @@ export default function GuestClipPage() {
   const clearSignificant = () =>
     setFilters((prev) => ({ ...prev, significantPlay: [] }));
 
-  // 리스트 클릭 → 비디오 플레이어로 이동
-  const onClickClip = (c) => {
-    navigate('/service/video', {
-      state: {
-        rawClips,
-        initialFilters: filters,
-        teamOptions,
-        initialPlayId: String(c.id),
-        teamMeta: {
-          homeName: homeMeta?.display,
-          awayName: awayMeta?.display,
-          homeLogo: homeMeta?.logo,
-          awayLogo: awayMeta?.logo,
-        },
-      },
-    });
-  };
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  // 플레이콜 비율 계산 (RUN vs PASS 계열)
-  const rpStats = useMemo(() => {
-    const calc = (teamName) => {
-      if (!teamName) return { runPct: 0, passPct: 0, run: 0, pass: 0 };
-      const arr = clips.filter(
-        (c) =>
-          c.offensiveTeam === teamName &&
-          (c.playType === 'RUN' ||
-            c.playType === 'PASS' ||
-            c.playType === 'PASS_INCOMPLETE'),
-      );
-      const run = arr.filter((c) => c.playType === 'RUN').length;
-      const pass = arr.length - run;
-      const total = run + pass;
-      if (total > 0) {
-        const runPct = Math.round((run / total) * 100);
-        return { runPct, passPct: 100 - runPct, run, pass };
+  const onClickClip = useCallback(
+    (c) => {
+      // 이미 네비게이션 중이면 무시
+      if (isNavigating) return;
+
+      setIsNavigating(true);
+
+      // filters를 직접 전달하지 말고 정적 객체로 전달
+      const staticFilters = {
+        quarter: filters.quarter,
+        playType: filters.playType,
+        significantPlay: [...(filters.significantPlay || [])],
+        team: filters.team,
+      };
+
+      try {
+        navigate('/service/video', {
+          state: {
+            rawClips,
+            initialFilters: staticFilters, // 👈 정적 복사본 전달
+            teamOptions,
+            initialPlayId: String(c.id),
+            teamMeta: {
+              homeName: homeMeta?.display,
+              awayName: awayMeta?.display,
+              homeLogo: homeMeta?.logo,
+              awayLogo: awayMeta?.logo,
+              gameId: game?.gameKey || gameKey || 'guest-game',
+            },
+          },
+        });
+      } catch (error) {
+        console.error('Navigation failed:', error);
+        setIsNavigating(false);
       }
-      return { runPct: 0, passPct: 0, run: 0, pass: 0 };
-    };
-    return {
-      home: calc(homeMeta?.display),
-      away: calc(awayMeta?.display),
-    };
-  }, [clips, homeMeta?.display, awayMeta?.display]);
 
-  // down 표기
+      // 네비게이션 후 플래그 해제
+      setTimeout(() => setIsNavigating(false), 1000);
+    },
+    [
+      isNavigating,
+      rawClips,
+      filters,
+      teamOptions,
+      homeMeta,
+      awayMeta,
+      game,
+      gameKey,
+      navigate,
+    ],
+  );
+
+  // 컴포넌트 언마운트 시 상태 초기화
+  useEffect(() => {
+    return () => setIsNavigating(false);
+  }, []);
+
   const SPECIAL_DOWN_MAP = { TPT: '2PT', KICKOFF: '킥오프', PAT: 'PAT' };
   const getDownDisplay = (c) => {
     const pt = String(c.playType || '')
@@ -311,7 +309,6 @@ export default function GuestClipPage() {
     return pt ? `#${PT_LABEL[pt] ?? pt}` : null;
   };
 
-  /* ========= 페널티 동적 라벨링 ========= */
   const getPenaltyLabel = (c, key, homeDisplay, awayDisplay) => {
     // offensiveTeam은 붙여쓰기 display 사용
     const offenseIsHome =
@@ -328,7 +325,9 @@ export default function GuestClipPage() {
       return '페널티'; // 정보 부족 시 일반 표기
     }
     // 같은 사이드면 "공격팀 페널티", 아니면 "수비팀 페널티"
-    return penalizedIsHome === offenseIsHome ? '공격팀 페널티' : '수비팀 페널티';
+    return penalizedIsHome === offenseIsHome
+      ? '공격팀 페널티'
+      : '수비팀 페널티';
   };
 
   const labelSignificant = (c, token, homeDisplay, awayDisplay) => {
@@ -582,7 +581,9 @@ export default function GuestClipPage() {
                 <div className="clip-rows">
                   <div className="clip-row1">
                     <div className="clip-down">{getDownDisplay(c)}</div>
-                    <div className="clip-type">{renderPlayType(c.playType)}</div>
+                    <div className="clip-type">
+                      {renderPlayType(c.playType)}
+                    </div>
                   </div>
                   <div className="clip-row2">
                     <div className="clip-oT">{c.offensiveTeam}</div>
@@ -596,7 +597,7 @@ export default function GuestClipPage() {
                               c,
                               t,
                               homeMeta?.display,
-                              awayMeta?.display
+                              awayMeta?.display,
                             )}
                           </span>
                         ))}
@@ -667,13 +668,21 @@ export default function GuestClipPage() {
             <div className="tsc-header">
               <div className="tsc-team tsc-left">
                 {homeMeta?.logo && (
-                  <img className="tsc-logo" src={homeMeta.logo} alt={homeMeta?.name} />
+                  <img
+                    className="tsc-logo"
+                    src={homeMeta.logo}
+                    alt={homeMeta?.name}
+                  />
                 )}
                 <span className="tsc-pill">{homeMeta?.name}</span>
               </div>
               <div className="tsc-team tsc-right">
                 {awayMeta?.logo && (
-                  <img className="tsc-logo" src={awayMeta.logo} alt={awayMeta?.name} />
+                  <img
+                    className="tsc-logo"
+                    src={awayMeta.logo}
+                    alt={awayMeta?.name}
+                  />
                 )}
                 <span className="tsc-pill">{awayMeta?.name}</span>
               </div>

@@ -1,47 +1,75 @@
-// src/hooks/useClipFilter.js
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 
 const DEFAULT_FILTERS = {
-  quarter: null,          // 1|2|3|4|null
-  playType: null,         // 'RUN' | 'PASS' | null  ← 코드 값으로 통일
-  significantPlay: [],    // ['터치다운', ...]
-  team: null,             // 팀명 | null
+  quarter: null,
+  playType: null,
+  significantPlay: [],
+  team: null,
 };
 
 export function useClipFilter({
   persistKey = "clipFilters:default",
   rawClips = [],
   teamOptions = [],
-  opposites = {},      
-  initialFilters={},
+  opposites = {},
+  initialFilters = {},
 }) {
+  const hasInitialized = useRef(false);
+  
   const [filters, setFilters] = useState(() => {
-    if (initialFilters) {
-      return{ ...DEFAULT_FILTERS, ...initialFilters};
+    // 초기화 시에만 localStorage 또는 initialFilters 사용
+    if (initialFilters && Object.keys(initialFilters).length > 0) {
+      hasInitialized.current = true;
+      return { ...DEFAULT_FILTERS, ...initialFilters };
     }
     try {
       const raw = localStorage.getItem(persistKey);
       if (raw) {
         const p = JSON.parse(raw);
+        hasInitialized.current = true;
         return {
           quarter: p?.quarter ?? null,
-          playType: p?.playType ?? null, // 'RUN' | 'PASS' | null
+          playType: p?.playType ?? null,
           significantPlay: Array.isArray(p?.significantPlay) ? p.significantPlay : [],
           team: p?.team ?? null,
         };
       }
     } catch {}
+    hasInitialized.current = true;
     return { ...DEFAULT_FILTERS };
   });
 
+  // localStorage 저장은 디바운스로 처리
+  const saveTimeoutRef = useRef(null);
   useEffect(() => {
-    try { localStorage.setItem(persistKey, JSON.stringify(filters)); } catch {}
+    if (!hasInitialized.current) return;
+    
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    
+    saveTimeoutRef.current = setTimeout(() => {
+      try { 
+        localStorage.setItem(persistKey, JSON.stringify(filters)); 
+      } catch {}
+    }, 500); // 500ms 디바운스
+    
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
   }, [filters, persistKey]);
 
-  // 저장된 team 값이 현재 팀 옵션에 없다면 해제
+  // 팀 옵션 변경 시에만 검증
+  const prevTeamOptionsRef = useRef(teamOptions);
   useEffect(() => {
-    if (filters.team && !teamOptions.some((o) => o.value === filters.team)) {
-      setFilters((f) => ({ ...f, team: null }));
+    if (JSON.stringify(prevTeamOptionsRef.current) !== JSON.stringify(teamOptions)) {
+      prevTeamOptionsRef.current = teamOptions;
+      
+      if (filters.team && !teamOptions.some((o) => o.value === filters.team)) {
+        setFilters((f) => ({ ...f, team: null }));
+      }
     }
   }, [teamOptions, filters.team]);
 
@@ -56,10 +84,10 @@ export function useClipFilter({
           next.quarter = value ?? null;
           break;
         case "playType":
-          next.playType = value || null; // 'RUN' | 'PASS' | null (코드값)
+          next.playType = value || null;
           break;
         case "significantPlay": {
-          const arr = Array.isArray(prev.significantPlay) ? [...prev.significantPlay] : [];
+          const arr = [...(prev.significantPlay || [])];
           const idx = arr.indexOf(value);
           if (idx >= 0) {
             arr.splice(idx, 1);
@@ -81,72 +109,41 @@ export function useClipFilter({
     });
   };
 
-  const removeFilter = (category, value) => {
-    setFilters((prev) => {
-      const next = { ...prev };
-      if (category === "significantPlay") {
-        next.significantPlay = (prev.significantPlay || []).filter((v) => v !== value);
-      } else {
-        next[category] = null;
-      }
-      return next;
-    });
-  };
-
   const clearAllFilters = () => setFilters({ ...DEFAULT_FILTERS });
 
-  // 실제 필터 적용 (rawClips는 코드값 기준이어야 정확)
   const clips = useMemo(() => {
-    return (rawClips || []).filter((r) => {
+    if (!rawClips) return [];
+    return rawClips.filter((r) => {
       if (filters.team && r.offensiveTeam !== filters.team) return false;
       if (filters.quarter && r.quarter !== filters.quarter) return false;
-      if (filters.playType && r.playType !== filters.playType) return false; // 'RUN'|'PASS'
+      if (filters.playType && r.playType !== filters.playType) return false;
       if (filters.significantPlay?.length) {
-        const hasAny = (r.significantPlay || []).some((s) => filters.significantPlay.includes(s));
+        if (!r.significantPlay || r.significantPlay.length === 0) return false;
+        const hasAny = r.significantPlay.some((s) => filters.significantPlay.includes(s));
         if (!hasAny) return false;
       }
       return true;
     });
   }, [rawClips, filters]);
 
-  // 플레이어로 넘길 페이로드
-  const buildPlayerNavState = (initialPlayId = null) => ({
-    filteredPlaysData: clips,
-    initialPlayId,
-    filtersSnapshot: filters,
-  });
-
-  // 요약/칩(표시용)
-  const summaries = {
+  const summaries = useMemo(() => ({
     team: filters.team || "공격팀",
     quarter: filters.quarter ? `Q${filters.quarter}` : "쿼터",
     playType: filters.playType || "유형",
     significant: (() => {
-      const arr = Array.isArray(filters.significantPlay) ? filters.significantPlay : [];
+      const arr = filters.significantPlay || [];
       if (arr.length === 0) return "중요플레이";
       if (arr.length === 1) return arr[0];
       return `${arr[0]} 외 ${arr.length - 1}`;
     })(),
-  };
-
-  const activeFilters = useMemo(() => {
-    const chips = [];
-    if (filters.team) chips.push({ category: "team", value: filters.team, label: filters.team });
-    if (filters.quarter) chips.push({ category: "quarter", value: filters.quarter, label: `Q${filters.quarter}` });
-    if (filters.playType) chips.push({ category: "playType", value: filters.playType, label: filters.playType });
-    (filters.significantPlay || []).forEach((s) => chips.push({ category: "significantPlay", value: s, label: s }));
-    return chips;
-  }, [filters]);
+  }), [filters]);
 
   return {
     filters,
     setFilters,
     summaries,
-    activeFilters,
     clips,
     handleFilterChange,
-    removeFilter,
     clearAllFilters,
-    buildPlayerNavState,
   };
 }

@@ -22,7 +22,7 @@ import MagicPencil from '../../../components/MagicPencil/MagicPencil';
 import VideoMemo from '../../../components/VideoMemo/VideoMemo';
 import GameDataEditModal from '../../../components/GameDataEditModal/GameDataEditModal';
 
-// Dropdown 컴포넌트 (공용으로 분리 권장)
+/* ================= Dropdown ================= */
 function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -37,7 +37,11 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
       <button
         type="button"
         className={`ff-dd-btn ${isOpen ? 'open' : ''}`}
-        onClick={onToggle}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onToggle();
+        }}
       >
         <span className="ff-dd-label">{summary || label}</span>
         <span className="ff-dd-icon">▾</span>
@@ -51,7 +55,7 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
   );
 }
 
-// 필터 관련 상수
+/* ================= Labels / Consts ================= */
 export const PT_LABEL = {
   RUN: '런',
   PASS: '패스',
@@ -68,6 +72,7 @@ const PLAY_TYPES = {
   KICKOFF: 'KICKOFF',
   PUNT: 'PUNT',
 };
+
 const SIGNIFICANT_PLAYS = {
   TOUCHDOWN: '터치다운',
   TWOPTCONVGOOD: '2PT 성공',
@@ -93,114 +98,45 @@ const OPPOSITES = {
   'FG 실패': 'FG 성공',
 };
 
-// 헬퍼 함수
-const prettyPlayType = (raw) => {
-  if (!raw) return '';
-  const u = String(raw).toUpperCase();
-  if (u === 'RUN') return 'Run';
-  if (u === 'PASS') return 'Pass';
-  if (u === 'NOPASS') return 'No Pass';
-  return raw;
-};
-
-const normalizeClips = (clips = []) =>
-  clips.map((c, idx) => {
-    const startScoreArr = c?.StartScore || c?.startScore;
-    const startScore = Array.isArray(startScoreArr) ? startScoreArr[0] : null;
-    const id = c?.id ?? c?.ClipKey ?? c?.clipKey ?? c?.key ?? `idx-${idx}`;
-    const url = c?.videoUrl ?? c?.clipUrl ?? c?.ClipUrl ?? null;
-    const quarter = Number(c?.quarter ?? c?.Quarter) || 1;
-    const downRaw = c?.down ?? c?.Down;
-    const down =
-      typeof downRaw === 'number' ? downRaw : parseInt(downRaw, 10) || null;
-    const yardsToGo = c?.yardsToGo ?? c?.RemainYard ?? c?.remainYard ?? null;
-    const playType = c?.playType ?? c?.PlayType ?? null;
-    const offensiveTeam = c?.offensiveTeam ?? c?.OffensiveTeam ?? null;
-    const significant = Array.isArray(c?.significantPlay)
-      ? c.significantPlay
-      : Array.isArray(c?.SignificantPlays)
-      ? c.SignificantPlays.map((sp) => sp?.label || sp?.key).filter(Boolean)
-      : [];
-    return {
-      id: String(id),
-      videoUrl: url,
-      quarter,
-      offensiveTeam,
-      specialTeam: !!(c?.specialTeam ?? c?.SpecialTeam),
-      down,
-      yardsToGo,
-      playType,
-      startYard: c?.startYard ?? c?.StartYard ?? null,
-      endYard: c?.endYard ?? c?.EndYard ?? null,
-      carriers: Array.isArray(c?.carriers)
-        ? c.carriers
-        : Array.isArray(c?.Carrier)
-        ? c.Carrier
-        : [],
-      significant,
-      scoreHome: startScore?.Home ?? c?.scoreHome ?? 0,
-      scoreAway: startScore?.Away ?? c?.scoreAway ?? 0,
-      raw: c,
-    };
-  });
-
-const getOrdinal = (n) => {
-  if (n === 1) return 'st';
-  if (n === 2) return 'nd';
-  if (n === 3) return 'rd';
-  return 'th';
-};
-const SPECIAL_DOWN_MAP = {
-  TPT: '2PT',
-  KICKOFF: '킥오프',
-  PAT: 'PAT',
-};
+const SPECIAL_DOWN_MAP = { TPT: '2PT', KICKOFF: '킥오프', PAT: 'PAT' };
 
 const getDownDisplay = (c) => {
+  if (!c) return '';
   const pt = String(c.playType || '')
     .trim()
     .toUpperCase();
-  const downRaw = c.raw.down; // 정규화된 데이터가 아닌 원본 raw 데이터의 down을 사용
+  const downRaw = c.raw?.down ?? c.down;
   const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
-
-  // 1) down 값이 특수 문자열이면 그 라벨만 표시
   if (SPECIAL_DOWN_MAP[downStr]) return SPECIAL_DOWN_MAP[downStr];
-  // 2) playType으로도 특수 플레이라면 라벨만 표시
   if (SPECIAL_DOWN_MAP[pt]) return SPECIAL_DOWN_MAP[pt];
-
-  // 3) 일반 다운: "n & ytg"
   const d =
     typeof c.down === 'number'
       ? c.down
       : Number.isFinite(parseInt(downStr, 10))
       ? parseInt(downStr, 10)
       : null;
-
   if (d != null) {
     const ytg = c.yardsToGo ?? 0;
     return `${d} & ${ytg}`;
   }
-
-  return ''; // 그 외는 비워둠
+  return '';
 };
 
-// 핵심 로직을 담당할 내부 컴포넌트
+/* ================= Core ================= */
 function PlayerCore({ stateData }) {
   const navigate = useNavigate();
   const { settings } = useVideoSettings();
 
-  const { rawClips, initialFilters, teamOptions, teamMeta, initialPlayId } =
-    stateData;
+  const { rawClips, initialFilters, teamOptions, teamMeta, initialPlayId } = stateData;
 
-  // 필터 훅 사용
-  const filterHookResult =
-    useClipFilter({
-      rawClips,
-      initialFilters,
-      teamOptions,
-      opposites: OPPOSITES,
-      persistKey: `videoPlayerFilters:${teamMeta?.homeName}`,
-    }) || {};
+  // useClipFilter를 고정된 파라미터로만 호출
+  const clipFilterParams = useMemo(() => ({
+    rawClips: rawClips || [],
+    initialFilters: initialFilters || {},
+    teamOptions: teamOptions || [],
+    opposites: OPPOSITES,
+    persistKey: `videoPlayerFilters:${teamMeta?.homeName || 'default'}`,
+  }), []); // 빈 의존성 배열로 고정
 
   const {
     clips = [],
@@ -209,15 +145,12 @@ function PlayerCore({ stateData }) {
     summaries = {},
     handleFilterChange = () => {},
     clearAllFilters = () => {},
-  } = filterHookResult;
+  } = useClipFilter(clipFilterParams);
 
-  const normalized = useMemo(() => normalizeClips(clips), [clips]);
-
-  // Refs
   const videoRef = useRef(null);
   const timelineRef = useRef(null);
+  const pendingAutoplayRef = useRef(false);
 
-  // State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -229,8 +162,8 @@ function PlayerCore({ stateData }) {
   const [showMagicPencil, setShowMagicPencil] = useState(false);
   const [showMemo, setShowMemo] = useState(false);
   const [memos, setMemos] = useState(() => {
-    const savedMemos = localStorage.getItem(`videoMemos:${teamMeta?.gameId}`);
-    return savedMemos ? JSON.parse(savedMemos) : {};
+    const saved = localStorage.getItem(`videoMemos:${teamMeta?.gameId}`);
+    return saved ? JSON.parse(saved) : {};
   });
 
   const [contextMenu, setContextMenu] = useState({
@@ -240,21 +173,45 @@ function PlayerCore({ stateData }) {
   });
   const [showGameDataModal, setShowGameDataModal] = useState(false);
 
+  // 초기화를 한 번만 수행
+  const initializationDone = useRef(false);
+  
+  useEffect(() => {
+    if (initializationDone.current) return;
+    
+    if (clips && clips.length > 0) {
+      const targetId = initialPlayId && clips.some(c => String(c.id) === String(initialPlayId))
+        ? String(initialPlayId)
+        : String(clips[0].id);
+      
+      setSelectedId(targetId);
+      initializationDone.current = true;
+    }
+  }, [clips.length > 0]); // clips가 로드되었을 때만 실행
+
+  // 필터 변경 시 현재 클립이 결과에 없으면 첫 번째 클립으로 이동
+  useEffect(() => {
+    if (!selectedId || !clips || clips.length === 0) return;
+    
+    const isCurrentClipInResults = clips.some(c => String(c.id) === String(selectedId));
+    if (!isCurrentClipInResults && clips.length > 0) {
+      setSelectedId(String(clips[0].id));
+      setIsPlaying(false);
+      setHasError(false);
+      setIsLoading(true);
+      setCurrentTime(0);
+      setDuration(0);
+    }
+  }, [clips, selectedId]);
+
   const handleSaveMemo = (clipId, memoData, playerID) => {
     setMemos((prev) => {
-      // playerID별로 메모를 저장
       const playerMemos = prev[playerID] || {};
       const memoKey = `memo_${clipId}`;
-
       const updated = {
         ...prev,
-        [playerID]: {
-          ...playerMemos,
-          [memoKey]: memoData,
-        },
+        [playerID]: { ...playerMemos, [memoKey]: memoData },
       };
-
-      // localStorage에 저장
       localStorage.setItem(
         `videoMemos:${teamMeta?.gameId}`,
         JSON.stringify(updated),
@@ -263,93 +220,132 @@ function PlayerCore({ stateData }) {
     });
   };
 
-  // 컨텍스트 메뉴 관련 함수
   const handleVideoContextMenu = useCallback((e) => {
-    console.log('우클릭 감지됨!', e); // 디버깅용 로그 추가
-    e.preventDefault(); // 기본 컨텍스트 메뉴 차단
-    e.stopPropagation(); // 이벤트 전파 중단
-
-    setContextMenu({
-      visible: true,
-      x: e.clientX,
-      y: e.clientY,
-    });
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ visible: true, x: e.clientX, y: e.clientY });
   }, []);
 
-  const closeContextMenu = useCallback(() => {
-    setContextMenu({ visible: false, x: 0, y: 0 });
-  }, []);
+  const closeContextMenu = useCallback(
+    () => setContextMenu({ visible: false, x: 0, y: 0 }),
+    [],
+  );
 
-  const handleSystemSettings = useCallback(() => {
+  const handleSystemSettings = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
     navigate('../Member/Settings');
     closeContextMenu();
   }, [closeContextMenu, navigate]);
 
-  const handleEditGameData = useCallback(() => {
+  const handleEditGameData = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
     setShowGameDataModal(true);
     closeContextMenu();
   }, [closeContextMenu]);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (contextMenu.visible) {
-        closeContextMenu();
-      }
-    };
-
+    const handleClickOutside = () => contextMenu.visible && closeContextMenu();
     if (contextMenu.visible) {
       document.addEventListener('click', handleClickOutside);
       document.addEventListener('contextmenu', handleClickOutside);
     }
-
     return () => {
       document.removeEventListener('click', handleClickOutside);
       document.removeEventListener('contextmenu', handleClickOutside);
     };
   }, [contextMenu.visible, closeContextMenu]);
 
-  // Callbacks & Memos
   const closeAllMenus = useCallback(() => setOpenMenu(null), []);
   const handleMenuToggle = useCallback((menuName) => {
     setOpenMenu((prev) => (prev === menuName ? null : menuName));
   }, []);
 
   const selected = useMemo(
-    () =>
-      (normalized || []).find((p) => p.id === selectedId) ||
-      (normalized || [])[0] ||
-      null,
-    [normalized, selectedId],
+    () => clips.find((p) => String(p.id) === selectedId) || null,
+    [clips, selectedId],
   );
 
-  const videoUrl = selected?.videoUrl || null;
   const hasNoVideo = !!selected && !selected.videoUrl;
-  const isPlaySelected = useCallback((id) => id === selectedId, [selectedId]);
+  const isPlaySelected = useCallback(
+    (id) => String(id) === selectedId,
+    [selectedId],
+  );
 
-  const selectPlay = useCallback((id) => {
-    setSelectedId(id || null);
+  // selectPlay를 단순화
+  const selectPlay = useCallback((id, options = {}) => {
+    const newId = String(id);
+    if (newId === selectedId) return;
+    
+    setSelectedId(newId);
+    
+    if (options.autoplay) {
+      pendingAutoplayRef.current = true;
+    }
+    
     setIsPlaying(false);
     setHasError(false);
     setIsLoading(true);
     setCurrentTime(0);
     setDuration(0);
-  }, []);
+  }, [selectedId]);
 
-  // Effects
-  useEffect(() => {
-    const isInitialClipAvailable =
-      initialPlayId &&
-      clips.some((c) => String(c.id) === String(initialPlayId));
-    if (isInitialClipAvailable) {
-      if (selectedId !== initialPlayId) selectPlay(String(initialPlayId));
-    } else if (clips.length > 0) {
-      const isSelectedClipInList =
-        selectedId && clips.some((c) => String(c.id) === selectedId);
-      if (!isSelectedClipInList) selectPlay(String(clips[0].id));
-    } else {
-      selectPlay(null);
+  // 현재 클립의 위치 정보
+  const getCurrentClipPosition = useCallback(() => {
+    if (!selectedId || !clips || clips.length === 0) return null;
+    
+    const currentIndex = clips.findIndex(c => String(c.id) === String(selectedId));
+    if (currentIndex === -1) return null;
+    
+    return {
+      current: currentIndex + 1,
+      total: clips.length,
+      isFirst: currentIndex === 0,
+      isLast: currentIndex === clips.length - 1
+    };
+  }, [selectedId, clips]);
+
+  const clipPosition = getCurrentClipPosition();
+
+  // 필터링된 클립들 기준으로 네비게이션
+  const goNextClip = useCallback(() => {
+    if (!selectedId || !clips || clips.length === 0) return;
+    
+    const currentIndex = clips.findIndex(c => String(c.id) === String(selectedId));
+    
+    if (currentIndex === -1 || currentIndex >= clips.length - 1) return;
+    
+    const nextClip = clips[currentIndex + 1];
+    if (nextClip) {
+      setSelectedId(String(nextClip.id));
+      pendingAutoplayRef.current = true;
+      setIsPlaying(false);
+      setHasError(false);
+      setIsLoading(true);
+      setCurrentTime(0);
+      setDuration(0);
     }
-  }, [clips, initialPlayId, selectedId, selectPlay]);
+  }, [selectedId, clips]);
+
+  const goPrevClip = useCallback(() => {
+    if (!selectedId || !clips || clips.length === 0) return;
+    
+    const currentIndex = clips.findIndex(c => String(c.id) === String(selectedId));
+    
+    if (currentIndex <= 0) return;
+    
+    const prevClip = clips[currentIndex - 1];
+    if (prevClip) {
+      setSelectedId(String(prevClip.id));
+      pendingAutoplayRef.current = true;
+      setIsPlaying(false);
+      setHasError(false);
+      setIsLoading(true);
+      setCurrentTime(0);
+      setDuration(0);
+    }
+  }, [selectedId, clips]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -358,14 +354,8 @@ function PlayerCore({ stateData }) {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !videoUrl) {
-      if (video) video.src = '';
-      return;
-    }
-    if (video.src !== videoUrl) {
-      video.src = videoUrl;
-      video.load();
-    }
+    if (!video) return;
+
     const onLoadedMetadata = () => {
       setDuration(video.duration || 0);
       setIsLoading(false);
@@ -373,19 +363,33 @@ function PlayerCore({ stateData }) {
       setCurrentTime(video.currentTime || 0);
     };
     const onTimeUpdate = () => setCurrentTime(video.currentTime || 0);
-    const onEnded = () => setIsPlaying(false);
+    const onEnded = () => {
+      setIsPlaying(false);
+      goNextClip();
+    };
     const onError = () => {
       setHasError(true);
       setIsLoading(false);
     };
-    const onCanPlay = () => setIsLoading(false);
+    const onCanPlay = () => {
+      setIsLoading(false);
+      if (pendingAutoplayRef.current) {
+        pendingAutoplayRef.current = false;
+        video
+          .play()
+          .then(() => setIsPlaying(true))
+          .catch(() => {});
+      }
+    };
     const onLoadStart = () => setIsLoading(true);
+
     video.addEventListener('loadedmetadata', onLoadedMetadata);
     video.addEventListener('timeupdate', onTimeUpdate);
     video.addEventListener('ended', onEnded);
     video.addEventListener('error', onError);
     video.addEventListener('canplay', onCanPlay);
     video.addEventListener('loadstart', onLoadStart);
+
     return () => {
       video.removeEventListener('loadedmetadata', onLoadedMetadata);
       video.removeEventListener('timeupdate', onTimeUpdate);
@@ -394,7 +398,7 @@ function PlayerCore({ stateData }) {
       video.removeEventListener('canplay', onCanPlay);
       video.removeEventListener('loadstart', onLoadStart);
     };
-  }, [videoUrl]);
+  }, [selectedId, goNextClip]);
 
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
@@ -414,17 +418,43 @@ function PlayerCore({ stateData }) {
     (seconds) => {
       const video = videoRef.current;
       if (!video || hasError || duration === 0) return;
-      const newTime = Math.max(
+      video.currentTime = Math.max(
         0,
         Math.min(duration, video.currentTime + seconds),
       );
-      video.currentTime = newTime;
     },
     [duration, hasError],
   );
 
+  // 이벤트 전파 차단을 포함한 핸들러들
+  const handleTogglePlay = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    togglePlay();
+  }, [togglePlay]);
+
+  const handleStepTime = useCallback((e, seconds) => {
+    e.preventDefault();
+    e.stopPropagation();
+    stepTime(seconds);
+  }, [stepTime]);
+
+  const handleGoNextClip = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    goNextClip();
+  }, [goNextClip]);
+
+  const handleGoPrevClip = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    goPrevClip();
+  }, [goPrevClip]);
+
   const handleTimelineClick = useCallback(
     (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const video = videoRef.current;
       const tl = timelineRef.current;
       if (!video || !tl || hasError || duration === 0) return;
@@ -433,19 +463,24 @@ function PlayerCore({ stateData }) {
       const padding = 10;
       const trackWidth = rect.width - padding * 2;
       const rel = Math.max(0, Math.min(trackWidth, x - padding));
-      const pct = rel / trackWidth;
-      video.currentTime = pct * duration;
+      video.currentTime = (rel / trackWidth) * duration;
     },
     [duration, hasError],
   );
 
   const handleMouseDown = useCallback(
     (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const video = videoRef.current;
       const tl = timelineRef.current;
       if (!video || !tl || hasError || duration === 0) return;
       handleTimelineClick(e);
-      const onMove = (me) => handleTimelineClick(me);
+      const onMove = (me) => {
+        me.preventDefault();
+        me.stopPropagation();
+        handleTimelineClick(me);
+      };
       const onUp = () => {
         document.removeEventListener('mousemove', onMove);
         document.removeEventListener('mouseup', onUp);
@@ -456,28 +491,72 @@ function PlayerCore({ stateData }) {
     [duration, hasError, handleTimelineClick],
   );
 
+  // 키보드 이벤트 중복 방지
   useEffect(() => {
     const onKey = (e) => {
-      if (showMagicPencil || showMemo) return;
-      if (e.target?.tagName === 'INPUT' || e.target?.tagName === 'TEXTAREA')
+      if (
+        showMagicPencil ||
+        showMemo ||
+        e.target?.tagName === 'INPUT' ||
+        e.target?.tagName === 'TEXTAREA' ||
+        e.target?.isContentEditable
+      ) {
         return;
+      }
+
+      if (e.defaultPrevented) return;
+
       const key = e.key.toUpperCase();
-      const backwardKey = settings?.hotkeys?.backward?.toUpperCase();
-      const forwardKey = settings?.hotkeys?.forward?.toUpperCase();
+      const backwardKey = settings?.hotkeys?.backward?.toUpperCase?.() || 'A';
+      const forwardKey = settings?.hotkeys?.forward?.toUpperCase?.() || 'D';
+      const nextKey = settings?.hotkeys?.nextVideo?.toUpperCase?.() || 'N';
+      const prevKey = settings?.hotkeys?.prevVideo?.toUpperCase?.() || 'M';
+
+      let handled = false;
+
       if (key === ' ' && !e.repeat) {
         e.preventDefault();
+        e.stopPropagation();
         togglePlay();
-      } else if (backwardKey && key === backwardKey) {
+        handled = true;
+      } else if (key === backwardKey) {
         e.preventDefault();
+        e.stopPropagation();
         stepTime(-settings.skipTime);
-      } else if (forwardKey && key === forwardKey) {
+        handled = true;
+      } else if (key === forwardKey) {
         e.preventDefault();
+        e.stopPropagation();
         stepTime(settings.skipTime);
+        handled = true;
+      } else if (key === nextKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        goNextClip();
+        handled = true;
+      } else if (key === prevKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        goPrevClip();
+        handled = true;
+      }
+
+      if (handled) {
+        e.stopImmediatePropagation();
       }
     };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [togglePlay, stepTime, settings, showMagicPencil, showMemo]);
+
+    document.addEventListener('keydown', onKey, { capture: true });
+    return () => document.removeEventListener('keydown', onKey, { capture: true });
+  }, [
+    togglePlay,
+    stepTime,
+    settings,
+    showMagicPencil,
+    showMemo,
+    goNextClip,
+    goPrevClip,
+  ]);
 
   const formatTime = (sec) => {
     if (isNaN(sec) || sec === null) return '0:00';
@@ -486,16 +565,18 @@ function PlayerCore({ stateData }) {
     return `${m}:${String(s).padStart(2, '0')}`;
   };
 
-  // UI Helper Variables
+  const downLabel = useMemo(
+    () => (selected ? getDownDisplay(selected) : ''),
+    [selected],
+  );
+
   const homeName = teamMeta?.homeName || 'Home';
   const awayName = teamMeta?.awayName || 'Away';
   const homeLogo = teamMeta?.homeLogo || null;
   const awayLogo = teamMeta?.awayLogo || null;
-  const scoreHome = selected?.scoreHome ?? 0;
-  const scoreAway = selected?.scoreAway ?? 0;
+const scoreHome = selected?.StartScore?.[0]?.Home ?? selected?.scoreHome ?? 0;
+const scoreAway = selected?.StartScore?.[0]?.Away ?? selected?.scoreAway ?? 0;
   const quarter = selected?.quarter ?? 1;
-  const down = selected?.down;
-  const ytg = selected?.yardsToGo;
 
   const teamSummary = summaries.team;
   const quarterSummary = summaries.quarter;
@@ -503,18 +584,32 @@ function PlayerCore({ stateData }) {
     ? PT_LABEL[filters.playType]
     : '유형';
   const significantSummary = summaries.significant;
-  const clearSignificant = () =>
-    setFilters((prev) => ({ ...prev, significantPlay: [] }));
+
+  // 컨테이너 클릭 이벤트 차단
+  const handleContainerClick = useCallback((e) => {
+    e.stopPropagation();
+  }, []);
 
   return (
     <div className="videoPlayerPage">
-      <div className="videoContainer">
-        <button className="videoBackButton" onClick={() => navigate(-1)}>
+      <div className="videoContainer" onClick={handleContainerClick}>
+        <button 
+          className="videoBackButton" 
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            navigate(-1);
+          }}
+        >
           <IoClose size={24} />
         </button>
         <button
           className="videoModalToggleButton"
-          onClick={() => setIsModalOpen((o) => !o)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsModalOpen((o) => !o);
+          }}
         >
           <HiOutlineMenuAlt3 size={24} />
         </button>
@@ -532,11 +627,7 @@ function PlayerCore({ stateData }) {
           </div>
           <div className="scoreCenter">
             <div className="scoreQuarter">Q{quarter}</div>
-            <div className="scoreDown">
-              {typeof down === 'number'
-                ? `${down}${getOrdinal(down)} & ${ytg ?? 0}`
-                : '--'}
-            </div>
+            <div className="scoreDown">{downLabel}</div>
           </div>
           <div className="scoreTeam rightTeam">
             <div className="scoreTeamInfo">
@@ -550,26 +641,6 @@ function PlayerCore({ stateData }) {
             )}
           </div>
         </div>
-
-        <div className="floatingToolButtons">
-          <button
-            className="floatingToolBtn memoBtn"
-            onClick={() => setShowMemo(true)}
-            title="메모 작성"
-          >
-            <FaStickyNote size={24} />
-            {memos[selectedId] && <span className="memoIndicator"></span>}
-          </button>
-          <button
-            className="floatingToolBtn magicPencilBtn"
-            onClick={() => setShowMagicPencil(true)}
-            disabled={isPlaying || hasError || !selected || hasNoVideo}
-            title="매직펜슬 (일시정지 상태에서만 사용 가능)"
-          >
-            <FaPencilAlt size={24} />
-          </button>
-        </div>
-
         <div className="videoScreen">
           <div className="videoPlaceholder">
             <div className="videoContent">
@@ -585,7 +656,7 @@ function PlayerCore({ stateData }) {
                   <div className="videoNoVideoText">표시할 클립이 없습니다</div>
                 </div>
               )}
-              {selected && videoUrl && (
+              {selected && (
                 <>
                   {isLoading && (
                     <div className="videoLoadingMessage">Loading...</div>
@@ -593,18 +664,22 @@ function PlayerCore({ stateData }) {
                   {hasError && (
                     <div className="videoErrorMessage">
                       <div>비디오를 로드할 수 없습니다</div>
-                      <div className="videoErrorUrl">URL: {videoUrl}</div>
+                      <div className="videoErrorUrl">ID: {selected?.id}</div>
                     </div>
                   )}
                   <video
+                    key={selected?.id}
                     ref={videoRef}
                     className={`videoElement ${
                       isLoading || hasError ? 'hidden' : ''
                     }`}
-                    src={videoUrl}
+                    src={selected?.videoUrl || ''}
                     preload="metadata"
                     controls={false}
                     crossOrigin="anonymous"
+                    muted
+                    playsInline
+                    autoPlay={false}
                     onContextMenu={handleVideoContextMenu}
                   />
                 </>
@@ -612,11 +687,37 @@ function PlayerCore({ stateData }) {
             </div>
           </div>
         </div>
+        <div className="floatingToolButtons">
+          <button
+            className="floatingToolBtn memoBtn"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShowMemo(true);
+            }}
+            title="메모 작성"
+          >
+            <FaStickyNote size={24} />
+            {memos[selectedId] && <span className="memoIndicator"></span>}
+          </button>
+          <button
+            className="floatingToolBtn magicPencilBtn"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShowMagicPencil(true);
+            }}
+            disabled={isPlaying || hasError || !selected || hasNoVideo}
+            title="매직펜슬 (일시정지 상태에서만 사용 가능)"
+          >
+            <FaPencilAlt size={24} />
+          </button>
+        </div>
         <div className="videoEditorControls">
           <div className="videoControlsTop">
             <button
               className="videoPlayButton"
-              onClick={togglePlay}
+              onClick={handleTogglePlay}
               disabled={hasError || !selected || hasNoVideo}
             >
               {isPlaying ? (
@@ -635,19 +736,35 @@ function PlayerCore({ stateData }) {
             <div className="videoFrameNavigation">
               <button
                 className="videoFrameStepButton"
-                onClick={() => stepTime(-0.5)}
+                onClick={(e) => handleStepTime(e, -settings.skipTime)}
                 disabled={hasError || !selected}
-                title="Previous 0.5s"
+                title={`Previous ${settings.skipTime}s (A)`}
               >
-                ◀ 0.5s
+                ◀ {settings.skipTime}s
               </button>
               <button
                 className="videoFrameStepButton"
-                onClick={() => stepTime(0.5)}
+                onClick={(e) => handleStepTime(e, settings.skipTime)}
                 disabled={hasError || !selected}
-                title="Next 0.5s"
+                title={`Next ${settings.skipTime}s (D)`}
               >
-                0.5s ▶
+                {settings.skipTime}s ▶
+              </button>
+              <button
+                className="videoFrameStepButton"
+                onClick={handleGoPrevClip}
+                disabled={!selected || !clipPosition || clipPosition.isFirst}
+                title="Previous Clip (M)"
+              >
+                이전 클립
+              </button>
+              <button
+                className="videoFrameStepButton"
+                onClick={handleGoNextClip}
+                disabled={!selected || !clipPosition || clipPosition.isLast}
+                title="Next Clip (N)"
+              >
+                다음 클립
               </button>
             </div>
           </div>
@@ -685,7 +802,11 @@ function PlayerCore({ stateData }) {
         <div className="videoModalClose">
           <button
             className="videoCloseButton"
-            onClick={() => setIsModalOpen(false)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsModalOpen(false);
+            }}
           >
             <IoClose size={20} />
           </button>
@@ -698,21 +819,6 @@ function PlayerCore({ stateData }) {
                   <img
                     src={homeLogo}
                     alt={homeName}
-                    className="videoTeamLogos"
-                  />
-                ) : (
-                  <div className="videoTeamLogos placeholder">
-                    {homeName[0]}
-                  </div>
-                )}
-                <span>{homeName}</span>
-              </div>
-              <div>VS</div>
-              <div className="videoMatchAway">
-                {awayLogo ? (
-                  <img
-                    src={awayLogo}
-                    alt={awayName}
                     className="videoTeamLogos"
                   />
                 ) : (
@@ -738,7 +844,9 @@ function PlayerCore({ stateData }) {
               >
                 <button
                   className={`ff-dd-item ${!filters.quarter ? 'selected' : ''}`}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     handleFilterChange('quarter', null);
                     closeAllMenus();
                   }}
@@ -751,7 +859,9 @@ function PlayerCore({ stateData }) {
                     className={`ff-dd-item ${
                       filters.quarter === q ? 'selected' : ''
                     }`}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       handleFilterChange('quarter', q);
                       closeAllMenus();
                     }}
@@ -769,7 +879,9 @@ function PlayerCore({ stateData }) {
               >
                 <button
                   className={`ff-dd-item ${!filters.team ? 'selected' : ''}`}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     handleFilterChange('team', null);
                     closeAllMenus();
                   }}
@@ -782,7 +894,9 @@ function PlayerCore({ stateData }) {
                     className={`ff-dd-item ${
                       filters.team === opt.value ? 'selected' : ''
                     }`}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       handleFilterChange('team', opt.value);
                       closeAllMenus();
                     }}
@@ -807,7 +921,9 @@ function PlayerCore({ stateData }) {
                   className={`ff-dd-item ${
                     !filters.playType ? 'selected' : ''
                   }`}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     handleFilterChange('playType', null);
                     closeAllMenus();
                   }}
@@ -820,7 +936,9 @@ function PlayerCore({ stateData }) {
                     className={`ff-dd-item ${
                       filters.playType === code ? 'selected' : ''
                     }`}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       handleFilterChange('playType', code);
                       closeAllMenus();
                     }}
@@ -845,45 +963,67 @@ function PlayerCore({ stateData }) {
                           ? 'selected'
                           : ''
                       }`}
-                      onClick={() =>
-                        handleFilterChange('significantPlay', label)
-                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleFilterChange('significantPlay', label);
+                      }}
                     >
                       {label}
                     </button>
                   ))}
                 </div>
                 <div className="ff-dd-actions">
-                  <button className="ff-dd-clear" onClick={clearSignificant}>
+                  <button
+                    className="ff-dd-clear"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setFilters((p) => ({ ...p, significantPlay: [] }));
+                    }}
+                  >
                     모두 해제
                   </button>
-                  <button className="ff-dd-close" onClick={closeAllMenus}>
+                  <button 
+                    className="ff-dd-close" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      closeAllMenus();
+                    }}
+                  >
                     닫기
                   </button>
                 </div>
               </Dropdown>
             </div>
-
             <div className="filterRow">
               <button
                 type="button"
                 className="videoFilterResetButton"
-                onClick={clearAllFilters}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  clearAllFilters();
+                }}
               >
                 초기화
               </button>
             </div>
           </div>
           <div className="videoPlaysList">
-            {normalized.length > 0 ? (
-              normalized.map((p) => (
+            {clips.length > 0 ? (
+              clips.map((p) => (
                 <div
                   key={p.id}
-                  // clip-row 클래스를 사용하고, 선택된 항목에 'selected' 클래스를 추가합니다.
                   className={`clip-row ${
                     isPlaySelected(p.id) ? 'selected' : ''
                   }`}
-                  onClick={() => selectPlay(p.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    selectPlay(p.id, { autoplay: true });
+                  }}
                 >
                   <div className="quarter-name">
                     <div>{p.quarter}Q</div>
@@ -912,7 +1052,6 @@ function PlayerCore({ stateData }) {
                 </div>
               ))
             ) : (
-              // 비어있을 때 표시될 메시지
               <div className="videoNoPlaysMessage">
                 일치하는 클립이 없습니다.
               </div>
@@ -920,10 +1059,15 @@ function PlayerCore({ stateData }) {
           </div>
         </div>
       </div>
+
       {isModalOpen && (
         <div
           className="videoModalOverlay"
-          onClick={() => setIsModalOpen(false)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsModalOpen(false);
+          }}
         />
       )}
       {contextMenu.visible && (
@@ -944,20 +1088,17 @@ function PlayerCore({ stateData }) {
           </div>
         </div>
       )}
-
       <GameDataEditModal
         isVisible={showGameDataModal}
         onClose={() => setShowGameDataModal(false)}
         clipId={selectedId}
         gameId={teamMeta?.gameId}
       />
-
       <MagicPencil
         videoElement={videoRef.current}
         isVisible={showMagicPencil && !isPlaying}
         onClose={() => setShowMagicPencil(false)}
       />
-
       <VideoMemo
         isVisible={showMemo}
         onClose={() => setShowMemo(false)}
@@ -966,24 +1107,21 @@ function PlayerCore({ stateData }) {
         onSaveMemo={handleSaveMemo}
         clipInfo={{
           quarter,
-          down,
-          yardsToGo: ytg,
+          down: selected?.down,
+          yardsToGo: selected?.yardsToGo,
           playType: selected?.playType,
           time: formatTime(currentTime),
         }}
-        // teamPlayers={teamPlayers}
-        // currentUser={currentUser}
       />
     </div>
   );
 }
 
-// 껍데기 역할의 메인 컴포넌트
+/* ================= Shell ================= */
 export default function VideoPlayer() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 데이터가 없으면(새로고침) 에러 메시지를 표시하고, 있으면 PlayerCore를 렌더링합니다.
   if (!location.state) {
     return (
       <div className="videoPlayerPage">
@@ -1005,6 +1143,5 @@ export default function VideoPlayer() {
     );
   }
 
-  // 데이터가 존재하므로 PlayerCore에 props로 전달합니다.
   return <PlayerCore stateData={location.state} />;
 }
