@@ -25,6 +25,7 @@ const dl_analyzer_service_1 = require("./analyzers/dl-analyzer.service");
 const lb_analyzer_service_1 = require("./analyzers/lb-analyzer.service");
 const db_analyzer_service_1 = require("./analyzers/db-analyzer.service");
 const stats_management_service_1 = require("../common/services/stats-management.service");
+const game_service_1 = require("../game/game.service");
 const team_module_1 = require("../team/team.module");
 const auth_module_1 = require("../auth/auth.module");
 const player_schema_1 = require("../schemas/player.schema");
@@ -77,6 +78,7 @@ exports.PlayerModule = PlayerModule = __decorate([
             lb_analyzer_service_1.LbAnalyzerService,
             db_analyzer_service_1.DbAnalyzerService,
             stats_management_service_1.StatsManagementService,
+            game_service_1.GameService,
         ],
         exports: [player_service_1.PlayerService],
     })

@@ -157,6 +157,8 @@ export default function JsonEx() {
         const payload = {
           gameKey: gameData.gameKey,
           date: gameData.date,
+          type: gameData.type,
+          region: gameData.region,
           homeTeam: normalizeTeamName(gameData.homeTeam),
           awayTeam: normalizeTeamName(gameData.awayTeam),
           location: gameData.location,

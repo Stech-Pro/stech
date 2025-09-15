@@ -28,6 +28,7 @@ import { AnalyzeNewClipsDto } from '../common/dto/new-clip.dto';
 import { GameDataDto } from '../common/dto/game-data.dto';
 import { StatsManagementService } from '../common/services/stats-management.service';
 import { TeamStatsAnalyzerService } from '../team/team-stats-analyzer.service';
+import { GameService } from '../game/game.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { User } from '../common/decorators/user.decorator';
 
@@ -38,6 +39,7 @@ export class PlayerController {
     private readonly playerService: PlayerService,
     private readonly statsManagementService: StatsManagementService,
     private readonly teamStatsService: TeamStatsAnalyzerService,
+    private readonly gameService: GameService,
   ) {}
 
   @Post('reset-all')
@@ -380,6 +382,17 @@ export class PlayerController {
       );
 
       console.log('✅ 팀 스탯 업데이트 완료');
+
+      // GameInfo 생성
+      console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
+      try {
+        await this.gameService.createGameInfo(gameData);
+        console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');
+      } catch (gameInfoError) {
+        console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
+        results.errors.push(`GameInfo 생성: ${gameInfoError.message}`);
+      }
+
     } catch (error) {
       console.error('게임 데이터 분석 중 전체 오류:', error);
       require('fs').appendFileSync(

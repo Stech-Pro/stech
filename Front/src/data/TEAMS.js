@@ -4,6 +4,7 @@
 const TEAM_NAME_MAPPING = {
   // 서울
   'YSeagles': 'YSEagles',
+  'YSEagles': 'YSEagles',
   'SNgreenterrors': 'SNGreenTerrors',
   'SNgreenTerrors': 'SNGreenTerrors',
   'HYlions': 'HYLions',
@@ -74,7 +75,21 @@ const TEAM_NAME_MAPPING = {
  */
 export const normalizeTeamName = (teamName) => {
   if (!teamName) return teamName;
-  return TEAM_NAME_MAPPING[teamName] || teamName;
+  
+  // 직접 매핑이 있으면 사용
+  if (TEAM_NAME_MAPPING[teamName]) {
+    return TEAM_NAME_MAPPING[teamName];
+  }
+  
+  // 대소문자 무시하고 매핑 찾기
+  const lowerTeamName = teamName.toLowerCase();
+  for (const [key, value] of Object.entries(TEAM_NAME_MAPPING)) {
+    if (key.toLowerCase() === lowerTeamName) {
+      return value;
+    }
+  }
+  
+  return teamName;
 };
 
 export const TEAMS = [
@@ -196,5 +211,8 @@ export const TEAMS = [
 
 
   //경기강원협회 /게스트용
-  { id: 'GCF',        name: '경기강원올스타',      logo: '/assets/images/svg/teams/gcf.png',                region: 'Gyeonggi-Gangwon'}
+  { id: 'GCF',        name: '경기강원올스타',      logo: '/assets/images/svg/teams/gcf.png',                region: 'Gyeonggi-Gangwon'},
+
+  // Admin 팀
+  { id: 'ADMIN',      name: '관리자',              logo: '/assets/images/svg/teams/Stechlogo.svg',          region: 'Admin' }
 ];

@@ -18,6 +18,7 @@ import { DlAnalyzerService } from './analyzers/dl-analyzer.service';
 import { LbAnalyzerService } from './analyzers/lb-analyzer.service';
 import { DbAnalyzerService } from './analyzers/db-analyzer.service';
 import { StatsManagementService } from '../common/services/stats-management.service';
+import { GameService } from '../game/game.service';
 import { TeamModule } from '../team/team.module';
 import { AuthModule } from '../auth/auth.module';
 import { Player, PlayerSchema } from '../schemas/player.schema';
@@ -83,6 +84,7 @@ import { GameClips, GameClipsSchema } from '../schemas/game-clips.schema';
     LbAnalyzerService,
     DbAnalyzerService,
     StatsManagementService,
+    GameService,
   ],
   exports: [PlayerService /*, PlayerNewService*/],
 })
