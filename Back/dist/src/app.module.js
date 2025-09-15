@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
 const throttler_1 = require("@nestjs/throttler");
+const platform_express_1 = require("@nestjs/platform-express");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_module_1 = require("./auth/auth.module");
@@ -36,6 +37,12 @@ exports.AppModule = AppModule = __decorate([
                     limit: 10,
                 },
             ]),
+            platform_express_1.MulterModule.register({
+                dest: './uploads',
+                limits: {
+                    fileSize: 50 * 1024 * 1024,
+                },
+            }),
             auth_module_1.AuthModule,
             team_module_1.TeamModule,
             video_module_1.VideoModule,

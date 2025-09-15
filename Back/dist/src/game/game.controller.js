@@ -34,6 +34,63 @@ let GameController = class GameController {
         this.gameService = gameService;
         this.s3Service = s3Service;
     }
+    async uploadGameData(gameData) {
+        console.log('🎮 JSON Body로 게임 데이터 업로드 시작');
+        console.log('📊 받은 데이터:', {
+            clips: gameData.clips?.length || 0,
+            gameKey: gameData.gameKey,
+            homeTeam: gameData.homeTeam,
+            awayTeam: gameData.awayTeam,
+        });
+        try {
+            if (!gameData.clips || !Array.isArray(gameData.clips)) {
+                throw new common_1.HttpException({
+                    success: false,
+                    message: '올바른 게임 데이터 형식이 아닙니다 (clips 배열이 필요)',
+                    code: 'INVALID_GAME_DATA_STRUCTURE',
+                }, common_1.HttpStatus.BAD_REQUEST);
+            }
+            console.log(`📊 게임 데이터 검증 완료: ${gameData.clips.length}개 클립`);
+            const processedGameData = {
+                ...gameData,
+                Clips: gameData.clips,
+            };
+            const playerResults = await this.processGameData(processedGameData);
+            console.log('🎯🎯🎯 선수 데이터 처리 완료, 이제 GameInfo 저장 시작 🎯🎯🎯');
+            console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
+            try {
+                await this.gameService.createGameInfo(processedGameData);
+                console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');
+            }
+            catch (gameInfoError) {
+                console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
+            }
+            console.log('💾 경기 클립 데이터 저장 시작...');
+            await this.gameService.saveGameClips(processedGameData);
+            console.log('✅ 경기 클립 데이터 저장 완료');
+            console.log('📊 팀 스탯 계산 시작...');
+            const teamStatsResult = await this.teamStatsService.analyzeTeamStats(processedGameData);
+            console.log('🏈 팀 스탯 계산 결과:', teamStatsResult);
+            console.log('💾 팀 스탯 데이터베이스 저장 시작...');
+            await this.teamStatsService.saveTeamStats(processedGameData.gameKey, teamStatsResult, processedGameData);
+            console.log('✅ 팀 스탯 데이터베이스 저장 완료');
+            console.log('✅ 게임 데이터 및 팀 스탯 처리 완료');
+            return {
+                success: true,
+                message: '게임 데이터 분석 및 저장이 완료되었습니다',
+                data: {
+                    totalClips: gameData.clips.length,
+                    gameKey: gameData.gameKey,
+                    playerResults,
+                    teamStats: teamStatsResult,
+                },
+            };
+        }
+        catch (error) {
+            console.error('❌ 게임 데이터 처리 실패:', error);
+            throw error;
+        }
+    }
     async uploadGameJson(file) {
         try {
             console.log('🎮 게임 JSON 파일 업로드 시작');
@@ -80,9 +137,15 @@ let GameController = class GameController {
             }
             console.log(`📊 게임 데이터 검증 완료: ${gameData.Clips.length}개 클립`);
             const playerResults = await this.processGameData(gameData);
-            console.log('💾 경기 정보 저장 시작...');
-            await this.gameService.createGameInfo(gameData);
-            console.log('✅ 경기 정보 저장 완료');
+            console.log('🎯🎯🎯 선수 데이터 처리 완료, 이제 GameInfo 저장 시작 🎯🎯🎯');
+            console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
+            try {
+                await this.gameService.createGameInfo(gameData);
+                console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');
+            }
+            catch (gameInfoError) {
+                console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
+            }
             console.log('💾 경기 클립 데이터 저장 시작...');
             await this.gameService.saveGameClips(gameData);
             console.log('✅ 경기 클립 데이터 저장 완료');
@@ -267,19 +330,29 @@ let GameController = class GameController {
         return Object.keys(positionCounts).reduce((a, b) => positionCounts[a] > positionCounts[b] ? a : b);
     }
     async getGamesByTeam(teamName) {
-        const games = await this.gameService.findGamesByTeam(teamName);
+        let games;
+        let message;
+        if (teamName.toLowerCase() === 'admin') {
+            games = await this.gameService.findAllGames();
+            message = '모든 경기 정보 조회 성공 (Admin)';
+        }
+        else {
+            games = await this.gameService.findGamesByTeam(teamName);
+            message = `${teamName} 팀의 경기 정보 조회 성공`;
+        }
         if (!games || games.length === 0) {
             throw new common_1.HttpException({
                 success: false,
-                message: `${teamName} 팀의 경기를 찾을 수 없습니다`,
+                message: `${teamName === 'admin' || teamName === 'Admin' ? '등록된 경기를' : `${teamName} 팀의 경기를`} 찾을 수 없습니다`,
                 code: 'TEAM_GAMES_NOT_FOUND',
             }, common_1.HttpStatus.NOT_FOUND);
         }
         return {
             success: true,
-            message: `${teamName} 팀의 경기 정보 조회 성공`,
+            message: message,
             data: games,
             totalGames: games.length,
+            accessLevel: teamName.toLowerCase() === 'admin' ? 'admin' : 'team',
         };
     }
     async getAllGames(req) {
@@ -453,6 +526,21 @@ let GameController = class GameController {
 };
 exports.GameController = GameController;
 __decorate([
+    (0, common_1.Post)('upload-data'),
+    (0, swagger_1.ApiOperation)({
+        summary: '📤 JSON 게임 데이터 업로드 및 자동 분석 (JSON Body)',
+        description: 'JSON 형태의 게임 데이터를 request body로 받아 처리합니다.',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: '✅ 게임 데이터 업로드 및 분석 성공',
+    }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], GameController.prototype, "uploadGameData", null);
+__decorate([
     (0, common_1.Post)('upload-json'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('gameFile')),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
@@ -551,11 +639,11 @@ __decorate([
     (0, common_1.Get)('team/:teamName'),
     (0, swagger_1.ApiOperation)({
         summary: '🏈 팀별 경기 정보 조회',
-        description: '특정 팀이 홈팀 또는 어웨이팀으로 참여한 모든 경기 정보를 조회합니다.',
+        description: '특정 팀이 홈팀 또는 어웨이팀으로 참여한 모든 경기 정보를 조회합니다. Admin 팀인 경우 모든 경기를 반환합니다.',
     }),
     (0, swagger_1.ApiParam)({
         name: 'teamName',
-        description: '조회할 팀 이름',
+        description: '조회할 팀 이름 (Admin의 경우 모든 경기 반환)',
         example: 'HYLions',
     }),
     (0, swagger_1.ApiResponse)({

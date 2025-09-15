@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { MulterModule } from '@nestjs/platform-express';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -27,6 +28,12 @@ import { ContactModule } from './contact/contact.module';
         limit: 10,
       },
     ]),
+    MulterModule.register({
+      dest: './uploads',
+      limits: {
+        fileSize: 50 * 1024 * 1024, // 50MB
+      },
+    }),
     AuthModule,
     TeamModule,
     VideoModule,

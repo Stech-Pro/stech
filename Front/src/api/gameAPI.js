@@ -34,10 +34,18 @@ export async function fetchTeamGames(teamNameOrId) {
     );
   }
 
-  const rows = Array.isArray(data) ? data : [data];
+  // 백엔드 응답 구조: { success: true, data: [...], message: "..." }
+  let games = [];
+  if (typeof data === 'object' && data.success && Array.isArray(data.data)) {
+    games = data.data;
+  } else if (Array.isArray(data)) {
+    games = data;
+  } else if (data && typeof data === 'object') {
+    games = [data];
+  }
 
   // 서버 스키마 → GamePage 스키마 매핑
-  return rows.map((g) => ({
+  return games.map((g) => ({
     gameKey: g.gameKey,                         // 예: 'SNSU20240907'
     date: (g.date || '').slice(0, 10),         // '2024-09-07'
     type: g.type || 'Season',

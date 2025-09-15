@@ -21,16 +21,19 @@ const new_clip_dto_1 = require("../common/dto/new-clip.dto");
 const game_data_dto_1 = require("../common/dto/game-data.dto");
 const stats_management_service_1 = require("../common/services/stats-management.service");
 const team_stats_analyzer_service_1 = require("../team/team-stats-analyzer.service");
+const game_service_1 = require("../game/game.service");
 const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
 const user_decorator_1 = require("../common/decorators/user.decorator");
 let PlayerController = class PlayerController {
     playerService;
     statsManagementService;
     teamStatsService;
-    constructor(playerService, statsManagementService, teamStatsService) {
+    gameService;
+    constructor(playerService, statsManagementService, teamStatsService, gameService) {
         this.playerService = playerService;
         this.statsManagementService = statsManagementService;
         this.teamStatsService = teamStatsService;
+        this.gameService = gameService;
     }
     async resetAllPlayers() {
         console.log('🔄 모든 선수 데이터 초기화 요청');
@@ -144,6 +147,15 @@ let PlayerController = class PlayerController {
             require('fs').appendFileSync('/tmp/team-stats-debug.log', `팀 스탯 분석 결과: ${JSON.stringify(teamStatsResult)}\n`);
             await this.teamStatsService.saveTeamStats(gameData.gameKey, teamStatsResult, gameData);
             console.log('✅ 팀 스탯 업데이트 완료');
+            console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
+            try {
+                await this.gameService.createGameInfo(gameData);
+                console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');
+            }
+            catch (gameInfoError) {
+                console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
+                results.errors.push(`GameInfo 생성: ${gameInfoError.message}`);
+            }
         }
         catch (error) {
             console.error('게임 데이터 분석 중 전체 오류:', error);
@@ -696,6 +708,7 @@ exports.PlayerController = PlayerController = __decorate([
     (0, common_1.Controller)('player'),
     __metadata("design:paramtypes", [player_service_1.PlayerService,
         stats_management_service_1.StatsManagementService,
-        team_stats_analyzer_service_1.TeamStatsAnalyzerService])
+        team_stats_analyzer_service_1.TeamStatsAnalyzerService,
+        game_service_1.GameService])
 ], PlayerController);
 //# sourceMappingURL=player.controller.js.map
