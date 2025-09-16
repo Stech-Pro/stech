@@ -1343,6 +1343,7 @@ export const BASE_GUEST_CLIPS = [
   }
 ];
 
+
 const norm = (s) => String(s || '').replace(/\s+/g, '').toLowerCase();
 
 // 3) 스타트 스코어 주입 함수

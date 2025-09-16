@@ -640,7 +640,7 @@ export default function ClipPage() {
 
       {/* ===== 본문 ===== */}
       <div className="clip-page-container">
-<div className='clip-left'>
+        <div className='clip-left'>
           <div className="clip-header">
             <div className="clip-team left">
               {homeMeta?.logo && (
@@ -712,7 +712,9 @@ export default function ClipPage() {
           )}
         </div>
 
-        <div className="clip-data">
+
+      </div>
+              <div className="clip-data">
           <div className="clip-playcall">
             <div className="clip-playcall-header">플레이콜 비율</div>
             <div className="clip-playcall-content">
@@ -844,7 +846,7 @@ export default function ClipPage() {
           </div>
 
         </div>
-      </div>
+
     </div>
     </div>
   );
