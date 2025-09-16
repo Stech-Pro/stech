@@ -22,7 +22,12 @@ export const API_CONFIG = {
     UPLOAD_VIDEO: '/video/upload',
     JSON_EX: '/player/analyze-game-data',
 
-    
+    //game
     GET_GAMES_BY_TEAM: '/game/team',
+    GET_CLIPS_BY_TEAM: '/game/clips',
+
+    //Team
+        ANALYZE_GAME_PLAYCALL: '/team/analyze-game-playcall',
+
   },
 };

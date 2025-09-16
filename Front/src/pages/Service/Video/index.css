@@ -62,6 +62,7 @@
 .videoScreen {
   flex: 1;
   width: 100%;
+  height: 100%;
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   display: flex;
   align-items: center;
@@ -86,9 +87,8 @@
 }
 
 .videoElement {
-  display: fix;
-  max-width: 100%;
-  max-height: 100%;
+width:100%;
+  height:100%;
   object-fit: contain;
   border-radius: 8px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -174,19 +174,21 @@
 
 /* 편집 스타일 컨트롤 */
 .videoEditorControls {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  /* background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(10, 10, 10, 0.95) 100%); */
-  border-top: 1px solid #333;
   padding: 20px;
-  z-index: 40;
+  z-index: 60;
   /* backdrop-filter: blur(10px); */
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+  /* box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2); */
+  pointer-events: none; 
+  pointer-events: auto;   
 }
 
 .videoControlsTop {
+  width: 112.5rem;
+  justify-self: center;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -283,7 +285,9 @@
 }
 
 .videoFrameStepButton {
-  background: rgba(255, 255, 255, 0.1);
+width: 55px;
+height: 55px;
+background: linear-gradient(0deg, #F77705 0%, #F77705 100%), #F77705;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   color: white;
@@ -310,14 +314,21 @@
 
 /* 프레임 기반 타임라인 */
 .videoTimelineContainer {
+  justify-self: center;
+  width: 112.5rem;
+  border-radius: 20px;
+padding: 25px 30px;
+
   position: relative;
+  display: flex;
   margin-bottom: 15px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(10, 10, 10, 0.95) 100%);
+
 }
 
 .videoTimeline {
   position: relative;
-  height: 60px;
-  background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%);
+  /* background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%); */
   border-radius: 12px;
   border: 1px solid #333;
   cursor: pointer;
@@ -327,10 +338,10 @@
 
 .videoTimelineTrack {
   position: absolute;
+  height: 10px;
   top: 50%;
   left: 10px;
   right: 10px;
-  height: 6px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
   transform: translateY(-50%);
@@ -338,7 +349,7 @@
 }
 
 .videoTimelineProgress {
-  height: 100%;
+  height: 10px;
   background: linear-gradient(90deg, #ee7b1a 0%, #ff9500 100%);
   border-radius: 3px;
   transition: width 0.1s ease;
@@ -1045,4 +1056,140 @@
   .contextMenuItem:active {
     background: #5f6368 !important;
   }
+}
+
+.videoTimelineContainer{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0; /* 기존 여백 제거 */
+  min-height: 26px;
+}
+
+/* 좌/우 시간 라벨 */
+.timeLabel{
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  color: #fff;
+  opacity: 0.95;
+  min-width: 42px;
+  text-align: right;
+}
+.timeLabel.dim{ color: #bdbdbd; opacity: .9; text-align: left; }
+
+/* 공통 버튼 */
+.ctrl{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #fff;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* === 타임라인(너가 쓴 클래스명 유지) === */
+.ctrl.timeline{
+  position: relative;
+  flex: 1;
+  height: 30px;
+  cursor: pointer;
+}
+.timelineTrack{
+  position: absolute;
+  left: 8px; right: 8px; top: 50%;
+  height: 10px; transform: translateY(-50%);
+  background: rgba(255,255,255,0.25);
+  border-radius: 999px;
+}
+.timelineProgress{
+  position: absolute;
+  left: 8px; top: 50%;
+  height: 10px; transform: translateY(-50%);
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 0 8px rgba(255,255,255,0.6);
+  pointer-events: none;
+}
+.timelineHandle{
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255,255,255,0.6);
+  pointer-events: none;
+}
+
+/* === 볼륨(아이콘+슬라이더) === */
+.volume{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 110px;
+}
+.volBtn{ width: 28px; height: 28px; }
+.volSlider{
+  -webkit-appearance: none; appearance: none;
+  width: 84px; height: 4px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 999px;
+  outline: none; cursor: pointer;
+}
+.volSlider::-webkit-slider-thumb{
+  -webkit-appearance: none; appearance: none;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #fff; box-shadow: 0 0 6px rgba(255,255,255,0.5);
+}
+.volSlider::-moz-range-thumb{
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #fff; border: none; box-shadow: 0 0 6px rgba(255,255,255,0.5);
+}
+
+/* === 전체화면 버튼 === */
+.fsBtn{ width: 28px; height: 28px; }
+
+/* 55px 정사각형 배지 */
+.skipSquare{
+  width:55px; height:55px;
+  border-radius:10px;
+  background:#F77705;
+  color:#fff;
+  border:0;
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  box-shadow:0 4px 14px rgba(238,123,26,.35);
+  transition:transform .08s ease, filter .2s ease;
+}
+.skipSquare:hover:not(:disabled){ filter:brightness(1.05); }
+.skipSquare:active:not(:disabled){ transform:translateY(1px); }
+.skipSquare:disabled{ opacity:.45; cursor:not-allowed; }
+
+/* 아이콘 크기 */
+.skipSquare__icon{
+  font-size:22px;      /* 여기로 아이콘 크기 조절 */
+  line-height:1;
+}
+
+/* 뒤로 버튼: 좌우 반전만 */
+.skipSquare--back .skipSquare__icon{
+  transform:scaleX(-1);
+  transform-origin:50% 50%;
+}
+
+/* 우하단 초 텍스트 */
+.skipSquare__sec{
+  position:absolute;
+  right:6px; bottom:4px;
+  font-size:12px; font-weight:800; line-height:1;
+  pointer-events:none;
+}
+
+.nextClipIcon, .prevClipIcon{
+  font-size: 20px;
+  color: white;
 }

@@ -5,7 +5,7 @@ import { MdOutlineHandyman } from 'react-icons/md';
 import { useVideoSettings } from '../hooks/useVideoSettings';
 import './VideoSettingModal.css';
 
-export default function VideoSettingModal({ onClose }) {
+export default function VideoSettingModal({ isVisible, onClose }) {
   console.log('VideoSettingModal 렌더링됨');
   const { settings, updateSetting, updateHotkey, resetSettings } =
     useVideoSettings();
@@ -40,6 +40,8 @@ export default function VideoSettingModal({ onClose }) {
       setCurrentHotkey(null);
     }
   };
+    if (!isVisible) return null;
+
 
   return createPortal(
     <div className="vs-overlay" onClick={onClose}>
