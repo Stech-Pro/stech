@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.d5acb881.css",
-    "main.js": "/static/js/main.659558be.js",
+    "main.css": "/static/css/main.c1a12364.css",
+    "main.js": "/static/js/main.768547e9.js",
     "static/media/HD.png": "/static/media/HD.6849a9fc423dc19d6350.png",
     "static/media/headimg.png": "/static/media/headimg.08a64629290141cfd3f2.png",
     "static/media/DW.png": "/static/media/DW.396463aae2bbdaf327da.png",
@@ -86,11 +86,11 @@
     "static/media/Stechlogo.svg": "/static/media/Stechlogo.2515ff7fa7a75b8f8e85a718db911acc.svg",
     "static/media/teamLogo.png": "/static/media/teamLogo.1cbc0faa7edd66f0a77c.png",
     "index.html": "/index.html",
-    "main.d5acb881.css.map": "/static/css/main.d5acb881.css.map",
-    "main.659558be.js.map": "/static/js/main.659558be.js.map"
+    "main.c1a12364.css.map": "/static/css/main.c1a12364.css.map",
+    "main.768547e9.js.map": "/static/js/main.768547e9.js.map"
   },
   "entrypoints": [
-    "static/css/main.d5acb881.css",
-    "static/js/main.659558be.js"
+    "static/css/main.c1a12364.css",
+    "static/js/main.768547e9.js"
   ]
 }
