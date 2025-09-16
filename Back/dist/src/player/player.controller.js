@@ -156,6 +156,15 @@ let PlayerController = class PlayerController {
                 console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
                 results.errors.push(`GameInfo 생성: ${gameInfoError.message}`);
             }
+            console.log('🎬🎬🎬 경기 클립 데이터 저장 시작... 🎬🎬🎬');
+            try {
+                await this.gameService.saveGameClips(gameData);
+                console.log('✅✅✅ 경기 클립 데이터 저장 완료 ✅✅✅');
+            }
+            catch (gameClipsError) {
+                console.error('❌❌❌ 경기 클립 데이터 저장 실패:', gameClipsError.message);
+                results.errors.push(`GameClips 생성: ${gameClipsError.message}`);
+            }
         }
         catch (error) {
             console.error('게임 데이터 분석 중 전체 오류:', error);

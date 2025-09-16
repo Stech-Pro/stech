@@ -7,6 +7,7 @@ import { useClipFilter } from '../../../../../hooks/useClipFilter';
 import UploadVideoModal from '../../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
 import { useAuth } from '../../../../../context/AuthContext';
+import { API_CONFIG } from '../../../../../config/api';
 
 /* ========== 공용 드롭다운 (이 페이지 내부 구현) ========== */
 function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
@@ -211,7 +212,7 @@ export default function ClipPage() {
     setStatsLoading(true);
     setStatsError(null);
 
-    fetch(`/team/stats/${encodeURIComponent(key)}`)
+    fetch(`${API_CONFIG.BASE_URL}/team/stats/${encodeURIComponent(key)}`)
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
@@ -308,7 +309,7 @@ export default function ClipPage() {
     setClipsLoading(true);
     setClipsError(null);
 
-    fetch(`/game/clips/${encodeURIComponent(key)}`)
+    fetch(`${API_CONFIG.BASE_URL}/game/clips/${encodeURIComponent(key)}`)
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
