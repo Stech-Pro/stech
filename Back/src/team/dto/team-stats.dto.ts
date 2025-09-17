@@ -1,6 +1,58 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
+ * 플레이콜 비율 DTO
+ */
+export class PlayCallRatioDto {
+  @ApiProperty({
+    example: 25,
+    description: '런 플레이 수',
+  })
+  runPlays: number;
+
+  @ApiProperty({
+    example: 35,
+    description: '패스 플레이 수',
+  })
+  passPlays: number;
+
+  @ApiProperty({
+    example: 42,
+    description: '런 비율 (%)',
+  })
+  runPercentage: number;
+
+  @ApiProperty({
+    example: 58,
+    description: '패스 비율 (%)',
+  })
+  passPercentage: number;
+}
+
+/**
+ * 3rd down 스탯 DTO
+ */
+export class ThirdDownStatsDto {
+  @ApiProperty({
+    example: 12,
+    description: '3rd down 시도 수',
+  })
+  attempts: number;
+
+  @ApiProperty({
+    example: 5,
+    description: '3rd down 성공 수',
+  })
+  conversions: number;
+
+  @ApiProperty({
+    example: 42,
+    description: '3rd down 성공률 (%)',
+  })
+  percentage: number;
+}
+
+/**
  * 팀 스탯 데이터 DTO
  */
 export class TeamStatsDataDto {
@@ -63,6 +115,18 @@ export class TeamStatsDataDto {
     description: 'Sack 야드 (러싱야드 차감용)',
   })
   sackYards: number;
+
+  @ApiProperty({
+    type: PlayCallRatioDto,
+    description: '플레이콜 비율',
+  })
+  playCallRatio?: PlayCallRatioDto;
+
+  @ApiProperty({
+    type: ThirdDownStatsDto,
+    description: '3rd down 스탯',
+  })
+  thirdDownStats?: ThirdDownStatsDto;
 }
 
 /**

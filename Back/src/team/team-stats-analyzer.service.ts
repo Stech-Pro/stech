@@ -569,6 +569,24 @@ export class TeamStatsAnalyzerService {
   }
 
   private convertToTeamStatsData(stats: any): TeamStatsData {
+    // 플레이콜 비율 계산
+    const totalPlays = (stats.stats?.passingAttempts || 0) + (stats.stats?.rushingAttempts || 0);
+    const playCallRatio = {
+      runPlays: stats.stats?.rushingAttempts || 0,
+      passPlays: stats.stats?.passingAttempts || 0,
+      runPercentage: totalPlays > 0 ? Math.round(((stats.stats?.rushingAttempts || 0) / totalPlays) * 100) : 0,
+      passPercentage: totalPlays > 0 ? Math.round(((stats.stats?.passingAttempts || 0) / totalPlays) * 100) : 0,
+    };
+
+    // 3rd down 스탯 계산
+    const thirdDownStats = {
+      attempts: stats.stats?.thirdDownAttempts || 0,
+      conversions: stats.stats?.thirdDownMade || 0,
+      percentage: (stats.stats?.thirdDownAttempts || 0) > 0 
+        ? Math.round(((stats.stats?.thirdDownMade || 0) / (stats.stats?.thirdDownAttempts || 0)) * 100) 
+        : 0,
+    };
+
     return {
       teamName: stats.teamName,
       totalYards: stats.stats?.totalYards || 0,
@@ -602,6 +620,8 @@ export class TeamStatsAnalyzerService {
       // 옵셔널 필드들
       touchdowns: stats.stats?.touchdowns,
       fieldGoals: stats.stats?.fieldGoals,
+      playCallRatio: playCallRatio,
+      thirdDownStats: thirdDownStats,
       totalPoints: stats.stats?.totalPoints,
     };
   }
