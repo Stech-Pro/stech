@@ -1,6 +1,6 @@
 export const API_CONFIG = {
   BASE_URL: process.env.REACT_APP_API_URL || 'https://api.stechpro.ai/api',
-  TIMEOUT: 10000,
+  TIMEOUT: 20000,
   ENDPOINTS: {
     //Auth
     CHECK_USER_EXISTS: '/auth/check-user-exists',
@@ -21,6 +21,7 @@ export const API_CONFIG = {
 
     UPLOAD_VIDEO: '/video/upload',
     JSON_EX: '/player/analyze-game-data',
+    DELETE_VIDEOS: '/videoupload',
 
     
     GET_GAMES_BY_TEAM: '/game/team',

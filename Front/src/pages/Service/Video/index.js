@@ -267,7 +267,7 @@ function PlayerCore({ stateData }) {
     [clips, selectedId],
   );
 
-  const hasNoVideo = !!selected && !selected.videoUrl;
+  const hasNoVideo = !!selected && !selected.clipUrl;
   const isPlaySelected = useCallback(
     (id) => String(id) === selectedId,
     [selectedId],
@@ -673,7 +673,7 @@ const scoreAway = selected?.StartScore?.[0]?.Away ?? selected?.scoreAway ?? 0;
                     className={`videoElement ${
                       isLoading || hasError ? 'hidden' : ''
                     }`}
-                    src={selected?.videoUrl || ''}
+                    src={selected?.clipUrl || ''}
                     preload="metadata"
                     controls={false}
                     crossOrigin="anonymous"

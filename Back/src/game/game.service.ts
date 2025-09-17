@@ -36,6 +36,29 @@ export class GameService {
     console.log('  homeTeam:', gameData.homeTeam);
     console.log('  awayTeam:', gameData.awayTeam);
 
+    // 중복 체크: 같은 gameKey가 이미 존재하는지 확인
+    const existingGame = await this.gameInfoModel.findOne({ gameKey: gameData.gameKey });
+    if (existingGame) {
+      console.log(`⚠️ 게임 데이터 중복: ${gameData.gameKey} 이미 존재함. 덮어쓰기 진행.`);
+      
+      // 기존 데이터 업데이트
+      const updatedGame = await this.gameInfoModel.findOneAndUpdate(
+        { gameKey: gameData.gameKey },
+        {
+          date: gameData.date,
+          type: gameData.type,
+          score: gameData.score,
+          region: gameData.region,
+          location: gameData.location,
+          homeTeam: gameData.homeTeam,
+          awayTeam: gameData.awayTeam,
+        },
+        { new: true }
+      );
+      console.log('✅ GameInfo 업데이트 성공:', updatedGame._id);
+      return updatedGame;
+    }
+
     const gameInfo = {
       gameKey: gameData.gameKey,
       date: gameData.date,
@@ -47,7 +70,7 @@ export class GameService {
       awayTeam: gameData.awayTeam,
     };
 
-    console.log('📝 저장할 gameInfo 객체:', JSON.stringify(gameInfo, null, 2));
+    console.log('📝 새로운 gameInfo 저장:', JSON.stringify(gameInfo, null, 2));
 
     try {
       const createdGameInfo = new this.gameInfoModel(gameInfo);

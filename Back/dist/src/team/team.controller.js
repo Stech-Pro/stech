@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const team_service_1 = require("./team.service");
 const team_stats_analyzer_service_1 = require("./team-stats-analyzer.service");
 const game_service_1 = require("../game/game.service");
+const s3_service_1 = require("../common/services/s3.service");
 const team_dto_1 = require("../common/dto/team.dto");
 const team_stats_dto_1 = require("./dto/team-stats.dto");
 const game_analysis_dto_1 = require("./dto/game-analysis.dto");
@@ -27,10 +28,12 @@ let TeamController = class TeamController {
     teamService;
     teamStatsService;
     gameService;
-    constructor(teamService, teamStatsService, gameService) {
+    s3Service;
+    constructor(teamService, teamStatsService, gameService, s3Service) {
         this.teamService = teamService;
         this.teamStatsService = teamStatsService;
         this.gameService = gameService;
+        this.s3Service = s3Service;
     }
     async createTeam(createTeamDto, user) {
         return this.teamService.createTeam(createTeamDto, user._id);
@@ -108,15 +111,26 @@ let TeamController = class TeamController {
             }
             const allGames = await this.gameService.findAllGames();
             console.log('저장된 모든 gameKey들:', allGames.map((game) => game.gameKey));
-            const gameData = await this.gameService.getGameClipsByKey(body.gameKey);
-            console.log('조회된 gameData:', gameData ? '있음' : '없음');
-            if (!gameData) {
+            const clips = await this.gameService.getGameClipsByKey(body.gameKey);
+            console.log('조회된 gameData:', clips ? '있음' : '없음');
+            if (!clips) {
                 return {
                     success: false,
                     message: `${body.gameKey}에 해당하는 경기 데이터를 찾을 수 없습니다. 저장된 gameKey들: ${allGames.map((g) => g.gameKey).join(', ')}`,
                     timestamp: new Date().toISOString(),
                 };
             }
+            console.log(`🎬 ${body.gameKey}의 ${clips.Clips.length}개 클립에 대한 비디오 URL 생성 시작`);
+            const videoUrls = await this.s3Service.generateClipUrls(body.gameKey, clips.Clips.length);
+            const clipsWithUrls = clips.Clips.map((clip, index) => ({
+                ...clip,
+                clipUrl: videoUrls[index] || null,
+            }));
+            const gameData = {
+                ...clips.toObject(),
+                Clips: clipsWithUrls,
+            };
+            console.log(`✅ ${body.gameKey} 클립 URL 매핑 완료: ${videoUrls.length}/${clips.Clips.length}`);
             const result = await this.teamStatsService.analyzeGameForDisplay(gameData);
             return {
                 success: true,
@@ -360,6 +374,7 @@ exports.TeamController = TeamController = __decorate([
     (0, common_1.Controller)('team'),
     __metadata("design:paramtypes", [team_service_1.TeamService,
         team_stats_analyzer_service_1.TeamStatsAnalyzerService,
-        game_service_1.GameService])
+        game_service_1.GameService,
+        s3_service_1.S3Service])
 ], TeamController);
 //# sourceMappingURL=team.controller.js.map

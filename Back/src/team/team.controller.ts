@@ -21,6 +21,7 @@ import {
 import { TeamService } from './team.service';
 import { TeamStatsAnalyzerService } from './team-stats-analyzer.service';
 import { GameService } from '../game/game.service';
+import { S3Service } from '../common/services/s3.service';
 import { CreateTeamDto, UpdateTeamDto } from '../common/dto/team.dto';
 import { TeamStatsSuccessDto, TeamStatsErrorDto } from './dto/team-stats.dto';
 import { TeamRankingResponseDto } from './dto/team-season-stats.dto';
@@ -38,6 +39,7 @@ export class TeamController {
     private readonly teamService: TeamService,
     private readonly teamStatsService: TeamStatsAnalyzerService,
     private readonly gameService: GameService,
+    private readonly s3Service: S3Service,
   ) {}
 
   @Post()
@@ -216,16 +218,42 @@ export class TeamController {
       );
 
       // gameKey로 저장된 경기 데이터 조회
-      const gameData = await this.gameService.getGameClipsByKey(body.gameKey);
-      console.log('조회된 gameData:', gameData ? '있음' : '없음');
+      const clips = await this.gameService.getGameClipsByKey(body.gameKey);
+      console.log('조회된 gameData:', clips ? '있음' : '없음');
 
-      if (!gameData) {
+      if (!clips) {
         return {
           success: false,
           message: `${body.gameKey}에 해당하는 경기 데이터를 찾을 수 없습니다. 저장된 gameKey들: ${allGames.map((g) => g.gameKey).join(', ')}`,
           timestamp: new Date().toISOString(),
         };
       }
+
+      // S3에서 비디오 URL들 가져오기
+      console.log(
+        `🎬 ${body.gameKey}의 ${clips.Clips.length}개 클립에 대한 비디오 URL 생성 시작`,
+      );
+
+      const videoUrls = await this.s3Service.generateClipUrls(
+        body.gameKey,
+        clips.Clips.length,
+      );
+
+      // 클립 데이터에 videoUrl 추가
+      const clipsWithUrls = clips.Clips.map((clip, index) => ({
+        ...clip,
+        clipUrl: videoUrls[index] || null, // URL이 없으면 null
+      }));
+
+      // 원본 데이터 구조 유지하면서 Clips만 수정
+      const gameData = {
+        ...(clips as any).toObject(),
+        Clips: clipsWithUrls,
+      };
+
+      console.log(
+        `✅ ${body.gameKey} 클립 URL 매핑 완료: ${videoUrls.length}/${clips.Clips.length}`,
+      );
 
       const result =
         await this.teamStatsService.analyzeGameForDisplay(gameData);
