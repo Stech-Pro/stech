@@ -9,8 +9,70 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TeamStatsErrorDto = exports.TeamStatsSuccessDto = exports.TeamStatsResultDto = exports.TeamStatsDataDto = void 0;
+exports.TeamStatsErrorDto = exports.TeamStatsSuccessDto = exports.TeamStatsResultDto = exports.TeamStatsDataDto = exports.ThirdDownStatsDto = exports.PlayCallRatioDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
+class PlayCallRatioDto {
+    runPlays;
+    passPlays;
+    runPercentage;
+    passPercentage;
+}
+exports.PlayCallRatioDto = PlayCallRatioDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 25,
+        description: '런 플레이 수',
+    }),
+    __metadata("design:type", Number)
+], PlayCallRatioDto.prototype, "runPlays", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 35,
+        description: '패스 플레이 수',
+    }),
+    __metadata("design:type", Number)
+], PlayCallRatioDto.prototype, "passPlays", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 42,
+        description: '런 비율 (%)',
+    }),
+    __metadata("design:type", Number)
+], PlayCallRatioDto.prototype, "runPercentage", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 58,
+        description: '패스 비율 (%)',
+    }),
+    __metadata("design:type", Number)
+], PlayCallRatioDto.prototype, "passPercentage", void 0);
+class ThirdDownStatsDto {
+    attempts;
+    conversions;
+    percentage;
+}
+exports.ThirdDownStatsDto = ThirdDownStatsDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 12,
+        description: '3rd down 시도 수',
+    }),
+    __metadata("design:type", Number)
+], ThirdDownStatsDto.prototype, "attempts", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 5,
+        description: '3rd down 성공 수',
+    }),
+    __metadata("design:type", Number)
+], ThirdDownStatsDto.prototype, "conversions", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 42,
+        description: '3rd down 성공률 (%)',
+    }),
+    __metadata("design:type", Number)
+], ThirdDownStatsDto.prototype, "percentage", void 0);
 class TeamStatsDataDto {
     teamName;
     totalYards;
@@ -22,6 +84,8 @@ class TeamStatsDataDto {
     turnovers;
     penaltyYards;
     sackYards;
+    playCallRatio;
+    thirdDownStats;
 }
 exports.TeamStatsDataDto = TeamStatsDataDto;
 __decorate([
@@ -94,6 +158,20 @@ __decorate([
     }),
     __metadata("design:type", Number)
 ], TeamStatsDataDto.prototype, "sackYards", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: PlayCallRatioDto,
+        description: '플레이콜 비율',
+    }),
+    __metadata("design:type", PlayCallRatioDto)
+], TeamStatsDataDto.prototype, "playCallRatio", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: ThirdDownStatsDto,
+        description: '3rd down 스탯',
+    }),
+    __metadata("design:type", ThirdDownStatsDto)
+], TeamStatsDataDto.prototype, "thirdDownStats", void 0);
 class TeamStatsResultDto {
     homeTeamStats;
     awayTeamStats;
