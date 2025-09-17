@@ -17,6 +17,7 @@ const player_schema_1 = require("../schemas/player.schema");
 const team_game_stats_schema_1 = require("../schemas/team-game-stats.schema");
 const team_total_stats_schema_1 = require("../schemas/team-total-stats.schema");
 const game_module_1 = require("../game/game.module");
+const s3_service_1 = require("../common/services/s3.service");
 let TeamModule = class TeamModule {
 };
 exports.TeamModule = TeamModule;
@@ -32,7 +33,7 @@ exports.TeamModule = TeamModule = __decorate([
             game_module_1.GameModule,
         ],
         controllers: [team_controller_1.TeamController],
-        providers: [team_service_1.TeamService, team_stats_analyzer_service_1.TeamStatsAnalyzerService],
+        providers: [team_service_1.TeamService, team_stats_analyzer_service_1.TeamStatsAnalyzerService, s3_service_1.S3Service],
         exports: [team_service_1.TeamService, team_stats_analyzer_service_1.TeamStatsAnalyzerService],
     })
 ], TeamModule);

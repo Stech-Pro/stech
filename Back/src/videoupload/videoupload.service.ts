@@ -10,8 +10,8 @@ export class VideoUploadService {
    */
   async generatePresignedUrl(gameKey: string, fileName: string) {
     try {
-      // S3 키 생성: stechpro-frontend/GAMEKEY/FILENAME
-      const s3Key = `stechpro-frontend/${gameKey}/${fileName}`;
+      // S3 키 생성: videos/GAMEKEY/FILENAME
+      const s3Key = `videos/${gameKey}/${fileName}`;
       
       console.log(`🔗 Presigned URL 생성 시작: ${s3Key}`);
 
@@ -50,7 +50,7 @@ export class VideoUploadService {
       const hasVideos = files.length > 0;
       const fileList = files.map(file => {
         // 전체 경로에서 파일명만 추출
-        // stechpro-frontend/HFHY20240907/clip_0_xxx.mp4 → clip_0_xxx.mp4
+        // videos/HFHY20240907/clip_0_xxx.mp4 → clip_0_xxx.mp4
         const parts = file.split('/');
         return parts[parts.length - 1];
       });
@@ -103,6 +103,28 @@ export class VideoUploadService {
       .substring(0, 14); // YYYYMMDDHHMMSS
 
     return `clip_${clipIndex}_${timestamp}.mp4`;
+  }
+
+  /**
+   * 특정 경기의 모든 비디오 파일 삭제
+   */
+  async deleteVideos(gameKey: string) {
+    try {
+      console.log(`🗑️ ${gameKey} 비디오 삭제 요청 시작`);
+
+      // S3Service를 통해 비디오 파일들 삭제
+      const result = await this.s3Service.deleteVideosByGameKey(gameKey);
+
+      console.log(`✅ ${gameKey} 비디오 삭제 완료: ${result.deletedCount}개 파일`);
+
+      return {
+        deletedCount: result.deletedCount,
+        deletedFiles: result.deletedFiles,
+      };
+    } catch (error) {
+      console.error(`❌ ${gameKey} 비디오 삭제 실패:`, error);
+      throw new Error(`비디오 삭제 실패: ${error.message}`);
+    }
   }
 
   /**

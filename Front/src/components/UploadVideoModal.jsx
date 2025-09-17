@@ -351,6 +351,7 @@ const UploadVideoModal = ({
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const handleClose = () => {
     if (loading) return;
@@ -411,6 +412,64 @@ const UploadVideoModal = ({
       setError(err?.message || '업로드 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteVideos = async () => {
+    if (!home || !away || !matchDate) {
+      setError('홈팀, 원정팀, 경기 날짜를 먼저 선택해주세요.');
+      return;
+    }
+
+    // gameKey 생성 (홈팀 + 원정팀 + 날짜)
+    const gameDate = new Date(matchDate);
+    const formattedDate = gameDate.toISOString().slice(0, 10).replace(/-/g, '');
+    const homeCode = home.id.length > 2 ? home.id.slice(0, 2) : home.id;
+    const awayCode = away.id.length > 2 ? away.id.slice(0, 2) : away.id;
+    const gameKey = `${homeCode}${awayCode}${formattedDate}`;
+
+    const confirmDelete = window.confirm(
+      `정말로 ${gameKey} 경기의 모든 비디오를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      setDeleteLoading(true);
+      setError('');
+
+      const token = getToken?.();
+      const resp = await fetch(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELETE_VIDEOS}/${gameKey}`,
+        {
+          method: 'DELETE',
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        }
+      );
+
+      if (!resp.ok) {
+        const errorData = await resp.text();
+        throw new Error(errorData || '비디오 삭제 실패');
+      }
+
+      const result = await resp.json();
+      
+      if (result.success) {
+        alert(`성공적으로 ${result.deletedCount}개의 비디오 파일을 삭제했습니다.`);
+        
+        // 파일 선택 상태 초기화
+        setQ1([]);
+        setQ2([]);
+        setQ3([]);
+        setQ4([]);
+      } else {
+        throw new Error(result.message || '비디오 삭제 실패');
+      }
+    } catch (err) {
+      console.error('비디오 삭제 오류:', err);
+      setError(err?.message || '비디오 삭제 중 오류가 발생했습니다.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -560,11 +619,20 @@ const UploadVideoModal = ({
                 type="button"
                 className="btn ghost"
                 onClick={handleClose}
-                disabled={loading}
+                disabled={loading || deleteLoading}
               >
                 닫기
               </button>
-              <button type="submit" className="btn primary" disabled={loading}>
+              <button
+                type="button"
+                className="btn danger"
+                onClick={handleDeleteVideos}
+                disabled={loading || deleteLoading}
+                style={{ backgroundColor: '#dc3545', color: 'white', marginRight: '8px' }}
+              >
+                {deleteLoading ? '삭제 중…' : '비디오 삭제'}
+              </button>
+              <button type="submit" className="btn primary" disabled={loading || deleteLoading}>
                 {loading ? '업로드 중…' : '경기 업로드'}
               </button>
             </div>

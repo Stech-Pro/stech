@@ -19,6 +19,7 @@ export default function VideoUpload() {
   const [successMessage, setSuccessMessage] = useState('');
   const [dragOver, setDragOver] = useState(false);
   const [existingVideos, setExistingVideos] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -241,6 +242,60 @@ export default function VideoUpload() {
   }, [gameKey, selectedFiles, uploadSingleFile, generateClipFileName]);
 
   // ──────────────────────────────
+  // 비디오 삭제
+  // ──────────────────────────────
+  const handleDeleteVideos = useCallback(async () => {
+    if (!gameKey || !/^[A-Z]{4}[0-9]{8}$/.test(gameKey)) {
+      setErrorMessage('올바른 GameKey를 입력해주세요');
+      return;
+    }
+
+    if (!existingVideos?.hasVideos) {
+      setErrorMessage('삭제할 비디오가 없습니다');
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      `정말로 ${gameKey} 경기의 모든 비디오 ${existingVideos.fileCount}개를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      setDeleteLoading(true);
+      setErrorMessage('');
+      setSuccessMessage('');
+
+      const response = await fetch(`${API_CONFIG.BASE_URL}/videoupload/${gameKey}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${getToken()}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || '비디오 삭제 실패');
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setSuccessMessage(`성공적으로 ${result.deletedCount}개의 비디오 파일을 삭제했습니다!`);
+        // 기존 비디오 정보 새로고침
+        setTimeout(() => checkExistingVideos(gameKey), 1000);
+      } else {
+        throw new Error(result.message || '비디오 삭제 실패');
+      }
+    } catch (error) {
+      console.error('비디오 삭제 오류:', error);
+      setErrorMessage(error?.message || '비디오 삭제 중 오류가 발생했습니다.');
+    } finally {
+      setDeleteLoading(false);
+    }
+  }, [gameKey, existingVideos, checkExistingVideos]);
+
+  // ──────────────────────────────
   // 파일 크기 포맷
   // ──────────────────────────────
   const formatFileSize = useCallback((bytes) => {
@@ -285,6 +340,24 @@ export default function VideoUpload() {
                 <div>
                   <strong>⚠️ 기존 비디오 {existingVideos.fileCount}개 발견!</strong>
                   <p>같은 인덱스 파일은 덮어쓰기됩니다</p>
+                  <div style={{ marginTop: '10px' }}>
+                    <button
+                      type="button"
+                      onClick={handleDeleteVideos}
+                      disabled={deleteLoading || uploadStatus === 'uploading'}
+                      style={{
+                        backgroundColor: '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        padding: '8px 16px',
+                        borderRadius: '4px',
+                        cursor: deleteLoading ? 'not-allowed' : 'pointer',
+                        fontSize: '14px'
+                      }}
+                    >
+                      {deleteLoading ? '삭제 중...' : `기존 비디오 ${existingVideos.fileCount}개 삭제`}
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div>

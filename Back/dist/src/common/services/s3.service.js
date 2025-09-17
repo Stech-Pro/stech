@@ -113,21 +113,60 @@ let S3Service = class S3Service {
                 console.log(`⚠️ ${gameKey}에 비디오 파일이 없습니다`);
                 return [];
             }
-            const urlsToGenerate = Math.min(clipCount, fileKeys.length);
             const signedUrls = [];
-            for (let i = 0; i < urlsToGenerate; i++) {
-                const signedUrl = await this.getSignedUrl(fileKeys[i]);
-                signedUrls.push(signedUrl);
+            for (let i = 0; i < clipCount; i++) {
+                if (i < fileKeys.length) {
+                    const signedUrl = await this.getSignedUrl(fileKeys[i]);
+                    signedUrls.push(signedUrl);
+                }
+                else {
+                    signedUrls.push(null);
+                }
             }
-            console.log(`✅ ${gameKey}에서 ${signedUrls.length}개 클립 URL 생성 완료`);
+            const validUrls = signedUrls.filter(url => url !== null).length;
+            console.log(`✅ ${gameKey}에서 ${validUrls}/${signedUrls.length}개 클립에 비디오 URL 생성 완료`);
             if (clipCount > fileKeys.length) {
-                console.log(`⚠️ 클립 개수(${clipCount})가 파일 개수(${fileKeys.length})보다 많습니다`);
+                console.log(`ℹ️ 클립 개수(${clipCount})가 파일 개수(${fileKeys.length})보다 많습니다 - 일부 클립은 비디오 없음`);
             }
             return signedUrls;
         }
         catch (error) {
             console.error(`❌ 클립 URL 생성 실패 (${gameKey}):`, error.message);
             return [];
+        }
+    }
+    async deleteVideosByGameKey(gameKey) {
+        try {
+            console.log(`🗑️ ${gameKey} 비디오 파일 삭제 시작`);
+            const fileKeys = await this.getVideoFilesByGameKey(gameKey);
+            if (fileKeys.length === 0) {
+                console.log(`⚠️ ${gameKey}에 삭제할 비디오 파일이 없습니다`);
+                return { deletedCount: 0, deletedFiles: [] };
+            }
+            console.log(`📁 삭제할 파일들:`, fileKeys.map(key => key.split('/').pop()));
+            const deletedFiles = [];
+            for (const fileKey of fileKeys) {
+                try {
+                    await this.s3.deleteObject({
+                        Bucket: this.bucketName,
+                        Key: fileKey,
+                    }).promise();
+                    deletedFiles.push(fileKey);
+                    console.log(`✅ 파일 삭제 성공: ${fileKey.split('/').pop()}`);
+                }
+                catch (error) {
+                    console.error(`❌ 파일 삭제 실패 (${fileKey}):`, error.message);
+                }
+            }
+            console.log(`🎉 ${gameKey} 비디오 삭제 완료: ${deletedFiles.length}/${fileKeys.length}개 성공`);
+            return {
+                deletedCount: deletedFiles.length,
+                deletedFiles: deletedFiles.map(key => key.split('/').pop()).filter(Boolean),
+            };
+        }
+        catch (error) {
+            console.error(`❌ ${gameKey} 비디오 삭제 실패:`, error.message);
+            throw new Error(`비디오 삭제 실패: ${error.message}`);
         }
     }
     async generatePresignedUploadUrl(fileKey, contentType = 'video/mp4', expiresIn = 3600) {
@@ -149,15 +188,15 @@ let S3Service = class S3Service {
     }
     async listVideosByGameKey(gameKey) {
         try {
-            console.log(`🔍 S3에서 stechpro-frontend/${gameKey} 폴더의 파일들 조회 시작`);
+            console.log(`🔍 S3에서 videos/${gameKey} 폴더의 파일들 조회 시작`);
             const params = {
                 Bucket: this.bucketName,
-                Prefix: `stechpro-frontend/${gameKey}/`,
+                Prefix: `videos/${gameKey}/`,
                 Delimiter: '/',
             };
             const data = await this.s3.listObjectsV2(params).promise();
             if (!data.Contents || data.Contents.length === 0) {
-                console.log(`❌ stechpro-frontend/${gameKey} 폴더에 파일이 없습니다`);
+                console.log(`❌ videos/${gameKey} 폴더에 파일이 없습니다`);
                 return [];
             }
             const videoFiles = data.Contents.filter((obj) => {
@@ -172,7 +211,7 @@ let S3Service = class S3Service {
                 return indexA - indexB;
             });
             const fileKeys = sortedFiles.map((file) => file.Key).filter((key) => key);
-            console.log(`✅ stechpro-frontend/${gameKey}에서 ${fileKeys.length}개 비디오 파일 발견:`, fileKeys.map(key => key.split('/').pop()));
+            console.log(`✅ videos/${gameKey}에서 ${fileKeys.length}개 비디오 파일 발견:`, fileKeys.map(key => key.split('/').pop()));
             return fileKeys;
         }
         catch (error) {

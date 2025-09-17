@@ -14,6 +14,7 @@ import {
   TeamTotalStatsSchema,
 } from '../schemas/team-total-stats.schema';
 import { GameModule } from '../game/game.module';
+import { S3Service } from '../common/services/s3.service';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { GameModule } from '../game/game.module';
     GameModule,
   ],
   controllers: [TeamController],
-  providers: [TeamService, TeamStatsAnalyzerService],
+  providers: [TeamService, TeamStatsAnalyzerService, S3Service],
   exports: [TeamService, TeamStatsAnalyzerService],
 })
 export class TeamModule {}

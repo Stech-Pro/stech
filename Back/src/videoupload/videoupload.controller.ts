@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Delete,
   Body,
   Param,
   HttpException,
@@ -164,6 +165,75 @@ export class VideoUploadController {
           success: false,
           message: '비디오 목록 조회 중 오류가 발생했습니다',
           code: 'VIDEO_LIST_ERROR',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Delete(':gameKey')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: '🗑️ 경기별 비디오 파일 삭제',
+    description: '특정 경기에 업로드된 모든 비디오 파일을 S3에서 삭제합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 비디오 삭제 성공',
+    schema: {
+      example: {
+        success: true,
+        gameKey: 'HFHY20240907',
+        deletedCount: 3,
+        deletedFiles: [
+          'clip_0_20220604_103740.mp4',
+          'clip_1_20220604_103850.mp4',
+          'clip_2_20220604_103920.mp4',
+        ],
+        message: '3개의 비디오 파일이 삭제되었습니다',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: '❌ 삭제할 비디오가 없음',
+  })
+  async deleteVideos(@Param('gameKey') gameKey: string) {
+    try {
+      if (!/^[A-Z]{4}[0-9]{8}$/.test(gameKey)) {
+        throw new HttpException(
+          {
+            success: false,
+            message: 'gameKey 형식이 올바르지 않습니다 (예: HFHY20240907)',
+            code: 'INVALID_GAMEKEY_FORMAT',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const result = await this.videoUploadService.deleteVideos(gameKey);
+
+      return {
+        success: true,
+        gameKey,
+        ...result,
+        message: result.deletedCount > 0 
+          ? `${result.deletedCount}개의 비디오 파일이 삭제되었습니다`
+          : '삭제할 비디오 파일이 없습니다',
+      };
+    } catch (error) {
+      console.error(`❌ 비디오 삭제 실패 (${gameKey}):`, error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new HttpException(
+        {
+          success: false,
+          message: '비디오 삭제 중 오류가 발생했습니다',
+          code: 'VIDEO_DELETE_ERROR',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
