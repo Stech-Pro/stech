@@ -7,7 +7,7 @@ import { useClipFilter } from '../../../../../hooks/useClipFilter';
 import UploadVideoModal from '../../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
 import { useAuth } from '../../../../../context/AuthContext';
-import { analyzeGamePlaycall } from '../../../../../api/teamAPI';
+import { fetchTeamStatsByKey } from '../../../../../api/teamAPI';
 import { fetchGameClips } from '../../../../../api/gameAPI';
 
 /* ========== 공용 드롭다운 (이 페이지 내부 구현) ========== */
@@ -131,7 +131,12 @@ const normalizeTeamStats = (s) => {
       thirdDownPct: 0,
       turnovers: 0,
       penaltyYards: 0,
-      playCallRatio: { runPlays: 0, passPlays: 0, runPercentage: 0, passPercentage: 0 },
+      playCallRatio: {
+        runPlays: 0,
+        passPlays: 0,
+        runPercentage: 0,
+        passPercentage: 0,
+      },
     };
   }
   return {
@@ -168,11 +173,9 @@ const TEAM_BY_ID = TEAMS.reduce((m, t) => {
   return m;
 }, {});
 
-
-
 /* ========== 메인 컴포넌트 ========== */
 export default function ClipPage() {
-  const { gameKey:gameKeyParam} = useParams();
+  const { gameKey: gameKeyParam } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -193,17 +196,16 @@ export default function ClipPage() {
   /* 업로드 모달 상태 */
   const [showUpload, setShowUpload] = useState(false);
 
-const gameFromState = location.state?.game || null;
+  const gameFromState = location.state?.game || null;
 
-const resolvedGameKey = useMemo(
-  () => gameFromState?.gameKey || gameKeyParam || null,
-  [gameFromState?.gameKey, gameKeyParam]
-);
+  const resolvedGameKey = useMemo(
+    () => gameFromState?.gameKey || gameKeyParam || null,
+    [gameFromState?.gameKey, gameKeyParam],
+  );
 
-const [game, setGame] = useState(gameFromState);
+  const [game, setGame] = useState(gameFromState);
 
-
-useEffect(() => {
+  useEffect(() => {
     if (!resolvedGameKey) {
       setStatsLoading(false);
       return;
@@ -217,8 +219,8 @@ useEffect(() => {
       setStatsLoading(true);
       setStatsError(null);
       try {
-        const stats = await analyzeGamePlaycall(resolvedGameKey, { signal });
-        
+        const stats = await fetchTeamStatsByKey(resolvedGameKey, { signal });
+
         // signal.aborted 체크로 컴포넌트 언마운트 후의 상태 업데이트를 방지합니다.
         if (!signal.aborted) {
           setTeamStats({
@@ -226,7 +228,7 @@ useEffect(() => {
             away: normalizeTeamStats(stats.away),
           });
           // API 응답으로 game 상태도 함께 업데이트하여 데이터 일관성을 유지합니다.
-          setGame(prevGame => ({
+          setGame((prevGame) => ({
             ...prevGame, // 기존에 gameKey 등 다른 정보가 있다면 유지
             home: stats.home?.teamName,
             away: stats.away?.teamName,
@@ -235,7 +237,7 @@ useEffect(() => {
         }
       } catch (err) {
         if (!signal.aborted) {
-          console.error("Failed to fetch game stats:", err);
+          console.error('Failed to fetch game stats:', err);
           setStatsError(err);
         }
       } finally {
@@ -309,60 +311,69 @@ useEffect(() => {
       return `${d} & ${ytg}`;
     }
 
-
     // 다운 정보가 없으면 빈값/대시 등
     return '';
   };
-
 
   /* ========== 예시 클립 데이터(실제 API로 교체) ========== */
   const [rawClips, setRawClips] = useState([]);
   const [clipsLoading, setClipsLoading] = useState(false);
   const [clipsError, setClipsError] = useState(null);
-useEffect(() => {
-  if (!resolvedGameKey) return;
+  useEffect(() => {
+    if (!resolvedGameKey) return;
 
-  let abort = false;
-  setClipsLoading(true);
-  setClipsError(null);
+    let abort = false;
+    setClipsLoading(true);
+    setClipsError(null);
 
-  fetchGameClips(resolvedGameKey)
-    .then((clipsData) => {
-      if (abort) return;
-      
-      // API 데이터를 프론트엔드 형식으로 변환
-      const transformedClips = clipsData.map(clip => ({
-        id: clip.clipKey,
-        quarter: clip.quarter,
-        playType: clip.playType,
-        down: clip.down,
-        yardsToGo: clip.toGoYard,
-        significantPlay: clip.significantPlays?.filter(p => p !== null) || [],
-        offensiveTeam: clip.offensiveTeam,
-        gainYard: clip.gainYard,
-        clipUrl: clip.clipUrl || null
-      }));
-      
-      setRawClips(transformedClips);
-    })
-    .catch((err) => {
-      if (!abort) {
-        console.error('클립 데이터 조회 오류:', err);
-        setClipsError(err);
-      }
-    })
-    .finally(() => {
-      if (!abort) setClipsLoading(false);
-    });
+    fetchGameClips(resolvedGameKey)
+      .then((clipsData) => {
+        if (abort) return;
 
-  return () => {
-    abort = true;
-  };
-}, [resolvedGameKey]);
+        // API 데이터를 프론트엔드 형식으로 변환
+        const transformedClips = clipsData.map((clip, idx) => {
+          const clipKey = String(clip.clipKey ?? clip.id ?? idx); // 도메인 식별자(필수)
+          const uiId = `${clipKey}__${idx}`; // 렌더용 유니크 id
 
+          return {
+            // 식별자들
+            id: uiId, // 렌더 key로 사용
+            clipKey, // 플레이어/API에서 사용할 원본 키
+            playIndex: clip.playIndex ?? idx, // (보조 식별자)
+
+            // 데이터
+            quarter: clip.quarter,
+            playType: clip.playType,
+            down: clip.down,
+            yardsToGo: clip.toGoYard,
+            significantPlay:
+              clip.significantPlays?.filter((p) => p != null) || [],
+            offensiveTeam: clip.offensiveTeam,
+            gainYard: clip.gainYard,
+            clipUrl: clip.clipUrl || null,
+          };
+        });
+        setRawClips(transformedClips);
+      })
+      .catch((err) => {
+        if (!abort) {
+          console.error('클립 데이터 조회 오류:', err);
+          setClipsError(err);
+        }
+      })
+      .finally(() => {
+        if (!abort) setClipsLoading(false);
+      });
+
+    return () => {
+      abort = true;
+    };
+  }, [resolvedGameKey]);
 
   /* ========== 훅 사용 (필터/클립/요약/초기화/네비) ========== */
-  const persistKey = `clipFilters:${game?.gameKey || resolvedGameKey || 'default'}`;
+  const persistKey = `clipFilters:${
+    game?.gameKey || resolvedGameKey || 'default'
+  }`;
   const {
     filters,
     setFilters,
@@ -401,7 +412,9 @@ useEffect(() => {
         teamOptions: teamOptions,
 
         // 2. 비디오 플레이어 UI 구성에 필요한 정보 전달
-        initialPlayId: String(c.id ?? c.ClipKey),
+        initialPlayId: String(c.clipKey),
+        initialPlayIndex: c.playIndex, // (선택) clipKey 중복 대비
+        clipKey: c.clipKey,
         teamMeta: {
           homeName: homeMeta?.name,
           awayName: awayMeta?.name,
@@ -411,7 +424,6 @@ useEffect(() => {
       },
     });
   };
-
 
   return (
     <div className="clip-root">
@@ -604,7 +616,7 @@ useEffect(() => {
 
       {/* ===== 본문 ===== */}
       <div className="clip-page-container">
-        <div className='clip-left'>
+        <div className="clip-left">
           <div className="clip-header">
             <div className="clip-team left">
               {homeMeta?.logo && (
@@ -618,9 +630,7 @@ useEffect(() => {
                   />
                 </div>
               )}
-              <span className="clip-team-name">
-                {homeMeta?.name}
-              </span>
+              <span className="clip-team-name">{homeMeta?.name}</span>
             </div>
 
             <div className="clip-vs">VS</div>
@@ -637,111 +647,141 @@ useEffect(() => {
                   />
                 </div>
               )}
-              <span className="clip-team-name">
-                {awayMeta?.name}
-              </span>
+              <span className="clip-team-name">{awayMeta?.name}</span>
             </div>
           </div>
-        <div className="clip-list">
-          {clips.map((c) => (
-            <div key={c.id} className="clip-row" onClick={() => onClickClip(c)}>
-              <div className="quarter-name">
-                <div>{c.quarter}Q</div>
-              </div>
-              <div className="clip-rows">
-                <div className="clip-row1">
-                  <div className="clip-down">{getDownDisplay(c)}</div>
-                  <div className="clip-type">
-                    #{PT_LABEL[c.playType] || c.playType}
+          <div className="clip-list">
+            {clips.map((c, index) => {
+              const safeKey = c.id ?? `${c.clipKey ?? 'noid'}__${index}`;
+              return (
+                <div
+                  key={safeKey}
+                  className="clip-row"
+                  onClick={() => onClickClip(c)}
+                >
+                  <div className="quarter-name">
+                    <div>{c.quarter}Q</div>
+                  </div>
+
+                  <div className="clip-rows">
+                    <div className="clip-row1">
+                      <div className="clip-down">{getDownDisplay(c)}</div>
+                      <div className="clip-type">
+                        #{PT_LABEL[c.playType] || c.playType}
+                      </div>
+                    </div>
+
+                    <div className="clip-row2">
+                      <div className="clip-oT">{c.offensiveTeam}</div>
+
+                      {Array.isArray(c.significantPlay) &&
+                      c.significantPlay.length > 0 ? (
+                        <div className="clip-sig">
+                          {c.significantPlay.map((t, idx) => (
+                            <span key={`${safeKey}-sig-${idx}`}>#{t}</span>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="clip-sig" />
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="clip-row2">
-                  <div className="clip-oT">{c.offensiveTeam}</div>
-                  {Array.isArray(c.significantPlay) &&
-                  c.significantPlay.length > 0 ? (
-                    <div className="clip-sig">
-                      {c.significantPlay.map((t, idx) => (
-                        <span key={`${c.id}-sig-${idx}`}>#{t}</span>
-                      ))}
+              );
+            })}
+
+            {clips.length === 0 && (
+              <div className="empty">일치하는 플레이가 없습니다.</div>
+            )}
+          </div>
+        </div>
+        <div className="clip-data">
+          {teamStats && !statsLoading && (
+            <div className="clip-playcall">
+              <div className="clip-playcall-header">플레이콜 비율</div>
+              <div className="clip-playcall-content">
+                <div className="playcall-team">
+                  <div className="playcall-team-name">{homeMeta.name}</div>
+                  <div className="pc-run">
+                    <div className="pc-row1">
+                      <div>런</div>
+                      <div>
+                        {teamStats.home?.playCallRatio?.runPercentage ?? 0}%
+                      </div>
                     </div>
-                  ) : (
-                    <div className="clip-sig" />
-                  )}
+                    <div className="pc-row2">
+                      <div
+                        className="bar bar-run"
+                        style={{
+                          width: `${
+                            teamStats.home?.playCallRatio?.runPercentage ?? 0
+                          }%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="pc-pass">
+                    <div className="pc-row1">
+                      <div>패스</div>
+                      <div>
+                        {teamStats.home?.playCallRatio?.passPercentage ?? 0}%
+                      </div>
+                    </div>
+                    <div className="pc-row2">
+                      <div
+                        className="bar bar-pass"
+                        style={{
+                          width: `${
+                            teamStats.home?.playCallRatio?.passPercentage ?? 0
+                          }%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="playcall-team">
+                  <div className="playcall-team-name">{awayMeta.name}</div>
+                  <div className="pc-run">
+                    <div className="pc-row1">
+                      <div>런</div>
+                      <div>
+                        {teamStats.away?.playCallRatio?.runPercentage ?? 0}%
+                      </div>
+                    </div>
+                    <div className="pc-row2">
+                      <div
+                        className="bar bar-run"
+                        style={{
+                          width: `${
+                            teamStats.away?.playCallRatio?.runPercentage ?? 0
+                          }%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="pc-pass">
+                    <div className="pc-row1">
+                      <div>패스</div>
+                      <div>
+                        {teamStats.away?.playCallRatio?.passPercentage ?? 0}%
+                      </div>
+                    </div>
+                    <div className="pc-row2">
+                      <div
+                        className="bar bar-pass"
+                        style={{
+                          width: `${
+                            teamStats.away?.playCallRatio?.passPercentage ?? 0
+                          }%`,
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          ))}
-          {clips.length === 0 && (
-            <div className="empty">일치하는 플레이가 없습니다.</div>
           )}
-        </div>
-
-
-      </div>
-              <div className="clip-data">
-
-{teamStats && !statsLoading && (
-  <div className="clip-playcall">
-    <div className="clip-playcall-header">플레이콜 비율</div>
-    <div className="clip-playcall-content">
-      <div className="playcall-team">
-        <div className="playcall-team-name">{homeMeta.name}</div>
-        <div className="pc-run">
-          <div className="pc-row1">
-            <div>런</div>
-            <div>{teamStats.home?.playCallRatio?.runPercentage ?? 0}%</div>
-          </div>
-          <div className="pc-row2">
-            <div
-              className="bar bar-run"
-              style={{ width: `${teamStats.home?.playCallRatio?.runPercentage ?? 0}%` }}
-            />
-          </div>
-        </div>
-        <div className="pc-pass">
-          <div className="pc-row1">
-            <div>패스</div>
-            <div>{teamStats.home?.playCallRatio?.passPercentage ?? 0}%</div>
-          </div>
-          <div className="pc-row2">
-            <div
-              className="bar bar-pass"
-              style={{ width: `${teamStats.home?.playCallRatio?.passPercentage ?? 0}%` }}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="playcall-team">
-        <div className="playcall-team-name">{awayMeta.name}</div>
-        <div className="pc-run">
-          <div className="pc-row1">
-            <div>런</div>
-            <div>{teamStats.away?.playCallRatio?.runPercentage ?? 0}%</div>
-          </div>
-          <div className="pc-row2">
-            <div
-              className="bar bar-run"
-              style={{ width: `${teamStats.away?.playCallRatio?.runPercentage ?? 0}%` }}
-            />
-          </div>
-        </div>
-        <div className="pc-pass">
-          <div className="pc-row1">
-            <div>패스</div>
-            <div>{teamStats.away?.playCallRatio?.passPercentage ?? 0}%</div>
-          </div>
-          <div className="pc-row2">
-            <div
-              className="bar bar-pass"
-              style={{ width: `${teamStats.away?.playCallRatio?.passPercentage ?? 0}%` }}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
           <div className="clip-teamstats">
             <div className="tsc-header">
               <div className="tsc-team tsc-left">
@@ -812,10 +852,8 @@ useEffect(() => {
               </>
             )}
           </div>
-
         </div>
-
-    </div>
+      </div>
     </div>
   );
 }
