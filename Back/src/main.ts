@@ -11,18 +11,21 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'https://stech-1-0-iz4v.vercel.app',
-      'http://3.34.47.22:3000',
-      'http://www.stechpro.ai',
-      'https://www.stechpro.ai',
-      'http://stechpro.ai',
-      'https://stechpro.ai',
-      'http://stechpro-frontend.s3-website.ap-northeast-2.amazonaws.com',
-      process.env.FRONTEND_URL,
-    ].filter(Boolean),
+    origin: process.env.NODE_ENV === 'development' 
+      ? true  // 개발 환경에서는 모든 origin 허용
+      : [
+          'http://localhost:3000',
+          'http://localhost:3001',
+          'http://localhost:3002',
+          'https://stech-1-0-iz4v.vercel.app',
+          'http://3.34.47.22:3000',
+          'http://www.stechpro.ai',
+          'https://www.stechpro.ai',
+          'http://stechpro.ai',
+          'https://stechpro.ai',
+          'http://stechpro-frontend.s3-website.ap-northeast-2.amazonaws.com',
+          process.env.FRONTEND_URL,
+        ].filter(Boolean),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
