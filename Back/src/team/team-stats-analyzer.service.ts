@@ -20,6 +20,19 @@ export interface TeamStatsResult {
   awayTeamStats: TeamStatsData;
 }
 
+export interface PlayCallRatio {
+  runPlays: number;
+  passPlays: number;
+  runPercentage: number;
+  passPercentage: number;
+}
+
+export interface ThirdDownStats {
+  attempts: number;
+  conversions: number;
+  percentage: number;
+}
+
 export interface TeamStatsData {
   teamName: string;
   totalYards: number;
@@ -57,6 +70,8 @@ export interface TeamStatsData {
   penalties: number;
   touchbacks: number;
   fieldGoalAttempts: number;
+  playCallRatio?: PlayCallRatio;
+  thirdDownStats?: ThirdDownStats;
 }
 
 @Injectable()
