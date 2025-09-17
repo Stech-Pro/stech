@@ -177,9 +177,14 @@ export class TeamController {
   @Post('analyze-game-playcall')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: '🎯 경기 플레이콜 및 주요 스탯 분석 API',
+    summary: '🎯 [DEPRECATED] 경기 플레이콜 및 주요 스탯 분석 API',
     description: `
-    ## 📊 경기 플레이콜 분석 API
+    ## ⚠️ DEPRECATED - /team/stats/{gameKey} API를 사용해주세요
+    
+    이 API는 더 이상 사용되지 않습니다. 
+    팀 스탯 조회 API(/team/stats/{gameKey})에 플레이콜 비율과 3rd down 상세 정보가 추가되었습니다.
+    
+    ### 📊 경기 플레이콜 분석 API
     
     gameKey로 저장된 경기의 플레이콜 비율과 주요 스탯을 분석합니다.
     
@@ -192,6 +197,7 @@ export class TeamController {
     - **턴오버**: 인터셉트 + 펌블 로스트
     - **페널티 야드**: 총 페널티 야드
     `,
+    deprecated: true,
   })
   @ApiResponse({
     status: 200,
