@@ -28,7 +28,9 @@ export const API_CONFIG = {
     GET_CLIPS_BY_TEAM: '/game/clips',
 
     //Team
-        ANALYZE_GAME_PLAYCALL: '/team/analyze-game-playcall',
-
+    GET_TEAM_TOTAL_STATS: '/team/total-stats',
+    GET_TEAM_STATS_BY_KEY: '/team/stats',
+    //Player
+    GET_PLAYER_RANKINGS: '/player/rankings',
   },
 };
