@@ -107,6 +107,31 @@
   transform: translateY(0);
 }
 
+/* 비디오 업로드 버튼 */
+.uploadVideoButton {
+  border-radius: 1.25rem;
+  background: #059669;
+  width: 8.438rem;
+  height: 3.444rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);
+  margin-left: 0.75rem;
+}
+
+.uploadVideoButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.45);
+}
+
+.uploadVideoButton:active {
+  transform: translateY(0);
+}
+
 /* Date picker 래퍼 */
 .datePickerWrap {
   position: relative;

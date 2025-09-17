@@ -21,6 +21,7 @@ const player_module_1 = require("./player/player.module");
 const game_module_1 = require("./game/game.module");
 const admin_module_1 = require("./admin/admin.module");
 const contact_module_1 = require("./contact/contact.module");
+const videoupload_module_1 = require("./videoupload/videoupload.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -50,6 +51,7 @@ exports.AppModule = AppModule = __decorate([
             game_module_1.GameModule,
             admin_module_1.AdminModule,
             contact_module_1.ContactModule,
+            videoupload_module_1.VideoUploadModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

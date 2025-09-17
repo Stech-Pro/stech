@@ -1,0 +1,332 @@
+/* VideoUploadModal.css */
+.video-upload-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.video-upload-modal {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* 헤더 */
+.video-upload-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.video-upload-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-button:hover {
+  color: #374151;
+}
+
+/* 내용 */
+.video-upload-content {
+  padding: 24px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.upload-section {
+  margin-bottom: 24px;
+}
+
+.upload-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-label {
+  display: block;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.required {
+  color: #ef4444;
+}
+
+/* 입력 필드 */
+.gamekey-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  transition: border-color 0.2s;
+}
+
+.gamekey-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.gamekey-input:disabled {
+  background-color: #f9fafb;
+  color: #6b7280;
+}
+
+.file-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.file-input:disabled {
+  background-color: #f9fafb;
+  cursor: not-allowed;
+}
+
+.input-help {
+  display: block;
+  margin-top: 4px;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+/* 기존 비디오 정보 */
+.existing-videos {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.existing-videos.warning {
+  background-color: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+}
+
+.existing-videos.info {
+  background-color: #dbeafe;
+  border: 1px solid #3b82f6;
+  color: #1e40af;
+}
+
+.existing-videos details {
+  margin-top: 8px;
+}
+
+.existing-videos summary {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.existing-videos ul {
+  margin: 8px 0 0 16px;
+  padding: 0;
+}
+
+.existing-videos li {
+  margin: 2px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+}
+
+/* 선택된 파일 목록 */
+.selected-files {
+  margin-top: 16px;
+}
+
+.selected-files h4 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.file-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.file-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  padding: 8px 12px;
+  align-items: center;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.file-item:last-child {
+  border-bottom: none;
+}
+
+.file-index {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #3b82f6;
+  font-size: 0.875rem;
+}
+
+.file-name {
+  color: #374151;
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  color: #6b7280;
+  font-size: 0.8rem;
+  font-family: 'Courier New', monospace;
+}
+
+/* 업로드 진행률 */
+.progress-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.progress-item:last-child {
+  border-bottom: none;
+}
+
+.progress-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.progress-status {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.progress-status.waiting {
+  color: #6b7280;
+}
+
+.progress-status.uploading {
+  color: #3b82f6;
+}
+
+.progress-status.completed {
+  color: #059669;
+}
+
+.progress-status.error {
+  color: #dc2626;
+}
+
+/* 에러 메시지 */
+.error-message {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+/* 푸터 */
+.video-upload-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.upload-status {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+
+.cancel-button {
+  padding: 8px 16px;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  color: #374151;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background-color: #f9fafb;
+}
+
+.cancel-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upload-button {
+  padding: 8px 16px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.upload-button:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.upload-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}

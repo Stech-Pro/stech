@@ -83,6 +83,7 @@ export default function AppRouter() {
       </Route>
       {/* 404 Not Found */}
       <Route path="json" element={<CommonPages.JsonEx />} />
+      <Route path="videoupload" element={<CommonPages.VideoUpload />} />
       <Route path="*" element={<CommonPages.NotFoundPage />} />
     </Routes>
   );

@@ -130,6 +130,77 @@ let S3Service = class S3Service {
             return [];
         }
     }
+    async generatePresignedUploadUrl(fileKey, contentType = 'video/mp4', expiresIn = 3600) {
+        try {
+            const params = {
+                Bucket: this.bucketName,
+                Key: fileKey,
+                Expires: expiresIn,
+                ContentType: contentType,
+            };
+            const uploadUrl = await this.s3.getSignedUrlPromise('putObject', params);
+            console.log(`🔗 업로드 URL 생성 성공: ${fileKey}`);
+            return uploadUrl;
+        }
+        catch (error) {
+            console.error(`❌ 업로드 URL 생성 실패 (${fileKey}):`, error.message);
+            throw new Error(`S3 업로드 URL 생성 실패: ${error.message}`);
+        }
+    }
+    async listVideosByGameKey(gameKey) {
+        try {
+            console.log(`🔍 S3에서 stechpro-frontend/${gameKey} 폴더의 파일들 조회 시작`);
+            const params = {
+                Bucket: this.bucketName,
+                Prefix: `stechpro-frontend/${gameKey}/`,
+                Delimiter: '/',
+            };
+            const data = await this.s3.listObjectsV2(params).promise();
+            if (!data.Contents || data.Contents.length === 0) {
+                console.log(`❌ stechpro-frontend/${gameKey} 폴더에 파일이 없습니다`);
+                return [];
+            }
+            const videoFiles = data.Contents.filter((obj) => {
+                const key = obj.Key || '';
+                return /\.(mp4|avi|mov|mkv|flv|wmv)$/i.test(key);
+            });
+            const sortedFiles = videoFiles.sort((a, b) => {
+                const keyA = a.Key || '';
+                const keyB = b.Key || '';
+                const indexA = parseInt(keyA.match(/clip_(\d+)_/)?.[1] || '999');
+                const indexB = parseInt(keyB.match(/clip_(\d+)_/)?.[1] || '999');
+                return indexA - indexB;
+            });
+            const fileKeys = sortedFiles.map((file) => file.Key).filter((key) => key);
+            console.log(`✅ stechpro-frontend/${gameKey}에서 ${fileKeys.length}개 비디오 파일 발견:`, fileKeys.map(key => key.split('/').pop()));
+            return fileKeys;
+        }
+        catch (error) {
+            console.error(`❌ S3 파일 조회 실패 (${gameKey}):`, error.message);
+            return [];
+        }
+    }
+    async getFilesSize(fileKeys) {
+        try {
+            const fileSizes = [];
+            let totalSize = 0;
+            for (const key of fileKeys) {
+                const params = {
+                    Bucket: this.bucketName,
+                    Key: key,
+                };
+                const headData = await this.s3.headObject(params).promise();
+                const size = headData.ContentLength || 0;
+                fileSizes.push({ key, size });
+                totalSize += size;
+            }
+            return { totalSize, fileSizes };
+        }
+        catch (error) {
+            console.error('❌ 파일 크기 조회 실패:', error.message);
+            throw new Error(`파일 크기 조회 실패: ${error.message}`);
+        }
+    }
 };
 exports.S3Service = S3Service;
 exports.S3Service = S3Service = __decorate([
