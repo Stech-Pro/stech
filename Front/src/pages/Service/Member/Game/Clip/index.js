@@ -7,7 +7,8 @@ import { useClipFilter } from '../../../../../hooks/useClipFilter';
 import UploadVideoModal from '../../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
 import { useAuth } from '../../../../../context/AuthContext';
-import { API_CONFIG } from '../../../../../config/api';
+import { fetchTeamStatsByKey } from '../../../../../api/teamAPI';
+import { fetchGameClips } from '../../../../../api/gameAPI';
 
 /* ========== 공용 드롭다운 (이 페이지 내부 구현) ========== */
 function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
@@ -71,40 +72,46 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
 export const PT_LABEL = {
   RUN: '런',
   PASS: '패스',
-  PASS_INCOMPLETE: '패스 실패',
   KICKOFF: '킥오프',
+  RETURN: '리턴',
   PUNT: '펀트',
   PAT: 'PAT',
-  TWOPT: '2PT',
-  FIELDGOAL: 'FG',
+  TPT: '2PT',
+  FG: 'FG',
+  SACK: '색',
+  NOPASS: '패스 실패',
 };
 const PLAY_TYPES = {
   RUN: 'RUN',
   PASS: 'PASS',
-  PASS_INCOMPLETE: 'PASS_INCOMPLETE',
   KICKOFF: 'KICKOFF',
+  RETURN: 'RETURN',
   PUNT: 'PUNT',
   PAT: 'PAT',
   TWOPT: 'TWOPT',
   FIELDGOAL: 'FIELDGOAL',
+  SACK: 'SACK',
+  NOPASS: 'NOPASS',
 };
 const SIGNIFICANT_PLAYS = {
   TOUCHDOWN: '터치다운',
-  TWOPTCONVGOOD: '2PT 성공',
-  TWOPTCONVNOGOOD: '2PT 실패',
-  PATSUCCESS: 'PAT 성공',
-  PATFAIL: 'PAT 실패',
+  'TWOPTCONV.GOOD': '2PT 성공',
+  'TWOPTCONV.NOGOOD': '2PT 실패',
+  PATGOOD: 'PAT 성공',
+  PATNOGOOD: 'PAT 실패',
   FIELDGOALGOOD: 'FG 성공',
   FIELDGOALNOGOOD: 'FG 실패',
-  PENALTY: '페널티',
   SACK: '색',
   TFL: 'TFL',
+  KICKOFF: '킥오프',
+  PUNT: '펀트',
   FUMBLE: '펌블',
-  INTERCEPTION: '인터셉트',
+  FUMBLERECOFF: '공격 펌블 리커버리',
+  FUMBLERECDEF: '수비 펌블 리커버리',
+  INTERCEPT: '인터셉트',
   TURNOVER: '턴오버',
   SAFETY: '세이프티',
 };
-
 const OPPOSITES = {
   '2PT 성공': '2PT 실패',
   '2PT 실패': '2PT 성공',
@@ -124,29 +131,30 @@ const normalizeTeamStats = (s) => {
       thirdDownPct: 0,
       turnovers: 0,
       penaltyYards: 0,
+      playCallRatio: {
+        runPlays: 0,
+        passPlays: 0,
+        runPercentage: 0,
+        passPercentage: 0,
+      },
     };
   }
-  const thirdDownPct =
-    s.thirdDownPercentage ??
-    s.thirdDownPct ??
-    (s.thirdDownAttempts
-      ? Math.round(((s.thirdDownMade || 0) / s.thirdDownAttempts) * 100)
-      : 0);
-
-  const turnovers =
-    s.turnovers ?? (s.interceptions || 0) + (s.fumblesLost || 0);
-
   return {
     teamName: s.teamName ?? '',
     totalYards: s.totalYards ?? 0,
     passingYards: s.passingYards ?? s.passYards ?? 0,
     rushingYards: s.rushingYards ?? s.rushYards ?? 0,
-    thirdDownPct,
-    turnovers,
+    thirdDownPct: s.thirdDownStats?.percentage ?? 0,
+    turnovers: s.turnovers ?? 0,
     penaltyYards: s.penaltyYards ?? 0,
+    playCallRatio: s.playCallRatio || {
+      runPlays: s.runPlays ?? 0,
+      passPlays: s.passPlays ?? 0,
+      runPercentage: s.runPercentage ?? 0,
+      passPercentage: s.passPercentage ?? 0,
+    },
   };
 };
-
 /* TEAMS에서 이름/영문/코드로 팀 찾기(느슨 매칭) */
 const findTeamMeta = (raw) => {
   if (!raw) return { name: '', logo: null };
@@ -165,8 +173,9 @@ const TEAM_BY_ID = TEAMS.reduce((m, t) => {
   return m;
 }, {});
 
+/* ========== 메인 컴포넌트 ========== */
 export default function ClipPage() {
-  const { gameKey } = useParams();
+  const { gameKey: gameKeyParam } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -187,55 +196,65 @@ export default function ClipPage() {
   /* 업로드 모달 상태 */
   const [showUpload, setShowUpload] = useState(false);
 
-  // GamePage에서 넘어온 상태(가장 빠름)
   const gameFromState = location.state?.game || null;
 
-  // 새로고침 대비: gameKey로 재조회(목업)
+  const resolvedGameKey = useMemo(
+    () => gameFromState?.gameKey || gameKeyParam || null,
+    [gameFromState?.gameKey, gameKeyParam],
+  );
+
   const [game, setGame] = useState(gameFromState);
-  useEffect(() => {
-    if (game) return;
-    if (!gameKey) return;
-    // TODO: 실제 API로 대체
-    setGame({
-      gameKey,
-      home: '한양대 라이온스',
-      away: '연세대 이글스',
-      date: '2024-10-01',
-    });
-  }, [game, gameKey]);
 
   useEffect(() => {
-    const key = game?.gameKey || gameKey;
-    if (!key) return;
+    if (!resolvedGameKey) {
+      setStatsLoading(false);
+      return;
+    }
 
-    let abort = false;
-    setStatsLoading(true);
-    setStatsError(null);
+    // AbortController를 사용하여 클린업을 더 안전하게 처리합니다.
+    const controller = new AbortController();
+    const { signal } = controller;
 
-    fetch(`${API_CONFIG.BASE_URL}/team/stats/${encodeURIComponent(key)}`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then((json) => {
-        if (abort) return;
-        const payload = json?.data || json;
-        setTeamStats({
-          home: normalizeTeamStats(payload?.homeTeamStats),
-          away: normalizeTeamStats(payload?.awayTeamStats),
-        });
-      })
-      .catch((err) => {
-        if (!abort) setStatsError(err);
-      })
-      .finally(() => {
-        if (!abort) setStatsLoading(false);
-      });
+    const fetchGameData = async () => {
+      setStatsLoading(true);
+      setStatsError(null);
+      try {
+        const stats = await fetchTeamStatsByKey(resolvedGameKey, { signal });
 
-    return () => {
-      abort = true;
+        // signal.aborted 체크로 컴포넌트 언마운트 후의 상태 업데이트를 방지합니다.
+        if (!signal.aborted) {
+          setTeamStats({
+            home: normalizeTeamStats(stats.home),
+            away: normalizeTeamStats(stats.away),
+          });
+          // API 응답으로 game 상태도 함께 업데이트하여 데이터 일관성을 유지합니다.
+          setGame((prevGame) => ({
+            ...prevGame, // 기존에 gameKey 등 다른 정보가 있다면 유지
+            home: stats.home?.teamName,
+            away: stats.away?.teamName,
+            // API가 제공하는 다른 게임 정보도 여기에 추가할 수 있습니다.
+          }));
+        }
+      } catch (err) {
+        if (!signal.aborted) {
+          console.error('Failed to fetch game stats:', err);
+          setStatsError(err);
+        }
+      } finally {
+        if (!signal.aborted) {
+          setStatsLoading(false);
+        }
+      }
     };
-  }, [game?.gameKey, gameKey]);
+
+    fetchGameData();
+
+    // 클린업 함수: 컴포넌트가 언마운트되거나 gameKey가 바뀌면 API 요청을 취소합니다.
+    return () => {
+      controller.abort();
+    };
+  }, [resolvedGameKey]); // gameKey가 변경될 때마다 이 effect를 다시 실행합니다.
+
   // 드롭다운 상태
   const [openMenu, setOpenMenu] = useState(null); // 'team'|'quarter'|'playType'|'significant'|null
   const closeAll = () => setOpenMenu(null);
@@ -292,71 +311,54 @@ export default function ClipPage() {
       return `${d} & ${ytg}`;
     }
 
-
     // 다운 정보가 없으면 빈값/대시 등
     return '';
   };
+
   /* ========== 예시 클립 데이터(실제 API로 교체) ========== */
   const [rawClips, setRawClips] = useState([]);
   const [clipsLoading, setClipsLoading] = useState(false);
   const [clipsError, setClipsError] = useState(null);
-
   useEffect(() => {
-    const key = game?.gameKey || gameKey;
-    if (!key) return;
+    if (!resolvedGameKey) return;
 
     let abort = false;
     setClipsLoading(true);
     setClipsError(null);
 
-    fetch(`${API_CONFIG.BASE_URL}/game/clips/${encodeURIComponent(key)}`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then((json) => {
+    fetchGameClips(resolvedGameKey)
+      .then((clipsData) => {
         if (abort) return;
-        const clipsData = json?.data?.Clips || [];
-        
+
         // API 데이터를 프론트엔드 형식으로 변환
-        const transformedClips = clipsData.map(clip => ({
-          id: clip.clipKey,
-          quarter: clip.quarter,
-          playType: clip.playType,
-          down: clip.down,
-          yardsToGo: clip.toGoYard,
-          significantPlay: clip.significantPlays?.filter(p => p !== null) || [],
-          offensiveTeam: clip.offensiveTeam,
-          gainYard: clip.gainYard,
-          clipUrl: clip.clipUrl || null
-        }));
-        
+        const transformedClips = clipsData.map((clip, idx) => {
+          const clipKey = String(clip.clipKey ?? clip.id ?? idx); // 도메인 식별자(필수)
+          const uiId = `${clipKey}__${idx}`; // 렌더용 유니크 id
+
+          return {
+            // 식별자들
+            id: uiId, // 렌더 key로 사용
+            clipKey, // 플레이어/API에서 사용할 원본 키
+            playIndex: clip.playIndex ?? idx, // (보조 식별자)
+
+            // 데이터
+            quarter: clip.quarter,
+            playType: clip.playType,
+            down: clip.down,
+            yardsToGo: clip.toGoYard,
+            significantPlay:
+              clip.significantPlays?.filter((p) => p != null) || [],
+            offensiveTeam: clip.offensiveTeam,
+            gainYard: clip.gainYard,
+            clipUrl: clip.clipUrl || null,
+          };
+        });
         setRawClips(transformedClips);
       })
       .catch((err) => {
         if (!abort) {
           console.error('클립 데이터 조회 오류:', err);
           setClipsError(err);
-          // 오류시 목업 데이터 사용
-          setRawClips([
-            {
-              id: 'mock1',
-              quarter: 1,
-              playType: 'KICKOFF',
-              down: 'kickoff',
-              significantPlay: [],
-              offensiveTeam: homeMeta?.name || '홈팀',
-            },
-            {
-              id: 'mock2',
-              quarter: 1,
-              playType: 'RUN',
-              down: 1,
-              yardsToGo: 10,
-              significantPlay: ['TFL'],
-              offensiveTeam: homeMeta?.name || '홈팀',
-            }
-          ]);
         }
       })
       .finally(() => {
@@ -366,10 +368,12 @@ export default function ClipPage() {
     return () => {
       abort = true;
     };
-  }, [game?.gameKey, gameKey, homeMeta?.name]);
+  }, [resolvedGameKey]);
 
   /* ========== 훅 사용 (필터/클립/요약/초기화/네비) ========== */
-  const persistKey = `clipFilters:${game?.gameKey || gameKey || 'default'}`;
+  const persistKey = `clipFilters:${
+    game?.gameKey || resolvedGameKey || 'default'
+  }`;
   const {
     filters,
     setFilters,
@@ -408,7 +412,9 @@ export default function ClipPage() {
         teamOptions: teamOptions,
 
         // 2. 비디오 플레이어 UI 구성에 필요한 정보 전달
-        initialPlayId: String(c.id ?? c.ClipKey),
+        initialPlayId: String(c.clipKey),
+        initialPlayIndex: c.playIndex, // (선택) clipKey 중복 대비
+        clipKey: c.clipKey,
         teamMeta: {
           homeName: homeMeta?.name,
           awayName: awayMeta?.name,
@@ -418,36 +424,6 @@ export default function ClipPage() {
       },
     });
   };
-
-  const rpStats = useMemo(() => {
-    const calc = (teamName, apiStat) => {
-      if (!teamName) return { runPct: 0, passPct: 0, run: 0, pass: 0 };
-
-      const arr = clips.filter(
-        (c) =>
-          c.offensiveTeam === teamName &&
-          (c.playType === 'RUN' ||
-            c.playType === 'PASS' ||
-            c.playType === 'PASS_INCOMPLETE'),
-      );
-
-      const run = arr.filter((c) => c.playType === 'RUN').length;
-      const pass = arr.length - run;
-      const total = run + pass;
-
-      if (total > 0) {
-        const runPct = Math.round((run / total) * 100);
-        return { runPct, passPct: 100 - runPct, run, pass };
-      }
-
-      return { runPct: 0, passPct: 0, run: 0, pass: 0 };
-    };
-
-    return {
-      home: calc(homeMeta?.name, teamStats?.home),
-      away: calc(awayMeta?.name, teamStats?.away),
-    };
-  }, [clips, homeMeta?.name, awayMeta?.name, teamStats]);
 
   return (
     <div className="clip-root">
@@ -640,7 +616,7 @@ export default function ClipPage() {
 
       {/* ===== 본문 ===== */}
       <div className="clip-page-container">
-<div className='clip-left'>
+        <div className="clip-left">
           <div className="clip-header">
             <div className="clip-team left">
               {homeMeta?.logo && (
@@ -654,9 +630,7 @@ export default function ClipPage() {
                   />
                 </div>
               )}
-              <span className="clip-team-name">
-                {homeMeta?.name}
-              </span>
+              <span className="clip-team-name">{homeMeta?.name}</span>
             </div>
 
             <div className="clip-vs">VS</div>
@@ -673,105 +647,141 @@ export default function ClipPage() {
                   />
                 </div>
               )}
-              <span className="clip-team-name">
-                {awayMeta?.name}
-              </span>
+              <span className="clip-team-name">{awayMeta?.name}</span>
             </div>
           </div>
-        <div className="clip-list">
-          {clips.map((c) => (
-            <div key={c.id} className="clip-row" onClick={() => onClickClip(c)}>
-              <div className="quarter-name">
-                <div>{c.quarter}Q</div>
-              </div>
-              <div className="clip-rows">
-                <div className="clip-row1">
-                  <div className="clip-down">{getDownDisplay(c)}</div>
-                  <div className="clip-type">
-                    #{PT_LABEL[c.playType] || c.playType}
+          <div className="clip-list">
+            {clips.map((c, index) => {
+              const safeKey = c.id ?? `${c.clipKey ?? 'noid'}__${index}`;
+              return (
+                <div
+                  key={safeKey}
+                  className="clip-row"
+                  onClick={() => onClickClip(c)}
+                >
+                  <div className="quarter-name">
+                    <div>{c.quarter}Q</div>
                   </div>
-                </div>
-                <div className="clip-row2">
-                  <div className="clip-oT">{c.offensiveTeam}</div>
-                  {Array.isArray(c.significantPlay) &&
-                  c.significantPlay.length > 0 ? (
-                    <div className="clip-sig">
-                      {c.significantPlay.map((t, idx) => (
-                        <span key={`${c.id}-sig-${idx}`}>#{t}</span>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="clip-sig" />
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-          {clips.length === 0 && (
-            <div className="empty">일치하는 플레이가 없습니다.</div>
-          )}
-        </div>
 
+                  <div className="clip-rows">
+                    <div className="clip-row1">
+                      <div className="clip-down">{getDownDisplay(c)}</div>
+                      <div className="clip-type">
+                        #{PT_LABEL[c.playType] || c.playType}
+                      </div>
+                    </div>
+
+                    <div className="clip-row2">
+                      <div className="clip-oT">{c.offensiveTeam}</div>
+
+                      {Array.isArray(c.significantPlay) &&
+                      c.significantPlay.length > 0 ? (
+                        <div className="clip-sig">
+                          {c.significantPlay.map((t, idx) => (
+                            <span key={`${safeKey}-sig-${idx}`}>#{t}</span>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="clip-sig" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {clips.length === 0 && (
+              <div className="empty">일치하는 플레이가 없습니다.</div>
+            )}
+          </div>
+        </div>
         <div className="clip-data">
-          <div className="clip-playcall">
-            <div className="clip-playcall-header">플레이콜 비율</div>
-            <div className="clip-playcall-content">
-              <div className="playcall-team">
-                <div className="playcall-team-name">{homeMeta.name}</div>
-                <div className="pc-run">
-                  <div className="pc-row1">
-                    <div>런</div>
-                    <div>{rpStats.home.runPct}%</div>
+          {teamStats && !statsLoading && (
+            <div className="clip-playcall">
+              <div className="clip-playcall-header">플레이콜 비율</div>
+              <div className="clip-playcall-content">
+                <div className="playcall-team">
+                  <div className="playcall-team-name">{homeMeta.name}</div>
+                  <div className="pc-run">
+                    <div className="pc-row1">
+                      <div>런</div>
+                      <div>
+                        {teamStats.home?.playCallRatio?.runPercentage ?? 0}%
+                      </div>
+                    </div>
+                    <div className="pc-row2">
+                      <div
+                        className="bar bar-run"
+                        style={{
+                          width: `${
+                            teamStats.home?.playCallRatio?.runPercentage ?? 0
+                          }%`,
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="pc-row2">
-                    <div
-                      className="bar bar-run"
-                      style={{ width: `${rpStats.home.runPct}%` }}
-                    />
+                  <div className="pc-pass">
+                    <div className="pc-row1">
+                      <div>패스</div>
+                      <div>
+                        {teamStats.home?.playCallRatio?.passPercentage ?? 0}%
+                      </div>
+                    </div>
+                    <div className="pc-row2">
+                      <div
+                        className="bar bar-pass"
+                        style={{
+                          width: `${
+                            teamStats.home?.playCallRatio?.passPercentage ?? 0
+                          }%`,
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="pc-pass">
-                  <div className="pc-row1">
-                    <div>패스</div>
-                    <div>{rpStats.home.passPct}%</div>
+
+                <div className="playcall-team">
+                  <div className="playcall-team-name">{awayMeta.name}</div>
+                  <div className="pc-run">
+                    <div className="pc-row1">
+                      <div>런</div>
+                      <div>
+                        {teamStats.away?.playCallRatio?.runPercentage ?? 0}%
+                      </div>
+                    </div>
+                    <div className="pc-row2">
+                      <div
+                        className="bar bar-run"
+                        style={{
+                          width: `${
+                            teamStats.away?.playCallRatio?.runPercentage ?? 0
+                          }%`,
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="pc-row2">
-                    <div
-                      className="bar bar-pass"
-                      style={{ width: `${rpStats.home.passPct}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="playcall-team">
-                <div className="playcall-team-name">{awayMeta.name}</div>
-                <div className="pc-run">
-                  <div className="pc-row1">
-                    <div>런</div>
-                    <div>{rpStats.away.runPct}%</div>
-                  </div>
-                  <div className="pc-row2">
-                    <div
-                      className="bar bar-run"
-                      style={{ width: `${rpStats.away.runPct}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="pc-pass">
-                  <div className="pc-row1">
-                    <div>패스</div>
-                    <div>{rpStats.away.passPct}%</div>
-                  </div>
-                  <div className="pc-row2">
-                    <div
-                      className="bar bar-pass"
-                      style={{ width: `${rpStats.away.passPct}%` }}
-                    />
+                  <div className="pc-pass">
+                    <div className="pc-row1">
+                      <div>패스</div>
+                      <div>
+                        {teamStats.away?.playCallRatio?.passPercentage ?? 0}%
+                      </div>
+                    </div>
+                    <div className="pc-row2">
+                      <div
+                        className="bar bar-pass"
+                        style={{
+                          width: `${
+                            teamStats.away?.playCallRatio?.passPercentage ?? 0
+                          }%`,
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
           <div className="clip-teamstats">
             <div className="tsc-header">
               <div className="tsc-team tsc-left">
@@ -842,10 +852,8 @@ export default function ClipPage() {
               </>
             )}
           </div>
-
         </div>
       </div>
-    </div>
     </div>
   );
 }

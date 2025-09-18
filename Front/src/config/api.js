@@ -23,7 +23,14 @@ export const API_CONFIG = {
     JSON_EX: '/player/analyze-game-data',
     DELETE_VIDEOS: '/videoupload',
 
-    
+    //game
     GET_GAMES_BY_TEAM: '/game/team',
+    GET_CLIPS_BY_TEAM: '/game/clips',
+
+    //Team
+    GET_TEAM_TOTAL_STATS: '/team/total-stats',
+    GET_TEAM_STATS_BY_KEY: '/team/stats',
+    //Player
+    GET_PLAYER_RANKINGS: '/player/rankings',
   },
 };

@@ -35,7 +35,7 @@ const MOCK_GAMES = [
     // 필터/정렬용 ISO (KST 기준이면 +09:00)
     dateISO: '2025-06-01T11:00:00+09:00',
     homeId: 'GCF',
-    awayId: 'VI',
+    awayId: 'seoulVI',
     homeScore: 6,
     awayScore: 24,
     type: 'Friendly match',
