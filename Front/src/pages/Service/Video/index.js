@@ -180,6 +180,12 @@ function PlayerCore({ stateData }) {
     if (initializationDone.current) return;
     
     if (clips && clips.length > 0) {
+      console.log('📋 Initial clips loaded:', clips.map(c => ({
+        id: c.id,
+        clipUrl: c.clipUrl,
+        playType: c.playType
+      })));
+      
       const targetId = initialPlayId && clips.some(c => String(c.id) === String(initialPlayId))
         ? String(initialPlayId)
         : String(clips[0].id);
@@ -276,6 +282,11 @@ function PlayerCore({ stateData }) {
   // selected가 변경될 때 비디오 소스 강제 리로드
   useEffect(() => {
     if (selected && selected.clipUrl && videoRef.current) {
+      console.log('🎥 Loading new video:', {
+        id: selected.id,
+        clipUrl: selected.clipUrl,
+        currentSrc: videoRef.current.src
+      });
       videoRef.current.load();
     }
   }, [selected?.clipUrl]);
@@ -284,6 +295,12 @@ function PlayerCore({ stateData }) {
   const selectPlay = useCallback((id, options = {}) => {
     const newId = String(id);
     if (newId === selectedId) return;
+    
+    console.log('🎬 selectPlay called:', {
+      newId,
+      currentSelectedId: selectedId,
+      clips: clips.map(c => ({ id: c.id, clipUrl: c.clipUrl }))
+    });
     
     setSelectedId(newId);
     
@@ -301,7 +318,7 @@ function PlayerCore({ stateData }) {
     if (videoRef.current) {
       videoRef.current.load();
     }
-  }, [selectedId]);
+  }, [selectedId, clips]);
 
   // 현재 클립의 위치 정보
   const getCurrentClipPosition = useCallback(() => {
