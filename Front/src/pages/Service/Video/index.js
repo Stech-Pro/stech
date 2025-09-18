@@ -152,7 +152,7 @@ function PlayerCore({ stateData }) {
       persistKey: `videoPlayerFilters:${teamMeta?.homeName || 'default'}`,
     }),
     [],
-  ); // 빈 의존성 배열로 고정
+  );
 
   const {
     clips = [],

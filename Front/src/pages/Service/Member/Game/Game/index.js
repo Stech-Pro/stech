@@ -1,5 +1,4 @@
 // src/pages/Service/Member/Game/GamePage.jsx
-// (id 기반으로 전면 수정)
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -7,7 +6,7 @@ import { FaChevronDown, FaRegFileAlt } from 'react-icons/fa';
 import { useAuth } from '../../../../../context/AuthContext.js';
 import { fetchTeamGames } from '../../../../../api/gameAPI.js';
 import './GamePage.css';
-import { TEAMS } from '../../../../../data/TEAMS';
+import { TEAMS, TEAM_BY_ID } from '../../../../../data/TEAMS';
 import CalendarDropdown from '../../../../../components/Calendar.jsx';
 import UploadVideoModal from '../../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
@@ -24,11 +23,6 @@ const REGION_LABEL = {
   Amateur: '사회인',
 };
 
-/** 빠른 조회용 맵 (id → 팀 메타) */
-const TEAM_BY_ID = TEAMS.reduce((m, t) => {
-  m[t.id] = t;
-  return m;
-}, {});
 
 export default function GamePage() {
   const { user } = useAuth();
@@ -57,7 +51,7 @@ export default function GamePage() {
   const [selectedType, setSelectedType] = useState(null);
 
   const [showOpps, setShowOpps] = useState(false);
-  const [selectedOpps, setSelectedOpps] = useState(null); // 선택한 상대: 팀 객체(= TEAMS의 요소)
+  const [selectedOpps, setSelectedOpps] = useState(null);
   const [activeLeague, setActiveLeague] = useState(null);
 
   const [showUpload, setShowUpload] = useState(false);
