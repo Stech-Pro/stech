@@ -14,6 +14,25 @@ import {
 
 @Injectable()
 export class GameService {
+  // 잘못된 팀명을 올바른 팀명으로 매핑하는 맵
+  private readonly teamNameFixes = {
+    'KMRazorbacks': 'KMrazorbacks',
+    'YSEagles': 'YSeagles',
+    'SNGreenTerrors': 'SNgreenterrors',
+    'HYLions': 'HYlions',
+    'USCityhawks': 'UScityhawks',
+    'HFBlackKnights': 'HFblackKnights',
+    'KKRagingbulls': 'KKragingbulls',
+    'HICowboys': 'HIcowboys',
+    'KUTigers': 'KUtigers',
+    'DongkukTuskers': 'DongkukTuskers', // 이미 올바른 형태
+    'SSCrusaders': 'SScrusaders',
+    'CABluedragons': 'CAbluedragons',
+    'KHCommanders': 'KHcommanders',
+    'SGAlbatross': 'SGalbatross',
+    // 추가로 필요한 매핑들을 여기에 추가
+  };
+
   constructor(
     @InjectModel(GameInfo.name)
     private gameInfoModel: Model<GameInfoDocument>,
@@ -25,6 +44,17 @@ export class GameService {
     private teamTotalStatsModel: Model<TeamTotalStatsDocument>,
   ) {}
 
+  /**
+   * 잘못된 팀명을 올바른 형태로 변환
+   */
+  private fixTeamName(teamName: string): string {
+    if (this.teamNameFixes[teamName]) {
+      console.log(`🔧 팀명 수정: ${teamName} → ${this.teamNameFixes[teamName]}`);
+      return this.teamNameFixes[teamName];
+    }
+    return teamName;
+  }
+
   async createGameInfo(gameData: any): Promise<GameInfo> {
     console.log('🔍 createGameInfo 호출됨, gameData 필드들:');
     console.log('  gameKey:', gameData.gameKey);
@@ -35,6 +65,10 @@ export class GameService {
     console.log('  location:', gameData.location);
     console.log('  homeTeam:', gameData.homeTeam);
     console.log('  awayTeam:', gameData.awayTeam);
+
+    // 팀명 수정
+    const fixedHomeTeam = this.fixTeamName(gameData.homeTeam);
+    const fixedAwayTeam = this.fixTeamName(gameData.awayTeam);
 
     // 중복 체크: 같은 gameKey가 이미 존재하는지 확인
     const existingGame = await this.gameInfoModel.findOne({ gameKey: gameData.gameKey });
@@ -50,8 +84,8 @@ export class GameService {
           score: gameData.score,
           region: gameData.region,
           location: gameData.location,
-          homeTeam: gameData.homeTeam,
-          awayTeam: gameData.awayTeam,
+          homeTeam: fixedHomeTeam,
+          awayTeam: fixedAwayTeam,
         },
         { new: true }
       );
@@ -66,8 +100,8 @@ export class GameService {
       score: gameData.score,
       region: gameData.region,
       location: gameData.location,
-      homeTeam: gameData.homeTeam,
-      awayTeam: gameData.awayTeam,
+      homeTeam: fixedHomeTeam,
+      awayTeam: fixedAwayTeam,
     };
 
     console.log('📝 새로운 gameInfo 저장:', JSON.stringify(gameInfo, null, 2));
@@ -108,8 +142,8 @@ export class GameService {
       score: gameData.score,
       region: gameData.region,
       location: gameData.location,
-      homeTeam: gameData.homeTeam,
-      awayTeam: gameData.awayTeam,
+      homeTeam: this.fixTeamName(gameData.homeTeam),
+      awayTeam: this.fixTeamName(gameData.awayTeam),
     };
 
     return this.gameInfoModel
@@ -168,6 +202,13 @@ export class GameService {
 
   // 경기 클립 데이터 저장 (전체 데이터 포함)
   async saveGameClips(gameData: any): Promise<GameClips> {
+    // 팀명 수정
+    const fixedGameData = {
+      ...gameData,
+      homeTeam: this.fixTeamName(gameData.homeTeam),
+      awayTeam: this.fixTeamName(gameData.awayTeam),
+    };
+
     const existingClips = await this.gameClipsModel.findOne({
       gameKey: gameData.gameKey,
     });
@@ -175,14 +216,14 @@ export class GameService {
     if (existingClips) {
       // 이미 존재하면 업데이트
       return this.gameClipsModel
-        .findOneAndUpdate({ gameKey: gameData.gameKey }, gameData, {
+        .findOneAndUpdate({ gameKey: gameData.gameKey }, fixedGameData, {
           new: true,
         })
         .exec();
     }
 
     // 새로 생성
-    const createdGameClips = new this.gameClipsModel(gameData);
+    const createdGameClips = new this.gameClipsModel(fixedGameData);
     return createdGameClips.save();
   }
 
