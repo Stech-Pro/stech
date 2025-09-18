@@ -108,7 +108,7 @@ let S3Service = class S3Service {
     }
     async generateClipUrls(gameKey, clipCount) {
         try {
-            const fileKeys = await this.getVideoFilesByGameKey(gameKey);
+            const fileKeys = await this.listVideosByGameKey(gameKey);
             if (fileKeys.length === 0) {
                 console.log(`⚠️ ${gameKey}에 비디오 파일이 없습니다`);
                 return [];
@@ -116,10 +116,14 @@ let S3Service = class S3Service {
             const signedUrls = [];
             for (let i = 0; i < clipCount; i++) {
                 if (i < fileKeys.length) {
+                    const fileName = fileKeys[i].split('/').pop();
+                    console.log(`🔗 클립 ${i}번에 ${fileName} 파일 URL 생성 중...`);
                     const signedUrl = await this.getSignedUrl(fileKeys[i]);
                     signedUrls.push(signedUrl);
+                    console.log(`✅ 클립 ${i}번 URL 생성 완료: ${fileName}`);
                 }
                 else {
+                    console.log(`⚠️ 클립 ${i}번: 비디오 파일 없음 (null로 설정)`);
                     signedUrls.push(null);
                 }
             }
@@ -208,10 +212,11 @@ let S3Service = class S3Service {
                 const keyB = b.Key || '';
                 const indexA = parseInt(keyA.match(/clip_(\d+)_/)?.[1] || '999');
                 const indexB = parseInt(keyB.match(/clip_(\d+)_/)?.[1] || '999');
+                console.log(`🔍 파일 정렬: ${keyA.split('/').pop()} (index: ${indexA}) vs ${keyB.split('/').pop()} (index: ${indexB})`);
                 return indexA - indexB;
             });
             const fileKeys = sortedFiles.map((file) => file.Key).filter((key) => key);
-            console.log(`✅ videos/${gameKey}에서 ${fileKeys.length}개 비디오 파일 발견:`, fileKeys.map(key => key.split('/').pop()));
+            console.log(`✅ videos/${gameKey}에서 ${fileKeys.length}개 비디오 파일 발견 (정렬 후):`, fileKeys.map(key => key.split('/').pop()));
             return fileKeys;
         }
         catch (error) {
