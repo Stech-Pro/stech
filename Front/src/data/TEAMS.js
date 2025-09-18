@@ -1,214 +1,63 @@
 // src/data/TEAMS.js
-
-// 팀명 정규화 매핑 (JSON에서 오는 팀명 → 표준 팀명)
-const TEAM_NAME_MAPPING = {
-  // 서울
-  'YSeagles': 'YSEagles',
-  'YSEagles': 'YSEagles',
-  'SNgreenterrors': 'SNGreenTerrors',
-  'SNgreenTerrors': 'SNGreenTerrors',
-  'HYlions': 'HYLions',
-  'KMrazorbacks': 'KMRazorbacks',
-  'UScityhawks': 'USCityhawks',
-  'HFblackknights': 'HFBlackKnights',
-  'HFblackKnights': 'HFBlackKnights',
-  'KKragingbulls': 'KKRagingBulls',
-  'KKragingBulls': 'KKRagingBulls',
-  'HIcowboys': 'HICowboys',
-  'KUtigers': 'KUTigers',
-  'DongkukTuskers': 'DGTuskers',
-  'DGtuskers': 'DGTuskers',
-  'SScrusaders': 'SSCrusaders',
-  'CAbluedragons': 'CABlueDragons',
-  'KHcommanders': 'KHCommanders',
-  'SGalbatross': 'SGAlbatross',
-  
-  // 경기강원권
-  'SKroyals': 'SKRoyals',
-  'KWcapra': 'KWCapras',
-  'DKkodiakbears': 'DKKodiakBears',
-  'YIwhitetigers': 'YIWhiteTigers',
-  'IHtealdragons': 'IHTealDragons',
-  'HLphoenix': 'HLPhoenix',
-  'HSkillerwhales': 'HSKillerWhales',
-  'KAmavericks': 'KAMavericks',
-  
-  // 대구경북권
-  'KPorangefighters': 'KBOrangeFighters',
-  'KIblackbears': 'KIBlackBears',
-  'KeimyungSuperlions': 'KMSuperLions',
-  'KOravens': 'KOTRavens',
-  'DCscudangels': 'DCUScudAngels',
-  'DGflyingtigers': 'DUFlyingTigers',
-  'DHrhinos': 'DHURhinos',
-  'DongkukWhiteelephants': 'DGWhiteElephants',
-  'YNpegasus': 'YNPegasus',
-  'HDholyrams': 'HDHolyRams',
-  
-  // 부산경남권
-  'GSdrangons': 'GSDragons',
-  'BSeagles': 'PNUEagles',
-  'HHvikings': 'KMOUVikings',
-  'SLdevils': 'SUDevils',
-  'BKmadmobydicks': 'BKMadMobyDicks',
-  'DUturtlefighters': 'DEUTurtleFighters',
-  'DAleopards': 'DALeopards',
-  'DSbluedolphins': 'DSBlueDolphins',
-  'DSblueDolphons': 'DSBlueDolphins',
-  'BFtornado': 'BUFSTornados',
-  'UUunicorns': 'UOUUnicorns',
-  
-  // 사회인
-  'GunwiPheonix': 'GunwiPhoenix',
-  'BusanGryphons': 'BusanGryphons',
-  'samsungBT': 'SamsungBlueStorm',
-  'seoulGE': 'SeoulGoldenEagles',
-  'seoulDF': 'SeoulDefenders',
-  'seoulVI': 'SeoulVikings',
-  'incheonRH': 'IncheonRhinos'
-};
-
-/**
- * 팀명을 표준 형태로 정규화
- * @param {string} teamName - 정규화할 팀명
- * @returns {string} 표준 형태의 팀명
- */
-export const normalizeTeamName = (teamName) => {
-  if (!teamName) return teamName;
-  
-  // 직접 매핑이 있으면 사용
-  if (TEAM_NAME_MAPPING[teamName]) {
-    return TEAM_NAME_MAPPING[teamName];
-  }
-  
-  // 대소문자 무시하고 매핑 찾기
-  const lowerTeamName = teamName.toLowerCase();
-  for (const [key, value] of Object.entries(TEAM_NAME_MAPPING)) {
-    if (key.toLowerCase() === lowerTeamName) {
-      return value;
-    }
-  }
-  
-  return teamName;
-};
-
 export const TEAMS = [
   // Seoul
-  { id: 'YSEagles',        name: '연세대 이글스',        logo: '/assets/images/svg/teams/Yonsei.png',              region: 'Seoul' },
-  { id: 'SNGreenTerrors',  name: '서울대 그린테러스',    logo: '/assets/images/svg/teams/SNU.png',                 region: 'Seoul' },
-  { id: 'HYLions',         name: '한양대 라이온스',      logo: '/assets/images/svg/teams/Hanyang.png',             region: 'Seoul' },
-  { id: 'KMRazorbacks',    name: '국민대 레이저백스',    logo: '/assets/images/svg/teams/Kookmin.png',             region: 'Seoul' },
-  { id: 'USCityhawks',     name: '서울시립대 시티혹스',  logo: '/assets/images/svg/teams/UOS.png',                 region: 'Seoul' },
-  { id: 'HFBlackKnights',  name: '한국외대 블랙나이츠',  logo: '/assets/images/svg/teams/HUFS.png',                region: 'Seoul' },
-  { id: 'KKRagingBulls',   name: '건국대 레이징불스',    logo: '/assets/images/svg/teams/Konkuk.png',              region: 'Seoul' },
-  { id: 'HICowboys',       name: '홍익대 카우보이스',    logo: '/assets/images/svg/teams/Hongik.png',              region: 'Seoul' },
-  { id: 'DGTuskers',       name: '동국대 터스커스',      logo: '/assets/images/svg/teams/Dongguk.png',             region: 'Seoul' },
-  { id: 'KUTigers',        name: '고려대 타이거스',      logo: '/assets/images/svg/teams/KoreaUniversity.png',    region: 'Seoul' },
-  { id: 'CABlueDragons',   name: '중앙대 블루드래곤스',  logo: '/assets/images/svg/teams/ChungAng.png',            region: 'Seoul' },
-  { id: 'SSCrusaders',     name: '숭실대 크루세이더스',  logo: '/assets/images/svg/teams/Soongsil.png',            region: 'Seoul' },
-  { id: 'SGAlbatross',     name: '서강대 알바트로스',    logo: '/assets/images/svg/teams/Sogang.png',              region: 'Seoul' },
-  { id: 'KHCommanders',    name: '경희대 커맨더스',      logo: '/assets/images/svg/teams/Kyunghee.png',            region: 'Seoul' },
+  { id: 'YSeagles',        name: '연세대 이글스',        logo: '/assets/images/svg/teams/Yonsei.png',              region: 'Seoul' },
+  { id: 'SNgreenterrors',  name: '서울대 그린테러스',    logo: '/assets/images/svg/teams/SNU.png',                 region: 'Seoul' },
+  { id: 'HYlions',         name: '한양대 라이온스',      logo: '/assets/images/svg/teams/Hanyang.png',             region: 'Seoul' },
+  { id: 'KMrazorbacks',    name: '국민대 레이저백스',    logo: '/assets/images/svg/teams/Kookmin.png',             region: 'Seoul' },
+  { id: 'UScityhawks',     name: '서울시립대 시티혹스',  logo: '/assets/images/svg/teams/UOS.png',                 region: 'Seoul' },
+  { id: 'HFblackKnights',  name: '한국외대 블랙나이츠',  logo: '/assets/images/svg/teams/HUFS.png',                region: 'Seoul' },
+  { id: 'KKragingbulls',   name: '건국대 레이징불스',    logo: '/assets/images/svg/teams/Konkuk.png',              region: 'Seoul' },
+  { id: 'HIcowboys',       name: '홍익대 카우보이스',    logo: '/assets/images/svg/teams/Hongik.png',              region: 'Seoul' },
+  { id: 'KUtigers',        name: '고려대 타이거스',      logo: '/assets/images/svg/teams/KoreaUniversity.png',    region: 'Seoul' },
+  { id: 'DongkukTuskers',  name: '동국대 터스커스',      logo: '/assets/images/svg/teams/Dongguk.png',             region: 'Seoul' },
+  { id: 'SScrusaders',     name: '숭실대 크루세이더스',  logo: '/assets/images/svg/teams/Soongsil.png',            region: 'Seoul' },
+  { id: 'CAbluedragons',   name: '중앙대 블루드래곤스',  logo: '/assets/images/svg/teams/ChungAng.png',            region: 'Seoul' },
+  { id: 'KHcommanders',    name: '경희대 커맨더스',      logo: '/assets/images/svg/teams/Kyunghee.png',            region: 'Seoul' },
+  { id: 'SGalbatross',     name: '서강대 알바트로스',    logo: '/assets/images/svg/teams/Sogang.png',              region: 'Seoul' },
 
-  // Gyeonggi-Gangwon
-  { id: 'KWCapras',        name: '강원대 카프라스',      logo: '/assets/images/svg/teams/Kangwon.png',             region: 'Gyeonggi-Gangwon' },
-  { id: 'DKKodiakBears',   name: '단국대 코디악베어스',  logo: '/assets/images/svg/teams/Dankook.png',             region: 'Gyeonggi-Gangwon' },
-  { id: 'SKRoyals',        name: '성균관대 로얄스',      logo: '/assets/images/svg/teams/SKKU.png',                region: 'Gyeonggi-Gangwon' },
-  { id: 'YIWhiteTigers',   name: '용인대 화이트타이거스',logo: '/assets/images/svg/teams/YIU.png',                 region: 'Gyeonggi-Gangwon' },
-  { id: 'IHTealDragons',   name: '인하대 틸 드래곤스',   logo: '/assets/images/svg/teams/Inha.png',                region: 'Gyeonggi-Gangwon' },
-  { id: 'HLPhoenix',       name: '한림대 피닉스',        logo: '/assets/images/svg/teams/Hallym.png',              region: 'Gyeonggi-Gangwon' },
-  { id: 'HSKillerWhales',  name: '한신대 킬러웨일스',    logo: '/assets/images/svg/teams/Hanshin.png',             region: 'Gyeonggi-Gangwon' },
+  // Gyeonggi-Gangwona
+  { id: 'SKroyals',        name: '성균관대 로얄스',      logo: '/assets/images/svg/teams/SKKU.png',                region: 'Gyeonggi-Gangwon' },
+  { id: 'KWcapra',        name: '강원대 카프라',      logo: '/assets/images/svg/teams/Kangwon.png',             region: 'Gyeonggi-Gangwon' },
+  { id: 'DKkodiakbears',   name: '단국대 코디악베어스',  logo: '/assets/images/svg/teams/Dankook.png',             region: 'Gyeonggi-Gangwon' },
+  { id: 'YIwhitetigers',   name: '용인대 화이트타이거스',logo: '/assets/images/svg/teams/YIU.png',                 region: 'Gyeonggi-Gangwon' },
+  { id: 'IHtealdragons',   name: '인하대 틸 드래곤스',   logo: '/assets/images/svg/teams/Inha.png',                region: 'Gyeonggi-Gangwon' },
+  { id: 'HLphoenix',       name: '한림대 피닉스',        logo: '/assets/images/svg/teams/Hallym.png',              region: 'Gyeonggi-Gangwon' },
+  { id: 'HSkillerwhales',  name: '한신대 킬러웨일스',    logo: '/assets/images/svg/teams/Hanshin.png',             region: 'Gyeonggi-Gangwon' },
+  { id: 'KAmavericks',       name: '카이스트 매버릭스',        logo: '/assets/images/svg/teams/KAmavericks.png',          region: 'Gyeonggi-Gangwon' },
 
   // Daegu-Gyeongbuk
-  { id: 'KBOrangeFighters', name: '경북대 오렌지파이터스', logo: '/assets/images/svg/teams/KNU.png',               region: 'Daegu-Gyeongbuk' },
-  { id: 'KIBlackBears',     name: '경일대 블랙베어스',     logo: '/assets/images/svg/teams/KIU.png',               region: 'Daegu-Gyeongbuk' },
-  { id: 'KMSuperLions',     name: '계명대 슈퍼라이온스',   logo: '/assets/images/svg/teams/Keimyung.png',          region: 'Daegu-Gyeongbuk' },
-  { id: 'KOTRavens',        name: '금오공과대 레이븐스',    logo: '/assets/images/svg/teams/Kumho.png',             region: 'Daegu-Gyeongbuk' },
-  { id: 'DCUScudAngels',    name: '대구가톨릭대 스커드엔젤스', logo: '/assets/images/svg/teams/DaeguCatholic.png', region: 'Daegu-Gyeongbuk' },
-  { id: 'DUFlyingTigers',   name: '대구대 플라잉타이거스',  logo: '/assets/images/svg/teams/Daegu.png',            region: 'Daegu-Gyeongbuk' },
-  { id: 'DHURhinos',        name: '대구한의대 라이노스',    logo: '/assets/images/svg/teams/DaeguHaany.png',       region: 'Daegu-Gyeongbuk' },
-  { id: 'DGWhiteElephants', name: '동국대 화이트엘리펀츠',  logo: '/assets/images/svg/teams/DaeguDongguk.png',     region: 'Daegu-Gyeongbuk' },
-  { id: 'YNPegasus',        name: '영남대 페가수스',        logo: '/assets/images/svg/teams/Yeungnam.png',         region: 'Daegu-Gyeongbuk' },
-  { id: 'HDHolyRams',       name: '한동대 홀리램스',        logo: '/assets/images/svg/teams/Handong.png',          region: 'Daegu-Gyeongbuk' },
+  { id: 'KPorangefighters', name: '경북대 오렌지파이터스', logo: '/assets/images/svg/teams/KNU.png',               region: 'Daegu-Gyeongbuk' },
+  { id: 'KIblackbears',     name: '경일대 블랙베어스',     logo: '/assets/images/svg/teams/KIU.png',               region: 'Daegu-Gyeongbuk' },
+  { id: 'KeimyungSuperlions',     name: '계명대 슈퍼라이온스',   logo: '/assets/images/svg/teams/Keimyung.png',          region: 'Daegu-Gyeongbuk' },
+  { id: 'KOTravens',        name: '금오공과대 레이븐스',    logo: '/assets/images/svg/teams/Kumho.png',             region: 'Daegu-Gyeongbuk' },
+  { id: 'DCscudangels',    name: '대구가톨릭대 스커드엔젤스', logo: '/assets/images/svg/teams/DaeguCatholic.png', region: 'Daegu-Gyeongbuk' },
+  { id: 'DGflyingyigers',   name: '대구대 플라잉타이거스',  logo: '/assets/images/svg/teams/Daegu.png',            region: 'Daegu-Gyeongbuk' },
+  { id: 'DHrhinos',        name: '대구한의대 라이노스',    logo: '/assets/images/svg/teams/DaeguHaany.png',       region: 'Daegu-Gyeongbuk' },
+  { id: 'DongkukWhiteelephants', name: '동국대 화이트엘리펀츠',  logo: '/assets/images/svg/teams/DaeguDongguk.png',     region: 'Daegu-Gyeongbuk' },
+  { id: 'YNpegasus',        name: '영남대 페가수스',        logo: '/assets/images/svg/teams/Yeungnam.png',         region: 'Daegu-Gyeongbuk' },
+  { id: 'HDholyrams',       name: '한동대 홀리램스',        logo: '/assets/images/svg/teams/Handong.png',          region: 'Daegu-Gyeongbuk' },
 
   // Busan-Gyeongnam
-  { id: 'GSDragons',        name: '경성대 드래곤스',      logo: '/assets/images/svg/teams/Kyungsung.png',          region: 'Busan-Gyeongnam' },
-  { id: 'DSBlueDolphins',   name: '동서대 블루돌핀스',    logo: '/assets/images/svg/teams/Dongseo.png',            region: 'Busan-Gyeongnam' },
-  { id: 'DALeopards',       name: '동아대 레오파즈',      logo: '/assets/images/svg/teams/Dong-A.png',             region: 'Busan-Gyeongnam' },
-  { id: 'DEUTurtleFighters',name: '동의대 터틀파이터스',  logo: '/assets/images/svg/teams/Dongeui.png',            region: 'Busan-Gyeongnam' },
-  { id: 'PNUEagles',        name: '부산대 이글스',        logo: '/assets/images/svg/teams/Pusan.png',               region: 'Busan-Gyeongnam' },
-  { id: 'BUFSTornados',     name: '부산외국어대 토네이도', logo: '/assets/images/svg/teams/BUFS.png',               region: 'Busan-Gyeongnam' },
-  { id: 'SUDevils',         name: '신라대 데빌스',        logo: '/assets/images/svg/teams/Silla.png',              region: 'Busan-Gyeongnam' },
-  { id: 'UOUUnicorns',      name: '울산대 유니콘스',      logo: '/assets/images/svg/teams/Ulsan.png',              region: 'Busan-Gyeongnam' },
-  { id: 'KMOUVikings',      name: '한국해양대 바이킹스',  logo: '/assets/images/svg/teams/KMOU.png',               region: 'Busan-Gyeongnam' },
+  { id: 'GSdragons',        name: '경성대 드래곤스',      logo: '/assets/images/svg/teams/Kyungsung.png',          region: 'Busan-Gyeongnam' },
+  { id: 'BSeagles',        name: '부산대 이글스',        logo: '/assets/images/svg/teams/Pusan.png',               region: 'Busan-Gyeongnam' },
+  { id: 'HHvikings',      name: '한국해양대 바이킹스',  logo: '/assets/images/svg/teams/KMOU.png',               region: 'Busan-Gyeongnam' },
+  { id: 'SLdevils',         name: '신라대 데빌스',        logo: '/assets/images/svg/teams/Silla.png',              region: 'Busan-Gyeongnam' },
+  { id: 'BKmadmobydicks',   name: '부경대 매드모비딕스',   logo: '/assets/images/svg/teams/BKmadmobydicks.png',            region: 'Busan-Gyeongnam' },
+  { id: 'DUturtlefighters',name: '동의대 터틀파이터스',  logo: '/assets/images/svg/teams/Dongeui.png',            region: 'Busan-Gyeongnam' },
+  { id: 'DAleopards',       name: '동아대 레오파즈',      logo: '/assets/images/svg/teams/Dong-A.png',             region: 'Busan-Gyeongnam' },
+  { id: 'DSbluedolphins',   name: '동서대 블루돌핀스',    logo: '/assets/images/svg/teams/Dongseo.png',            region: 'Busan-Gyeongnam' },
+  { id: 'BFtornado',     name: '부산외국어대 토네이도', logo: '/assets/images/svg/teams/BUFS.png',               region: 'Busan-Gyeongnam' },
+  { id: 'UUunicorns',      name: '울산대 유니콘스',      logo: '/assets/images/svg/teams/Ulsan.png',              region: 'Busan-Gyeongnam' },
 
   // Amateur
   { id: 'GunwiPhoenix',     name: '군위 피닉스',          logo: '/assets/images/svg/teams/Phoenix.png',            region: 'Amateur' },
   { id: 'BusanGryphons',    name: '부산 그리폰즈',        logo: '/assets/images/svg/teams/Gryphons.png',           region: 'Amateur' },
-  { id: 'SamsungBlueStorm', name: '삼성 블루스톰',        logo: '/assets/images/svg/teams/BlueStorm.png',          region: 'Amateur' },
-  { id: 'SeoulGoldenEagles',name: '서울 골든이글스',      logo: '/assets/images/svg/teams/GoldenEagles.png',       region: 'Amateur' },
-  { id: 'SeoulDefenders',   name: '서울 디펜더스',        logo: '/assets/images/svg/teams/Defenders.png',          region: 'Amateur' },
-  { id: 'SeoulVikings',     name: '서울 바이킹스',        logo: '/assets/images/svg/teams/Vikings.png',            region: 'Amateur' },
-  { id: 'IncheonRhinos',    name: '인천 라이노스',        logo: '/assets/images/svg/teams/Rhinos.png',             region: 'Amateur' },
-
-  // Seoul
-  { id: 'YS',        name: '연세대 이글스',        logo: '/assets/images/svg/teams/Yonsei.png',              region: 'Seoul' },
-  { id: 'SN',  name: '서울대 그린테러스',    logo: '/assets/images/svg/teams/SNU.png',                 region: 'Seoul' },
-  { id: 'HY',         name: '한양대 라이온스',      logo: '/assets/images/svg/teams/Hanyang.png',             region: 'Seoul' },
-  { id: 'KM',    name: '국민대 레이저백스',    logo: '/assets/images/svg/teams/Kookmin.png',             region: 'Seoul' },
-  { id: 'US',     name: '서울시립대 시티혹스',  logo: '/assets/images/svg/teams/UOS.png',                 region: 'Seoul' },
-  { id: 'HF',  name: '한국외대 블랙나이츠',  logo: '/assets/images/svg/teams/HUFS.png',                region: 'Seoul' },
-  { id: 'KK',   name: '건국대 레이징불스',    logo: '/assets/images/svg/teams/Konkuk.png',              region: 'Seoul' },
-  { id: 'HI',       name: '홍익대 카우보이스',    logo: '/assets/images/svg/teams/Hongik.png',              region: 'Seoul' },
-  { id: 'DT',       name: '동국대 터스커스',      logo: '/assets/images/svg/teams/Dongguk.png',             region: 'Seoul' },
-  { id: 'KU',        name: '고려대 타이거스',      logo: '/assets/images/svg/teams/KoreaUniversity.png',    region: 'Seoul' },
-  { id: 'CA',   name: '중앙대 블루드래곤스',  logo: '/assets/images/svg/teams/ChungAng.png',            region: 'Seoul' },
-  { id: 'SS',     name: '숭실대 크루세이더스',  logo: '/assets/images/svg/teams/Soongsil.png',            region: 'Seoul' },
-  { id: 'SG',     name: '서강대 알바트로스',    logo: '/assets/images/svg/teams/Sogang.png',              region: 'Seoul' },
-  { id: 'KH',    name: '경희대 커맨더스',      logo: '/assets/images/svg/teams/Kyunghee.png',            region: 'Seoul' },
-
-  // Gyeonggi-Gangwon
-  { id: 'KW',        name: '강원대 카프라스',      logo: '/assets/images/svg/teams/Kangwon.png',             region: 'Gyeonggi-Gangwon' },
-  { id: 'DK',   name: '단국대 코디악베어스',  logo: '/assets/images/svg/teams/Dankook.png',             region: 'Gyeonggi-Gangwon' },
-  { id: 'SK',        name: '성균관대 로얄스',      logo: '/assets/images/svg/teams/SKKU.png',                region: 'Gyeonggi-Gangwon' },
-  { id: 'YI',   name: '용인대 화이트타이거스',logo: '/assets/images/svg/teams/YIU.png',                 region: 'Gyeonggi-Gangwon' },
-  { id: 'IH',   name: '인하대 틸 드래곤스',   logo: '/assets/images/svg/teams/Inha.png',                region: 'Gyeonggi-Gangwon' },
-  { id: 'HL',       name: '한림대 피닉스',        logo: '/assets/images/svg/teams/Hallym.png',              region: 'Gyeonggi-Gangwon' },
-  { id: 'HS',  name: '한신대 킬러웨일스',    logo: '/assets/images/svg/teams/Hanshin.png',             region: 'Gyeonggi-Gangwon' },
-  { id : 'KA', name:'카이스트 매버릭스', logo:'/assets/images/svg/teams/KAIST.png', region:'Gyeonggi-Gangwon'},
-
-  // Daegu-Gyeongbuk
-{ id: 'KP', name: '경북대 오렌지파이터스', logo: '/assets/images/svg/teams/KNU.png',               region: 'Daegu-Gyeongbuk' },
-  { id: 'KI',     name: '경일대 블랙베어스',     logo: '/assets/images/svg/teams/KIU.png',               region: 'Daegu-Gyeongbuk' },
-  { id: 'KS',     name: '계명대 슈퍼라이온스',   logo: '/assets/images/svg/teams/Keimyung.png',          region: 'Daegu-Gyeongbuk' },
-  { id: 'KO',        name: '금오공과대 레이븐스',    logo: '/assets/images/svg/teams/Kumho.png',             region: 'Daegu-Gyeongbuk' },
-  { id: 'DC',    name: '대구가톨릭대 스커드엔젤스', logo: '/assets/images/svg/teams/DaeguCatholic.png', region: 'Daegu-Gyeongbuk' },
-  { id: 'DG',   name: '대구대 플라잉타이거스',  logo: '/assets/images/svg/teams/Daegu.png',            region: 'Daegu-Gyeongbuk' },
-  { id: 'DH',        name: '대구한의대 라이노스',    logo: '/assets/images/svg/teams/DaeguHaany.png',       region: 'Daegu-Gyeongbuk' },
-  { id: 'DW', name: '동국대 화이트엘리펀츠',  logo: '/assets/images/svg/teams/DaeguDongguk.png',     region: 'Daegu-Gyeongbuk' },
-  { id: 'YN',        name: '영남대 페가수스',        logo: '/assets/images/svg/teams/Yeungnam.png',         region: 'Daegu-Gyeongbuk' },
-  { id: 'HD',       name: '한동대 홀리램스',        logo: '/assets/images/svg/teams/Handong.png',          region: 'Daegu-Gyeongbuk' },
-
-  // Busan-Gyeongnam
-  { id: 'GS',        name: '경성대 드래곤스',      logo: '/assets/images/svg/teams/Kyungsung.png',          region: 'Busan-Gyeongnam' },
-  { id: 'DS',   name: '동서대 블루돌핀스',    logo: '/assets/images/svg/teams/Dongseo.png',            region: 'Busan-Gyeongnam' },
-  { id: 'DA',       name: '동아대 레오파즈',      logo: '/assets/images/svg/teams/Dong-A.png',             region: 'Busan-Gyeongnam' },
-  { id: 'DU',name: '동의대 터틀파이터스',  logo: '/assets/images/svg/teams/Dongeui.png',            region: 'Busan-Gyeongnam' },
-  { id: 'BS',        name: '부산대 이글스',        logo: '/assets/images/svg/teams/Pusan.png',               region: 'Busan-Gyeongnam' },
-  { id: 'BF',     name: '부산외국어대 토네이도', logo: '/assets/images/svg/teams/BUFS.png',               region: 'Busan-Gyeongnam' },
-  { id: 'SL',         name: '신라대 데빌스',        logo: '/assets/images/svg/teams/Silla.png',              region: 'Busan-Gyeongnam' },
-  { id: 'UU',      name: '울산대 유니콘스',      logo: '/assets/images/svg/teams/Ulsan.png',              region: 'Busan-Gyeongnam' },
-  { id: 'HH',      name: '한국해양대 바이킹스',  logo: '/assets/images/svg/teams/KMOU.png',               region: 'Busan-Gyeongnam' },
-
-  // Amateur
-  { id: 'GP',     name: '군위 피닉스',          logo: '/assets/images/svg/teams/Phoenix.png',            region: 'Amateur' },
-  { id: 'BG',    name: '부산 그리폰즈',        logo: '/assets/images/svg/teams/Gryphons.png',           region: 'Amateur' },
-  { id: 'BT', name: '삼성 블루스톰',        logo: '/assets/images/svg/teams/BlueStorm.png',          region: 'Amateur' },
-  { id: 'GE',name: '서울 골든이글스',      logo: '/assets/images/svg/teams/GoldenEagles.png',       region: 'Amateur' },
-  { id: 'DF',   name: '서울 디펜더스',        logo: '/assets/images/svg/teams/Defenders.png',          region: 'Amateur' },
-  { id: 'VI',     name: '서울 바이킹스',        logo: '/assets/images/svg/teams/Vikings.png',            region: 'Amateur' },
-  { id: 'RH',    name: '인천 라이노스',        logo: '/assets/images/svg/teams/Rhinos.png',             region: 'Amateur' },
-
-
+  { id: 'samsungBT', name: '삼성 블루스톰',        logo: '/assets/images/svg/teams/BlueStorm.png',          region: 'Amateur' },
+  { id: 'seoulGE',name: '서울 골든이글스',      logo: '/assets/images/svg/teams/GoldenEagles.png',       region: 'Amateur' },
+  { id: 'seoulDF',   name: '서울 디펜더스',        logo: '/assets/images/svg/teams/Defenders.png',          region: 'Amateur' },
+  { id: 'seoulVI',     name: '서울 바이킹스',        logo: '/assets/images/svg/teams/Vikings.png',            region: 'Amateur' },
+  { id: 'IncheonRH',    name: '인천 라이노스',        logo: '/assets/images/svg/teams/Rhinos.png',             region: 'Amateur' },
 
   //경기강원협회 /게스트용
   { id: 'GCF',        name: '경기강원올스타',      logo: '/assets/images/svg/teams/gcf.png',                region: 'Gyeonggi-Gangwon'},
@@ -216,3 +65,5 @@ export const TEAMS = [
   // Admin 팀
   { id: 'ADMIN',      name: '관리자',              logo: '/assets/images/svg/teams/Stechlogo.svg',          region: 'Admin' }
 ];
+
+export const TEAM_BY_ID = Object.fromEntries(TEAMS.map(t => [t.id, t]));

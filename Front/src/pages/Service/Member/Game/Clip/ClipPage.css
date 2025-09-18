@@ -175,7 +175,7 @@
 .clip-page-container {
   display: grid;
   grid-template-columns: 52rem 1fr;
-gap: 2rem;
+  gap: 2rem;
   height: calc(100dvh - 80px); /* 헤더 높이(대략 80px)만큼 빼기. 필요시 숫자 조절 */
   min-height: 0;               /* 자식이 overflow 할 수 있도록 */
   overflow: hidden;            /* 바디 스크롤 방지, 오른쪽 고정 */
