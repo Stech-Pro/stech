@@ -55,6 +55,8 @@ async function bootstrap() {
                 'https://www.stechpro.ai',
                 'http://stechpro.ai',
                 'https://stechpro.ai',
+                'http://api.stechpro.ai',
+                'https://api.stechpro.ai',
                 'http://stechpro-frontend.s3-website.ap-northeast-2.amazonaws.com',
                 process.env.FRONTEND_URL,
             ].filter(Boolean),

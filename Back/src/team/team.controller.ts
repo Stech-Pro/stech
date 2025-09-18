@@ -92,7 +92,8 @@ export class TeamController {
     }
   })
   async getAllTeams() {
-    return this.teamService.getAllTeams();
+    // TODO: TeamService에 getAllTeams 메서드 구현 필요
+    return { success: true, message: 'getAllTeams 메서드 구현 필요', data: [] };
   }
 
   @Get('total-stats')
