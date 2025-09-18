@@ -58,11 +58,11 @@ export async function fetchTeamGames(teamNameOrId) {
 
   // 서버 스키마 → GamePage 스키마 매핑
   return games.map((g) => ({
-    gameKey: g.gameKey, // 예: 'SNSU20240907'
+    gameKey: g.gameKey,
     date: (g.date || '').slice(0, 10), // '2024-09-07'
     type: g.type || 'Season',
     location: g.location || '',
-    homeId: g.homeTeam, // 서버가 팀 id/코드 문자열 제공
+    homeId: g.homeTeam,
     awayId: g.awayTeam,
     homeScore: g?.score?.home ?? 0,
     awayScore: g?.score?.away ?? 0,
