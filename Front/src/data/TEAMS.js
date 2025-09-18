@@ -1,97 +1,4 @@
 // src/data/TEAMS.js
-
-// 팀명 정규화 매핑 (JSON에서 오는 팀명 → 표준 팀명)
-const TEAM_NAME_MAPPING = {
-  // 서울
-  'YSeagles': 'YSEagles',
-  'YSEagles': 'YSEagles',
-  'SNgreenterrors': 'SNGreenTerrors',
-  'SNgreenTerrors': 'SNGreenTerrors',
-  'HYlions': 'HYLions',
-  'KMrazorbacks': 'KMRazorbacks',
-  'UScityhawks': 'USCityhawks',
-  'HFblackknights': 'HFBlackKnights',
-  'HFblackKnights': 'HFBlackKnights',
-  'KKragingbulls': 'KKRagingBulls',
-  'KKragingBulls': 'KKRagingBulls',
-  'HIcowboys': 'HICowboys',
-  'KUtigers': 'KUTigers',
-  'DongkukTuskers': 'DGTuskers',
-  'DGtuskers': 'DGTuskers',
-  'SScrusaders': 'SSCrusaders',
-  'CAbluedragons': 'CABlueDragons',
-  'KHcommanders': 'KHCommanders',
-  'SGalbatross': 'SGAlbatross',
-  
-  // 경기강원권
-  'SKroyals': 'SKRoyals',
-  'KWcapra': 'KWCapras',
-  'DKkodiakbears': 'DKKodiakBears',
-  'YIwhitetigers': 'YIWhiteTigers',
-  'IHtealdragons': 'IHTealDragons',
-  'HLphoenix': 'HLPhoenix',
-  'HSkillerwhales': 'HSKillerWhales',
-  'KAmavericks': 'KAMavericks',
-  
-  // 대구경북권
-  'KPorangefighters': 'KBOrangeFighters',
-  'KIblackbears': 'KIBlackBears',
-  'KeimyungSuperlions': 'KMSuperLions',
-  'KOravens': 'KOTRavens',
-  'DCscudangels': 'DCUScudAngels',
-  'DGflyingtigers': 'DUFlyingTigers',
-  'DHrhinos': 'DHURhinos',
-  'DongkukWhiteelephants': 'DGWhiteElephants',
-  'YNpegasus': 'YNPegasus',
-  'HDholyrams': 'HDHolyRams',
-  
-  // 부산경남권
-  'GSdrangons': 'GSDragons',
-  'BSeagles': 'PNUEagles',
-  'HHvikings': 'KMOUVikings',
-  'SLdevils': 'SUDevils',
-  'BKmadmobydicks': 'BKMadMobyDicks',
-  'DUturtlefighters': 'DEUTurtleFighters',
-  'DAleopards': 'DALeopards',
-  'DSbluedolphins': 'DSBlueDolphins',
-  'DSblueDolphons': 'DSBlueDolphins',
-  'BFtornado': 'BUFSTornados',
-  'UUunicorns': 'UOUUnicorns',
-  
-  // 사회인
-  'GunwiPheonix': 'GunwiPhoenix',
-  'BusanGryphons': 'BusanGryphons',
-  'samsungBT': 'SamsungBlueStorm',
-  'seoulGE': 'SeoulGoldenEagles',
-  'seoulDF': 'SeoulDefenders',
-  'seoulVI': 'SeoulVikings',
-  'incheonRH': 'IncheonRhinos'
-};
-
-/**
- * 팀명을 표준 형태로 정규화
- * @param {string} teamName - 정규화할 팀명
- * @returns {string} 표준 형태의 팀명
- */
-export const normalizeTeamName = (teamName) => {
-  if (!teamName) return teamName;
-  
-  // 직접 매핑이 있으면 사용
-  if (TEAM_NAME_MAPPING[teamName]) {
-    return TEAM_NAME_MAPPING[teamName];
-  }
-  
-  // 대소문자 무시하고 매핑 찾기
-  const lowerTeamName = teamName.toLowerCase();
-  for (const [key, value] of Object.entries(TEAM_NAME_MAPPING)) {
-    if (key.toLowerCase() === lowerTeamName) {
-      return value;
-    }
-  }
-  
-  return teamName;
-};
-
 export const TEAMS = [
   // Seoul
   { id: 'YSeagles',        name: '연세대 이글스',        logo: '/assets/images/svg/teams/Yonsei.png',              region: 'Seoul' },
@@ -103,13 +10,13 @@ export const TEAMS = [
   { id: 'KKragingbulls',   name: '건국대 레이징불스',    logo: '/assets/images/svg/teams/Konkuk.png',              region: 'Seoul' },
   { id: 'HIcowboys',       name: '홍익대 카우보이스',    logo: '/assets/images/svg/teams/Hongik.png',              region: 'Seoul' },
   { id: 'KUtigers',        name: '고려대 타이거스',      logo: '/assets/images/svg/teams/KoreaUniversity.png',    region: 'Seoul' },
-  { id: 'DongkukTuskers',       name: '동국대 터스커스',      logo: '/assets/images/svg/teams/Dongguk.png',             region: 'Seoul' },
+  { id: 'DongkukTuskers',  name: '동국대 터스커스',      logo: '/assets/images/svg/teams/Dongguk.png',             region: 'Seoul' },
   { id: 'SScrusaders',     name: '숭실대 크루세이더스',  logo: '/assets/images/svg/teams/Soongsil.png',            region: 'Seoul' },
   { id: 'CAbluedragons',   name: '중앙대 블루드래곤스',  logo: '/assets/images/svg/teams/ChungAng.png',            region: 'Seoul' },
   { id: 'KHcommanders',    name: '경희대 커맨더스',      logo: '/assets/images/svg/teams/Kyunghee.png',            region: 'Seoul' },
   { id: 'SGalbatross',     name: '서강대 알바트로스',    logo: '/assets/images/svg/teams/Sogang.png',              region: 'Seoul' },
 
-  // Gyeonggi-Gangwon
+  // Gyeonggi-Gangwona
   { id: 'SKroyals',        name: '성균관대 로얄스',      logo: '/assets/images/svg/teams/SKKU.png',                region: 'Gyeonggi-Gangwon' },
   { id: 'KWcapra',        name: '강원대 카프라',      logo: '/assets/images/svg/teams/Kangwon.png',             region: 'Gyeonggi-Gangwon' },
   { id: 'DKkodiakbears',   name: '단국대 코디악베어스',  logo: '/assets/images/svg/teams/Dankook.png',             region: 'Gyeonggi-Gangwon' },
@@ -158,3 +65,5 @@ export const TEAMS = [
   // Admin 팀
   { id: 'ADMIN',      name: '관리자',              logo: '/assets/images/svg/teams/Stechlogo.svg',          region: 'Admin' }
 ];
+
+export const TEAM_BY_ID = Object.fromEntries(TEAMS.map(t => [t.id, t]));
