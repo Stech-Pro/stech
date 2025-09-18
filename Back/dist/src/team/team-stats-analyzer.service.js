@@ -176,9 +176,10 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
                 offenseStats.patGood += 1;
             }
         }
-        if (playType === '2PT' || playType === 'TWOPOINT') {
+        if (playType === '2PT' || playType === 'TWOPOINT' || playType === 'TPT') {
             if (significantPlays.includes('2PTGOOD') ||
-                significantPlays.includes('TWOPTGOOD')) {
+                significantPlays.includes('TWOPTGOOD') ||
+                significantPlays.includes('TWOPTCONV.GOOD')) {
                 offenseStats.twoPtGood += 1;
             }
         }

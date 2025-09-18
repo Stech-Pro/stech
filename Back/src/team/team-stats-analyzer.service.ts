@@ -312,10 +312,11 @@ export class TeamStatsAnalyzerService {
     }
 
     // 2점 컨버전 처리
-    if (playType === '2PT' || playType === 'TWOPOINT') {
+    if (playType === '2PT' || playType === 'TWOPOINT' || playType === 'TPT') {
       if (
         significantPlays.includes('2PTGOOD') ||
-        significantPlays.includes('TWOPTGOOD')
+        significantPlays.includes('TWOPTGOOD') ||
+        significantPlays.includes('TWOPTCONV.GOOD')
       ) {
         offenseStats.twoPtGood += 1;
       }

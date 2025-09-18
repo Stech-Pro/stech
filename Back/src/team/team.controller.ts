@@ -61,6 +61,41 @@ export class TeamController {
     return this.teamService.getMyTeams(user._id);
   }
 
+  @Get('all')
+  @ApiOperation({ 
+    summary: '🏈 모든 팀 목록 조회',
+    description: '시스템에 등록된 모든 팀의 목록을 조회합니다. 팀 ID, 이름, 로고 등의 정보를 포함합니다.'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: '✅ 모든 팀 목록 조회 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '모든 팀 목록 조회가 완료되었습니다',
+        data: [
+          {
+            id: 'YSEagles',
+            name: '연세대 이글스',
+            logo: '/assets/images/svg/teams/Yonsei.png',
+            region: 'Seoul'
+          },
+          {
+            id: 'SNGreenTerrors',
+            name: '서울대 그린테러스',
+            logo: '/assets/images/svg/teams/SNU.png',
+            region: 'Seoul'
+          }
+        ],
+        timestamp: '2024-12-26T10:30:00.000Z'
+      }
+    }
+  })
+  async getAllTeams() {
+    // TODO: TeamService에 getAllTeams 메서드 구현 필요
+    return { success: true, message: 'getAllTeams 메서드 구현 필요', data: [] };
+  }
+
   @Get('total-stats')
   // @UseGuards(JwtAuthGuard)  // 팀 스탯은 공개 정보로 변경
   // @ApiBearerAuth()
