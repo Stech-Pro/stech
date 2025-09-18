@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import './ClipPage.css';
-import { TEAMS } from '../../../../../data/TEAMS';
+import { TEAMS, TEAM_BY_ID } from '../../../../../data/TEAMS';
 import { useClipFilter } from '../../../../../hooks/useClipFilter';
 import UploadVideoModal from '../../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
@@ -168,10 +168,7 @@ const findTeamMeta = (raw) => {
     ) || { name: String(raw), logo: null }
   );
 };
-const TEAM_BY_ID = TEAMS.reduce((m, t) => {
-  m[t.id] = t;
-  return m;
-}, {});
+
 
 /* ========== 메인 컴포넌트 ========== */
 export default function ClipPage() {
@@ -285,6 +282,7 @@ export default function ClipPage() {
     KICKOFF: '킥오프',
     PAT: 'PAT',
   };
+
   const getDownDisplay = (c) => {
     const pt = String(c.playType || '')
       .trim()
@@ -330,16 +328,15 @@ export default function ClipPage() {
       .then((clipsData) => {
         if (abort) return;
 
-        // API 데이터를 프론트엔드 형식으로 변환
         const transformedClips = clipsData.map((clip, idx) => {
           const clipKey = String(clip.clipKey ?? clip.id ?? idx); // 도메인 식별자(필수)
           const uiId = `${clipKey}__${idx}`; // 렌더용 유니크 id
 
           return {
             // 식별자들
-            id: uiId, // 렌더 key로 사용
-            clipKey, // 플레이어/API에서 사용할 원본 키
-            playIndex: clip.playIndex ?? idx, // (보조 식별자)
+            id: uiId,
+            clipKey, 
+            playIndex: clip.playIndex ?? idx, 
 
             // 데이터
             quarter: clip.quarter,
@@ -347,7 +344,7 @@ export default function ClipPage() {
             down: clip.down,
             yardsToGo: clip.toGoYard,
             significantPlay:
-              clip.significantPlays?.filter((p) => p != null) || [],
+            clip.significantPlays?.filter((p) => p != null) || [],
             offensiveTeam: clip.offensiveTeam,
             gainYard: clip.gainYard,
             clipUrl: clip.clipUrl || null,
