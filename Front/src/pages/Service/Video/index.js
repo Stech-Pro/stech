@@ -322,27 +322,37 @@ function PlayerCore({ stateData }) {
     (id) => String(id) === selectedId,
     [selectedId],
   );
+  
+  // selected가 변경될 때 비디오 소스 강제 리로드
+  useEffect(() => {
+    if (selected && selected.clipUrl && videoRef.current) {
+      videoRef.current.load();
+    }
+  }, [selected?.clipUrl]);
 
   // selectPlay를 단순화
-  const selectPlay = useCallback(
-    (id, options = {}) => {
-      const newId = String(id);
-      if (newId === selectedId) return;
 
-      setSelectedId(newId);
-
-      if (options.autoplay) {
-        pendingAutoplayRef.current = true;
-      }
-
-      setIsPlaying(false);
-      setHasError(false);
-      setIsLoading(true);
-      setCurrentTime(0);
-      setDuration(0);
-    },
-    [selectedId],
-  );
+  const selectPlay = useCallback((id, options = {}) => {
+    const newId = String(id);
+    if (newId === selectedId) return;
+    
+    setSelectedId(newId);
+    
+    if (options.autoplay) {
+      pendingAutoplayRef.current = true;
+    }
+    
+    setIsPlaying(false);
+    setHasError(false);
+    setIsLoading(true);
+    setCurrentTime(0);
+    setDuration(0);
+    
+    // 비디오 소스를 강제로 다시 로드
+    if (videoRef.current) {
+      videoRef.current.load();
+    }
+  }, [selectedId]);
 
   // 현재 클립의 위치 정보
   const getCurrentClipPosition = useCallback(() => {
@@ -744,7 +754,7 @@ function PlayerCore({ stateData }) {
                     </div>
                   )}
                   <video
-                    key={selected?.id}
+                    key={`${selected?.id}_${selected?.clipUrl}`}
                     ref={videoRef}
                     className={`videoElement ${
                       isLoading || hasError ? 'hidden' : ''
