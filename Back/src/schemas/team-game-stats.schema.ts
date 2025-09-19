@@ -66,6 +66,8 @@ export class TeamGameStats {
     penaltyYards?: number;
     timeOfPossession?: string;
     thirdDownConversions?: string; // "5/12"
+    thirdDownAttempts?: number;
+    thirdDownMade?: number;
     fourthDownConversions?: string; // "1/2"
   };
 

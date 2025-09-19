@@ -25,17 +25,58 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
         this.teamGameStatsModel = teamGameStatsModel;
         this.teamTotalStatsModel = teamTotalStatsModel;
     }
+    safeNumber(value) {
+        if (value === null || value === undefined || isNaN(value)) {
+            return 0;
+        }
+        return Number(value) || 0;
+    }
     async analyzeTeamStats(gameData) {
         console.log('팀 스탯 분석 시작:', gameData.gameKey);
         const homeTeamStats = this.createEmptyStats(gameData.homeTeam || 'Home');
         const awayTeamStats = this.createEmptyStats(gameData.awayTeam || 'Away');
-        for (const clip of gameData.Clips || []) {
+        const thirdDownData = {
+            home: { attempts: 0, conversions: 0 },
+            away: { attempts: 0, conversions: 0 },
+        };
+        for (let i = 0; i < (gameData.Clips || []).length; i++) {
+            const clip = gameData.Clips[i];
             this.analyzeClip(clip, homeTeamStats, awayTeamStats);
+            const currentDown = typeof clip.down === 'string' ? parseInt(clip.down, 10) : clip.down;
+            console.log(`🔍 클립 ${i}: down=${clip.down} (타입: ${typeof clip.down}), 변환된 값: ${currentDown}`);
+            if (currentDown === 3) {
+                const isHomeOffense = clip.offensiveTeam === 'Home';
+                const thirdDownTeam = isHomeOffense
+                    ? thirdDownData.home
+                    : thirdDownData.away;
+                thirdDownTeam.attempts++;
+                console.log(`📊 3rd down 발견! 클립 ${i}: ${isHomeOffense ? '홈팀' : '어웨이팀'} 시도`);
+                if (i + 1 < gameData.Clips.length) {
+                    const nextClip = gameData.Clips[i + 1];
+                    const nextDown = typeof nextClip.down === 'string' ? parseInt(nextClip.down, 10) : nextClip.down;
+                    console.log(`  다음 클립 정보: 팀=${nextClip.offensiveTeam}, down=${nextDown}`);
+                    if (nextClip.offensiveTeam === clip.offensiveTeam &&
+                        nextDown === 1) {
+                        thirdDownTeam.conversions++;
+                        console.log(`  ✅ 3rd down 성공!`);
+                    }
+                    else {
+                        console.log(`  ❌ 3rd down 실패 (팀 변경 또는 다운 != 1)`);
+                    }
+                }
+            }
         }
         homeTeamStats.totalYards =
             homeTeamStats.passingYards + homeTeamStats.rushingYards;
         awayTeamStats.totalYards =
             awayTeamStats.passingYards + awayTeamStats.rushingYards;
+        console.log(`📈 3rd Down 최종 데이터 (analyzeTeamStats):`);
+        console.log(`  홈팀 (${homeTeamStats.teamName}): ${thirdDownData.home.conversions}/${thirdDownData.home.attempts}`);
+        console.log(`  어웨이팀 (${awayTeamStats.teamName}): ${thirdDownData.away.conversions}/${thirdDownData.away.attempts}`);
+        homeTeamStats.thirdDownAttempts = this.safeNumber(thirdDownData.home.attempts);
+        homeTeamStats.thirdDownMade = this.safeNumber(thirdDownData.home.conversions);
+        awayTeamStats.thirdDownAttempts = this.safeNumber(thirdDownData.away.attempts);
+        awayTeamStats.thirdDownMade = this.safeNumber(thirdDownData.away.conversions);
         homeTeamStats.totalReturnYards =
             homeTeamStats.puntReturnYards +
                 homeTeamStats.kickReturnYards +
@@ -191,15 +232,17 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
         if (isPenalty) {
             const isHomePenalty = significantPlays.some((play) => play && play.includes('PENALTY.HOME'));
             const isAwayPenalty = significantPlays.some((play) => play && play.includes('PENALTY.AWAY'));
+            const penaltyYards = gainYard !== 0 ? Math.abs(gainYard) :
+                (clip.start?.yard ? Math.abs(clip.start.yard) : 5);
             if ((isHomeOffense && isHomePenalty) ||
                 (!isHomeOffense && isAwayPenalty)) {
                 offenseStats.penalties += 1;
-                offenseStats.penaltyYards += Math.abs(gainYard);
+                offenseStats.penaltyYards += penaltyYards;
             }
             else if ((isHomeOffense && isAwayPenalty) ||
                 (!isHomeOffense && isHomePenalty)) {
                 defenseStats.penalties += 1;
-                defenseStats.penaltyYards += Math.abs(gainYard);
+                defenseStats.penaltyYards += penaltyYards;
             }
         }
     }
@@ -233,6 +276,8 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
                     puntYards: teamStatsResult.homeTeamStats.puntYards,
                     penalties: teamStatsResult.homeTeamStats.penalties,
                     penaltyYards: teamStatsResult.homeTeamStats.penaltyYards,
+                    thirdDownAttempts: teamStatsResult.homeTeamStats.thirdDownAttempts,
+                    thirdDownMade: teamStatsResult.homeTeamStats.thirdDownMade,
                 },
                 finalScore: {
                     own: teamStatsResult.homeTeamStats.totalPoints,
@@ -266,6 +311,8 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
                     puntYards: teamStatsResult.awayTeamStats.puntYards,
                     penalties: teamStatsResult.awayTeamStats.penalties,
                     penaltyYards: teamStatsResult.awayTeamStats.penaltyYards,
+                    thirdDownAttempts: teamStatsResult.awayTeamStats.thirdDownAttempts,
+                    thirdDownMade: teamStatsResult.awayTeamStats.thirdDownMade,
                 },
                 finalScore: {
                     own: teamStatsResult.awayTeamStats.totalPoints,
@@ -336,6 +383,13 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
                 (existingStats.penalties || 0) + teamStats.penalties;
             existingStats.penaltyYards =
                 (existingStats.penaltyYards || 0) + teamStats.penaltyYards;
+            console.log(`🔄 3rd down 누적 계산 - ${teamStats.teamName}:`);
+            console.log(`  기존 Attempts: ${existingStats.thirdDownAttempts || 0}, 추가: ${teamStats.thirdDownAttempts || 0}, 총합: ${(existingStats.thirdDownAttempts || 0) + (teamStats.thirdDownAttempts || 0)}`);
+            console.log(`  기존 Made: ${existingStats.thirdDownMade || 0}, 추가: ${teamStats.thirdDownMade || 0}, 총합: ${(existingStats.thirdDownMade || 0) + (teamStats.thirdDownMade || 0)}`);
+            existingStats.thirdDownAttempts =
+                this.safeNumber(existingStats.thirdDownAttempts) + this.safeNumber(teamStats.thirdDownAttempts);
+            existingStats.thirdDownMade =
+                this.safeNumber(existingStats.thirdDownMade) + this.safeNumber(teamStats.thirdDownMade);
             existingStats.gamesPlayed += 1;
             existingStats.processedGames.push(gameKey);
             await existingStats.save();
@@ -367,6 +421,8 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
                 opponentTurnovers: teamStats.opponentTurnovers,
                 penalties: teamStats.penalties,
                 penaltyYards: teamStats.penaltyYards,
+                thirdDownAttempts: this.safeNumber(teamStats.thirdDownAttempts),
+                thirdDownMade: this.safeNumber(teamStats.thirdDownMade),
                 gamesPlayed: 1,
                 wins: 0,
                 losses: 0,
@@ -374,6 +430,9 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
                 processedGames: [gameKey],
                 season: new Date().getFullYear().toString(),
             });
+            console.log(`💾 새 팀 스탯 저장 - ${teamStats.teamName}:`);
+            console.log(`  3rd Down Attempts: ${teamStats.thirdDownAttempts || 0}`);
+            console.log(`  3rd Down Made: ${teamStats.thirdDownMade || 0}`);
             await newTeamStats.save();
         }
     }
@@ -462,17 +521,26 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
         };
         for (let i = 0; i < (gameData.Clips || []).length; i++) {
             const clip = gameData.Clips[i];
-            if (clip.down === 3) {
+            const currentDown = typeof clip.down === 'string' ? parseInt(clip.down, 10) : clip.down;
+            console.log(`🔍 클립 ${i}: down=${clip.down} (타입: ${typeof clip.down}), 변환된 값: ${currentDown}`);
+            if (currentDown === 3) {
                 const isHomeOffense = clip.offensiveTeam === 'Home';
                 const thirdDownTeam = isHomeOffense
                     ? thirdDownData.home
                     : thirdDownData.away;
                 thirdDownTeam.attempts++;
+                console.log(`📊 3rd down 발견! 클립 ${i}: ${isHomeOffense ? '홈팀' : '어웨이팀'} 시도`);
                 if (i + 1 < gameData.Clips.length) {
                     const nextClip = gameData.Clips[i + 1];
+                    const nextDown = typeof nextClip.down === 'string' ? parseInt(nextClip.down, 10) : nextClip.down;
+                    console.log(`  다음 클립 정보: 팀=${nextClip.offensiveTeam}, down=${nextDown}`);
                     if (nextClip.offensiveTeam === clip.offensiveTeam &&
-                        nextClip.down === 1) {
+                        nextDown === 1) {
                         thirdDownTeam.conversions++;
+                        console.log(`  ✅ 3rd down 성공!`);
+                    }
+                    else {
+                        console.log(`  ❌ 3rd down 실패 (팀 변경 또는 다운 != 1)`);
                     }
                 }
             }
@@ -482,17 +550,26 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
             homeTeamStats.passingYards + homeTeamStats.rushingYards;
         awayTeamStats.totalYards =
             awayTeamStats.passingYards + awayTeamStats.rushingYards;
+        console.log(`📈 3rd Down 최종 데이터:`);
+        console.log(`  홈팀 (${homeTeamStats.teamName}): ${thirdDownData.home.conversions}/${thirdDownData.home.attempts}`);
+        console.log(`  어웨이팀 (${awayTeamStats.teamName}): ${thirdDownData.away.conversions}/${thirdDownData.away.attempts}`);
+        homeTeamStats.thirdDownAttempts = this.safeNumber(thirdDownData.home.attempts);
+        homeTeamStats.thirdDownMade = this.safeNumber(thirdDownData.home.conversions);
+        awayTeamStats.thirdDownAttempts = this.safeNumber(thirdDownData.away.attempts);
+        awayTeamStats.thirdDownMade = this.safeNumber(thirdDownData.away.conversions);
         console.log('홈팀 스탯:', {
             팀명: homeTeamStats.teamName,
             패싱: homeTeamStats.passingAttempts,
             러싱: homeTeamStats.rushingAttempts,
             총야드: homeTeamStats.totalYards,
+            '3rd다운': `${homeTeamStats.thirdDownMade}/${homeTeamStats.thirdDownAttempts}`,
         });
         console.log('어웨이팀 스탯:', {
             팀명: awayTeamStats.teamName,
             패싱: awayTeamStats.passingAttempts,
             러싱: awayTeamStats.rushingAttempts,
             총야드: awayTeamStats.totalYards,
+            '3rd다운': `${awayTeamStats.thirdDownMade}/${awayTeamStats.thirdDownAttempts}`,
         });
         const calculatePlayCallRatio = (stats) => {
             const totalPlays = stats.passingAttempts + stats.rushingAttempts;
@@ -508,6 +585,7 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
             };
         };
         const calculateThirdDownStats = (data) => {
+            console.log('📊 3rd down 계산:', data);
             return {
                 attempts: data.attempts,
                 conversions: data.conversions,
@@ -546,6 +624,9 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
             const teamTotalStats = await this.teamTotalStatsModel.find(filter);
             if (teamTotalStats.length > 0) {
                 console.log(`✅ ${teamTotalStats.length}개 팀의 team_total_stats 데이터 조회`);
+                teamTotalStats.forEach(team => {
+                    console.log(`🔍 ${team.teamName}: 3rd Down ${team.thirdDownMade || 0}/${team.thirdDownAttempts || 0}`);
+                });
                 const formattedStats = teamTotalStats
                     .map((team) => ({
                     teamName: team.teamName,
@@ -614,6 +695,11 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
                     avgPenaltyYardsPerGame: team.gamesPlayed > 0
                         ? Math.round((team.penaltyYards || 0) / team.gamesPlayed)
                         : 0,
+                    thirdDownAttempts: team.thirdDownAttempts || 0,
+                    thirdDownMade: team.thirdDownMade || 0,
+                    thirdDownPercentage: (team.thirdDownAttempts || 0) > 0
+                        ? ((team.thirdDownMade || 0) / team.thirdDownAttempts * 100).toFixed(1)
+                        : '0.0',
                     lastUpdated: team.updatedAt || new Date(),
                 }))
                     .sort((a, b) => b.totalYards - a.totalYards);
@@ -668,6 +754,8 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
             penalties: 0,
             touchbacks: 0,
             fieldGoalAttempts: 0,
+            thirdDownAttempts: 0,
+            thirdDownMade: 0,
         };
     }
 };

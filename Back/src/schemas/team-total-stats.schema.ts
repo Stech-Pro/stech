@@ -93,6 +93,12 @@ export class TeamTotalStats {
   @Prop({ default: 0 })
   penaltyYards: number;
 
+  @Prop({ default: 0 })
+  thirdDownAttempts: number;
+
+  @Prop({ default: 0 })
+  thirdDownMade: number;
+
   @Prop()
   season: string;
 
