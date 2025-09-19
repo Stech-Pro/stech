@@ -1,0 +1,3 @@
+
+ Error  Could not find TypeScript configuration file "tsconfig.json". Please, ensure that you are running this command in the appropriate directory (inside Nest workspace).
+

@@ -40,6 +40,8 @@ let TeamTotalStats = class TeamTotalStats {
     opponentTurnovers;
     penalties;
     penaltyYards;
+    thirdDownAttempts;
+    thirdDownMade;
     season;
     processedGames;
     gamesPlayed;
@@ -162,6 +164,14 @@ __decorate([
     (0, mongoose_1.Prop)({ default: 0 }),
     __metadata("design:type", Number)
 ], TeamTotalStats.prototype, "penaltyYards", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], TeamTotalStats.prototype, "thirdDownAttempts", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], TeamTotalStats.prototype, "thirdDownMade", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
