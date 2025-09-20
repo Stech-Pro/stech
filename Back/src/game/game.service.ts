@@ -14,24 +14,6 @@ import {
 
 @Injectable()
 export class GameService {
-  // 잘못된 팀명을 올바른 팀명으로 매핑하는 맵
-  private readonly teamNameFixes = {
-    'KMRazorbacks': 'KMrazorbacks',
-    'YSEagles': 'YSeagles',
-    'SNGreenTerrors': 'SNgreenterrors',
-    'HYLions': 'HYlions',
-    'USCityhawks': 'UScityhawks',
-    'HFBlackKnights': 'HFblackKnights',
-    'KKRagingbulls': 'KKragingbulls',
-    'HICowboys': 'HIcowboys',
-    'KUTigers': 'KUtigers',
-    'DongkukTuskers': 'DongkukTuskers', // 이미 올바른 형태
-    'SSCrusaders': 'SScrusaders',
-    'CABluedragons': 'CAbluedragons',
-    'KHCommanders': 'KHcommanders',
-    'SGAlbatross': 'SGalbatross',
-    // 추가로 필요한 매핑들을 여기에 추가
-  };
 
   constructor(
     @InjectModel(GameInfo.name)
@@ -44,16 +26,6 @@ export class GameService {
     private teamTotalStatsModel: Model<TeamTotalStatsDocument>,
   ) {}
 
-  /**
-   * 잘못된 팀명을 올바른 형태로 변환
-   */
-  private fixTeamName(teamName: string): string {
-    if (this.teamNameFixes[teamName]) {
-      console.log(`🔧 팀명 수정: ${teamName} → ${this.teamNameFixes[teamName]}`);
-      return this.teamNameFixes[teamName];
-    }
-    return teamName;
-  }
 
   async createGameInfo(gameData: any): Promise<GameInfo> {
     console.log('🔍 createGameInfo 호출됨, gameData 필드들:');
@@ -66,9 +38,9 @@ export class GameService {
     console.log('  homeTeam:', gameData.homeTeam);
     console.log('  awayTeam:', gameData.awayTeam);
 
-    // 팀명 수정
-    const fixedHomeTeam = this.fixTeamName(gameData.homeTeam);
-    const fixedAwayTeam = this.fixTeamName(gameData.awayTeam);
+    // 팀명은 그대로 사용
+    const fixedHomeTeam = gameData.homeTeam;
+    const fixedAwayTeam = gameData.awayTeam;
 
     // 중복 체크: 같은 gameKey가 이미 존재하는지 확인
     const existingGame = await this.gameInfoModel.findOne({ gameKey: gameData.gameKey });
@@ -128,8 +100,9 @@ export class GameService {
     // 팀명 수정 적용
     return games.map(game => {
       const gameObj = game.toObject();
-      gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
-      gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
+      // 팀명은 그대로 사용
+      // gameObj.homeTeam = gameObj.homeTeam;
+      // gameObj.awayTeam = gameObj.awayTeam;
       return gameObj;
     });
   }
@@ -140,8 +113,9 @@ export class GameService {
     // 팀명 수정 적용
     return games.map(game => {
       const gameObj = game.toObject();
-      gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
-      gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
+      // 팀명은 그대로 사용
+      // gameObj.homeTeam = gameObj.homeTeam;
+      // gameObj.awayTeam = gameObj.awayTeam;
       return gameObj;
     });
   }
@@ -152,10 +126,8 @@ export class GameService {
       return null;
     }
     
-    // 팀명 수정 적용
+    // 팀명은 그대로 사용
     const gameObj = game.toObject();
-    gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
-    gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
     return gameObj as any;
   }
 
@@ -167,8 +139,8 @@ export class GameService {
       score: gameData.score,
       region: gameData.region,
       location: gameData.location,
-      homeTeam: this.fixTeamName(gameData.homeTeam),
-      awayTeam: this.fixTeamName(gameData.awayTeam),
+      homeTeam: gameData.homeTeam,
+      awayTeam: gameData.awayTeam,
     };
 
     return this.gameInfoModel
@@ -227,11 +199,9 @@ export class GameService {
 
   // 경기 클립 데이터 저장 (전체 데이터 포함)
   async saveGameClips(gameData: any): Promise<GameClips> {
-    // 팀명 수정
+    // 데이터 그대로 사용
     const fixedGameData = {
       ...gameData,
-      homeTeam: this.fixTeamName(gameData.homeTeam),
-      awayTeam: this.fixTeamName(gameData.awayTeam),
     };
 
     const existingClips = await this.gameClipsModel.findOne({
@@ -261,8 +231,9 @@ export class GameService {
 
     // 팀명 수정 적용
     const clipsObject = clips.toObject();
-    clipsObject.homeTeam = this.fixTeamName(clipsObject.homeTeam);
-    clipsObject.awayTeam = this.fixTeamName(clipsObject.awayTeam);
+    // 팀명은 그대로 사용
+    // clipsObject.homeTeam = clipsObject.homeTeam;
+    // clipsObject.awayTeam = clipsObject.awayTeam;
     
     return clipsObject as any;
   }
@@ -296,8 +267,8 @@ export class GameService {
         highlights.push({
           gameKey: game.gameKey,
           date: game.date,
-          homeTeam: this.fixTeamName(game.homeTeam),
-          awayTeam: this.fixTeamName(game.awayTeam),
+          homeTeam: game.homeTeam,
+          awayTeam: game.awayTeam,
           location: game.location,
           clip: clip,
         });
@@ -385,8 +356,8 @@ export class GameService {
         highlights.push({
           gameKey: game.gameKey,
           date: game.date,
-          homeTeam: this.fixTeamName(game.homeTeam),
-          awayTeam: this.fixTeamName(game.awayTeam),
+          homeTeam: game.homeTeam,
+          awayTeam: game.awayTeam,
           location: game.location,
           clip: clip,
         });
