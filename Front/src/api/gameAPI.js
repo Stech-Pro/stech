@@ -90,6 +90,7 @@ export async function fetchGameClips(gameKey) {
       data,
     );
   }
+  console.log('fetchGameClips data:', data);  
 
   // 실제 API 응답 구조에 맞게 수정
   let clips = [];

@@ -259,8 +259,8 @@ export default function ClipPage() {
   const handleMenuToggle = (menuName) => {
     setOpenMenu(openMenu === menuName ? null : menuName);
   };
-  const homeMeta = useMemo(() => findTeamMeta(game?.home), [game?.home]);
-  const awayMeta = useMemo(() => findTeamMeta(game?.away), [game?.away]);
+            const homeMeta = TEAM_BY_ID[game.homeId];
+            const awayMeta = TEAM_BY_ID[game.awayId];
 
   // 홈/원정 → 팀 드롭다운 옵션
   const teamOptions = useMemo(() => {
