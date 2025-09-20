@@ -119,19 +119,44 @@ export class GameService {
   }
 
   async findGamesByTeam(teamName: string): Promise<GameInfo[]> {
-    return this.gameInfoModel
+    const games = await this.gameInfoModel
       .find({
         $or: [{ homeTeam: teamName }, { awayTeam: teamName }],
       })
       .exec();
+    
+    // 팀명 수정 적용
+    return games.map(game => {
+      const gameObj = game.toObject();
+      gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
+      gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
+      return gameObj;
+    });
   }
 
   async findAllGames(): Promise<GameInfo[]> {
-    return this.gameInfoModel.find().exec();
+    const games = await this.gameInfoModel.find().exec();
+    
+    // 팀명 수정 적용
+    return games.map(game => {
+      const gameObj = game.toObject();
+      gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
+      gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
+      return gameObj;
+    });
   }
 
   async findGameByKey(gameKey: string): Promise<GameInfo> {
-    return this.gameInfoModel.findOne({ gameKey }).exec();
+    const game = await this.gameInfoModel.findOne({ gameKey }).exec();
+    if (!game) {
+      return null;
+    }
+    
+    // 팀명 수정 적용
+    const gameObj = game.toObject();
+    gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
+    gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
+    return gameObj as any;
   }
 
   async updateGameInfo(gameKey: string, gameData: any): Promise<GameInfo> {
@@ -229,7 +254,17 @@ export class GameService {
 
   // gameKey로 경기 클립 데이터 조회
   async getGameClipsByKey(gameKey: string): Promise<GameClips> {
-    return this.gameClipsModel.findOne({ gameKey }).exec();
+    const clips = await this.gameClipsModel.findOne({ gameKey }).exec();
+    if (!clips) {
+      return null;
+    }
+
+    // 팀명 수정 적용
+    const clipsObject = clips.toObject();
+    clipsObject.homeTeam = this.fixTeamName(clipsObject.homeTeam);
+    clipsObject.awayTeam = this.fixTeamName(clipsObject.awayTeam);
+    
+    return clipsObject as any;
   }
 
   // 코치용 하이라이트 조회
@@ -261,8 +296,8 @@ export class GameService {
         highlights.push({
           gameKey: game.gameKey,
           date: game.date,
-          homeTeam: game.homeTeam,
-          awayTeam: game.awayTeam,
+          homeTeam: this.fixTeamName(game.homeTeam),
+          awayTeam: this.fixTeamName(game.awayTeam),
           location: game.location,
           clip: clip,
         });
@@ -350,8 +385,8 @@ export class GameService {
         highlights.push({
           gameKey: game.gameKey,
           date: game.date,
-          homeTeam: game.homeTeam,
-          awayTeam: game.awayTeam,
+          homeTeam: this.fixTeamName(game.homeTeam),
+          awayTeam: this.fixTeamName(game.awayTeam),
           location: game.location,
           clip: clip,
         });
