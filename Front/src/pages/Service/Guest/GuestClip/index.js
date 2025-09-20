@@ -179,26 +179,28 @@ export default function GuestClipPage() {
   const handleMenuToggle = (menuName) =>
     setOpenMenu(openMenu === menuName ? null : menuName);
 
-const rawClips = useMemo(() => {
-  return (GUEST_CLIPS || []).map((clip, idx) => {
-    const ot = clip.offensiveTeam ?? homeMeta?.display ?? '홈팀';
-    return {
-      id: String(clip.id ?? `row${idx + 1}`),
-      quarter: Number(clip.quarter ?? 0),
-      playType: String(clip.playType ?? '').toUpperCase(),
-      down: clip.down ?? clip.Down ?? null,
-      yardsToGo: clip.yardsToGo ?? clip.RemainYard ?? null,
-      significantPlay: Array.isArray(clip.significantPlay) ? clip.significantPlay : [],
-      offensiveTeam: compactTeam(ot),
-      gainYard: clip.gainYard ?? null,
-      videoUrl: clip.videoUrl ?? clip.clipUrl ?? clip.ClipUrl ?? null,
-      // 점수 정보 추가
-      scoreHome: clip.StartScore?.[0]?.Home ?? 0,
-      scoreAway: clip.StartScore?.[0]?.Away ?? 0,
-      raw: clip,
-    };
-  });
-}, [homeMeta?.display]);
+  const rawClips = useMemo(() => {
+    return (GUEST_CLIPS || []).map((clip, idx) => {
+      const ot = clip.offensiveTeam ?? homeMeta?.display ?? '홈팀';
+      return {
+        id: String(clip.id ?? `row${idx + 1}`),
+        quarter: Number(clip.quarter ?? 0),
+        playType: String(clip.playType ?? '').toUpperCase(),
+        down: clip.down ?? clip.Down ?? null,
+        yardsToGo: clip.yardsToGo ?? clip.RemainYard ?? null,
+        significantPlay: Array.isArray(clip.significantPlay)
+          ? clip.significantPlay
+          : [],
+        offensiveTeam: compactTeam(ot),
+        gainYard: clip.gainYard ?? null,
+        videoUrl: clip.videoUrl ?? clip.clipUrl ?? clip.ClipUrl ?? null,
+        // 점수 정보 추가
+        scoreHome: clip.StartScore?.[0]?.Home ?? 0,
+        scoreAway: clip.StartScore?.[0]?.Away ?? 0,
+        raw: clip,
+      };
+    });
+  }, [homeMeta?.display]);
 
   const {
     filters,
@@ -283,27 +285,46 @@ const rawClips = useMemo(() => {
   }, []);
 
   const SPECIAL_DOWN_MAP = { TPT: '2PT', KICKOFF: '킥오프', PAT: 'PAT' };
+  const ordinal = (n) => {
+    const num = Number(n);
+    if (!Number.isFinite(num)) return '';
+    const sfx = ['th', 'st', 'nd', 'rd'];
+    const v = num % 100;
+    return `${num}${sfx[(v - 20) % 10] || sfx[v] || sfx[0]}`;
+  };
   const getDownDisplay = (c) => {
     const pt = String(c.playType || '')
       .trim()
       .toUpperCase();
     const downRaw = c.down;
     const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
+
+    // 1) down 값이 특수 문자열이면 그 라벨만 표시 (야드투고 X)
     if (SPECIAL_DOWN_MAP[downStr]) return SPECIAL_DOWN_MAP[downStr];
+
+    // 2) playType으로도 특수 플레이라면 라벨만 표시
     if (SPECIAL_DOWN_MAP[pt]) return SPECIAL_DOWN_MAP[pt];
+
+    // 3) 일반 다운: "1st & ytg" / "2nd & ytg" ...
     const d =
       typeof downRaw === 'number'
         ? downRaw
         : Number.isFinite(parseInt(downStr, 10))
         ? parseInt(downStr, 10)
         : null;
+
     if (d != null) {
-      const ytg = c.yardsToGo ?? 0;
-      return `${d} & ${ytg}`;
+      const ytg =
+        c.yardsToGo != null && Number.isFinite(Number(c.yardsToGo))
+          ? Number(c.yardsToGo)
+          : null;
+      // yardsToGo가 없으면 "& ..." 생략
+      return ytg != null ? `${ordinal(d)} & ${ytg}` : `${ordinal(d)}`;
     }
+
+    // 다운 정보가 없으면 빈값/대시 등
     return '';
   };
-
   const renderPlayType = (v) => {
     const pt = (v ?? '').toString().trim().toUpperCase();
     return pt ? `#${PT_LABEL[pt] ?? pt}` : null;

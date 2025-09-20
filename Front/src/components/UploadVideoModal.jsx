@@ -7,60 +7,13 @@ import { API_CONFIG } from '../config/api';
 import { getToken } from '../utils/tokenUtils';
 import { TEAMS } from '../data/TEAMS.js';
 
-/* 팀명 → 리그 매핑 */
-const TEAM_TO_LEAGUE = {
-  // 서울
-  '연세대학교 이글스': '서울',
-  '서울대학교 그린테러스': '서울',
-  '한양대학교 라이온스': '서울',
-  '국민대학교 레이저백스': '서울',
-  '서울시립대학교 시티혹스': '서울',
-  '한국외대학교 블랙나이츠': '서울',
-  '건국대학교 레이징불스': '서울',
-  '홍익대학교 카우보이스': '서울',
-  '동국대학교 터스커스': '서울',
-  '고려대학교 타이거스': '서울',
-  '중앙대학교 블루드래곤스': '서울',
-  '숭실대학교 크루세이더스': '서울',
-  '서강대학교 알바트로스': '서울',
-  '경희대학교 커맨더스': '서울',
-  // 경기·강원
-  '강원대학교 카프라스': '경기강원',
-  '단국대학교 코디악베어스': '경기강원',
-  '성균관대학교 로얄스': '경기강원',
-  '용인대학교 화이트타이거스': '경기강원',
-  '인하대학교 틸 드래곤스': '경기강원',
-  '한림대학교 피닉스': '경기강원',
-  '한신대학교 킬러웨일스': '경기강원',
-  // 대구·경북
-  '경북대학교 오렌지파이터스': '대구경북',
-  '경일대학교 블랙베어스': '대구경북',
-  '계명대학교 슈퍼라이온스': '대구경북',
-  '금오공과대학교 레이븐스': '대구경북',
-  '대구가톨릭대학교 스커드엔젤스': '대구경북',
-  '대구대학교 플라잉타이거스': '대구경북',
-  '대구한의대학교 라이노스': '대구경북',
-  '동국대학교 화이트엘리펀츠': '대구경북',
-  '영남대학교 페가수스': '대구경북',
-  '한동대학교 홀리램스': '대구경북',
-  // 부산·경남
-  '경성대학교 드래곤스': '부산경남',
-  '동서대학교 블루돌핀스': '부산경남',
-  '동아대학교 레오파즈': '부산경남',
-  '동의대학교 터틀파이터스': '부산경남',
-  '부산대학교 이글스': '부산경남',
-  '부산외국어대학교 토네이도': '부산경남',
-  '신라대학교 데빌스': '부산경남',
-  '울산대학교 유니콘스': '부산경남',
-  '한국해양대학교 바이킹스': '부산경남',
-  // 사회인
-  '군위 피닉스': '사회인',
-  '부산 그리폰즈': '사회인',
-  '삼성 블루스톰': '사회인',
-  '서울 골든이글스': '사회인',
-  '서울 디펜더스': '사회인',
-  '서울 바이킹스': '사회인',
-  '인천 라이노스': '사회인',
+/* region 라벨 매핑 (TEAMS.region → 한글) */
+const REGION_LABEL = {
+  Seoul: '서울',
+  'Gyeonggi-Gangwon': '경기강원',
+  'Daegu-Gyeongbuk': '대구경북',
+  'Busan-Gyeongnam': '부산경남',
+  Amateur: '사회인',
 };
 
 /** 로고+이름 드롭다운 (기본형) */
@@ -100,7 +53,7 @@ function TeamSelect({ value, options = [], onChange, placeholder = 'Select' }) {
       {open && (
         <ul className="teamSelect-menu">
           {options.map((t) => (
-            <li key={t.name}>
+            <li key={t.id}>
               <button
                 type="button"
                 className="teamSelect-option"
@@ -122,22 +75,15 @@ function TeamSelect({ value, options = [], onChange, placeholder = 'Select' }) {
               </button>
             </li>
           ))}
-          {options.length === 0 && (
-            <li className="teamSelect-empty">No teams</li>
-          )}
+          {options.length === 0 && <li className="teamSelect-empty">No teams</li>}
         </ul>
       )}
     </div>
   );
 }
 
-/** 리그 → 팀 2단 드롭다운 (상대팀 전용) */
-function LeagueTeamSelect({
-  value,
-  options = [],
-  onChange,
-  placeholder = 'Select',
-}) {
+/** 리그 → 팀 2단 드롭다운 (원정팀 전용) */
+function LeagueTeamSelect({ value, options = [], onChange, placeholder = 'Select' }) {
   const [open, setOpen] = useState(false);
   const [activeLeague, setActiveLeague] = useState(null);
   const boxRef = useRef(null);
@@ -153,8 +99,8 @@ function LeagueTeamSelect({
   const teamsByLeague = useMemo(() => {
     const m = {};
     options.forEach((t) => {
-      const lg = TEAM_TO_LEAGUE[t.name] || '기타';
-      (m[lg] ||= []).push(t);
+      const key = REGION_LABEL[t.region] || '기타';
+      (m[key] ||= []).push(t);
     });
     return m;
   }, [options]);
@@ -168,9 +114,7 @@ function LeagueTeamSelect({
 
   useEffect(() => {
     if (!open) return;
-    setActiveLeague((cur) =>
-      cur && teamsByLeague[cur]?.length ? cur : leaguesList[0],
-    );
+    setActiveLeague((cur) => (cur && teamsByLeague[cur]?.length ? cur : leaguesList[0]));
   }, [open, leaguesList, teamsByLeague]);
 
   return (
@@ -201,9 +145,7 @@ function LeagueTeamSelect({
               <li key={lg}>
                 <button
                   type="button"
-                  className={`leagueItem ${
-                    activeLeague === lg ? 'active' : ''
-                  }`}
+                  className={`leagueItem ${activeLeague === lg ? 'active' : ''}`}
                   onMouseEnter={() => setActiveLeague(lg)}
                   onFocus={() => setActiveLeague(lg)}
                   onClick={() => setActiveLeague(lg)}
@@ -216,7 +158,7 @@ function LeagueTeamSelect({
 
           <ul className="oppsTeams">
             {(teamsByLeague[activeLeague] || []).map((t) => (
-              <li key={t.name}>
+              <li key={t.id}>
                 <button
                   type="button"
                   className="oppsItem"
@@ -231,9 +173,7 @@ function LeagueTeamSelect({
                         src={t.logo}
                         alt={t.name}
                         className={`opps-team-logo-img ${
-                          String(t.logo).endsWith('.svg')
-                            ? 'svg-logo'
-                            : 'png-logo'
+                          String(t.logo).endsWith('.svg') ? 'svg-logo' : 'png-logo'
                         }`}
                       />
                     </span>
@@ -242,8 +182,7 @@ function LeagueTeamSelect({
                 </button>
               </li>
             ))}
-            {(!activeLeague ||
-              (teamsByLeague[activeLeague] || []).length === 0) && (
+            {(!activeLeague || (teamsByLeague[activeLeague] || []).length === 0) && (
               <li className="oppsEmpty">해당 리그 팀이 없습니다</li>
             )}
           </ul>
@@ -253,14 +192,7 @@ function LeagueTeamSelect({
   );
 }
 
-/**
- * [수정됨] Q1~Q4 업로드 라인 컴포넌트
- * @param {object} props
- * @param {string} props.q - 쿼터 이름 (e.g., 'Q1')
- * @param {File[]} props.files - 현재 선택된 파일 배열
- * @param {(newFiles: File[]) => void} props.onPick - 파일이 선택됐을 때 호출될 함수
- * @param {() => void} props.onClear - 파일 목록을 비울 때 호출될 함수
- */
+/** Q1~Q4 업로드 라인 */
 function QuarterRow({ q, files, onPick, onClear }) {
   const inputRef = useRef(null);
   return (
@@ -270,36 +202,24 @@ function QuarterRow({ q, files, onPick, onClear }) {
         type="file"
         accept="video/*"
         className="hiddenFile"
-        multiple // ✨ 여러 파일 선택 가능하도록 속성 추가
+        multiple
         onChange={(e) => {
-          if (e.target.files) {
-            // FileList를 배열로 변환하여 onPick에 전달
-            onPick(Array.from(e.target.files));
-          }
+          if (e.target.files) onPick(Array.from(e.target.files));
         }}
       />
-      <button
-        className="btn primary"
-        type="button"
-        onClick={() => inputRef.current?.click()}
-      >
+      <button className="btn primary" type="button" onClick={() => inputRef.current?.click()}>
         {q} 영상 추가
       </button>
       <button
         className="btn ghost"
         type="button"
-        disabled={files.length === 0} // ✨ 파일이 없을 때 비활성화
+        disabled={files.length === 0}
         onClick={onClear}
         title={files.length > 0 ? '선택한 파일 모두 제거' : '파일 없음'}
       >
         초기화
       </button>
-      <span className="quarterFilename">
-        {/* ✨ 파일 개수에 따라 다른 텍스트 표시 */}
-        {files.length > 0
-          ? `${files.length}개 파일 선택됨`
-          : '선택된 파일 없음'}
-      </span>
+      <span className="quarterFilename">{files.length > 0 ? `${files.length}개 파일 선택됨` : '선택된 파일 없음'}</span>
     </div>
   );
 }
@@ -311,70 +231,49 @@ const UploadVideoModal = ({
   defaultHomeTeam,
   defaultAwayTeam,
 }) => {
-  // TEAMS prop 없으면 전역 TEAMS로 fallback
   const teamsList = TEAMS;
 
-  // 훅은 항상 호출
   const [home, setHome] = useState(defaultHomeTeam || teamsList[0] || null);
   const [away, setAway] = useState(defaultAwayTeam || teamsList[1] || null);
 
   const selectableHomes = useMemo(() => teamsList, [teamsList]);
   const selectableAways = useMemo(
-    () => teamsList.filter((t) => t?.name !== home?.name),
+    () => teamsList.filter((t) => t?.id !== home?.id),
     [teamsList, home],
   );
 
   const [matchDate, setMatchDate] = useState('');
   const [scoreHome, setScoreHome] = useState('');
   const [scoreAway, setScoreAway] = useState('');
-  const [gameType, setGameType] = useState('리그');
+  // 옵션과 일치하도록 기본값 정리 (원하는 경우 '리그' 옵션을 추가해도 됨)
+  const [gameType, setGameType] = useState('친선전');
   const [leagueName, setLeagueName] = useState('2024 Fall Cup');
   const [week, setWeek] = useState('Week1');
   const [stadium, setStadium] = useState('서울대학교 경기장');
 
-  // ✨ 각 쿼터의 파일 상태를 배열로 관리 (useState([]) 사용)
   const [q1, setQ1] = useState([]);
   const [q2, setQ2] = useState([]);
   const [q3, setQ3] = useState([]);
   const [q4, setQ4] = useState([]);
 
-  // ✨ 비디오 미리보기 관련 로직은 여러 파일을 다루기 복잡하므로 제거
-  // const [preview, setPreview] = useState(null);
-  // const [previewUrl, setPreviewUrl] = useState('');
-
-  // useEffect(() => {
-  //   if (!isOpen || !preview) return;
-  //   const url = URL.createObjectURL(preview);
-  //   setPreviewUrl(url);
-  //   return () => URL.revokeObjectURL(url);
-  // }, [isOpen, preview]);
-
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleClose = () => {
-    if (loading) return;
-    // ✨ 미리보기 상태 제거
-    // setPreview(null);
+    if (loading || deleteLoading) return;
     onClose?.();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!home || !away) return setError('홈/원정 팀을 선택해 주세요.');
-    if (!matchDate) return setError('경기 날짜를 선택해 주세요.');
 
-    // ✨ 업로드할 파일이 하나라도 있는지 확인 (배열 길이 체크)
-    if (
-      q1.length === 0 &&
-      q2.length === 0 &&
-      q3.length === 0 &&
-      q4.length === 0
-    ) {
+    if (!home || !away) return setError('홈/원정 팀을 선택해 주세요.');
+    if (home?.id === away?.id) return setError('홈팀과 원정팀이 동일할 수 없습니다.');
+    if (!matchDate) return setError('경기 날짜를 선택해 주세요.');
+    if (q1.length + q2.length + q3.length + q4.length === 0)
       return setError('최소 1개 분기 영상을 업로드해 주세요.');
-    }
 
     try {
       setLoading(true);
@@ -389,8 +288,6 @@ const UploadVideoModal = ({
       fd.append('week', week);
       fd.append('stadium', stadium);
 
-      // ✨ 각 쿼터별 파일 배열을 순회하며 FormData에 추가
-      // 서버에서 `q1`, `q2`와 같이 동일한 키로 여러 파일을 받을 수 있어야 합니다.
       q1.forEach((file) => fd.append('q1', file));
       q2.forEach((file) => fd.append('q2', file));
       q3.forEach((file) => fd.append('q3', file));
@@ -405,7 +302,9 @@ const UploadVideoModal = ({
           body: fd,
         },
       );
+
       if (!resp.ok) throw new Error((await resp.text()) || '업로드 실패');
+
       onUploaded?.();
       handleClose();
     } catch (err) {
@@ -421,17 +320,17 @@ const UploadVideoModal = ({
       return;
     }
 
-    // gameKey 생성 (홈팀 + 원정팀 + 날짜)
+    // gameKey = 홈코드(앞2) + 원정코드(앞2) + YYYYMMDD
     const gameDate = new Date(matchDate);
     const formattedDate = gameDate.toISOString().slice(0, 10).replace(/-/g, '');
-    const homeCode = home.id.length > 2 ? home.id.slice(0, 2) : home.id;
-    const awayCode = away.id.length > 2 ? away.id.slice(0, 2) : away.id;
+    const normCode = (s) => String(s || '').slice(0, 2).toUpperCase();
+    const homeCode = normCode(home.id);
+    const awayCode = normCode(away.id);
     const gameKey = `${homeCode}${awayCode}${formattedDate}`;
 
     const confirmDelete = window.confirm(
-      `정말로 ${gameKey} 경기의 모든 비디오를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`
+      `정말로 ${gameKey} 경기의 모든 비디오를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`,
     );
-
     if (!confirmDelete) return;
 
     try {
@@ -444,7 +343,7 @@ const UploadVideoModal = ({
         {
           method: 'DELETE',
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-        }
+        },
       );
 
       if (!resp.ok) {
@@ -453,17 +352,11 @@ const UploadVideoModal = ({
       }
 
       const result = await resp.json();
-      
-      if (result.success) {
+      if (result?.success) {
         alert(`성공적으로 ${result.deletedCount}개의 비디오 파일을 삭제했습니다.`);
-        
-        // 파일 선택 상태 초기화
-        setQ1([]);
-        setQ2([]);
-        setQ3([]);
-        setQ4([]);
+        setQ1([]); setQ2([]); setQ3([]); setQ4([]);
       } else {
-        throw new Error(result.message || '비디오 삭제 실패');
+        throw new Error(result?.message || '비디오 삭제 실패');
       }
     } catch (err) {
       console.error('비디오 삭제 오류:', err);
@@ -473,19 +366,15 @@ const UploadVideoModal = ({
     }
   };
 
-  // 조건부 렌더링은 마지막에만
-  return !isOpen ? null : (
+  if (!isOpen) return null;
+
+  return (
     <div className="uvm-overlay" onClick={handleClose}>
       <div className="uvm-card" onClick={(e) => e.stopPropagation()}>
         {/* 상단: 로고 + 닫기 */}
         <div className="uvm-topbar">
           <img className="uvm-logo" src={Stechlogo} alt="Stech" />
-          <button
-            type="button"
-            className="uvm-close"
-            onClick={handleClose}
-            aria-label="닫기"
-          >
+          <button type="button" className="uvm-close" onClick={handleClose} aria-label="닫기">
             <IoCloseCircleOutline />
           </button>
         </div>
@@ -508,7 +397,6 @@ const UploadVideoModal = ({
 
             <div className="uvm-field two">
               <label>원정팀 (AWAY)</label>
-              {/* ⬇️ 상대팀은 리그 → 팀 2단 드롭다운 */}
               <LeagueTeamSelect
                 value={away}
                 options={selectableAways}
@@ -536,6 +424,7 @@ const UploadVideoModal = ({
                 placeholder="예: 24"
               />
             </div>
+
             <div className="uvm-field two">
               <label>스코어 (AWAY)</label>
               <input
@@ -547,14 +436,10 @@ const UploadVideoModal = ({
               />
             </div>
 
-            <h3 className="uvm-section-title">경기 정보 입력</h3>
-
             <div className="uvm-field two">
               <label>경기 유형</label>
-              <select
-                value={gameType}
-                onChange={(e) => setGameType(e.target.value)}
-              >
+              <select value={gameType} onChange={(e) => setGameType(e.target.value)}>
+                {/* 필요하면 <option>리그</option> 추가 */}
                 <option>친선전</option>
                 <option>연습 경기</option>
               </select>
@@ -562,10 +447,7 @@ const UploadVideoModal = ({
 
             <div className="uvm-field two">
               <label>리그 명칭</label>
-              <input
-                value={leagueName}
-                onChange={(e) => setLeagueName(e.target.value)}
-              />
+              <input value={leagueName} onChange={(e) => setLeagueName(e.target.value)} />
             </div>
 
             <div className="uvm-field two">
@@ -575,10 +457,7 @@ const UploadVideoModal = ({
 
             <div className="uvm-field two">
               <label>경기장</label>
-              <input
-                value={stadium}
-                onChange={(e) => setStadium(e.target.value)}
-              />
+              <input value={stadium} onChange={(e) => setStadium(e.target.value)} />
             </div>
           </section>
 
@@ -586,31 +465,10 @@ const UploadVideoModal = ({
           <section className="uvm-col right">
             <h3 className="uvm-section-title">경기 영상 업로드</h3>
 
-            {/* ✨ QuarterRow에 수정된 props 전달 */}
-            <QuarterRow
-              q="Q1"
-              files={q1}
-              onPick={(newFiles) => setQ1((prev) => [...prev, ...newFiles])}
-              onClear={() => setQ1([])}
-            />
-            <QuarterRow
-              q="Q2"
-              files={q2}
-              onPick={(newFiles) => setQ2((prev) => [...prev, ...newFiles])}
-              onClear={() => setQ2([])}
-            />
-            <QuarterRow
-              q="Q3"
-              files={q3}
-              onPick={(newFiles) => setQ3((prev) => [...prev, ...newFiles])}
-              onClear={() => setQ3([])}
-            />
-            <QuarterRow
-              q="Q4"
-              files={q4}
-              onPick={(newFiles) => setQ4((prev) => [...prev, ...newFiles])}
-              onClear={() => setQ4([])}
-            />
+            <QuarterRow q="Q1" files={q1} onPick={(f) => setQ1((p) => [...p, ...f])} onClear={() => setQ1([])} />
+            <QuarterRow q="Q2" files={q2} onPick={(f) => setQ2((p) => [...p, ...f])} onClear={() => setQ2([])} />
+            <QuarterRow q="Q3" files={q3} onPick={(f) => setQ3((p) => [...p, ...f])} onClear={() => setQ3([])} />
+            <QuarterRow q="Q4" files={q4} onPick={(f) => setQ4((p) => [...p, ...f])} onClear={() => setQ4([])} />
 
             {error && <p className="uvm-error">{error}</p>}
 
@@ -628,7 +486,7 @@ const UploadVideoModal = ({
                 className="btn danger"
                 onClick={handleDeleteVideos}
                 disabled={loading || deleteLoading}
-                style={{ backgroundColor: '#dc3545', color: 'white', marginRight: '8px' }}
+                style={{ backgroundColor: '#dc3545', color: 'white', marginRight: 8 }}
               >
                 {deleteLoading ? '삭제 중…' : '비디오 삭제'}
               </button>
@@ -638,8 +496,6 @@ const UploadVideoModal = ({
             </div>
           </section>
         </form>
-
-        {/* ✨ 단일 파일 미리보기 UI 제거 */}
       </div>
     </div>
   );

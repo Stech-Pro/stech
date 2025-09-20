@@ -154,19 +154,7 @@ const normalizeTeamStats = (s) => {
     },
   };
 };
-/* TEAMS에서 이름/영문/코드로 팀 찾기(느슨 매칭) */
-const findTeamMeta = (raw) => {
-  if (!raw) return { name: '', logo: null };
-  const norm = String(raw).toLowerCase();
-  return (
-    TEAMS.find(
-      (t) =>
-        String(t.name).toLowerCase() === norm ||
-        String(t.enName || '').toLowerCase() === norm ||
-        String(t.code || '').toLowerCase() === norm,
-    ) || { name: String(raw), logo: null }
-  );
-};
+
 
 /* ========== 메인 컴포넌트 ========== */
 export default function ClipPage() {
@@ -281,35 +269,45 @@ export default function ClipPage() {
     PAT: 'PAT',
   };
 
-  const getDownDisplay = (c) => {
-    const pt = String(c.playType || '')
-      .trim()
-      .toUpperCase();
-    const downRaw = c.down;
-    const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
+  const ordinal = (n) => {
+  const num = Number(n);
+  if (!Number.isFinite(num)) return '';
+  const sfx = ['th', 'st', 'nd', 'rd'];
+  const v = num % 100;
+  return `${num}${sfx[(v - 20) % 10] || sfx[v] || sfx[0]}`;
+};
 
-    // 1) down 값이 특수 문자열이면 그 라벨만 표시 (야드투고 X)
-    if (SPECIAL_DOWN_MAP[downStr]) return SPECIAL_DOWN_MAP[downStr];
+const getDownDisplay = (c) => {
+  const pt = String(c.playType || '').trim().toUpperCase();
+  const downRaw = c.down;
+  const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
 
-    // 2) playType으로도 특수 플레이라면 라벨만 표시
-    if (SPECIAL_DOWN_MAP[pt]) return SPECIAL_DOWN_MAP[pt];
+  // 1) down 값이 특수 문자열이면 그 라벨만 표시 (야드투고 X)
+  if (SPECIAL_DOWN_MAP[downStr]) return SPECIAL_DOWN_MAP[downStr];
 
-    // 3) 일반 다운: "n & ytg"
-    const d =
-      typeof downRaw === 'number'
-        ? downRaw
-        : Number.isFinite(parseInt(downStr, 10))
-        ? parseInt(downStr, 10)
+  // 2) playType으로도 특수 플레이라면 라벨만 표시
+  if (SPECIAL_DOWN_MAP[pt]) return SPECIAL_DOWN_MAP[pt];
+
+  // 3) 일반 다운: "1st & ytg" / "2nd & ytg" ...
+  const d =
+    typeof downRaw === 'number'
+      ? downRaw
+      : Number.isFinite(parseInt(downStr, 10))
+      ? parseInt(downStr, 10)
+      : null;
+
+  if (d != null) {
+    const ytg =
+      c.yardsToGo != null && Number.isFinite(Number(c.yardsToGo))
+        ? Number(c.yardsToGo)
         : null;
+    // yardsToGo가 없으면 "& ..." 생략
+    return ytg != null ? `${ordinal(d)} & ${ytg}` : `${ordinal(d)}`;
+  }
 
-    if (d != null) {
-      const ytg = c.yardsToGo ?? 0;
-      return `${d} & ${ytg}`;
-    }
-
-    // 다운 정보가 없으면 빈값/대시 등
-    return '';
-  };
+  // 다운 정보가 없으면 빈값/대시 등
+  return '';
+};
 
   const [rawClips, setRawClips] = useState([]);
   const [clipsLoading, setClipsLoading] = useState(false);

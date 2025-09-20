@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../context/AuthContext';
-import { getUserHighlights } from '../../../../api/authAPI';
+import { getPlayerHighlights, getCoachHighlights } from '../../../../api/gameAPI';
 import HighlightModal from '../../../../components/HighlightModal';
 
 const GameItem = ({ gameKey, count, active, onClick }) => (
@@ -14,22 +14,29 @@ const GameItem = ({ gameKey, count, active, onClick }) => (
   </li>
 );
 
-const ClipItem = ({ clipKey, onClick }) => (
+const ClipItem = ({ clip, onClick }) => (
   <li>
-    <button type="button" onClick={onClick} title={clipKey}>
-      <span className="clip-key">{clipKey}</span>
+    <button type="button" onClick={onClick} title={clip?.clipKey}>
+      <span className="clip-key">{clip?.clipKey}</span>
+      <span className="clip-meta">
+        Q{clip?.quarter ?? '-'} • {clip?.playType ?? '-'} • {clip?.gainYard ?? 0}yd
+      </span>
     </button>
   </li>
 );
 
 export default function HighlightPage() {
   const navigate = useNavigate();
-  const { token, isAuthenticated } = useAuth();
+  const { token, isAuthenticated, user } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [byGame, setByGame] = useState({}); // { [gameKey]: string[] }
+  // { [gameKey]: Array<ClipObj> }
+  const [byGame, setByGame] = useState({});
   const [selectedGameKey, setSelectedGameKey] = useState(null);
+
+  const role = (user?.role || '').toLowerCase();
+  const isCoach = role === 'coach' || user?.isCoach === true || user?.accessLevel === 'team';
 
   useEffect(() => {
     let alive = true;
@@ -40,17 +47,36 @@ export default function HighlightPage() {
         setLoading(false);
         return;
       }
+
       try {
         setLoading(true);
         setError('');
-        const rowsRaw = await getUserHighlights(token);  // ← 항상 배열 보장
-        const rows = Array.isArray(rowsRaw) ? rowsRaw : []; // 추가 가드
 
-        const grouped = rows.reduce((acc, r) => {
-          const gk = r?.gameKey || 'UNKNOWN_GAME';
-          const ck = r?.clipKey || r?.clipId || r?.clip || '';
-          if (!ck) return acc;
-          (acc[gk] ||= []).push(ck);
+        // 역할에 따라 API
+        const rowsRaw = isCoach
+          ? await getCoachHighlights(token)
+          : await getPlayerHighlights(token);
+
+        // 서버 응답 모양: { accessLevel, data: [...] } or 그냥 배열
+        const base = Array.isArray(rowsRaw?.data) ? rowsRaw.data
+                   : Array.isArray(rowsRaw) ? rowsRaw
+                   : [];
+
+        // clip만 꺼내고 gameKey 달아주기 + 중복 제거
+        const seen = new Set();
+        const clips = base.map((r) => {
+          const clip = r?.clip && typeof r.clip === 'object' ? r.clip : r;
+          const gameKey = r?.gameKey ?? clip?.gameKey ?? 'UNKNOWN_GAME';
+          if (!clip?.clipKey) return null;
+          const key = `${gameKey}::${clip.clipKey}`;
+          if (seen.has(key)) return null;
+          seen.add(key);
+          return { ...clip, gameKey };
+        }).filter(Boolean);
+
+        // gameKey별 그룹핑
+        const grouped = clips.reduce((acc, c) => {
+          (acc[c.gameKey] ||= []).push(c);
           return acc;
         }, {});
 
@@ -68,22 +94,22 @@ export default function HighlightPage() {
     })();
 
     return () => { alive = false; };
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, token, isCoach]);
 
   const gameList = useMemo(
-    () => Object.keys(byGame).map((k) => ({ gameKey: k, count: (byGame[k] || []).length })),
+    () => Object.keys(byGame).map((k) => ({ gameKey: k, count: byGame[k]?.length ?? 0 })),
     [byGame]
   );
 
   const totalHighlights = useMemo(
-    () => Object.values(byGame).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0),
+    () => Object.values(byGame).reduce((sum, arr) => sum + (arr?.length ?? 0), 0),
     [byGame]
   );
 
-  const clipsForSelected = useMemo(() => {
-    if (!selectedGameKey) return [];
-    return (byGame[selectedGameKey] || []).filter(Boolean);
-  }, [selectedGameKey, byGame]);
+  const clipsForSelected = useMemo(
+    () => (selectedGameKey ? (byGame[selectedGameKey] || []) : []),
+    [selectedGameKey, byGame]
+  );
 
   const goVideo = (clipKey) => {
     const g = encodeURIComponent(selectedGameKey || '');
@@ -91,26 +117,25 @@ export default function HighlightPage() {
     navigate(`/video?gameKey=${g}&clipKey=${c}`);
   };
 
-  // --- 렌더링 --------------------------------------------------
-
+  // --- 렌더링 ---
   if (loading) return <p className="highlight-loading">불러오는 중…</p>;
-  if (error)   return (
-    <div className="highlight-error-wrap">
-      <p className="highlight-error" role="alert">⚠ {error}</p>
-      <button type="button" onClick={() => navigate(-1)}>닫기</button>
-    </div>
-  );
 
-  // ✅ 전체 하이라이트가 0개면 "모달만" 띄움 (뒤에 아무것도 없음)
+  if (error)
+    return (
+      <div className="highlight-error-wrap">
+        <p className="highlight-error" role="alert">⚠ {error}</p>
+        <button type="button" onClick={() => navigate(-1)}>닫기</button>
+      </div>
+    );
+
   if (totalHighlights === 0) {
     return <HighlightModal onClose={() => navigate(-1)} />;
   }
 
-  // ✅ 데이터가 있으면 목록 화면으로
   return (
     <div className="highlight-page">
       <div className="highlight-header">
-        <h2>하이라이트</h2>
+        <h2>{isCoach ? '코치 하이라이트' : '선수 하이라이트'}</h2>
         <button type="button" onClick={() => navigate(-1)}>닫기</button>
       </div>
 
@@ -133,13 +158,16 @@ export default function HighlightPage() {
         <section className="clip-section">
           <h3 className="section-title">{selectedGameKey || '선택된 경기'}</h3>
 
-          {/* 선택된 경기의 클립이 0개면 우측에만 모달 */}
           {clipsForSelected.length === 0 ? (
             <HighlightModal onClose={() => null} />
           ) : (
             <ul className="clip-list">
-              {clipsForSelected.map((clipKey) => (
-                <ClipItem key={clipKey} clipKey={clipKey} onClick={() => goVideo(clipKey)} />
+              {clipsForSelected.map((clip) => (
+                <ClipItem
+                  key={`${clip.gameKey}-${clip.clipKey}`}
+                  clip={clip}
+                  onClick={() => goVideo(clip.clipKey)}
+                />
               ))}
             </ul>
           )}
