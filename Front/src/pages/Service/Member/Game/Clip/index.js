@@ -68,7 +68,6 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
   );
 }
 
-/* ========== 표시 라벨/상반 항목 ========== */
 export const PT_LABEL = {
   RUN: '런',
   PASS: '패스',
@@ -154,19 +153,6 @@ const normalizeTeamStats = (s) => {
       passPercentage: s.passPercentage ?? 0,
     },
   };
-};
-/* TEAMS에서 이름/영문/코드로 팀 찾기(느슨 매칭) */
-const findTeamMeta = (raw) => {
-  if (!raw) return { name: '', logo: null };
-  const norm = String(raw).toLowerCase();
-  return (
-    TEAMS.find(
-      (t) =>
-        String(t.name).toLowerCase() === norm ||
-        String(t.enName || '').toLowerCase() === norm ||
-        String(t.code || '').toLowerCase() === norm,
-    ) || { name: String(raw), logo: null }
-  );
 };
 
 
@@ -259,8 +245,8 @@ export default function ClipPage() {
   const handleMenuToggle = (menuName) => {
     setOpenMenu(openMenu === menuName ? null : menuName);
   };
-  const homeMeta = useMemo(() => findTeamMeta(game?.home), [game?.home]);
-  const awayMeta = useMemo(() => findTeamMeta(game?.away), [game?.away]);
+  const homeMeta = TEAM_BY_ID[game.homeId];
+  const awayMeta = TEAM_BY_ID[game.awayId];
 
   // 홈/원정 → 팀 드롭다운 옵션
   const teamOptions = useMemo(() => {
@@ -283,37 +269,46 @@ export default function ClipPage() {
     PAT: 'PAT',
   };
 
-  const getDownDisplay = (c) => {
-    const pt = String(c.playType || '')
-      .trim()
-      .toUpperCase();
-    const downRaw = c.down;
-    const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
+  const ordinal = (n) => {
+  const num = Number(n);
+  if (!Number.isFinite(num)) return '';
+  const sfx = ['th', 'st', 'nd', 'rd'];
+  const v = num % 100;
+  return `${num}${sfx[(v - 20) % 10] || sfx[v] || sfx[0]}`;
+};
 
-    // 1) down 값이 특수 문자열이면 그 라벨만 표시 (야드투고 X)
-    if (SPECIAL_DOWN_MAP[downStr]) return SPECIAL_DOWN_MAP[downStr];
+const getDownDisplay = (c) => {
+  const pt = String(c.playType || '').trim().toUpperCase();
+  const downRaw = c.down;
+  const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
 
-    // 2) playType으로도 특수 플레이라면 라벨만 표시
-    if (SPECIAL_DOWN_MAP[pt]) return SPECIAL_DOWN_MAP[pt];
+  // 1) down 값이 특수 문자열이면 그 라벨만 표시 (야드투고 X)
+  if (SPECIAL_DOWN_MAP[downStr]) return SPECIAL_DOWN_MAP[downStr];
 
-    // 3) 일반 다운: "n & ytg"
-    const d =
-      typeof downRaw === 'number'
-        ? downRaw
-        : Number.isFinite(parseInt(downStr, 10))
-        ? parseInt(downStr, 10)
+  // 2) playType으로도 특수 플레이라면 라벨만 표시
+  if (SPECIAL_DOWN_MAP[pt]) return SPECIAL_DOWN_MAP[pt];
+
+  // 3) 일반 다운: "1st & ytg" / "2nd & ytg" ...
+  const d =
+    typeof downRaw === 'number'
+      ? downRaw
+      : Number.isFinite(parseInt(downStr, 10))
+      ? parseInt(downStr, 10)
+      : null;
+
+  if (d != null) {
+    const ytg =
+      c.yardsToGo != null && Number.isFinite(Number(c.yardsToGo))
+        ? Number(c.yardsToGo)
         : null;
+    // yardsToGo가 없으면 "& ..." 생략
+    return ytg != null ? `${ordinal(d)} & ${ytg}` : `${ordinal(d)}`;
+  }
 
-    if (d != null) {
-      const ytg = c.yardsToGo ?? 0;
-      return `${d} & ${ytg}`;
-    }
+  // 다운 정보가 없으면 빈값/대시 등
+  return '';
+};
 
-    // 다운 정보가 없으면 빈값/대시 등
-    return '';
-  };
-
-  /* ========== 예시 클립 데이터(실제 API로 교체) ========== */
   const [rawClips, setRawClips] = useState([]);
   const [clipsLoading, setClipsLoading] = useState(false);
   const [clipsError, setClipsError] = useState(null);
@@ -335,8 +330,8 @@ export default function ClipPage() {
           return {
             // 식별자들
             id: uiId,
-            clipKey, 
-            playIndex: clip.playIndex ?? idx, 
+            clipKey,
+            playIndex: clip.playIndex ?? idx,
 
             // 데이터
             quarter: clip.quarter,
@@ -344,7 +339,7 @@ export default function ClipPage() {
             down: clip.down,
             yardsToGo: clip.toGoYard,
             significantPlay:
-            clip.significantPlays?.filter((p) => p != null) || [],
+              clip.significantPlays?.filter((p) => p != null) || [],
             offensiveTeam: clip.offensiveTeam,
             gainYard: clip.gainYard,
             clipUrl: clip.clipUrl || null,
@@ -420,6 +415,42 @@ export default function ClipPage() {
         },
       },
     });
+  };
+  const getPenaltyLabel = (c, key, homeDisplay, awayDisplay) => {
+    // offensiveTeam은 붙여쓰기 display 사용
+    const offenseIsHome =
+      homeDisplay && c?.offensiveTeam ? c.offensiveTeam === homeDisplay : null;
+
+    // PENALTY.HOME / PENALTY.AWAY
+    const penalizedIsHome = key.endsWith('.HOME')
+      ? true
+      : key.endsWith('.AWAY')
+      ? false
+      : null;
+
+    if (offenseIsHome === null || penalizedIsHome === null) {
+      return '페널티'; // 정보 부족 시 일반 표기
+    }
+    // 같은 사이드면 "공격팀 페널티", 아니면 "수비팀 페널티"
+    return penalizedIsHome === offenseIsHome
+      ? '공격팀 페널티'
+      : '수비팀 페널티';
+  };
+
+  const labelSignificant = (c, token, homeDisplay, awayDisplay) => {
+    const raw = (token ?? '').toString().trim();
+    if (!raw) return '';
+    const key = raw.toUpperCase();
+
+    if (key.startsWith('PENALTY.')) {
+      return getPenaltyLabel(c, key, homeDisplay, awayDisplay);
+    }
+
+    if (Object.prototype.hasOwnProperty.call(SIGNIFICANT_PLAYS, key)) {
+      const mapped = SIGNIFICANT_PLAYS[key];
+      return mapped === '' ? key : mapped;
+    }
+    return key;
   };
 
   return (
@@ -669,13 +700,25 @@ export default function ClipPage() {
                     </div>
 
                     <div className="clip-row2">
-                      <div className="clip-oT">{c.offensiveTeam}</div>
+                      <div className="clip-oT">
+                        {c.offensiveTeam == 'Home'
+                          ? `${homeMeta?.name}`
+                          : `${awayMeta?.name}`}
+                      </div>
 
                       {Array.isArray(c.significantPlay) &&
                       c.significantPlay.length > 0 ? (
                         <div className="clip-sig">
                           {c.significantPlay.map((t, idx) => (
-                            <span key={`${safeKey}-sig-${idx}`}>#{t}</span>
+                            <span key={`${safeKey}-sig-${idx}`}>
+                              #{' '}
+                              {labelSignificant(
+                                c,
+                                t,
+                                homeMeta?.display,
+                                awayMeta?.display,
+                              )}
+                            </span>
                           ))}
                         </div>
                       ) : (

@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { FaChevronDown, FaRegFileAlt } from 'react-icons/fa';
-import { TEAMS } from '../../../../data/TEAMS';
+import { GUEST_TEAMS } from '../../../../data/TEAMS';
 import CalendarDropdown from '../../../../components/Calendar.jsx';
 import UploadVideoModal from '../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../assets/images/logos/Stechlogo.svg';
@@ -21,7 +21,7 @@ const REGION_LABEL = {
 };
 
 /** 빠른 조회용 맵 (id → 팀 메타) */
-const TEAM_BY_ID = TEAMS.reduce((m, t) => {
+const TEAM_BY_ID = GUEST_TEAMS.reduce((m, t) => {
   m[t.id] = t;
   return m;
 }, {});
@@ -51,7 +51,7 @@ export default function GuestGamePage() {
 
   /* 내 팀 표기(게스트용이니 대충 기본값) */
   const MY_TEAM_ID = 'GCF'; // 경기강원협회
-  const selfTeam = (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || TEAMS[0] || null;
+  const selfTeam = (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || GUEST_TEAMS[0] || null;
   const logoSrc = selfTeam?.logo || defaultLogo;
   const label = selfTeam?.name || 'Choose Team';
 
@@ -86,7 +86,7 @@ export default function GuestGamePage() {
   /* 리그별 팀 묶기 (드롭다운용) */
   const teamsByLeague = useMemo(() => {
     const m = {};
-    TEAMS.forEach((t) => {
+    GUEST_TEAMS.forEach((t) => {
       if (t.id === selfTeam?.id) return;
       const ko = REGION_LABEL[t.region] || '기타';
       (m[ko] ||= []).push(t);

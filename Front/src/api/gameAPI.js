@@ -90,6 +90,7 @@ export async function fetchGameClips(gameKey) {
       data,
     );
   }
+  console.log('fetchGameClips data:', data);  
 
   // 실제 API 응답 구조에 맞게 수정
   let clips = [];
@@ -105,4 +106,65 @@ export async function fetchGameClips(gameKey) {
   }
 
   return clips;
+}
+export async function getCoachHighlights(accessToken) {
+  if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
+
+  const res = await fetch(
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_COACH_HIGHLIGHTS}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`, // 중요
+      },
+      // 쿠키 기반이면 ↓ 추가
+      // credentials: 'include',
+    }
+  );
+  const data = await jsonOrText(res);
+  if (!res.ok) {
+    throw new APIError(
+      typeof data === 'object' ? data.message || '하이라이트 조회 실패' : '하이라이트 조회 실패',
+      res.status,
+      data
+    );
+  }
+  // 다양한 형태 방어
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === 'object') {
+    if (Array.isArray(data.highlights)) return data.highlights;
+    if (Array.isArray(data.data)) return data.data;
+  }
+  return [];
+}
+
+export async function getPlayerHighlights(accessToken) {
+  if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
+  const res = await fetch(
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_PLAYER_HIGHLIGHTS}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+  const data = await jsonOrText(res);
+  if (!res.ok) {
+    throw new APIError(
+      typeof data === 'object' ? data.message || '하이라이트 조회 실패' : '하이라이트 조회 실패',
+      res.status,
+      data
+    );
+  }
+  console.log('getPlayerHighlights data:', data);
+
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === 'object') {
+    if (Array.isArray(data.highlights)) return data.highlights;
+    if (Array.isArray(data.data)) return data.data;
+  }
+  return [];
 }

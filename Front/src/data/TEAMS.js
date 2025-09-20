@@ -66,4 +66,12 @@ export const TEAMS = [
   { id: 'ADMIN',      name: '관리자',              logo: '/assets/images/svg/teams/Stechlogo.svg',          region: 'Admin' }
 ];
 
+export const GUEST_TEAMS = [
+  { id: 'seoulVI',     name: '서울 바이킹스',        logo: '/assets/images/svg/teams/Vikings.png',            region: 'Amateur' },
+
+  //경기강원협회 /게스트용
+  { id: 'GCF',        name: '경기강원올스타',      logo: '/assets/images/svg/teams/gcf.png',                region: 'Gyeonggi-Gangwon'},
+
+];
+
 export const TEAM_BY_ID = Object.fromEntries(TEAMS.map(t => [t.id, t]));

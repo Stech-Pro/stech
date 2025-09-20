@@ -303,32 +303,7 @@ export async function updateProfile(payload, accessToken) {
   );
 }
 
-export async function getUserHighlights(accessToken) {
-  if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
 
-  const res = await fetch(
-    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_USER_HIGHLIGHTS}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
-  const data = await jsonOrText(res);
-  if (!res.ok) {
-    throw new APIError(typeof data === 'object' ? data.message || '하이라이트 조회 실패' : '하이라이트 조회 실패', res.status, data);
-  }
-
-  // 어떤 형태로 와도 결국 배열로 반환
-  if (Array.isArray(data)) return data;
-  if (data && typeof data === 'object') {
-    if (Array.isArray(data.highlights)) return data.highlights;
-    if (Array.isArray(data.data)) return data.data;
-  }
-  return []; // 안전 가드
-}
 
 export const createProfile = async (profileData, token) => {
   if (!token) throw new APIError('인증이 필요합니다.', 401);

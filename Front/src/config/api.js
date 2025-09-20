@@ -17,7 +17,7 @@ export const API_CONFIG = {
     VERIFY_PASSWORD: '/auth/verify-password',
     VERIFY_TEAM_CODE: '/auth/verify-team-code',
     VERIFY_TOKEN: '/auth/verify-token',
-    GET_USER_HIGHLIGHTS: '/auth/highlights',
+
 
     UPLOAD_VIDEO: '/video/upload',
     JSON_EX: '/player/analyze-game-data',
@@ -26,7 +26,8 @@ export const API_CONFIG = {
     //game
     GET_GAMES_BY_TEAM: '/game/team',
     GET_CLIPS_BY_TEAM: '/game/clips',
-
+    GET_PLAYER_HIGHLIGHTS: '/game/highlights/player',
+    GET_COACH_HIGHLIGHTS: '/game/highlights/coach',
     //Team
     GET_TEAM_TOTAL_STATS: '/team/total-stats',
     GET_TEAM_STATS_BY_KEY: '/team/stats',
