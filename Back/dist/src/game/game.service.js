@@ -105,17 +105,36 @@ let GameService = class GameService {
         }
     }
     async findGamesByTeam(teamName) {
-        return this.gameInfoModel
+        const games = await this.gameInfoModel
             .find({
             $or: [{ homeTeam: teamName }, { awayTeam: teamName }],
         })
             .exec();
+        return games.map(game => {
+            const gameObj = game.toObject();
+            gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
+            gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
+            return gameObj;
+        });
     }
     async findAllGames() {
-        return this.gameInfoModel.find().exec();
+        const games = await this.gameInfoModel.find().exec();
+        return games.map(game => {
+            const gameObj = game.toObject();
+            gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
+            gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
+            return gameObj;
+        });
     }
     async findGameByKey(gameKey) {
-        return this.gameInfoModel.findOne({ gameKey }).exec();
+        const game = await this.gameInfoModel.findOne({ gameKey }).exec();
+        if (!game) {
+            return null;
+        }
+        const gameObj = game.toObject();
+        gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
+        gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
+        return gameObj;
     }
     async updateGameInfo(gameKey, gameData) {
         const updateData = {
@@ -187,7 +206,14 @@ let GameService = class GameService {
         return createdGameClips.save();
     }
     async getGameClipsByKey(gameKey) {
-        return this.gameClipsModel.findOne({ gameKey }).exec();
+        const clips = await this.gameClipsModel.findOne({ gameKey }).exec();
+        if (!clips) {
+            return null;
+        }
+        const clipsObject = clips.toObject();
+        clipsObject.homeTeam = this.fixTeamName(clipsObject.homeTeam);
+        clipsObject.awayTeam = this.fixTeamName(clipsObject.awayTeam);
+        return clipsObject;
     }
     async getCoachHighlights(teamName) {
         const games = await this.gameClipsModel
@@ -206,8 +232,8 @@ let GameService = class GameService {
                 highlights.push({
                     gameKey: game.gameKey,
                     date: game.date,
-                    homeTeam: game.homeTeam,
-                    awayTeam: game.awayTeam,
+                    homeTeam: this.fixTeamName(game.homeTeam),
+                    awayTeam: this.fixTeamName(game.awayTeam),
                     location: game.location,
                     clip: clip,
                 });
@@ -255,8 +281,8 @@ let GameService = class GameService {
                 highlights.push({
                     gameKey: game.gameKey,
                     date: game.date,
-                    homeTeam: game.homeTeam,
-                    awayTeam: game.awayTeam,
+                    homeTeam: this.fixTeamName(game.homeTeam),
+                    awayTeam: this.fixTeamName(game.awayTeam),
                     location: game.location,
                     clip: clip,
                 });
