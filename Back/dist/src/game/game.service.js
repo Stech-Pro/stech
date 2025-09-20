@@ -25,34 +25,11 @@ let GameService = class GameService {
     gameClipsModel;
     teamGameStatsModel;
     teamTotalStatsModel;
-    teamNameFixes = {
-        'KMRazorbacks': 'KMrazorbacks',
-        'YSEagles': 'YSeagles',
-        'SNGreenTerrors': 'SNgreenterrors',
-        'HYLions': 'HYlions',
-        'USCityhawks': 'UScityhawks',
-        'HFBlackKnights': 'HFblackKnights',
-        'KKRagingbulls': 'KKragingbulls',
-        'HICowboys': 'HIcowboys',
-        'KUTigers': 'KUtigers',
-        'DongkukTuskers': 'DongkukTuskers',
-        'SSCrusaders': 'SScrusaders',
-        'CABluedragons': 'CAbluedragons',
-        'KHCommanders': 'KHcommanders',
-        'SGAlbatross': 'SGalbatross',
-    };
     constructor(gameInfoModel, gameClipsModel, teamGameStatsModel, teamTotalStatsModel) {
         this.gameInfoModel = gameInfoModel;
         this.gameClipsModel = gameClipsModel;
         this.teamGameStatsModel = teamGameStatsModel;
         this.teamTotalStatsModel = teamTotalStatsModel;
-    }
-    fixTeamName(teamName) {
-        if (this.teamNameFixes[teamName]) {
-            console.log(`🔧 팀명 수정: ${teamName} → ${this.teamNameFixes[teamName]}`);
-            return this.teamNameFixes[teamName];
-        }
-        return teamName;
     }
     async createGameInfo(gameData) {
         console.log('🔍 createGameInfo 호출됨, gameData 필드들:');
@@ -64,8 +41,8 @@ let GameService = class GameService {
         console.log('  location:', gameData.location);
         console.log('  homeTeam:', gameData.homeTeam);
         console.log('  awayTeam:', gameData.awayTeam);
-        const fixedHomeTeam = this.fixTeamName(gameData.homeTeam);
-        const fixedAwayTeam = this.fixTeamName(gameData.awayTeam);
+        const fixedHomeTeam = gameData.homeTeam;
+        const fixedAwayTeam = gameData.awayTeam;
         const existingGame = await this.gameInfoModel.findOne({ gameKey: gameData.gameKey });
         if (existingGame) {
             console.log(`⚠️ 게임 데이터 중복: ${gameData.gameKey} 이미 존재함. 덮어쓰기 진행.`);
@@ -112,8 +89,6 @@ let GameService = class GameService {
             .exec();
         return games.map(game => {
             const gameObj = game.toObject();
-            gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
-            gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
             return gameObj;
         });
     }
@@ -121,8 +96,6 @@ let GameService = class GameService {
         const games = await this.gameInfoModel.find().exec();
         return games.map(game => {
             const gameObj = game.toObject();
-            gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
-            gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
             return gameObj;
         });
     }
@@ -132,8 +105,6 @@ let GameService = class GameService {
             return null;
         }
         const gameObj = game.toObject();
-        gameObj.homeTeam = this.fixTeamName(gameObj.homeTeam);
-        gameObj.awayTeam = this.fixTeamName(gameObj.awayTeam);
         return gameObj;
     }
     async updateGameInfo(gameKey, gameData) {
@@ -144,8 +115,8 @@ let GameService = class GameService {
             score: gameData.score,
             region: gameData.region,
             location: gameData.location,
-            homeTeam: this.fixTeamName(gameData.homeTeam),
-            awayTeam: this.fixTeamName(gameData.awayTeam),
+            homeTeam: gameData.homeTeam,
+            awayTeam: gameData.awayTeam,
         };
         return this.gameInfoModel
             .findOneAndUpdate({ gameKey }, updateData, { new: true, upsert: true })
@@ -189,8 +160,6 @@ let GameService = class GameService {
     async saveGameClips(gameData) {
         const fixedGameData = {
             ...gameData,
-            homeTeam: this.fixTeamName(gameData.homeTeam),
-            awayTeam: this.fixTeamName(gameData.awayTeam),
         };
         const existingClips = await this.gameClipsModel.findOne({
             gameKey: gameData.gameKey,
@@ -211,8 +180,6 @@ let GameService = class GameService {
             return null;
         }
         const clipsObject = clips.toObject();
-        clipsObject.homeTeam = this.fixTeamName(clipsObject.homeTeam);
-        clipsObject.awayTeam = this.fixTeamName(clipsObject.awayTeam);
         return clipsObject;
     }
     async getCoachHighlights(teamName) {
@@ -232,8 +199,8 @@ let GameService = class GameService {
                 highlights.push({
                     gameKey: game.gameKey,
                     date: game.date,
-                    homeTeam: this.fixTeamName(game.homeTeam),
-                    awayTeam: this.fixTeamName(game.awayTeam),
+                    homeTeam: game.homeTeam,
+                    awayTeam: game.awayTeam,
                     location: game.location,
                     clip: clip,
                 });
@@ -281,8 +248,8 @@ let GameService = class GameService {
                 highlights.push({
                     gameKey: game.gameKey,
                     date: game.date,
-                    homeTeam: this.fixTeamName(game.homeTeam),
-                    awayTeam: this.fixTeamName(game.awayTeam),
+                    homeTeam: game.homeTeam,
+                    awayTeam: game.awayTeam,
                     location: game.location,
                     clip: clip,
                 });
