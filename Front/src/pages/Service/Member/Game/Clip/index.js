@@ -68,7 +68,6 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
   );
 }
 
-/* ========== 표시 라벨/상반 항목 ========== */
 export const PT_LABEL = {
   RUN: '런',
   PASS: '패스',
@@ -169,7 +168,6 @@ const findTeamMeta = (raw) => {
   );
 };
 
-
 /* ========== 메인 컴포넌트 ========== */
 export default function ClipPage() {
   const { gameKey: gameKeyParam } = useParams();
@@ -259,8 +257,8 @@ export default function ClipPage() {
   const handleMenuToggle = (menuName) => {
     setOpenMenu(openMenu === menuName ? null : menuName);
   };
-            const homeMeta = TEAM_BY_ID[game.homeId];
-            const awayMeta = TEAM_BY_ID[game.awayId];
+  const homeMeta = TEAM_BY_ID[game.homeId];
+  const awayMeta = TEAM_BY_ID[game.awayId];
 
   // 홈/원정 → 팀 드롭다운 옵션
   const teamOptions = useMemo(() => {
@@ -313,7 +311,6 @@ export default function ClipPage() {
     return '';
   };
 
-  /* ========== 예시 클립 데이터(실제 API로 교체) ========== */
   const [rawClips, setRawClips] = useState([]);
   const [clipsLoading, setClipsLoading] = useState(false);
   const [clipsError, setClipsError] = useState(null);
@@ -335,8 +332,8 @@ export default function ClipPage() {
           return {
             // 식별자들
             id: uiId,
-            clipKey, 
-            playIndex: clip.playIndex ?? idx, 
+            clipKey,
+            playIndex: clip.playIndex ?? idx,
 
             // 데이터
             quarter: clip.quarter,
@@ -344,7 +341,7 @@ export default function ClipPage() {
             down: clip.down,
             yardsToGo: clip.toGoYard,
             significantPlay:
-            clip.significantPlays?.filter((p) => p != null) || [],
+              clip.significantPlays?.filter((p) => p != null) || [],
             offensiveTeam: clip.offensiveTeam,
             gainYard: clip.gainYard,
             clipUrl: clip.clipUrl || null,
@@ -420,6 +417,42 @@ export default function ClipPage() {
         },
       },
     });
+  };
+  const getPenaltyLabel = (c, key, homeDisplay, awayDisplay) => {
+    // offensiveTeam은 붙여쓰기 display 사용
+    const offenseIsHome =
+      homeDisplay && c?.offensiveTeam ? c.offensiveTeam === homeDisplay : null;
+
+    // PENALTY.HOME / PENALTY.AWAY
+    const penalizedIsHome = key.endsWith('.HOME')
+      ? true
+      : key.endsWith('.AWAY')
+      ? false
+      : null;
+
+    if (offenseIsHome === null || penalizedIsHome === null) {
+      return '페널티'; // 정보 부족 시 일반 표기
+    }
+    // 같은 사이드면 "공격팀 페널티", 아니면 "수비팀 페널티"
+    return penalizedIsHome === offenseIsHome
+      ? '공격팀 페널티'
+      : '수비팀 페널티';
+  };
+
+  const labelSignificant = (c, token, homeDisplay, awayDisplay) => {
+    const raw = (token ?? '').toString().trim();
+    if (!raw) return '';
+    const key = raw.toUpperCase();
+
+    if (key.startsWith('PENALTY.')) {
+      return getPenaltyLabel(c, key, homeDisplay, awayDisplay);
+    }
+
+    if (Object.prototype.hasOwnProperty.call(SIGNIFICANT_PLAYS, key)) {
+      const mapped = SIGNIFICANT_PLAYS[key];
+      return mapped === '' ? key : mapped;
+    }
+    return key;
   };
 
   return (
@@ -669,13 +702,25 @@ export default function ClipPage() {
                     </div>
 
                     <div className="clip-row2">
-                      <div className="clip-oT">{c.offensiveTeam}</div>
+                      <div className="clip-oT">
+                        {c.offensiveTeam == 'Home'
+                          ? `${homeMeta?.name}`
+                          : `${awayMeta?.name}`}
+                      </div>
 
                       {Array.isArray(c.significantPlay) &&
                       c.significantPlay.length > 0 ? (
                         <div className="clip-sig">
                           {c.significantPlay.map((t, idx) => (
-                            <span key={`${safeKey}-sig-${idx}`}>#{t}</span>
+                            <span key={`${safeKey}-sig-${idx}`}>
+                              #{' '}
+                              {labelSignificant(
+                                c,
+                                t,
+                                homeMeta?.display,
+                                awayMeta?.display,
+                              )}
+                            </span>
                           ))}
                         </div>
                       ) : (
