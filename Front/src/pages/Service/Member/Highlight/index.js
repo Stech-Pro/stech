@@ -31,7 +31,8 @@ function cloudinaryThumbFromVideo(url) {
     // 확장자 .mp4 → .jpg
     const last = parts[parts.length - 1];
     const dot = last.lastIndexOf('.');
-    parts[parts.length - 1] = dot > 0 ? `${last.slice(0, dot)}.jpg` : `${last}.jpg`;
+    parts[parts.length - 1] =
+      dot > 0 ? `${last.slice(0, dot)}.jpg` : `${last}.jpg`;
     u.pathname = parts.join('/');
     return u.toString();
   } catch {
@@ -43,9 +44,9 @@ function cloudinaryThumbFromVideo(url) {
 async function captureFrameAsDataURL(videoUrl, timeSec = 0.5) {
   return new Promise((resolve, reject) => {
     const video = document.createElement('video');
-    video.crossOrigin = 'anonymous';         // CORS 허용 서버여야 함
+    video.crossOrigin = 'anonymous'; // CORS 허용 서버여야 함
     video.preload = 'auto';
-    video.muted = true;                      // 일부 브라우저 정책 우회
+    video.muted = true; // 일부 브라우저 정책 우회
     video.src = videoUrl;
 
     const onError = () => {
@@ -100,7 +101,9 @@ function GameThumbnail({ clip, alt = '썸네일' }) {
         return;
       }
       // 2) Cloudinary 변환
-      const cloud = clip?.clipUrl ? cloudinaryThumbFromVideo(clip.clipUrl) : null;
+      const cloud = clip?.clipUrl
+        ? cloudinaryThumbFromVideo(clip.clipUrl)
+        : null;
       if (cloud) {
         if (alive) setSrc(cloud);
         return;
@@ -117,15 +120,22 @@ function GameThumbnail({ clip, alt = '썸네일' }) {
         }
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [clip?.thumbnailUrl, clip?.clipUrl]);
 
   // 간단한 스켈레톤/플레이스홀더
   if (!src) {
     return (
-      <div className="game-thumb placeholder" aria-label="thumbnail placeholder">
+      <div
+        className="game-thumb placeholder"
+        aria-label="thumbnail placeholder"
+      >
         <div className="shimmer" />
-        {!triedCapture && <span className="visually-hidden">썸네일 생성 중…</span>}
+        {!triedCapture && (
+          <span className="visually-hidden">썸네일 생성 중…</span>
+        )}
       </div>
     );
   }
@@ -156,11 +166,19 @@ const normalizeTeamStats = (s) => {
 };
 
 // GameItem.jsx (동일 파일 내에 있으면 그대로 대체)
-const GameItem = ({ gameKey, count, active, onClick, myTeamName, onStats, firstClip  }) => {
+const GameItem = ({
+  gameKey,
+  count,
+  active,
+  onClick,
+  myTeamName,
+  onStats,
+  firstClip,
+}) => {
   const [teamStats, setTeamStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState(null);
-
+  const [enemyName, setEnemyName] = useState('');
   useEffect(() => {
     if (!gameKey) return;
 
@@ -180,9 +198,14 @@ const GameItem = ({ gameKey, count, active, onClick, myTeamName, onStats, firstC
 
         // 내 팀 스탯만 선택
         let mine = null;
-        if (home.teamName && home.teamName === myTeamName) mine = home;
-        else if (away.teamName && away.teamName === myTeamName) mine = away;
-
+        if (home.teamName && home.teamName === myTeamName) {
+          mine = home;
+          setEnemyName(away.teamName);
+        }
+        else if (away.teamName && away.teamName === myTeamName) {
+          mine = away;
+          setEnemyName(home.teamName);
+        }
         setTeamStats(mine);
         // 부모에도 저장 (게임키별로 모으기 위함)
         onStats?.(gameKey, mine);
@@ -203,36 +226,55 @@ const GameItem = ({ gameKey, count, active, onClick, myTeamName, onStats, firstC
   }, [gameKey, myTeamName, onStats]);
 
   return (
-    <div className='game-item'>
-        <div className="game-thumbanil">
-           <div className="game-thumbnail-box">
-            {/* 🔹 썸네일 */}
-            {firstClip ? (
-              <GameThumbnail clip={firstClip} alt={`${gameKey} 첫 클립 썸네일`} />
-            ) : (
-              <div className="game-thumb placeholder"><div className="shimmer" /></div>
-            )}
-          </div>
+    <div className="game-item">
+      <div className="game-thumbanil">
+        <div className="game-thumbnail-box">
+          {/* 🔹 썸네일 */}
+          {firstClip ? (
+            <GameThumbnail clip={firstClip} alt={`${gameKey} 첫 클립 썸네일`} />
+          ) : (
+            <div className="game-thumb placeholder">
+              <div className="shimmer" />
+            </div>
+          )}
         </div>
+      </div>
 
-        {statsLoading && (
-          <div className="game-stat small">스탯 불러오는 중…</div>
-        )}
-        {statsError && <div className="game-stat small">스탯 오류</div>}
+      {statsLoading && <div className="game-stat small">스탯 불러오는 중…</div>}
+      {statsError && <div className="game-stat small">스탯 오류</div>}
 
-        {teamStats && (
-          console.log('Rendering teamStats:', teamStats) || ( 
+      {teamStats &&
+        (console.log('Rendering teamStats:', teamStats) || (
           <div className="game-stat small">
-            <span>{teamStats.teamName}</span>
-            <span> • 총야드 {teamStats.totalYards}</span>
-            <span> • 패스 {teamStats.passingYards}</span>
-            <span> • 러시 {teamStats.rushingYards}</span>
-            <span> • 3rd {teamStats.thirdDownPct}%</span>
-            <span> • TO {teamStats.turnovers}</span>
-            <span> • 페널티 {teamStats.penaltyYards}야드</span>
+            <div className='h-game-title'> vs {enemyName}</div>
+            <div className='h-stat-rows'>
+              <div className='h-row'>
+                <div className='h-label'> 총 야드 </div>
+                <div className='h-value'> {teamStats.totalYards} </div>
+              </div>
+              <div className='h-row'>
+                <div className='h-label'> 패싱 야드 </div>
+                <div className='h-value'> {teamStats.passingYards} </div>
+              </div>
+              <div className='h-row'>
+                <div className='h-label'> 러싱 야드 </div>
+                <div className='h-value'> {teamStats.rushingYards} </div>     
+              </div>  
+              <div className='h-row'> 
+                <div className='h-label'> 3rd Down % </div>
+                <div className='h-value'> {teamStats.thirdDownPct}% </div>     
+              </div>
+              <div className='h-row'>
+                <div className='h-label'> 턴오버 </div>
+                <div className='h-value'> {teamStats.turnovers} </div>     
+              </div>
+              <div className='h-row'>
+                <div className='h-label'> 페널티 야드 </div>
+                <div className='h-value'> {teamStats.penaltyYards} </div>     
+              </div>
+            </div>
           </div>
-          )
-        )}
+        ))}
     </div>
   );
 };
@@ -337,14 +379,15 @@ export default function HighlightPage() {
     };
   }, [isAuthenticated, token, isCoach]);
 
-const gameList = useMemo(
-  () => Object.keys(byGame).map((k) => ({
-    gameKey: k,
-    count: byGame[k]?.length ?? 0,
-    firstClip: (byGame[k] && byGame[k][0]) || null,
-  })),
-  [byGame],
-);
+  const gameList = useMemo(
+    () =>
+      Object.keys(byGame).map((k) => ({
+        gameKey: k,
+        count: byGame[k]?.length ?? 0,
+        firstClip: (byGame[k] && byGame[k][0]) || null,
+      })),
+    [byGame],
+  );
 
   const totalHighlights = useMemo(
     () =>
@@ -412,7 +455,7 @@ const gameList = useMemo(
                 count={g.count}
                 active={g.gameKey === selectedGameKey}
                 onClick={() => setSelectedGameKey(g.gameKey)}
-                myTeamName={MY_TEAM_ID} // 🔹 내 팀 이름 전달
+                myTeamName={MY_TEAM_ID}
                 onStats={handleStats}
                 firstClip={g.firstClip}
               />
