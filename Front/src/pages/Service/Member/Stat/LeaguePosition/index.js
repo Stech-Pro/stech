@@ -1,5 +1,5 @@
 import StatPosition from '../../../../../components/Stat/StatPosition';
-import { TEAMS } from '../../../../../data/TEAMS';
+import { TEAMS, TEAM_BY_ID} from '../../../../../data/TEAMS';
 import { useState, useEffect } from 'react';
 import { API_CONFIG } from '../../../../../config/api';
 
@@ -14,41 +14,21 @@ const LeaguePositionPage = () => {
         setLoading(true);
         const response = await fetch(`${API_CONFIG.BASE_URL}/player/rankings`);
         const result = await response.json();
-
         console.log('🐛 선수 데이터 API 응답:', result);
 
         if (result.success && result.data) {
-          // 백엔드 팀명을 프론트엔드 팀명으로 매핑
-          const BACKEND_TO_FRONTEND_TEAM = {
-            KKRagingBulls: '건국대 레이징불스',
-            KHCommanders: '경희대 커맨더스',
-            SNGreenTerrors: '서울대 그린테러스',
-            USCityhawks: '서울시립대 시티혹스',
-            DGTuskers: '동국대 터스커스',
-            KMRazorbacks: '국민대 레이저백스',
-            YSEagles: '연세대 이글스',
-            KUTigers: '고려대 타이거스',
-            HICowboys: '홍익대 카우보이스',
-            SSCrusaders: '숭실대 크루세이더스',
-            HYLions: '한양대 라이온스',
-            HFBlackKnights: '한국외대 블랙나이츠',
-          };
-
-          // 새로운 멀티포지션 구조: 백엔드에서 이미 각 포지션별로 분리된 데이터 처리
           const transformedData = [];
 
           result.data.forEach((player, index) => {
             // 팀명 매핑
-            const backendTeamName = player.teamName || 'Unknown Team';
             const frontendTeamName =
-              BACKEND_TO_FRONTEND_TEAM[backendTeamName] || backendTeamName;
-
+            TEAM_BY_ID[player.teamName];
             // 백엔드에서 이미 포지션별로 분리된 선수 데이터 처리
             const playerData = {
               id: player._id,
               rank: index + 1,
               name: player.name,
-              team: frontendTeamName,
+              team: frontendTeamName.name,
               position: player.position, // 현재 표시할 포지션
               positions: player.positions, // 전체 포지션 목록
               primaryPosition: player.primaryPosition,
