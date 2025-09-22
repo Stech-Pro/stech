@@ -250,6 +250,8 @@ export class PlayerController {
   }
 
   @Post('analyze-game-data')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: '전체 게임 데이터 분석 및 팀/선수 스탯 업데이트',
     description:
@@ -260,7 +262,7 @@ export class PlayerController {
     description: '게임 데이터 분석 및 스탯 업데이트 성공',
   })
   @ApiResponse({ status: 400, description: '잘못된 게임 데이터 형식' })
-  async analyzeGameData(@Body() gameData: GameDataDto) {
+  async analyzeGameData(@Body() gameData: GameDataDto, @User() user: any) {
     console.log('게임 데이터 분석 시작:', gameData.gameKey);
     console.log('홈팀:', gameData.homeTeam, '어웨이팀:', gameData.awayTeam);
     console.log('클립 개수:', gameData.Clips?.length);
@@ -406,7 +408,11 @@ export class PlayerController {
       // GameInfo 생성
       console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
       try {
-        await this.gameService.createGameInfo(gameData);
+        const gameDataWithUploader = {
+          ...gameData,
+          uploader: user.team,
+        };
+        await this.gameService.createGameInfo(gameDataWithUploader);
         console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');
       } catch (gameInfoError) {
         console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
@@ -460,15 +466,25 @@ export class PlayerController {
   }
 
   @Post('update-game-stats')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: '게임별 스탯 업데이트',
     description:
       '새로운 형식의 클립 데이터로 게임의 모든 선수 스탯을 업데이트합니다.',
   })
   @ApiResponse({ status: 200, description: '게임 스탯 업데이트 성공' })
-  async updateGameStats(@Body() gameData: any) {
+  async updateGameStats(@Body() gameData: any, @User() user: any) {
     console.log('받은 데이터 구조:', JSON.stringify(gameData, null, 2));
-    return this.playerService.analyzeGameData(gameData);
+    console.log('업로더 정보:', user);
+    
+    // 업로더 정보를 게임 데이터에 추가
+    const gameDataWithUploader = {
+      ...gameData,
+      uploader: user.team,
+    };
+    
+    return this.playerService.analyzeGameData(gameDataWithUploader);
   }
 
   // === 3단계 스탯 관리 시스템 엔드포인트 ===

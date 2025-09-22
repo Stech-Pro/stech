@@ -54,6 +54,7 @@ let GameService = class GameService {
                 location: gameData.location,
                 homeTeam: fixedHomeTeam,
                 awayTeam: fixedAwayTeam,
+                uploader: gameData.uploader || existingGame.uploader,
             }, { new: true });
             console.log('✅ GameInfo 업데이트 성공:', updatedGame._id);
             return updatedGame;
@@ -67,6 +68,7 @@ let GameService = class GameService {
             location: gameData.location,
             homeTeam: fixedHomeTeam,
             awayTeam: fixedAwayTeam,
+            uploader: gameData.uploader,
         };
         console.log('📝 새로운 gameInfo 저장:', JSON.stringify(gameInfo, null, 2));
         try {
@@ -87,6 +89,25 @@ let GameService = class GameService {
             $or: [{ homeTeam: teamName }, { awayTeam: teamName }],
         })
             .exec();
+        return games.map(game => {
+            const gameObj = game.toObject();
+            return gameObj;
+        });
+    }
+    async findGamesByUploader(uploaderTeam) {
+        console.log(`🔍 업로더별 경기 조회: ${uploaderTeam}`);
+        const games = await this.gameInfoModel
+            .find({ uploader: uploaderTeam })
+            .exec();
+        console.log(`📊 ${uploaderTeam} 업로드 경기 수: ${games.length}개`);
+        if (games.length > 0) {
+            console.log(`📋 첫 번째 경기 예시:`, {
+                gameKey: games[0].gameKey,
+                uploader: games[0].uploader,
+                homeTeam: games[0].homeTeam,
+                awayTeam: games[0].awayTeam
+            });
+        }
         return games.map(game => {
             const gameObj = game.toObject();
             return gameObj;

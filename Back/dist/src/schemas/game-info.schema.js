@@ -20,6 +20,10 @@ let GameInfo = class GameInfo {
     location;
     homeTeam;
     awayTeam;
+    uploader;
+    uploadStatus;
+    videoUrls;
+    uploadCompletedAt;
 };
 exports.GameInfo = GameInfo;
 __decorate([
@@ -54,6 +58,22 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], GameInfo.prototype, "awayTeam", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], GameInfo.prototype, "uploader", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 'pending' }),
+    __metadata("design:type", String)
+], GameInfo.prototype, "uploadStatus", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Object }),
+    __metadata("design:type", Object)
+], GameInfo.prototype, "videoUrls", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], GameInfo.prototype, "uploadCompletedAt", void 0);
 exports.GameInfo = GameInfo = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], GameInfo);

@@ -132,7 +132,7 @@ let PlayerController = class PlayerController {
         }
         return result;
     }
-    async analyzeGameData(gameData) {
+    async analyzeGameData(gameData, user) {
         console.log('게임 데이터 분석 시작:', gameData.gameKey);
         console.log('홈팀:', gameData.homeTeam, '어웨이팀:', gameData.awayTeam);
         console.log('클립 개수:', gameData.Clips?.length);
@@ -164,7 +164,11 @@ let PlayerController = class PlayerController {
             console.log('✅ 팀 스탯 업데이트 완료');
             console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
             try {
-                await this.gameService.createGameInfo(gameData);
+                const gameDataWithUploader = {
+                    ...gameData,
+                    uploader: user.team,
+                };
+                await this.gameService.createGameInfo(gameDataWithUploader);
                 console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');
             }
             catch (gameInfoError) {
@@ -196,9 +200,14 @@ let PlayerController = class PlayerController {
         const jerseyNum = parseInt(jerseyNumber);
         return this.playerService.updatePlayerStatsFromNewClips(jerseyNum, analyzeNewClipsDto.clips);
     }
-    async updateGameStats(gameData) {
+    async updateGameStats(gameData, user) {
         console.log('받은 데이터 구조:', JSON.stringify(gameData, null, 2));
-        return this.playerService.analyzeGameData(gameData);
+        console.log('업로더 정보:', user);
+        const gameDataWithUploader = {
+            ...gameData,
+            uploader: user.team,
+        };
+        return this.playerService.analyzeGameData(gameDataWithUploader);
     }
     async getPlayerGameStats(jerseyNumber, season) {
         const jerseyNum = parseInt(jerseyNumber);
@@ -431,6 +440,8 @@ __decorate([
 ], PlayerController.prototype, "updatePlayerStatsFromNewClips", null);
 __decorate([
     (0, common_1.Post)('analyze-game-data'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({
         summary: '전체 게임 데이터 분석 및 팀/선수 스탯 업데이트',
         description: '게임의 전체 JSON 데이터를 받아서 홈팀/어웨이팀 정보를 자동으로 추출하고 모든 선수 및 팀 스탯을 업데이트합니다.',
@@ -441,8 +452,9 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({ status: 400, description: '잘못된 게임 데이터 형식' }),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, user_decorator_1.User)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [game_data_dto_1.GameDataDto]),
+    __metadata("design:paramtypes", [game_data_dto_1.GameDataDto, Object]),
     __metadata("design:returntype", Promise)
 ], PlayerController.prototype, "analyzeGameData", null);
 __decorate([
@@ -461,14 +473,17 @@ __decorate([
 ], PlayerController.prototype, "analyzeNewClipsOnly", null);
 __decorate([
     (0, common_1.Post)('update-game-stats'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
     (0, swagger_1.ApiOperation)({
         summary: '게임별 스탯 업데이트',
         description: '새로운 형식의 클립 데이터로 게임의 모든 선수 스탯을 업데이트합니다.',
     }),
     (0, swagger_1.ApiResponse)({ status: 200, description: '게임 스탯 업데이트 성공' }),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, user_decorator_1.User)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], PlayerController.prototype, "updateGameStats", null);
 __decorate([

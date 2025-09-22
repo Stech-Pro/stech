@@ -20,6 +20,7 @@ const game_clips_schema_1 = require("../schemas/game-clips.schema");
 const team_game_stats_schema_1 = require("../schemas/team-game-stats.schema");
 const team_total_stats_schema_1 = require("../schemas/team-total-stats.schema");
 const s3_service_1 = require("../common/services/s3.service");
+const videoupload_service_1 = require("../videoupload/videoupload.service");
 const config_1 = require("@nestjs/config");
 let GameModule = class GameModule {
 };
@@ -53,7 +54,7 @@ exports.GameModule = GameModule = __decorate([
             (0, common_1.forwardRef)(() => team_module_1.TeamModule),
         ],
         controllers: [game_controller_1.GameController, game_docs_controller_1.GameDocsController],
-        providers: [game_service_1.GameService, s3_service_1.S3Service],
+        providers: [game_service_1.GameService, s3_service_1.S3Service, videoupload_service_1.VideoUploadService],
         exports: [game_service_1.GameService],
     })
 ], GameModule);

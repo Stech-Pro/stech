@@ -27,6 +27,7 @@ import { PlayerService } from '../player/player.service';
 import { TeamStatsAnalyzerService } from '../team/team-stats-analyzer.service';
 import { GameService } from './game.service';
 import { S3Service } from '../common/services/s3.service';
+import { VideoUploadService } from '../videoupload/videoupload.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import {
@@ -49,9 +50,12 @@ export class GameController {
     private readonly teamStatsService: TeamStatsAnalyzerService,
     private readonly gameService: GameService,
     private readonly s3Service: S3Service,
+    private readonly videoUploadService: VideoUploadService,
   ) {}
 
   @Post('upload-data')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: '📤 JSON 게임 데이터 업로드 및 자동 분석 (JSON Body)',
     description: 'JSON 형태의 게임 데이터를 request body로 받아 처리합니다.',
@@ -60,7 +64,7 @@ export class GameController {
     status: 200,
     description: '✅ 게임 데이터 업로드 및 분석 성공',
   })
-  async uploadGameData(@Body() gameData: any): Promise<any> {
+  async uploadGameData(@Body() gameData: any, @Req() req: any): Promise<any> {
     console.log('🎮 JSON Body로 게임 데이터 업로드 시작');
     console.log('📊 받은 데이터:', {
       clips: gameData.clips?.length || 0,
@@ -97,7 +101,12 @@ export class GameController {
       // 4. 경기 정보 저장
       console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
       try {
-        await this.gameService.createGameInfo(processedGameData);
+        const { team: uploaderTeam } = req.user;
+        const gameInfoWithUploader = {
+          ...processedGameData,
+          uploader: uploaderTeam,
+        };
+        await this.gameService.createGameInfo(gameInfoWithUploader);
         console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');
       } catch (gameInfoError) {
         console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
@@ -142,6 +151,8 @@ export class GameController {
   }
 
   @Post('upload-json')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @UseInterceptors(FileInterceptor('gameFile'))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({
@@ -230,7 +241,7 @@ export class GameController {
       },
     },
   })
-  async uploadGameJson(@UploadedFile() file: Express.Multer.File) {
+  async uploadGameJson(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
     try {
       console.log('🎮 게임 JSON 파일 업로드 시작');
 
@@ -311,7 +322,12 @@ export class GameController {
       // 5. 경기 정보 저장
       console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
       try {
-        await this.gameService.createGameInfo(gameData);
+        const { team: uploaderTeam } = req.user;
+        const gameDataWithUploader = {
+          ...gameData,
+          uploader: uploaderTeam,
+        };
+        await this.gameService.createGameInfo(gameDataWithUploader);
         console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');
       } catch (gameInfoError) {
         console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
@@ -594,10 +610,12 @@ export class GameController {
   }
 
   @Get('team/:teamName')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: '🏈 팀별 경기 정보 조회',
     description:
-      '특정 팀이 홈팀 또는 어웨이팀으로 참여한 모든 경기 정보를 조회합니다. Admin 팀인 경우 모든 경기를 반환합니다.',
+      '특정 팀이 업로드한 경기 정보를 조회합니다. 업로더만 자신이 업로드한 경기를 볼 수 있습니다. Admin은 모든 경기 조회 가능.',
   })
   @ApiParam({
     name: 'teamName',
@@ -626,17 +644,24 @@ export class GameController {
     status: 404,
     description: '❌ 해당 팀의 경기를 찾을 수 없음',
   })
-  async getGamesByTeam(@Param('teamName') teamName: string) {
+  async getGamesByTeam(@Param('teamName') teamName: string, @Req() req: any) {
     let games: any[];
     let message: string;
 
-    // Admin 팀의 경우 모든 경기 반환
-    if (teamName.toLowerCase() === 'admin') {
+    const { role, team: userTeam } = req.user;
+    
+    console.log(`🔍 경기 조회 요청 - 사용자: ${userTeam}, 역할: ${role}`);
+
+    // Admin인 경우 모든 경기 반환
+    if (role === 'admin') {
       games = await this.gameService.findAllGames();
       message = '모든 경기 정보 조회 성공 (Admin)';
+      console.log(`👑 Admin 조회: 총 ${games.length}개 경기`);
     } else {
-      games = await this.gameService.findGamesByTeam(teamName);
-      message = `${teamName} 팀의 경기 정보 조회 성공`;
+      // 일반 사용자는 자신이 업로드한 경기만 조회
+      games = await this.gameService.findGamesByUploader(userTeam);
+      message = `${userTeam} 팀이 업로드한 경기 정보 조회 성공`;
+      console.log(`👤 ${userTeam} 업로드 경기: ${games.length}개`);
     }
 
     if (!games || games.length === 0) {
@@ -958,7 +983,7 @@ export class GameController {
 
       // 원본 데이터 구조 유지하면서 Clips만 수정
       const responseData = {
-        ...(clips as any).toObject(),
+        ...(clips as any).toObject ? (clips as any).toObject() : clips,
         Clips: clipsWithUrls,
       };
 
@@ -1065,5 +1090,291 @@ export class GameController {
       message: '경기 정보 조회 성공',
       data: game,
     };
+  }
+
+  @Post('prepare-match-upload')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: '🎬 경기 영상 업로드 준비',
+    description: `
+    ## 🏈 경기 + 쿼터별 영상 업로드 준비
+
+    경기 정보와 쿼터별 영상 개수를 받아서 S3 업로드용 Presigned URL들을 생성합니다.
+
+    ### 📤 요청 형태
+    \`\`\`json
+    {
+      "gameKey": "YSKM20250920",
+      "gameInfo": {
+        "homeTeam": "YSeagles",
+        "awayTeam": "KMrazorbacks",
+        "date": "2025-09-20(금) 15:00",
+        "type": "League",
+        "score": {"home": 21, "away": 14},
+        "region": "Seoul",
+        "location": "테스트 경기장"
+      },
+      "quarterVideoCounts": {
+        "Q1": 3,
+        "Q2": 3, 
+        "Q3": 2,
+        "Q4": 2
+      }
+    }
+    \`\`\`
+
+    ### 📥 응답 형태
+    - 각 영상별 S3 업로드 URL
+    - 연속된 clip 번호 (Q1: clip1,2,3 → Q2: clip4,5,6 ...)
+    - S3 경로: videos/{gameKey}/Q{n}/{gameKey}_clip{n}.mp4
+    `,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 업로드 URL 생성 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '업로드 URL 생성 완료',
+        data: {
+          gameKey: 'YSKM20250920',
+          totalVideos: 10,
+          uploadUrls: {
+            Q1: [
+              {
+                clipNumber: 1,
+                fileName: 'YSKM20250920_clip1.mp4',
+                uploadUrl: 'https://s3.amazonaws.com/...',
+                s3Path: 'videos/YSKM20250920/Q1/YSKM20250920_clip1.mp4'
+              }
+            ],
+            Q2: [
+              {
+                clipNumber: 4,
+                fileName: 'YSKM20250920_clip4.mp4',
+                uploadUrl: 'https://s3.amazonaws.com/...',
+                s3Path: 'videos/YSKM20250920/Q2/YSKM20250920_clip4.mp4'
+              }
+            ]
+          }
+        }
+      }
+    }
+  })
+  @ApiResponse({
+    status: 400,
+    description: '❌ 잘못된 요청 데이터',
+  })
+  async prepareMatchUpload(@Body() body: any, @Req() req: any) {
+    try {
+      const { gameKey, gameInfo, quarterVideoCounts } = body;
+
+      if (!gameKey || !gameInfo || !quarterVideoCounts) {
+        throw new HttpException(
+          {
+            success: false,
+            message: 'gameKey, gameInfo, quarterVideoCounts가 필요합니다',
+            code: 'MISSING_PARAMETERS',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // gameKey 형식 검증
+      if (!/^[A-Z0-9]{4,}$/.test(gameKey)) {
+        throw new HttpException(
+          {
+            success: false,
+            message: 'gameKey 형식이 올바르지 않습니다',
+            code: 'INVALID_GAMEKEY_FORMAT',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      console.log(`🎬 경기 업로드 준비 시작: ${gameKey}`);
+      console.log(`📊 쿼터별 영상 개수:`, quarterVideoCounts);
+
+      // 연속된 clip 번호 생성
+      let clipCounter = 1;
+      const uploadUrls = {};
+      let totalVideos = 0;
+
+      for (const quarter of ['Q1', 'Q2', 'Q3', 'Q4']) {
+        const videoCount = quarterVideoCounts[quarter] || 0;
+        if (videoCount > 0) {
+          uploadUrls[quarter] = [];
+          
+          for (let i = 0; i < videoCount; i++) {
+            const fileName = `${gameKey}_clip${clipCounter}.mp4`;
+            const s3Path = `videos/${gameKey}/${quarter}/${fileName}`;
+            
+            // S3 업로드 URL 생성
+            const uploadUrl = await this.s3Service.generatePresignedUploadUrl(
+              s3Path,
+              'video/mp4',
+              3600 // 1시간 유효
+            );
+
+            uploadUrls[quarter].push({
+              clipNumber: clipCounter,
+              fileName,
+              uploadUrl,
+              s3Path,
+              quarter,
+            });
+
+            clipCounter++;
+            totalVideos++;
+          }
+        }
+      }
+
+      // 업로더 정보 추가
+      const { team: uploaderTeam } = req.user;
+      
+      console.log(`🔍 JWT에서 추출된 업로더 팀: ${uploaderTeam}`);
+      console.log(`📋 전체 사용자 정보:`, req.user);
+
+      // 임시로 경기 정보 저장 (pending 상태)
+      await this.gameService.createGameInfo({
+        ...gameInfo,
+        gameKey,
+        uploader: uploaderTeam, // 업로드한 팀 저장
+        uploadStatus: 'pending',
+      });
+      
+      console.log(`✅ ${gameKey} 경기 저장 완료 - 업로더: ${uploaderTeam}`);
+
+      console.log(`✅ ${gameKey} 업로드 URL 생성 완료: 총 ${totalVideos}개`);
+
+      return {
+        success: true,
+        message: '업로드 URL 생성 완료',
+        data: {
+          gameKey,
+          totalVideos,
+          uploadUrls,
+          expiresIn: 3600,
+        },
+      };
+    } catch (error) {
+      console.error('❌ 경기 업로드 준비 실패:', error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new HttpException(
+        {
+          success: false,
+          message: '경기 업로드 준비 중 오류가 발생했습니다',
+          code: 'PREPARE_UPLOAD_ERROR',
+          details: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('complete-match-upload')
+  @ApiOperation({
+    summary: '🎯 경기 영상 업로드 완료',
+    description: `
+    ## ✅ 경기 영상 업로드 완료 처리
+
+    S3에 영상 업로드가 완료된 후, 최종 경기 데이터를 처리합니다.
+
+    ### 📤 요청 형태
+    \`\`\`json
+    {
+      "gameKey": "YSKM20250920",
+      "uploadedVideos": {
+        "Q1": ["YSKM20250920_clip1.mp4", "YSKM20250920_clip2.mp4"],
+        "Q2": ["YSKM20250920_clip4.mp4", "YSKM20250920_clip5.mp4"],
+        "Q3": ["YSKM20250920_clip7.mp4"],
+        "Q4": ["YSKM20250920_clip9.mp4", "YSKM20250920_clip10.mp4"]
+      }
+    }
+    \`\`\`
+    `,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 경기 업로드 완료',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '❌ 경기를 찾을 수 없음',
+  })
+  async completeMatchUpload(@Body() body: any) {
+    try {
+      const { gameKey, uploadedVideos } = body;
+
+      if (!gameKey || !uploadedVideos) {
+        throw new HttpException(
+          {
+            success: false,
+            message: 'gameKey와 uploadedVideos가 필요합니다',
+            code: 'MISSING_PARAMETERS',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      console.log(`🎯 경기 업로드 완료 처리 시작: ${gameKey}`);
+
+      // 업로드된 영상들 검증
+      const totalUploaded = Object.values(uploadedVideos).flat().length;
+      console.log(`📊 업로드된 영상 수: ${totalUploaded}개`);
+
+      // 경기 상태를 완료로 업데이트
+      const updatedGame = await this.gameService.updateGameInfo(gameKey, {
+        uploadStatus: 'completed',
+        videoUrls: uploadedVideos,
+        uploadCompletedAt: new Date().toISOString(),
+      });
+
+      if (!updatedGame) {
+        throw new HttpException(
+          {
+            success: false,
+            message: `${gameKey} 경기를 찾을 수 없습니다`,
+            code: 'GAME_NOT_FOUND',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      console.log(`✅ ${gameKey} 경기 업로드 완료 처리 성공`);
+
+      return {
+        success: true,
+        message: '경기 영상 업로드가 완료되었습니다',
+        data: {
+          gameKey,
+          totalVideos: totalUploaded,
+          uploadedVideos,
+          uploadCompletedAt: new Date().toISOString(),
+        },
+      };
+    } catch (error) {
+      console.error('❌ 경기 업로드 완료 처리 실패:', error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new HttpException(
+        {
+          success: false,
+          message: '경기 업로드 완료 처리 중 오류가 발생했습니다',
+          code: 'COMPLETE_UPLOAD_ERROR',
+          details: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
