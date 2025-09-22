@@ -249,7 +249,10 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
     async saveTeamStats(gameKey, teamStatsResult, gameData) {
         console.log('팀 스탯 저장:', gameKey);
         try {
-            const homeTeamGameStats = new this.teamGameStatsModel({
+            await this.teamGameStatsModel.findOneAndUpdate({
+                teamName: teamStatsResult.homeTeamStats.teamName,
+                gameKey,
+            }, {
                 teamName: teamStatsResult.homeTeamStats.teamName,
                 gameKey,
                 date: gameData.date || new Date().toISOString(),
@@ -283,8 +286,11 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
                     own: teamStatsResult.homeTeamStats.totalPoints,
                     opponent: teamStatsResult.awayTeamStats.totalPoints,
                 },
-            });
-            const awayTeamGameStats = new this.teamGameStatsModel({
+            }, { upsert: true, new: true });
+            await this.teamGameStatsModel.findOneAndUpdate({
+                teamName: teamStatsResult.awayTeamStats.teamName,
+                gameKey,
+            }, {
                 teamName: teamStatsResult.awayTeamStats.teamName,
                 gameKey,
                 date: gameData.date || new Date().toISOString(),
@@ -318,9 +324,7 @@ let TeamStatsAnalyzerService = class TeamStatsAnalyzerService {
                     own: teamStatsResult.awayTeamStats.totalPoints,
                     opponent: teamStatsResult.homeTeamStats.totalPoints,
                 },
-            });
-            await homeTeamGameStats.save();
-            await awayTeamGameStats.save();
+            }, { upsert: true, new: true });
             console.log('✅ 게임별 팀 스탯 저장 완료');
             await this.updateTeamTotalStats(teamStatsResult.homeTeamStats, gameKey);
             await this.updateTeamTotalStats(teamStatsResult.awayTeamStats, gameKey);
