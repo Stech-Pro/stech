@@ -21,14 +21,13 @@ const LeaguePositionPage = () => {
 
           result.data.forEach((player, index) => {
             // 팀명 매핑
-            const frontendTeamName =
-            TEAM_BY_ID[player.teamName];
+            const frontendTeamName = TEAM_BY_ID[player.teamName];
             // 백엔드에서 이미 포지션별로 분리된 선수 데이터 처리
             const playerData = {
               id: player._id,
               rank: index + 1,
               name: player.name,
-              team: frontendTeamName.name,
+              team: frontendTeamName?.name || player.teamName,
               position: player.position, // 현재 표시할 포지션
               positions: player.positions, // 전체 포지션 목록
               primaryPosition: player.primaryPosition,
@@ -193,6 +192,7 @@ const LeaguePositionPage = () => {
             `🐛 변환된 선수 데이터 ${transformedData.length}명:`,
             transformedData.slice(0, 2),
           );
+          console.log('🐛 첫 5명 선수 팀명:', transformedData.slice(0, 5).map(p => p.team));
           setData(transformedData);
         } else {
           throw new Error('Failed to fetch player data');
@@ -213,7 +213,7 @@ const LeaguePositionPage = () => {
   }
 
   if (error) {
-      <StatPosition data={[]} teams={TEAMS} />
+    return <StatPosition data={[]} teams={TEAMS} />;
   }
 
   return (

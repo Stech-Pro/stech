@@ -432,82 +432,93 @@ export class TeamStatsAnalyzerService {
     console.log('팀 스탯 저장:', gameKey);
 
     try {
-      // 1. 홈팀 게임별 스탯 저장
-      const homeTeamGameStats = new this.teamGameStatsModel({
-        teamName: teamStatsResult.homeTeamStats.teamName,
-        gameKey,
-        date: gameData.date || new Date().toISOString(),
-        season: gameData.date
-          ? gameData.date.substring(0, 4)
-          : new Date().getFullYear().toString(),
-        opponent: teamStatsResult.awayTeamStats.teamName,
-        isHomeGame: true,
-        stats: {
-          totalYards: teamStatsResult.homeTeamStats.totalYards,
-          passingYards: teamStatsResult.homeTeamStats.passingYards,
-          rushingYards: teamStatsResult.homeTeamStats.rushingYards,
-          passingAttempts: teamStatsResult.homeTeamStats.passingAttempts,
-          passingCompletions: teamStatsResult.homeTeamStats.passingCompletions,
-          passingTouchdowns: teamStatsResult.homeTeamStats.passingTouchdowns,
-          rushingAttempts: teamStatsResult.homeTeamStats.rushingAttempts,
-          touchdowns: teamStatsResult.homeTeamStats.touchdowns,
-          fieldGoals: teamStatsResult.homeTeamStats.fieldGoals,
-          turnovers: teamStatsResult.homeTeamStats.turnovers,
-          fumbles: teamStatsResult.homeTeamStats.fumbles,
-          sacks: teamStatsResult.homeTeamStats.sacks,
-          interceptions: teamStatsResult.homeTeamStats.interceptions,
-          puntAttempts: teamStatsResult.homeTeamStats.puntAttempts,
-          puntYards: teamStatsResult.homeTeamStats.puntYards,
-          penalties: teamStatsResult.homeTeamStats.penalties,
-          penaltyYards: teamStatsResult.homeTeamStats.penaltyYards,
-          thirdDownAttempts: teamStatsResult.homeTeamStats.thirdDownAttempts,
-          thirdDownMade: teamStatsResult.homeTeamStats.thirdDownMade,
+      // 1. 홈팀 게임별 스탯 저장 (upsert 방식으로 중복 방지)
+      await this.teamGameStatsModel.findOneAndUpdate(
+        {
+          teamName: teamStatsResult.homeTeamStats.teamName,
+          gameKey,
         },
-        finalScore: {
-          own: teamStatsResult.homeTeamStats.totalPoints,
-          opponent: teamStatsResult.awayTeamStats.totalPoints,
+        {
+          teamName: teamStatsResult.homeTeamStats.teamName,
+          gameKey,
+          date: gameData.date || new Date().toISOString(),
+          season: gameData.date
+            ? gameData.date.substring(0, 4)
+            : new Date().getFullYear().toString(),
+          opponent: teamStatsResult.awayTeamStats.teamName,
+          isHomeGame: true,
+          stats: {
+            totalYards: teamStatsResult.homeTeamStats.totalYards,
+            passingYards: teamStatsResult.homeTeamStats.passingYards,
+            rushingYards: teamStatsResult.homeTeamStats.rushingYards,
+            passingAttempts: teamStatsResult.homeTeamStats.passingAttempts,
+            passingCompletions: teamStatsResult.homeTeamStats.passingCompletions,
+            passingTouchdowns: teamStatsResult.homeTeamStats.passingTouchdowns,
+            rushingAttempts: teamStatsResult.homeTeamStats.rushingAttempts,
+            touchdowns: teamStatsResult.homeTeamStats.touchdowns,
+            fieldGoals: teamStatsResult.homeTeamStats.fieldGoals,
+            turnovers: teamStatsResult.homeTeamStats.turnovers,
+            fumbles: teamStatsResult.homeTeamStats.fumbles,
+            sacks: teamStatsResult.homeTeamStats.sacks,
+            interceptions: teamStatsResult.homeTeamStats.interceptions,
+            puntAttempts: teamStatsResult.homeTeamStats.puntAttempts,
+            puntYards: teamStatsResult.homeTeamStats.puntYards,
+            penalties: teamStatsResult.homeTeamStats.penalties,
+            penaltyYards: teamStatsResult.homeTeamStats.penaltyYards,
+            thirdDownAttempts: teamStatsResult.homeTeamStats.thirdDownAttempts,
+            thirdDownMade: teamStatsResult.homeTeamStats.thirdDownMade,
+          },
+          finalScore: {
+            own: teamStatsResult.homeTeamStats.totalPoints,
+            opponent: teamStatsResult.awayTeamStats.totalPoints,
+          },
         },
-      });
+        { upsert: true, new: true }
+      );
 
-      // 2. 어웨이팀 게임별 스탯 저장
-      const awayTeamGameStats = new this.teamGameStatsModel({
-        teamName: teamStatsResult.awayTeamStats.teamName,
-        gameKey,
-        date: gameData.date || new Date().toISOString(),
-        season: gameData.date
-          ? gameData.date.substring(0, 4)
-          : new Date().getFullYear().toString(),
-        opponent: teamStatsResult.homeTeamStats.teamName,
-        isHomeGame: false,
-        stats: {
-          totalYards: teamStatsResult.awayTeamStats.totalYards,
-          passingYards: teamStatsResult.awayTeamStats.passingYards,
-          rushingYards: teamStatsResult.awayTeamStats.rushingYards,
-          passingAttempts: teamStatsResult.awayTeamStats.passingAttempts,
-          passingCompletions: teamStatsResult.awayTeamStats.passingCompletions,
-          passingTouchdowns: teamStatsResult.awayTeamStats.passingTouchdowns,
-          rushingAttempts: teamStatsResult.awayTeamStats.rushingAttempts,
-          touchdowns: teamStatsResult.awayTeamStats.touchdowns,
-          fieldGoals: teamStatsResult.awayTeamStats.fieldGoals,
-          turnovers: teamStatsResult.awayTeamStats.turnovers,
-          fumbles: teamStatsResult.awayTeamStats.fumbles,
-          sacks: teamStatsResult.awayTeamStats.sacks,
-          interceptions: teamStatsResult.awayTeamStats.interceptions,
-          puntAttempts: teamStatsResult.awayTeamStats.puntAttempts,
-          puntYards: teamStatsResult.awayTeamStats.puntYards,
-          penalties: teamStatsResult.awayTeamStats.penalties,
-          penaltyYards: teamStatsResult.awayTeamStats.penaltyYards,
-          thirdDownAttempts: teamStatsResult.awayTeamStats.thirdDownAttempts,
-          thirdDownMade: teamStatsResult.awayTeamStats.thirdDownMade,
+      // 2. 어웨이팀 게임별 스탯 저장 (upsert 방식으로 중복 방지)
+      await this.teamGameStatsModel.findOneAndUpdate(
+        {
+          teamName: teamStatsResult.awayTeamStats.teamName,
+          gameKey,
         },
-        finalScore: {
-          own: teamStatsResult.awayTeamStats.totalPoints,
-          opponent: teamStatsResult.homeTeamStats.totalPoints,
+        {
+          teamName: teamStatsResult.awayTeamStats.teamName,
+          gameKey,
+          date: gameData.date || new Date().toISOString(),
+          season: gameData.date
+            ? gameData.date.substring(0, 4)
+            : new Date().getFullYear().toString(),
+          opponent: teamStatsResult.homeTeamStats.teamName,
+          isHomeGame: false,
+          stats: {
+            totalYards: teamStatsResult.awayTeamStats.totalYards,
+            passingYards: teamStatsResult.awayTeamStats.passingYards,
+            rushingYards: teamStatsResult.awayTeamStats.rushingYards,
+            passingAttempts: teamStatsResult.awayTeamStats.passingAttempts,
+            passingCompletions: teamStatsResult.awayTeamStats.passingCompletions,
+            passingTouchdowns: teamStatsResult.awayTeamStats.passingTouchdowns,
+            rushingAttempts: teamStatsResult.awayTeamStats.rushingAttempts,
+            touchdowns: teamStatsResult.awayTeamStats.touchdowns,
+            fieldGoals: teamStatsResult.awayTeamStats.fieldGoals,
+            turnovers: teamStatsResult.awayTeamStats.turnovers,
+            fumbles: teamStatsResult.awayTeamStats.fumbles,
+            sacks: teamStatsResult.awayTeamStats.sacks,
+            interceptions: teamStatsResult.awayTeamStats.interceptions,
+            puntAttempts: teamStatsResult.awayTeamStats.puntAttempts,
+            puntYards: teamStatsResult.awayTeamStats.puntYards,
+            penalties: teamStatsResult.awayTeamStats.penalties,
+            penaltyYards: teamStatsResult.awayTeamStats.penaltyYards,
+            thirdDownAttempts: teamStatsResult.awayTeamStats.thirdDownAttempts,
+            thirdDownMade: teamStatsResult.awayTeamStats.thirdDownMade,
+          },
+          finalScore: {
+            own: teamStatsResult.awayTeamStats.totalPoints,
+            opponent: teamStatsResult.homeTeamStats.totalPoints,
+          },
         },
-      });
-
-      await homeTeamGameStats.save();
-      await awayTeamGameStats.save();
+        { upsert: true, new: true }
+      );
       console.log('✅ 게임별 팀 스탯 저장 완료');
 
       // 2. 홈팀 누적 스탯 업데이트
