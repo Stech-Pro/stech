@@ -9,6 +9,128 @@ import {
 import HighlightModal from '../../../../components/HighlightModal';
 import { TEAMS, TEAM_BY_ID } from '../../../../data/TEAMS';
 import { fetchTeamStatsByKey } from '../../../../api/teamAPI';
+import './HighlightPage.css';
+
+function cloudinaryThumbFromVideo(url) {
+  try {
+    const u = new URL(url);
+    if (!u.hostname.includes('res.cloudinary.com')) return null;
+    // /video/upload/(옵션)/.../file.mp4  →  /video/upload/(옵션)/.../file.jpg
+    // 타임프레임: so_1 (1초 지점) - 필요에 따라 so_0.5 등 변경 가능
+    const parts = u.pathname.split('/');
+    const i = parts.findIndex((p) => p === 'upload');
+    if (i === -1) return null;
+    // 이미 변환 옵션이 있든 없든, so_1을 하나 추가
+    if (parts[i + 1] && !parts[i + 1].includes('.')) {
+      // 이미 옵션 존재 -> so_1 추가
+      parts[i + 1] = `so_1,${parts[i + 1]}`;
+    } else {
+      // 옵션 없음 -> so_1 삽입
+      parts.splice(i + 1, 0, 'so_1');
+    }
+    // 확장자 .mp4 → .jpg
+    const last = parts[parts.length - 1];
+    const dot = last.lastIndexOf('.');
+    parts[parts.length - 1] = dot > 0 ? `${last.slice(0, dot)}.jpg` : `${last}.jpg`;
+    u.pathname = parts.join('/');
+    return u.toString();
+  } catch {
+    return null;
+  }
+}
+
+// 비디오 프레임 캡처 → dataURL
+async function captureFrameAsDataURL(videoUrl, timeSec = 0.5) {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.crossOrigin = 'anonymous';         // CORS 허용 서버여야 함
+    video.preload = 'auto';
+    video.muted = true;                      // 일부 브라우저 정책 우회
+    video.src = videoUrl;
+
+    const onError = () => {
+      cleanup();
+      reject(new Error('video load error'));
+    };
+    const onLoaded = () => {
+      // 메타데이터 로드 후 시크
+      const go = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth || 480;
+          canvas.height = video.videoHeight || 270;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const url = canvas.toDataURL('image/jpeg', 0.8);
+          cleanup();
+          resolve(url);
+        } catch (e) {
+          cleanup();
+          reject(e);
+        }
+      };
+      const onSeeked = () => go();
+      video.currentTime = Math.min(timeSec, (video.duration || 1) - 0.01);
+      video.addEventListener('seeked', onSeeked, { once: true });
+    };
+    const cleanup = () => {
+      video.removeEventListener('error', onError);
+      video.removeEventListener('loadedmetadata', onLoaded);
+      video.src = '';
+      video.load();
+    };
+
+    video.addEventListener('error', onError);
+    video.addEventListener('loadedmetadata', onLoaded, { once: true });
+    // iOS 일부 환경에서 play()가 필요할 수 있으나, 썸네일 용도라 생략
+  });
+}
+
+// 썸네일 렌더러: 1) clip.thumbnailUrl → 2) cloudinary 변환 → 3) 캡처
+function GameThumbnail({ clip, alt = '썸네일' }) {
+  const [src, setSrc] = React.useState(null);
+  const [triedCapture, setTriedCapture] = React.useState(false);
+
+  React.useEffect(() => {
+    let alive = true;
+    (async () => {
+      // 1) 명시적 썸네일
+      if (clip?.thumbnailUrl) {
+        if (alive) setSrc(clip.thumbnailUrl);
+        return;
+      }
+      // 2) Cloudinary 변환
+      const cloud = clip?.clipUrl ? cloudinaryThumbFromVideo(clip.clipUrl) : null;
+      if (cloud) {
+        if (alive) setSrc(cloud);
+        return;
+      }
+      // 3) 클라이언트 캡처 (CORS 필요)
+      try {
+        const dataUrl = await captureFrameAsDataURL(clip?.clipUrl);
+        if (alive) setSrc(dataUrl);
+        setTriedCapture(true);
+      } catch {
+        if (alive) {
+          setSrc(null);
+          setTriedCapture(true);
+        }
+      }
+    })();
+    return () => { alive = false; };
+  }, [clip?.thumbnailUrl, clip?.clipUrl]);
+
+  // 간단한 스켈레톤/플레이스홀더
+  if (!src) {
+    return (
+      <div className="game-thumb placeholder" aria-label="thumbnail placeholder">
+        <div className="shimmer" />
+        {!triedCapture && <span className="visually-hidden">썸네일 생성 중…</span>}
+      </div>
+    );
+  }
+  return <img className="game-thumb" src={src} alt={alt} loading="lazy" />;
+}
 
 const normalizeTeamStats = (s) => {
   if (!s) {
@@ -20,12 +142,6 @@ const normalizeTeamStats = (s) => {
       thirdDownPct: 0,
       turnovers: 0,
       penaltyYards: 0,
-      playCallRatio: {
-        runPlays: 0,
-        passPlays: 0,
-        runPercentage: 0,
-        passPercentage: 0,
-      },
     };
   }
   return {
@@ -36,17 +152,11 @@ const normalizeTeamStats = (s) => {
     thirdDownPct: s.thirdDownStats?.percentage ?? 0,
     turnovers: s.turnovers ?? 0,
     penaltyYards: s.penaltyYards ?? 0,
-    playCallRatio: s.playCallRatio || {
-      runPlays: s.runPlays ?? 0,
-      passPlays: s.passPlays ?? 0,
-      runPercentage: s.runPercentage ?? 0,
-      passPercentage: s.passPercentage ?? 0,
-    },
   };
 };
 
 // GameItem.jsx (동일 파일 내에 있으면 그대로 대체)
-const GameItem = ({ gameKey, count, active, onClick, myTeamName, onStats }) => {
+const GameItem = ({ gameKey, count, active, onClick, myTeamName, onStats, firstClip  }) => {
   const [teamStats, setTeamStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState(null);
@@ -93,16 +203,16 @@ const GameItem = ({ gameKey, count, active, onClick, myTeamName, onStats }) => {
   }, [gameKey, myTeamName, onStats]);
 
   return (
-    <li>
-      <button
-        type="button"
-        onClick={onClick}
-        className={active ? 'active' : ''}
-        aria-pressed={active}
-      >
-        <div className="game-row">
-          <span className="game-key">{gameKey}</span>
-          <span className="game-count">하이라이트 {count}개</span>
+    <div className='game-item'>
+        <div className="game-thumbanil">
+           <div className="game-thumbnail-box">
+            {/* 🔹 썸네일 */}
+            {firstClip ? (
+              <GameThumbnail clip={firstClip} alt={`${gameKey} 첫 클립 썸네일`} />
+            ) : (
+              <div className="game-thumb placeholder"><div className="shimmer" /></div>
+            )}
+          </div>
         </div>
 
         {statsLoading && (
@@ -123,8 +233,7 @@ const GameItem = ({ gameKey, count, active, onClick, myTeamName, onStats }) => {
           </div>
           )
         )}
-      </button>
-    </li>
+    </div>
   );
 };
 
@@ -228,14 +337,14 @@ export default function HighlightPage() {
     };
   }, [isAuthenticated, token, isCoach]);
 
-  const gameList = useMemo(
-    () =>
-      Object.keys(byGame).map((k) => ({
-        gameKey: k,
-        count: byGame[k]?.length ?? 0,
-      })),
-    [byGame],
-  );
+const gameList = useMemo(
+  () => Object.keys(byGame).map((k) => ({
+    gameKey: k,
+    count: byGame[k]?.length ?? 0,
+    firstClip: (byGame[k] && byGame[k][0]) || null,
+  })),
+  [byGame],
+);
 
   const totalHighlights = useMemo(
     () =>
@@ -303,8 +412,9 @@ export default function HighlightPage() {
                 count={g.count}
                 active={g.gameKey === selectedGameKey}
                 onClick={() => setSelectedGameKey(g.gameKey)}
-                myTeamName={selfTeam?.name} // 🔹 내 팀 이름 전달
+                myTeamName={MY_TEAM_ID} // 🔹 내 팀 이름 전달
                 onStats={handleStats}
+                firstClip={g.firstClip}
               />
             ))}
           </ul>
