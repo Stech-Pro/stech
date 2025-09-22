@@ -31,6 +31,18 @@ export class GameInfo {
 
   @Prop({ required: true })
   awayTeam: string;
+
+  @Prop({ required: true })
+  uploader: string; // 업로드한 팀명
+
+  @Prop({ default: 'pending' })
+  uploadStatus: string; // pending, completed
+
+  @Prop({ type: Object })
+  videoUrls: any; // 업로드된 영상 URL들
+
+  @Prop()
+  uploadCompletedAt: string;
 }
 
 export const GameInfoSchema = SchemaFactory.createForClass(GameInfo);

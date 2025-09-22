@@ -17,6 +17,7 @@ import {
   TeamTotalStatsSchema,
 } from '../schemas/team-total-stats.schema';
 import { S3Service } from '../common/services/s3.service';
+import { VideoUploadService } from '../videoupload/videoupload.service';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -54,7 +55,7 @@ import { ConfigModule } from '@nestjs/config';
     forwardRef(() => TeamModule),
   ],
   controllers: [GameController, GameDocsController],
-  providers: [GameService, S3Service],
+  providers: [GameService, S3Service, VideoUploadService],
   exports: [GameService],
 })
 export class GameModule {}

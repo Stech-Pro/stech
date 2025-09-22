@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useRef, useState, useEffect } from "react"
 import axios from "axios";
 import { API_CONFIG } from '../../../config/api';
 import { normalizeTeamName } from '../../../data/TEAMS';
+import { useAuth } from '../../../context/AuthContext';
 import './index.css';
 
 /**
@@ -16,6 +17,7 @@ import './index.css';
  * .upload-zone, .upload-zone.dragover, .upload-progress, .success-result, .error-result, .hidden
  */
 export default function JsonEx() {
+  const { token, isAuthenticated, user } = useAuth();
   const [uploadStatus, setUploadStatus] = useState("idle"); // 'idle' | 'uploading' | 'success' | 'error'
   const [uploadProgress, setUploadProgress] = useState({
     totalClips: 0,
@@ -182,6 +184,10 @@ export default function JsonEx() {
           {
             timeout: API_CONFIG.TIMEOUT,
             signal: abortRef.current.signal,
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
           }
         );
         
@@ -221,7 +227,13 @@ export default function JsonEx() {
       await axios.post(
         `${API_CONFIG.BASE_URL}/player/reset-all-data`,
         {},
-        { timeout: API_CONFIG.TIMEOUT }
+        { 
+          timeout: API_CONFIG.TIMEOUT,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
       );
 
       setResetStatus("success");
@@ -308,9 +320,35 @@ export default function JsonEx() {
   // ──────────────────────────────
   // 렌더
   // ──────────────────────────────
+  
+  // 로그인 체크
+  if (!isAuthenticated) {
+    return (
+      <div style={{ padding: '20px', minHeight: '100vh', backgroundColor: 'white', textAlign: 'center' }}>
+        <h1>🔐 로그인이 필요합니다</h1>
+        <p>JSON 파일을 업로드하려면 먼저 로그인해주세요.</p>
+        <button 
+          onClick={() => window.location.href = '/auth'}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '16px'
+          }}
+        >
+          로그인 페이지로 이동
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: '20px', minHeight: '100vh', backgroundColor: 'white' }}>
       <h1>JSON 파일 업로드 테스트</h1>
+      <p>현재 로그인된 사용자: <strong>{user?.username}</strong> ({user?.team})</p>
       {/* 스탯 초기화 버튼 */}
       <div style={{ marginBottom: '20px', padding: '15px', border: '2px solid #ff6b6b', borderRadius: '8px', backgroundColor: '#ffe0e0' }}>
         <h3 style={{ color: '#d63031', marginBottom: '10px' }}>⚠️ 위험한 작업</h3>
