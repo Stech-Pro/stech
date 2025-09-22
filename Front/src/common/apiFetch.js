@@ -14,7 +14,7 @@ async function ensureFreshToken() {
     refreshingPromise = (async () => {
       try {
         const r = await refreshToken(t);
-        setToken(r.token);
+        setToken(r.token || r.accessToken);
         return r.token;
       } catch {
         clearToken();
