@@ -33,5 +33,9 @@ export const API_CONFIG = {
     GET_TEAM_STATS_BY_KEY: '/team/stats',
     //Player
     GET_PLAYER_RANKINGS: '/player/rankings',
+
+    //Video Upload
+    PREPARE_MATCH_UPLOAD: '/game/prepare-match-upload',
+    COMPLETE_MATCH_UPLOAD: '/game/complete-match-upload',
   },
 };
