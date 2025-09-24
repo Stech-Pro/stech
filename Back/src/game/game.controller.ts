@@ -1166,6 +1166,29 @@ export class GameController {
     status: 400,
     description: '❌ 잘못된 요청 데이터',
   })
+  @ApiBody({
+    description: '경기 정보 및 쿼터별 영상 개수',
+    schema: {
+      example: {
+        gameKey: 'YSKM20250920',
+        gameInfo: {
+          homeTeam: 'YSeagles',
+          awayTeam: 'KMrazorbacks',
+          date: '2025-09-20(금) 15:00',
+          type: 'League',
+          score: { home: 21, away: 14 },
+          region: 'Seoul',
+          location: '테스트 경기장'
+        },
+        quarterVideoCounts: {
+          Q1: 3,
+          Q2: 3,
+          Q3: 2,
+          Q4: 2
+        }
+      }
+    }
+  })
   async prepareMatchUpload(@Body() body: any, @Req() req: any) {
     try {
       const { gameKey, gameInfo, quarterVideoCounts } = body;
@@ -1279,6 +1302,8 @@ export class GameController {
   }
 
   @Post('complete-match-upload')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: '🎯 경기 영상 업로드 완료',
     description: `
@@ -1303,10 +1328,41 @@ export class GameController {
   @ApiResponse({
     status: 200,
     description: '✅ 경기 업로드 완료',
+    schema: {
+      example: {
+        success: true,
+        message: '경기 영상 업로드가 완료되었습니다',
+        data: {
+          gameKey: 'YSKM20250920',
+          totalVideos: 7,
+          uploadedVideos: {
+            Q1: ['YSKM20250920_clip1.mp4', 'YSKM20250920_clip2.mp4'],
+            Q2: ['YSKM20250920_clip4.mp4', 'YSKM20250920_clip5.mp4'],
+            Q3: ['YSKM20250920_clip7.mp4'],
+            Q4: ['YSKM20250920_clip9.mp4', 'YSKM20250920_clip10.mp4']
+          },
+          uploadCompletedAt: '2025-01-24T10:30:00.000Z'
+        }
+      }
+    }
   })
   @ApiResponse({
     status: 404,
     description: '❌ 경기를 찾을 수 없음',
+  })
+  @ApiBody({
+    description: '업로드 완료된 영상 정보',
+    schema: {
+      example: {
+        gameKey: 'YSKM20250920',
+        uploadedVideos: {
+          Q1: ['YSKM20250920_clip1.mp4', 'YSKM20250920_clip2.mp4'],
+          Q2: ['YSKM20250920_clip4.mp4', 'YSKM20250920_clip5.mp4'],
+          Q3: ['YSKM20250920_clip7.mp4'],
+          Q4: ['YSKM20250920_clip9.mp4', 'YSKM20250920_clip10.mp4']
+        }
+      }
+    }
   })
   async completeMatchUpload(@Body() body: any) {
     try {
