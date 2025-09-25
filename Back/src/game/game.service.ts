@@ -266,10 +266,10 @@ export class GameService {
 
   // 코치용 하이라이트 조회
   async getCoachHighlights(teamName: string): Promise<any[]> {
-    // 해당 팀이 참여한 모든 경기 찾기
+    // 해당 팀이 업로드한 모든 경기 찾기
     const games = await this.gameClipsModel
       .find({
-        $or: [{ homeTeam: teamName }, { awayTeam: teamName }],
+        uploader: teamName, // 자신의 팀이 업로드한 경기만
       })
       .exec();
 
@@ -311,10 +311,10 @@ export class GameService {
   ): Promise<any[]> {
     // playerId에서 실제 선수 번호 추출 (예: "2025_KK_10" -> 10)
     const playerNumber = this.extractPlayerNumberFromId(playerId);
-    // 해당 팀이 참여한 모든 경기 찾기
+    // 해당 팀이 업로드한 모든 경기 찾기
     const games = await this.gameClipsModel
       .find({
-        $or: [{ homeTeam: teamName }, { awayTeam: teamName }],
+        uploader: teamName, // 자신의 팀이 업로드한 경기만
       })
       .exec();
 
