@@ -2,3 +2,19 @@ Back/node_modules/
 node_modules/
 .env
 .claude/
+
+# TypeScript 빌드 파일
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# 빌드 결과물
+Back/dist/
+dist/
+
+# 소스맵
+*.js.map
+
+# 테스트 파일들
+Back/*test*.json
+Back/*hanyang*.json
+Back/*hf_vs_hy*.json
