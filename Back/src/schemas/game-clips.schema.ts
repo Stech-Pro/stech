@@ -32,6 +32,9 @@ export class GameClips {
   @Prop({ required: true })
   awayTeam: string;
 
+  @Prop({ required: true })
+  uploader: string; // 업로드한 팀명
+
   @Prop({ type: Array, required: true })
   Clips: Array<{
     clipKey: string;

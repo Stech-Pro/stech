@@ -20,7 +20,7 @@ export class GameInfo {
     away: number;
   };
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   region: string;
 
   @Prop({ required: true })

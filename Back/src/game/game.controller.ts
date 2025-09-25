@@ -1112,7 +1112,7 @@ export class GameController {
         "date": "2025-09-20(금) 15:00",
         "type": "League",
         "score": {"home": 21, "away": 14},
-        "region": "Seoul",
+        "region": "Seoul", // 친선전인 경우 생략 가능
         "location": "테스트 경기장"
       },
       "quarterVideoCounts": {
@@ -1177,7 +1177,7 @@ export class GameController {
           date: '2025-09-20(금) 15:00',
           type: 'League',
           score: { home: 21, away: 14 },
-          region: 'Seoul',
+          region: 'Seoul', // 친선전인 경우 생략 가능
           location: '테스트 경기장'
         },
         quarterVideoCounts: {
