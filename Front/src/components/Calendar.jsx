@@ -33,7 +33,7 @@ const CalendarDropdown = ({ value, onChange }) => {
 
             {/* 요일 */}
             <div className="calWeekRow">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+                {['일', '월', '화', '수', '목', '금', '토'].map((d) => (
                     <div key={d} className="calWeekCell">
                         {d}
                     </div>
