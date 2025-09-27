@@ -4,6 +4,8 @@ import * as LandingPages from '../pages/Landing';
 import * as ServicePages from '../pages/Service';
 import * as AuthPages from '../pages/Auth';
 import * as CommonPages from '../pages/Common';
+import AnalysisPage from '../pages/Analysis/AnalysisPage';
+import AnalysisClipsPage from '../pages/Analysis/AnalysisClipsPage';
 
 export default function AppRouter() {
   return (
@@ -66,6 +68,12 @@ export default function AppRouter() {
             />
           </Route>
         </Route>
+      </Route>
+
+      {/* Analysis Pages (Admin Only) */}
+      <Route path="/analysis">
+        <Route index element={<AnalysisPage />} />
+        <Route path=":gameKey/clips" element={<AnalysisClipsPage />} />
       </Route>
 
       {/* Auth Pages*/}

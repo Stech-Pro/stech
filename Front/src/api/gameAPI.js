@@ -135,3 +135,30 @@ export async function getPlayerHighlights() {
   }
   return [];
 }
+
+/* 분석 대기중 경기 목록: GET /game/pending (관리자 전용) */
+export async function fetchPendingGames() {
+  const res = await apiFetch('/game/pending', { method: 'GET' });
+  const data = await jsonOrText(res);
+
+  if (!res.ok) {
+    throw new APIError(
+      typeof data === 'object' ? data.message || '분석 대기 경기 조회 실패' : '분석 대기 경기 조회 실패',
+      res.status,
+      data
+    );
+  }
+
+  // 백엔드 응답 구조: { success: true, data: [...] }
+  let games = [];
+  if (typeof data === 'object' && data.success && Array.isArray(data.data)) {
+    games = data.data;
+  } else if (Array.isArray(data)) {
+    games = data;
+  } else if (data && typeof data === 'object') {
+    games = [data];
+  }
+
+  // 서버 스키마 그대로 반환 (분석팀용이므로 추가 변환 불필요)
+  return games;
+}
