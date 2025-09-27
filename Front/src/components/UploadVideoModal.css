@@ -120,7 +120,7 @@
   z-index: 9999;
 }
 .uvm-card {
-  background: #1c1d21;
+  background: #2c2c2c;
   border-radius: 12px;
   width: 100rem;
   height: 56.25rem;
@@ -458,3 +458,26 @@
 .calendarBox { width: 320px; }  /* 달력 박스 */
 .timeBox { width: 260px; }      /* 시간 박스 */
 
+select {
+  background:#FFFFFF;
+  color: #000000;
+}
+
+/* 날짜/시간 드롭다운 래퍼: 팝오버 기준점 */
+.uvm-dtp-wrap {
+  position: relative;
+}
+
+/* 트리거 버튼 스타일 (필요시 조절) */
+.dtpButton.uvm-dtp {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #3a3d45;
+  background: #1f2126;
+  color: #e5e7eb;
+}
+.dtpButton.uvm-dtp:hover {
+  background: #23262c;
+}

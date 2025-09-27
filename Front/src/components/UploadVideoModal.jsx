@@ -1,5 +1,5 @@
 // src/components/UploadVideoModal.jsx
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import './UploadVideoModal.css';
 import Stechlogo from '../assets/images/logos/stech.png';
 import { IoCloseCircleOutline } from 'react-icons/io5';
@@ -44,18 +44,30 @@ function FilePreviewModal({ open, onClose, filesByQuarter }) {
   const tabs = ['Q1', 'Q2', 'Q3', 'Q4'];
   const [active, setActive] = useState('Q1');
 
-  // 탭 전환 시 비디오 자동 일시정지 (훅은 항상 호출)
+  // 모달 open 상태 변화 추적
+  const prevOpen = useRef(open);
+  
   useEffect(() => {
-    if (!open) return;
-    const vids = document.querySelectorAll('.fpm-video');
-    vids.forEach((v) => v.pause?.());
-  }, [active, open]);
+    // 모달이 새로 열렸을 때만 Q1으로 리셋
+    if (open && !prevOpen.current) {
+      setActive('Q1');
+    }
+    prevOpen.current = open;
+  }, [open]);
 
-  // ✅ 훅(및 훅을 쓰는 로직)은 early return보다 위에!
+  // 비디오 제어는 이벤트 핸들러에서 직접 처리
+  const handleTabChange = (newTab) => {
+    setActive(newTab);
+    // 탭 변경 시 기존 비디오들 일시정지
+    setTimeout(() => {
+      const vids = document.querySelectorAll('.fpm-video');
+      vids.forEach((v) => v.pause?.());
+    }, 0);
+  };
+
   const files = filesByQuarter?.[active] || [];
   const urls = useObjectURLs(open ? files : []); // 닫혀있으면 빈 배열로 훅 호출 유지
 
-  // ⬇️ 이제야 반환
   if (!open) return null;
 
   return (
@@ -79,7 +91,7 @@ function FilePreviewModal({ open, onClose, filesByQuarter }) {
               key={t}
               type="button"
               className={`fpm-tab ${active === t ? 'active' : ''}`}
-              onClick={() => setActive(t)}
+              onClick={() => handleTabChange(t)}
             >
               {t} ({(filesByQuarter?.[t] || []).length})
             </button>
@@ -213,74 +225,6 @@ function getLeagueName(matchDate, regionKey) {
 const GAME_TYPES = ['리그', '친선전', '스크리미지'];
 const toBackendGameType = (t) =>
   t === '리그' ? 'League' : t === '친선전' ? 'Friendly' : 'Scrimmage';
-
-/** 로고+이름 드롭다운 (기본형) */
-function TeamSelect({ value, options = [], onChange, placeholder = 'Select' }) {
-  const [open, setOpen] = useState(false);
-  const boxRef = useRef(null);
-
-  useEffect(() => {
-    const close = (e) => {
-      if (boxRef.current && !boxRef.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
-  }, []);
-
-  return (
-    <div className="teamSelect" ref={boxRef}>
-      <button
-        type="button"
-        className={`teamSelect-trigger ${open ? 'open' : ''}`}
-        onClick={() => setOpen((o) => !o)}
-      >
-        {value?.logo && (
-          <img
-            src={value.logo}
-            alt={value.name}
-            className={`teamSelect-logo ${
-              String(value.logo).endsWith('.svg') ? 'svg-logo' : 'png-logo'
-            }`}
-          />
-        )}
-        <span className={`teamSelect-label ${value ? '' : 'placeholder'}`}>
-          {value?.name || placeholder}
-        </span>
-      </button>
-
-      {open && (
-        <ul className="teamSelect-menu">
-          {options.map((t) => (
-            <li key={t.id}>
-              <button
-                type="button"
-                className="teamSelect-option"
-                onClick={() => {
-                  onChange?.(t);
-                  setOpen(false);
-                }}
-              >
-                {t.logo && (
-                  <img
-                    src={t.logo}
-                    alt={t.name}
-                    className={`teamSelect-logo ${
-                      String(t.logo).endsWith('.svg') ? 'svg-logo' : 'png-logo'
-                    }`}
-                  />
-                )}
-                <span>{t.name}</span>
-              </button>
-            </li>
-          ))}
-          {options.length === 0 && (
-            <li className="teamSelect-empty">No teams</li>
-          )}
-        </ul>
-      )}
-    </div>
-  );
-}
 
 /** 리그 → 팀 2단 드롭다운 (원정팀 전용) */
 function LeagueTeamSelect({
@@ -473,9 +417,12 @@ const UploadVideoModal = ({
   const [q3, setQ3] = useState([]);
   const [q4, setQ4] = useState([]);
 
+  const [dtOpen, setDtOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  const closePreview = useCallback(() => setPreviewOpen(false), []);
 
   const isLeague = gameType === '리그';
 
@@ -510,14 +457,13 @@ const UploadVideoModal = ({
   useEffect(() => {
     if (!isLeague) return;
     if (home?.region && home.region !== regionKey) setRegionKey(home.region);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [home, isLeague]);
+  }, [home, isLeague, regionKey]);
 
   useEffect(() => {
     if (!isLeague) return;
     if (home && home.region !== regionKey) setHome(null);
     if (away && away.region !== regionKey) setAway(null);
-  }, [regionKey, isLeague]);
+  }, [regionKey, isLeague, home, away]);
 
   /** 경기장 입력 모드 전환 */
   useEffect(() => {
@@ -535,6 +481,7 @@ const UploadVideoModal = ({
     setStadiumMode(hasList ? 'select' : 'custom');
     setStadium(''); // 지역 바뀌면 초기화
   }, [isLeague, regionKey]);
+  
   const weekOptions = useMemo(() => {
     if (!isLeague || !regionKey) return [];
     const max = WEEK_LIMITS[regionKey] ?? 0;
@@ -558,7 +505,7 @@ const UploadVideoModal = ({
     ) {
       setWeek('Week1');
     }
-  }, [isLeague, regionKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLeague, regionKey, week]);
 
   /** 제출 */
   const handleSubmit = async (e) => {
@@ -708,11 +655,17 @@ const UploadVideoModal = ({
       setDeleteLoading(false);
     }
   };
+  
   const canShowStep3 = useMemo(() => {
     if (!gameType) return false;
     if (gameType !== '리그') return true;
     return Boolean(regionKey && week && stadium);
   }, [gameType, regionKey, week, stadium]);
+
+  const filesByQuarter = useMemo(
+    () => ({ Q1: q1, Q2: q2, Q3: q3, Q4: q4 }),
+    [q1, q2, q3, q4],
+  );
 
   if (!isOpen) return null;
 
@@ -904,16 +857,29 @@ const UploadVideoModal = ({
 
                 {/* 날짜/시간은 한 줄 전체 사용 */}
                 <div className="uvm-row">
-                  <div className="uvm-field two">
-                    <label>경기 날짜</label>
-                    <DateTimeDropdown
-                      value={matchDate ? dayjs(matchDate) : dayjs()}
-                      onChange={(d) =>
-                        setMatchDate(d.format('YYYY-MM-DDTHH:mm'))
-                      }
-                      minuteStep={10} // 5, 10, 15 등 변경 가능
-                      buttonClass="dtpButton uvm-dtp"
-                    />
+                  <div className="uvm-field two uvm-dtp-wrap">
+                    <label>경기 날짜/시간</label>
+
+                    <button
+                      type="button"
+                      className="dtpButton uvm-dtp"
+                      onClick={() => setDtOpen((v) => !v)}
+                    >
+                      {matchDate
+                        ? dayjs(matchDate).format('YYYY-MM-DD HH:mm')
+                        : '날짜/시간 선택'}
+                    </button>
+
+                    {dtOpen && (
+                      <DateTimeDropdown
+                        value={matchDate ? dayjs(matchDate) : dayjs()}
+                        onChange={(d) =>
+                          setMatchDate(d.format('YYYY-MM-DDTHH:mm'))
+                        }
+                        onClose={() => setDtOpen(false)}
+                        minuteStep={10} // 옵션으로 10분 간격
+                      />
+                    )}
                   </div>
 
                   {/* 스코어: HOME : AWAY */}
@@ -1032,8 +998,8 @@ const UploadVideoModal = ({
         </form>
         <FilePreviewModal
           open={previewOpen}
-          onClose={() => setPreviewOpen(false)}
-          filesByQuarter={{ Q1: q1, Q2: q2, Q3: q3, Q4: q4 }}
+          onClose={closePreview}
+          filesByQuarter={filesByQuarter}
         />
       </div>
     </div>

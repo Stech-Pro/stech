@@ -1,273 +1,86 @@
-/* DateTimeDropdown.css */
-
-.datetime-dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.datetime-trigger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-  font-size: 14px;
-  min-width: 160px;
-  justify-content: space-between;
-}
-
-.datetime-trigger:hover {
-  border-color: #999;
-}
-
-.datetime-trigger:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.dropdown-arrow {
-  font-size: 12px;
-  color: #666;
-  transition: transform 0.2s;
-}
-
-.datetime-popup {
+/* 팝오버 컨테이너 (부모에 position:relative 필요) */
+.dtpPopover {
   position: absolute;
-  top: 100%;
+  top: 48px;            /* 트리거 버튼 아래로 */
   left: 0;
-  z-index: 1000;
-  margin-top: 4px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 320px;
+  z-index: 50;
+  background: #1f2126;
+  border: 1px solid #2c2f36;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  padding: 12px;
+  min-width: 560px;
 }
 
-.datetime-content {
+/* 내부 레이아웃: 달력 + 사이드 패널 */
+.dtpWrap {
   display: flex;
-  padding: 16px;
-  gap: 16px;
+  gap: 12px;
 }
 
-.date-section {
-  flex: 1;
+/* 달력 영역 */
+.dtpCalendar {
+  flex: 1 1 320px;
 }
 
-.time-section {
-  flex: 0 0 160px;
-  border-left: 1px solid #eee;
-  padding-left: 16px;
-}
-
-/* 날짜 선택기 스타일 */
-.date-picker {
-  width: 100%;
-}
-
-.date-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  padding: 0 4px;
-}
-
-.nav-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: #666;
-}
-
-.nav-btn:hover {
-  background: #f5f5f5;
-  color: #333;
-}
-
-.month-year {
-  font-weight: 500;
-  font-size: 14px;
-  color: #333;
-}
-
-.weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-  margin-bottom: 4px;
-}
-
-.weekday {
-  text-align: center;
-  font-size: 12px;
-  font-weight: 500;
-  color: #666;
-  padding: 4px 2px;
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-}
-
-.calendar-day {
-  background: none;
-  border: none;
-  padding: 8px 4px;
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 13px;
-  transition: all 0.2s;
-  min-height: 32px;
-}
-
-.calendar-day:hover {
-  background: #f0f8ff;
-}
-
-.calendar-day.other-month {
-  color: #ccc;
-}
-
-.calendar-day.today {
-  background: #e3f2fd;
-  font-weight: 600;
-  color: #1976d2;
-}
-
-.calendar-day.selected {
-  background: #007bff;
-  color: white;
-  font-weight: 500;
-}
-
-.calendar-day.selected:hover {
-  background: #0056b3;
-}
-
-/* 시간 선택기 스타일 */
-.time-picker {
+/* 우측 사이드(드롭다운) */
+.dtpSide {
+  width: 220px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.time-selectors {
+/* 상단 미리보기 */
+.dtpPreview {
+  font-size: 14px;
+  color: #e5e7eb;
+  background: #191b20;
+  border: 1px solid #2b2e35;
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+/* 라인 */
+.dtpRow {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
-.time-column {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.time-column label {
+.dtpLabel {
+  width: 44px;
+  color: #aeb3bd;
   font-size: 12px;
-  font-weight: 500;
-  color: #666;
-  text-align: center;
 }
 
-.time-select {
-  padding: 6px 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  width: 60px;
-  text-align: center;
-}
-
-.time-select:focus {
+/* 네이티브 셀렉트 스타일 */
+.dtpSelect {
+  flex: 1;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid #3a3d45;
+  background: #191b20;
+  color: #e5e7eb;
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
-.time-separator {
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
-  margin-top: 20px;
+.dtpSelect:hover {
+  background: #1c1e24;
 }
 
-.quick-time-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
+.dtpActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
 }
 
-.quick-time-btn {
-  padding: 6px 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.2s;
-}
-
-.quick-time-btn:hover {
-  background: #f8f9fa;
-  border-color: #999;
-}
-
-.time-actions {
-  margin-top: 12px;
-}
-
-.btn-current-time {
-  width: 100%;
-  padding: 8px 12px;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: background 0.2s;
-}
-
-.btn-current-time:hover {
-  background: #218838;
-}
-
-.datetime-footer {
-  border-top: 1px solid #eee;
-  padding: 12px 16px;
-  text-align: right;
-}
-
-.btn-close {
-  padding: 6px 16px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.btn-close:hover {
-  background: #0056b3;
-}
-
-/* UploadVideoModal에서 사용할 때의 스타일 */
-.uvm-dtp {
-  width: 100%;
-  justify-content: space-between;
-  padding: 10px 12px;
-  font-size: 14px;
+/* 반응형(좁을 때 수직 스택) */
+@media (max-width: 640px) {
+  .dtpPopover { min-width: 0; width: 100%; left: 0; right: 0; }
+  .dtpWrap { flex-direction: column; }
+  .dtpSide { width: 100%; }
 }
