@@ -30,6 +30,7 @@ import { S3Service } from '../common/services/s3.service';
 import { VideoUploadService } from '../videoupload/videoupload.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { AdminGuard } from '../common/guards/admin.guard';
 import {
   GameUploadSuccessDto,
   GameUploadErrorDto,
@@ -98,15 +99,30 @@ export class GameController {
       const playerResults = await this.processGameData(processedGameData);
       console.log('🎯🎯🎯 선수 데이터 처리 완료, 이제 GameInfo 저장 시작 🎯🎯🎯');
 
-      // 4. 경기 정보 저장
+      // 4. 경기 정보 저장 또는 업데이트
       console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
       try {
-        const { team: uploaderTeam } = req.user;
-        const gameInfoWithUploader = {
-          ...processedGameData,
-          uploader: uploaderTeam,
-        };
-        await this.gameService.createGameInfo(gameInfoWithUploader);
+        // 이미 pending 상태로 존재하는 경기인지 확인
+        const existingGame = await this.gameService.findGameByKey(processedGameData.gameKey);
+        
+        if (existingGame) {
+          // 기존 경기가 있으면 uploadStatus를 completed로 업데이트
+          console.log('📝 기존 경기 발견, uploadStatus를 completed로 업데이트');
+          await this.gameService.updateGameInfo(processedGameData.gameKey, {
+            ...processedGameData,
+            uploadStatus: 'completed',
+            uploader: existingGame.uploader, // 기존 uploader 유지
+          });
+        } else {
+          // 새 경기면 완료 상태로 생성
+          const { team: uploaderTeam } = req.user;
+          const gameInfoWithUploader = {
+            ...processedGameData,
+            uploader: uploaderTeam,
+            uploadStatus: 'completed', // 👈 완료 상태로 설정
+          };
+          await this.gameService.createGameInfo(gameInfoWithUploader);
+        }
         console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');
       } catch (gameInfoError) {
         console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
@@ -114,7 +130,15 @@ export class GameController {
 
       // 5. 전체 경기 클립 데이터 저장 (하이라이트용)
       console.log('💾 경기 클립 데이터 저장 시작...');
-      await this.gameService.saveGameClips(processedGameData);
+      // existingGame 변수가 스코프 밖에서 선언되어야 함
+      const uploaderTeam = await this.gameService.findGameByKey(processedGameData.gameKey)
+        .then(game => game?.uploader || req.user.team);
+      
+      const gameClipsData = {
+        ...processedGameData,
+        uploader: uploaderTeam,
+      };
+      await this.gameService.saveGameClips(gameClipsData);
       console.log('✅ 경기 클립 데이터 저장 완료');
 
       // 6. 팀 스탯 자동 계산
@@ -722,6 +746,101 @@ export class GameController {
     }
   }
 
+  @Get('pending')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: '⏳ 분석 대기중 경기 조회 (관리자 전용)',
+    description: '영상 업로드는 완료되었지만 분석 JSON이 아직 업로드되지 않은 경기들을 조회합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 분석 대기중 경기 조회 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '분석 대기중 경기 조회 성공',
+        data: [
+          {
+            gameKey: 'YSKM20250920',
+            date: '2025-09-20(금) 15:00',
+            homeTeam: 'YSeagles',
+            awayTeam: 'KMrazorbacks',
+            location: '테스트 경기장',
+            uploader: 'YSeagles',
+            uploadStatus: 'pending',
+            videoUrls: {
+              Q1: ['YSKM20250920_clip1.mp4'],
+              Q2: ['YSKM20250920_clip4.mp4']
+            }
+          }
+        ],
+        totalGames: 1
+      }
+    }
+  })
+  @ApiResponse({
+    status: 403,
+    description: '❌ 관리자 권한 필요',
+  })
+  async getPendingGames(@Req() req: any) {
+    console.log('⏳ 분석 대기중 경기 조회 시작');
+    
+    const pendingGames = await this.gameService.findPendingGames();
+    
+    console.log(`📊 분석 대기중 경기 수: ${pendingGames.length}개`);
+    
+    // 각 게임의 클립 개수 및 실제 비디오 파일 개수 조회
+    const gamesWithClipCount = await Promise.all(
+      pendingGames.map(async (game) => {
+        try {
+          const clips = await this.gameService.getGameClipsByKey(game.gameKey);
+          const clipCount = clips?.Clips?.length || 0;
+          
+          // S3에서 실제 존재하는 비디오 파일 개수 확인
+          let videoCount = 0;
+          if (clipCount > 0) {
+            try {
+              const videoUrls = await this.s3Service.generateClipUrls(
+                game.gameKey,
+                clipCount,
+              );
+              // null이 아닌 URL들만 카운트 (실제 존재하는 비디오 파일)
+              videoCount = videoUrls.filter(url => url !== null).length;
+              console.log(`🎬 ${game.gameKey}: S3에서 ${videoCount}/${clipCount} 비디오 URL 생성 성공`);
+            } catch (s3Error) {
+              console.error(`❌ ${game.gameKey} S3 비디오 URL 생성 실패:`, s3Error.message);
+              videoCount = 0;
+            }
+          }
+          
+          console.log(`📊 ${game.gameKey}: 클립 ${clipCount}개, 실제 비디오 ${videoCount}개`);
+          
+          return {
+            ...game,
+            totalClips: clipCount,
+            totalVideos: videoCount,
+          };
+        } catch (error) {
+          console.error(`❌ ${game.gameKey} 클립 조회 실패:`, error.message);
+          return {
+            ...game,
+            totalClips: 0,
+            totalVideos: 0,
+          };
+        }
+      })
+    );
+    
+    return {
+      success: true,
+      message: '분석 대기중 경기 조회 성공',
+      data: gamesWithClipCount,
+      totalGames: pendingGames.length,
+      accessLevel: 'admin',
+    };
+  }
+
   @Get('highlights/coach')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
@@ -1260,12 +1379,22 @@ export class GameController {
       console.log(`🔍 JWT에서 추출된 업로더 팀: ${uploaderTeam}`);
       console.log(`📋 전체 사용자 정보:`, req.user);
 
+      // 예상 videoUrls 구조 생성
+      const expectedVideoUrls = {};
+      for (const quarter of ['Q1', 'Q2', 'Q3', 'Q4']) {
+        const videoCount = quarterVideoCounts[quarter] || 0;
+        if (videoCount > 0) {
+          expectedVideoUrls[quarter] = uploadUrls[quarter].map(url => url.fileName);
+        }
+      }
+
       // 임시로 경기 정보 저장 (pending 상태)
       await this.gameService.createGameInfo({
         ...gameInfo,
         gameKey,
         uploader: uploaderTeam, // 업로드한 팀 저장
         uploadStatus: 'pending',
+        videoUrls: expectedVideoUrls, // 👈 예상 videoUrls 추가
       });
       
       console.log(`✅ ${gameKey} 경기 저장 완료 - 업로더: ${uploaderTeam}`);

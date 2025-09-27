@@ -93,11 +93,16 @@ export class GameService {
   }
 
   async findGamesByTeam(teamName: string): Promise<GameInfo[]> {
+    console.log(`🔍 팀별 경기 조회: ${teamName} (completed 상태만)`);
+    
     const games = await this.gameInfoModel
       .find({
         $or: [{ homeTeam: teamName }, { awayTeam: teamName }],
+        uploadStatus: 'completed', // 👈 분석 완료된 경기만
       })
       .exec();
+    
+    console.log(`📊 ${teamName} 완료된 경기 수: ${games.length}개`);
     
     // 팀명 수정 적용
     return games.map(game => {
@@ -134,7 +139,13 @@ export class GameService {
   }
 
   async findAllGames(): Promise<GameInfo[]> {
-    const games = await this.gameInfoModel.find().exec();
+    console.log(`🔍 모든 경기 조회 (completed 상태만)`);
+    
+    const games = await this.gameInfoModel
+      .find({ uploadStatus: 'completed' }) // 👈 Admin도 완료된 것만
+      .exec();
+    
+    console.log(`📊 전체 완료된 경기 수: ${games.length}개`);
     
     // 팀명 수정 적용
     return games.map(game => {
@@ -142,6 +153,34 @@ export class GameService {
       // 팀명은 그대로 사용
       // gameObj.homeTeam = gameObj.homeTeam;
       // gameObj.awayTeam = gameObj.awayTeam;
+      return gameObj;
+    });
+  }
+
+  async findPendingGames(): Promise<GameInfo[]> {
+    console.log('🔍 pending 상태 경기 조회 시작');
+    
+    const games = await this.gameInfoModel
+      .find({ uploadStatus: 'pending' })
+      .sort({ date: -1 }) // 최신순 정렬
+      .exec();
+    
+    console.log(`📊 pending 상태 경기 발견: ${games.length}개`);
+    
+    if (games.length > 0) {
+      console.log(`📋 첫 번째 pending 경기:`, {
+        gameKey: games[0].gameKey,
+        date: games[0].date,
+        homeTeam: games[0].homeTeam,
+        awayTeam: games[0].awayTeam,
+        uploader: games[0].uploader,
+        uploadStatus: games[0].uploadStatus,
+        videoUrls: games[0].videoUrls
+      });
+    }
+    
+    return games.map(game => {
+      const gameObj = game.toObject();
       return gameObj;
     });
   }
@@ -158,7 +197,7 @@ export class GameService {
   }
 
   async updateGameInfo(gameKey: string, gameData: any): Promise<GameInfo> {
-    const updateData = {
+    const updateData: any = {
       gameKey: gameData.gameKey,
       date: gameData.date,
       type: gameData.type,
@@ -168,6 +207,18 @@ export class GameService {
       homeTeam: gameData.homeTeam,
       awayTeam: gameData.awayTeam,
     };
+
+    // uploadStatus가 있으면 추가
+    if (gameData.uploadStatus) {
+      updateData.uploadStatus = gameData.uploadStatus;
+    }
+
+    // uploader가 있으면 추가
+    if (gameData.uploader) {
+      updateData.uploader = gameData.uploader;
+    }
+
+    console.log(`📝 GameInfo 업데이트: ${gameKey}`, updateData);
 
     return this.gameInfoModel
       .findOneAndUpdate({ gameKey }, updateData, { new: true, upsert: true })
