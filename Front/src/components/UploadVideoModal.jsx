@@ -27,58 +27,75 @@ function isVideo(file) {
   return /^video\//.test(file?.type || '');
 }
 
-function useObjectURLs(files = []) {
+function FilePreviewModal({ open, onClose, filesByQuarter }) {
+  const tabs = ['Q1', 'Q2', 'Q3', 'Q4'];
+  
+  const [active, setActive] = useState('Q1');
   const [urls, setUrls] = useState([]);
+
+  // 모달이 열릴 때마다 Q1으로 리셋
   useEffect(() => {
+    if (open) {
+      setActive('Q1');
+    }
+  }, [open]);
+
+  // active 탭의 파일들에 대한 URL 생성
+  useEffect(() => {
+    if (!open) {
+      setUrls([]);
+      return;
+    }
+
+    const files = filesByQuarter?.[active] || [];
     const created = files.map((f) => ({
       file: f,
       url: URL.createObjectURL(f),
     }));
+    
     setUrls(created);
-    return () => created.forEach(({ url }) => URL.revokeObjectURL(url));
-  }, [files]);
-  return urls;
-}
 
-function FilePreviewModal({ open, onClose, filesByQuarter }) {
-  const tabs = ['Q1', 'Q2', 'Q3', 'Q4'];
-  const [active, setActive] = useState('Q1');
-
-  // 모달 open 상태 변화 추적
-  const prevOpen = useRef(open);
-  
-  useEffect(() => {
-    // 모달이 새로 열렸을 때만 Q1으로 리셋
-    if (open && !prevOpen.current) {
-      setActive('Q1');
-    }
-    prevOpen.current = open;
-  }, [open]);
-
-  // 비디오 제어는 이벤트 핸들러에서 직접 처리
-  const handleTabChange = (newTab) => {
-    setActive(newTab);
-    // 탭 변경 시 기존 비디오들 일시정지
-    setTimeout(() => {
-      const vids = document.querySelectorAll('.fpm-video');
-      vids.forEach((v) => v.pause?.());
-    }, 0);
-  };
-
-  const files = filesByQuarter?.[active] || [];
-  const urls = useObjectURLs(open ? files : []); // 닫혀있으면 빈 배열로 훅 호출 유지
+    // cleanup
+    return () => {
+      created.forEach(({ url }) => URL.revokeObjectURL(url));
+    };
+  }, [open, active]); // filesByQuarter를 의존성에서 제거
 
   if (!open) return null;
 
+  const handleTabChange = (newTab) => {
+    // 탭 변경 전 모든 비디오 일시정지
+    const vids = document.querySelectorAll('.fpm-video');
+    vids.forEach((v) => {
+      if (v && typeof v.pause === 'function') {
+        v.pause();
+      }
+    });
+    setActive(newTab);
+  };
+
+  const handleClose = () => {
+    // 모달 닫기 전 모든 비디오 일시정지
+    const vids = document.querySelectorAll('.fpm-video');
+    vids.forEach((v) => {
+      if (v && typeof v.pause === 'function') {
+        v.pause();
+      }
+    });
+    onClose();
+  };
+
+  const files = filesByQuarter?.[active] || [];
+
   return (
-    <div className="fpm-overlay" onClick={onClose}>
+    <div className="fpm-overlay" onClick={handleClose}>
       <div className="fpm-card" onClick={(e) => e.stopPropagation()}>
         <div className="fpm-top">
           <h3 className="fpm-title">분기별 영상 확인</h3>
           <button
             type="button"
             className="fpm-close"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="닫기"
           >
             ×
@@ -137,7 +154,7 @@ function FilePreviewModal({ open, onClose, filesByQuarter }) {
         </div>
 
         <div className="fpm-actions">
-          <button type="button" className="btn ghost" onClick={onClose}>
+          <button type="button" className="btn ghost" onClick={handleClose}>
             닫기
           </button>
         </div>
@@ -145,7 +162,6 @@ function FilePreviewModal({ open, onClose, filesByQuarter }) {
     </div>
   );
 }
-
 const WEEK_LIMITS = {
   Seoul: 6,
   'Gyeonggi-Gangwon': 3,
@@ -263,10 +279,13 @@ function LeagueTeamSelect({
 
   useEffect(() => {
     if (!open) return;
-    setActiveLeague((cur) =>
-      cur && teamsByLeague[cur]?.length ? cur : leaguesList[0],
-    );
-  }, [open, leaguesList, teamsByLeague]);
+    
+    // teamsByLeague의 첫 번째 키를 기본값으로 설정
+    const firstLeague = leaguesList[0];
+    if (firstLeague && !activeLeague) {
+      setActiveLeague(firstLeague);
+    }
+  }, [open]); // teamsByLeague와 leaguesList을 의존성에서 제거
 
   return (
     <div className="teamSelect" ref={boxRef}>
