@@ -21,12 +21,12 @@ export class S3Service {
    */
   async getVideoFilesByGameKey(gameKey: string): Promise<string[]> {
     try {
-      console.log(`🔍 S3에서 videos/${gameKey} 폴더의 파일들 조회 시작`);
+      console.log(`🔍 S3에서 videos/${gameKey} 폴더의 파일들 조회 시작 (하위 폴더 포함)`);
 
       const params = {
         Bucket: this.bucketName,
         Prefix: `videos/${gameKey}/`,
-        Delimiter: '/',
+        // Delimiter 제거하여 하위 폴더(Q1, Q2, etc.)까지 모든 파일 조회
       };
 
       const data = await this.s3.listObjectsV2(params).promise();
@@ -213,12 +213,12 @@ export class S3Service {
    */
   async listVideosByGameKey(gameKey: string): Promise<string[]> {
     try {
-      console.log(`🔍 S3에서 videos/${gameKey} 폴더의 파일들 조회 시작`);
+      console.log(`🔍 S3에서 videos/${gameKey} 폴더의 파일들 조회 시작 (하위 폴더 포함)`);
 
       const params = {
         Bucket: this.bucketName,
         Prefix: `videos/${gameKey}/`,
-        Delimiter: '/',
+        // Delimiter 제거하여 하위 폴더(Q1, Q2, etc.)까지 모든 파일 조회
       };
 
       const data = await this.s3.listObjectsV2(params).promise();

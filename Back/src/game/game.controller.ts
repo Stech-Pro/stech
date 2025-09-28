@@ -1092,18 +1092,170 @@ export class GameController {
     description: '❌ 클립 데이터를 찾을 수 없음',
   })
   async getGameClips(@Param('gameKey') gameKey: string) {
-    const clips = await this.gameService.getGameClipsByKey(gameKey);
-
-    if (!clips) {
+    // 분석 대시보드용: 항상 GameInfo에서 영상 파일 기반으로 임시 클립 생성
+    console.log(`📹 ${gameKey}: 분석 대시보드용 영상 클립 생성 시작`);
+    const gameInfo = await this.gameService.findGameByKey(gameKey);
+    
+    if (!gameInfo) {
       throw new HttpException(
         {
           success: false,
-          message: `${gameKey} 경기의 클립 데이터를 찾을 수 없습니다`,
-          code: 'CLIPS_NOT_FOUND',
+          message: `${gameKey} 경기 정보를 찾을 수 없습니다`,
+          code: 'GAME_NOT_FOUND',
         },
         HttpStatus.NOT_FOUND,
       );
     }
+
+    // S3에서 업로드된 영상 파일 개수 확인
+    let videoCount = 0;
+    if (gameInfo.videoUrls) {
+      videoCount = Object.values(gameInfo.videoUrls).flat().length;
+    } else {
+      // videoUrls가 없으면 S3에서 직접 파일 개수 조회
+      try {
+        console.log(`📂 ${gameKey}: videoUrls가 없음, S3에서 직접 파일 조회`);
+        const s3Files = await this.s3Service.listVideosByGameKey(gameKey);
+        videoCount = s3Files.length;
+        console.log(`📂 ${gameKey}: S3에서 ${videoCount}개 영상 파일 발견`);
+      } catch (error) {
+        console.error(`❌ ${gameKey}: S3 파일 조회 실패:`, error.message);
+        videoCount = 0;
+      }
+    }
+
+    // 영상 파일 기반 클립 데이터 생성 (분석용)
+    // 실제 videoUrls를 기반으로 올바른 쿼터 배정
+    const tempClips = [];
+    let clipIndex = 1;
+    
+    if (gameInfo.videoUrls) {
+      // videoUrls가 있는 경우: 쿼터별로 올바르게 배정
+      for (const quarter of ['Q1', 'Q2', 'Q3', 'Q4']) {
+        const quarterVideos = gameInfo.videoUrls[quarter] || [];
+        const quarterNumber = parseInt(quarter.substring(1)); // Q1 -> 1, Q2 -> 2 등
+        
+        for (let i = 0; i < quarterVideos.length; i++) {
+          tempClips.push({
+            clipKey: `${gameKey}_clip${clipIndex}`,
+            offensiveTeam: clipIndex % 2 === 0 ? 'Home' : 'Away',
+            quarter: quarterNumber,
+            down: null,
+            toGoYard: null,
+            playType: '분석 대기',
+            specialTeam: false,
+            start: { side: 'Own', yard: 50 },
+            end: { side: 'Own', yard: 50 },
+            gainYard: 0,
+            car: { num: null, pos: null },
+            car2: { num: null, pos: null },
+            tkl: { num: null, pos: null },
+            tkl2: { num: null, pos: null },
+            significantPlays: [null, null, null, null, null],
+          });
+          clipIndex++;
+        }
+      }
+    } else {
+      // videoUrls가 없는 경우: S3 파일 구조를 분석하여 쿼터 정보 추출
+      try {
+        console.log(`📂 ${gameKey}: S3 파일 구조 분석하여 쿼터별 클립 생성`);
+        const s3Files = await this.s3Service.listVideosByGameKey(gameKey);
+        
+        // S3 파일들을 쿼터별로 그룹화
+        const filesByQuarter = { Q1: [], Q2: [], Q3: [], Q4: [] };
+        
+        s3Files.forEach((file: any) => {
+          // 파일 경로에서 쿼터 정보 추출: videos/GAMEKEY/Q1/filename.mp4
+          const filePath = file.Key || file;
+          const quarterMatch = filePath.match(/\/Q(\d+)\//);
+          if (quarterMatch) {
+            const quarter = `Q${quarterMatch[1]}`;
+            if (filesByQuarter[quarter]) {
+              filesByQuarter[quarter].push(file);
+            }
+          } else {
+            // 쿼터 정보가 없는 경우 파일명에서 클립 번호 추출하여 추정
+            const clipMatch = filePath.match(/clip(\d+)/);
+            if (clipMatch) {
+              const clipNum = parseInt(clipMatch[1]);
+              // 클립 번호 기반으로 쿼터 추정 (4등분)
+              const estimatedQuarter = Math.min(4, Math.ceil(clipNum / Math.max(1, s3Files.length / 4)));
+              const quarter = `Q${estimatedQuarter}`;
+              filesByQuarter[quarter].push(file);
+            }
+          }
+        });
+
+        // 쿼터별로 클립 생성
+        let clipIndex = 1;
+        for (const quarter of ['Q1', 'Q2', 'Q3', 'Q4']) {
+          const quarterFiles = filesByQuarter[quarter] || [];
+          const quarterNumber = parseInt(quarter.substring(1));
+          
+          for (let i = 0; i < quarterFiles.length; i++) {
+            tempClips.push({
+              clipKey: `${gameKey}_clip${clipIndex}`,
+              offensiveTeam: clipIndex % 2 === 0 ? 'Home' : 'Away',
+              quarter: quarterNumber,
+              down: null,
+              toGoYard: null,
+              playType: '분석 대기',
+              specialTeam: false,
+              start: { side: 'Own', yard: 50 },
+              end: { side: 'Own', yard: 50 },
+              gainYard: 0,
+              car: { num: null, pos: null },
+              car2: { num: null, pos: null },
+              tkl: { num: null, pos: null },
+              tkl2: { num: null, pos: null },
+              significantPlays: [null, null, null, null, null],
+            });
+            clipIndex++;
+          }
+        }
+        
+        console.log(`📊 ${gameKey}: S3 파일 분석 완료 - Q1: ${filesByQuarter.Q1.length}, Q2: ${filesByQuarter.Q2.length}, Q3: ${filesByQuarter.Q3.length}, Q4: ${filesByQuarter.Q4.length}`);
+        
+      } catch (s3Error) {
+        console.error(`❌ ${gameKey}: S3 파일 분석 실패, 기본 방식 사용:`, s3Error.message);
+        // S3 분석 실패 시 기본 방식으로 폴백
+        for (let index = 0; index < videoCount; index++) {
+          tempClips.push({
+            clipKey: `${gameKey}_clip${index + 1}`,
+            offensiveTeam: index % 2 === 0 ? 'Home' : 'Away',
+            quarter: Math.floor(index / Math.max(1, videoCount / 4)) + 1,
+            down: null,
+            toGoYard: null,
+            playType: '분석 대기',
+            specialTeam: false,
+            start: { side: 'Own', yard: 50 },
+            end: { side: 'Own', yard: 50 },
+            gainYard: 0,
+            car: { num: null, pos: null },
+            car2: { num: null, pos: null },
+            tkl: { num: null, pos: null },
+            tkl2: { num: null, pos: null },
+            significantPlays: [null, null, null, null, null],
+          });
+        }
+      }
+    }
+
+    const clips = {
+      gameKey: gameInfo.gameKey,
+      date: gameInfo.date,
+      type: gameInfo.type,
+      score: gameInfo.score || { home: 0, away: 0 },
+      region: gameInfo.region,
+      location: gameInfo.location,
+      homeTeam: gameInfo.homeTeam,
+      awayTeam: gameInfo.awayTeam,
+      uploader: gameInfo.uploader,
+      Clips: tempClips,
+    };
+
+    console.log(`📹 ${gameKey}: 분석용 임시 클립 ${tempClips.length}개 생성 (영상 ${videoCount}개 기반)`);
 
     try {
       // S3에서 비디오 URL들 가져오기
@@ -1359,6 +1511,17 @@ export class GameController {
 
       console.log(`🎬 경기 업로드 준비 시작: ${gameKey}`);
       console.log(`📊 쿼터별 영상 개수:`, quarterVideoCounts);
+      
+      // 쿼터별 개수 검증 및 경고
+      const totalRequestedVideos = Object.values(quarterVideoCounts).reduce((sum: number, count: any) => sum + (Number(count) || 0), 0);
+      console.log(`📊 총 요청된 영상 개수: ${totalRequestedVideos}개`);
+      
+      for (const [quarter, count] of Object.entries(quarterVideoCounts)) {
+        const videoCount = Number(count) || 0;
+        if (videoCount > 0) {
+          console.log(`✅ ${quarter}: ${videoCount}개 영상 업로드 예정`);
+        }
+      }
 
       // 연속된 clip 번호 생성
       let clipCounter = 1;
@@ -1367,12 +1530,15 @@ export class GameController {
 
       for (const quarter of ['Q1', 'Q2', 'Q3', 'Q4']) {
         const videoCount = quarterVideoCounts[quarter] || 0;
+        console.log(`🎯 ${quarter}: ${videoCount}개 영상 처리 시작`);
+        
         if (videoCount > 0) {
           uploadUrls[quarter] = [];
           
           for (let i = 0; i < videoCount; i++) {
             const fileName = `${gameKey}_clip${clipCounter}.mp4`;
             const s3Path = `videos/${gameKey}/${quarter}/${fileName}`;
+            console.log(`📁 ${quarter} 폴더에 ${fileName} 생성 (clip번호: ${clipCounter})`);
             
             // S3 업로드 URL 생성
             const uploadUrl = await this.s3Service.generatePresignedUploadUrl(
@@ -1538,7 +1704,7 @@ export class GameController {
 
       // 경기 상태를 완료로 업데이트
       const updatedGame = await this.gameService.updateGameInfo(gameKey, {
-        uploadStatus: 'completed',
+        uploadStatus: 'pending',
         videoUrls: uploadedVideos,
         uploadCompletedAt: new Date().toISOString(),
       });
