@@ -43,6 +43,9 @@ export class GameInfo {
 
   @Prop()
   uploadCompletedAt: string;
+
+  @Prop({ default: false })
+  report: boolean; // 보고서 생성 여부
 }
 
 export const GameInfoSchema = SchemaFactory.createForClass(GameInfo);

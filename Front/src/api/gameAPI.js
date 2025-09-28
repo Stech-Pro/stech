@@ -57,6 +57,7 @@ export async function fetchTeamGames(teamNameOrId) {
     awayScore: g?.score?.away ?? 0,
     length: g.length || '-',   // 없으면 '-'
     report: !!g.report,        // bool
+    uploadStatus: g.uploadStatus || 'completed', // pending, completed
   }));
 }
 

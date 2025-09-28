@@ -55,6 +55,7 @@ export default function GamePage() {
   const [activeLeague, setActiveLeague] = useState(null);
 
   const [showUpload, setShowUpload] = useState(false);
+  const [showAnalysisAlert, setShowAnalysisAlert] = useState(false);
 
   /* 바깥 클릭 닫기 */
   const dateWrapRef = useRef(null);
@@ -150,6 +151,12 @@ export default function GamePage() {
 
   /* 이동 */
   const openClips = (game) => {
+    // pending 상태 경기는 분석 중 팝업 표시
+    if (game.uploadStatus === 'pending') {
+      setShowAnalysisAlert(true);
+      return;
+    }
+    
     navigate(`/service/game/${game.gameKey}/clip`, { state: { game } });
   };
 
@@ -302,11 +309,39 @@ export default function GamePage() {
         <UploadVideoModal
           isOpen={showUpload}
           onClose={() => setShowUpload(false)}
-          onUploaded={() => {
+          onUploaded={async () => {
             setShowUpload(false);
-            // TODO: 업로드 후 목록 갱신
+            // 업로드 후 목록 갱신
+            try {
+              const list = await fetchTeamGames(MY_TEAM_ID);
+              setGames(list);
+            } catch (e) {
+              console.error('경기 목록 갱신 실패:', e);
+            }
           }}
         />
+
+        {/* 분석 중 알림 모달 */}
+        {showAnalysisAlert && (
+          <div className="modal-overlay" onClick={() => setShowAnalysisAlert(false)}>
+            <div className="analysis-alert-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="analysis-alert-content">
+                <div className="analysis-alert-icon">⏳</div>
+                <h3 className="analysis-alert-title">영상 분석 중입니다</h3>
+                <p className="analysis-alert-message">
+                  분석팀에서 영상을 분석하고 있습니다.<br />
+                  잠시만 기다려주세요.
+                </p>
+                <button 
+                  className="analysis-alert-button"
+                  onClick={() => setShowAnalysisAlert(false)}
+                >
+                  확인
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* ===== 경기 표 ===== */}
@@ -383,7 +418,6 @@ export default function GamePage() {
                   <span className="report-text">
                     {g.report ? '보고서 생성됨' : '보고서 생성 중…'}
                   </span>
-                  {g.report ? <FaRegFileAlt size={16} /> : null}
                 </div>
 
                 <div className="game-length">{g.length}</div>
