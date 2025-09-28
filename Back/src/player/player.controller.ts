@@ -411,6 +411,8 @@ export class PlayerController {
         const gameDataWithUploader = {
           ...gameData,
           uploader: user.team,
+          uploadStatus: 'completed', // JSON 업로드 시 완료 상태로 설정
+          report: true, // 보고서 생성 완료 표시
         };
         await this.gameService.createGameInfo(gameDataWithUploader);
         console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');

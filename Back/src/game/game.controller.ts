@@ -73,6 +73,14 @@ export class GameController {
       homeTeam: gameData.homeTeam,
       awayTeam: gameData.awayTeam,
     });
+    
+    // 기존 게임 상태 확인
+    const existingGameBefore = await this.gameService.findGameByKey(gameData.gameKey);
+    console.log('🔍 업로드 전 게임 상태:', {
+      gameKey: gameData.gameKey,
+      uploadStatus: existingGameBefore?.uploadStatus,
+      존재여부: !!existingGameBefore
+    });
 
     try {
       // 1. 기본 구조 검증
@@ -104,15 +112,20 @@ export class GameController {
       try {
         // 이미 pending 상태로 존재하는 경기인지 확인
         const existingGame = await this.gameService.findGameByKey(processedGameData.gameKey);
+        console.log('🔍 기존 게임 존재 여부:', !!existingGame, '- gameKey:', processedGameData.gameKey);
         
         if (existingGame) {
           // 기존 경기가 있으면 uploadStatus를 completed로 업데이트
           console.log('📝 기존 경기 발견, uploadStatus를 completed로 업데이트');
-          await this.gameService.updateGameInfo(processedGameData.gameKey, {
+          console.log('📝 업데이트 전 상태:', existingGame.uploadStatus);
+          
+          const updatedGame = await this.gameService.updateGameInfo(processedGameData.gameKey, {
             ...processedGameData,
             uploadStatus: 'completed',
             uploader: existingGame.uploader, // 기존 uploader 유지
           });
+          
+          console.log('📝 업데이트 후 상태:', updatedGame?.uploadStatus);
         } else {
           // 새 경기면 완료 상태로 생성
           const { team: uploaderTeam } = req.user;
@@ -121,9 +134,18 @@ export class GameController {
             uploader: uploaderTeam,
             uploadStatus: 'completed', // 👈 완료 상태로 설정
           };
+          console.log('📝 새 경기 생성 - uploadStatus:', gameInfoWithUploader.uploadStatus);
+          console.log('📝 gameInfoWithUploader 객체:', {
+            gameKey: gameInfoWithUploader.gameKey,
+            uploader: gameInfoWithUploader.uploader,
+            uploadStatus: gameInfoWithUploader.uploadStatus
+          });
           await this.gameService.createGameInfo(gameInfoWithUploader);
         }
-        console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');
+        
+        // 최종 상태 확인
+        const finalGame = await this.gameService.findGameByKey(processedGameData.gameKey);
+        console.log('✅✅✅ 경기 정보 저장 완료 - 최종 상태:', finalGame?.uploadStatus, '✅✅✅');
       } catch (gameInfoError) {
         console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
       }

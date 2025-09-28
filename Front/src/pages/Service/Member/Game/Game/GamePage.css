@@ -360,6 +360,88 @@
   color: #ff2b6e;
 }
 
+/* 새로운 분석 상태 스타일 */
+.statusCompleted {
+  color: #22c55e; /* 녹색 - 완료 */
+}
+.statusPending {
+  color: #f59e0b; /* 주황색 - 대기 중 */
+}
+
+.loading-spinner {
+  display: inline-block;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 분석 중 알림 모달 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.analysis-alert-modal {
+  background: #1f2937;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.analysis-alert-content {
+  text-align: center;
+  color: #e5e7eb;
+}
+
+.analysis-alert-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: spin 2s linear infinite;
+}
+
+.analysis-alert-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #f59e0b;
+}
+
+.analysis-alert-message {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+  color: #d1d5db;
+}
+
+.analysis-alert-button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.analysis-alert-button:hover {
+  background: #2563eb;
+}
+
 /* 반응형 컬럼 축소 */
 @media (max-width: 1080px) {
   .game-header,

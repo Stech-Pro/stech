@@ -37,6 +37,7 @@ export class GameService {
     console.log('  location:', gameData.location);
     console.log('  homeTeam:', gameData.homeTeam);
     console.log('  awayTeam:', gameData.awayTeam);
+    console.log('  uploadStatus:', gameData.uploadStatus);
 
     // 팀명은 그대로 사용
     const fixedHomeTeam = gameData.homeTeam;
@@ -48,18 +49,32 @@ export class GameService {
       console.log(`⚠️ 게임 데이터 중복: ${gameData.gameKey} 이미 존재함. 덮어쓰기 진행.`);
       
       // 기존 데이터 업데이트
+      const updateData: any = {
+        date: gameData.date,
+        type: gameData.type,
+        score: gameData.score,
+        region: gameData.region,
+        location: gameData.location,
+        homeTeam: fixedHomeTeam,
+        awayTeam: fixedAwayTeam,
+        uploader: gameData.uploader || existingGame.uploader,
+      };
+      
+      // uploadStatus가 있으면 포함
+      if (gameData.uploadStatus) {
+        updateData.uploadStatus = gameData.uploadStatus;
+        console.log(`📝 uploadStatus 업데이트: ${existingGame.uploadStatus} → ${gameData.uploadStatus}`);
+      }
+      
+      // report가 있으면 포함
+      if (gameData.report !== undefined) {
+        updateData.report = gameData.report;
+        console.log(`📝 report 업데이트: ${(existingGame as any).report} → ${gameData.report}`);
+      }
+      
       const updatedGame = await this.gameInfoModel.findOneAndUpdate(
         { gameKey: gameData.gameKey },
-        {
-          date: gameData.date,
-          type: gameData.type,
-          score: gameData.score,
-          region: gameData.region,
-          location: gameData.location,
-          homeTeam: fixedHomeTeam,
-          awayTeam: fixedAwayTeam,
-          uploader: gameData.uploader || existingGame.uploader,
-        },
+        updateData,
         { new: true }
       );
       console.log('✅ GameInfo 업데이트 성공:', updatedGame._id);
@@ -76,7 +91,10 @@ export class GameService {
       homeTeam: fixedHomeTeam,
       awayTeam: fixedAwayTeam,
       uploader: gameData.uploader, // JWT 토큰에서 가져온 팀명
+      uploadStatus: gameData.uploadStatus || 'pending', // 기본값 pending
     };
+    
+    console.log(`📝 새 게임 생성 - uploadStatus: ${gameInfo.uploadStatus}`);
 
     console.log('📝 새로운 gameInfo 저장:', JSON.stringify(gameInfo, null, 2));
 
@@ -93,23 +111,21 @@ export class GameService {
   }
 
   async findGamesByTeam(teamName: string): Promise<GameInfo[]> {
-    console.log(`🔍 팀별 경기 조회: ${teamName} (completed 상태만)`);
+    console.log(`🔍 팀별 경기 조회: ${teamName} (pending + completed 상태)`);
     
     const games = await this.gameInfoModel
       .find({
         $or: [{ homeTeam: teamName }, { awayTeam: teamName }],
-        uploadStatus: 'completed', // 👈 분석 완료된 경기만
+        uploadStatus: { $in: ['pending', 'completed'] }, // 👈 업로드된 경기 + 분석 완료된 경기
       })
+      .sort({ date: -1 }) // 최신순 정렬
       .exec();
     
-    console.log(`📊 ${teamName} 완료된 경기 수: ${games.length}개`);
+    console.log(`📊 ${teamName} 전체 경기 수: ${games.length}개 (pending + completed)`);
     
     // 팀명 수정 적용
     return games.map(game => {
       const gameObj = game.toObject();
-      // 팀명은 그대로 사용
-      // gameObj.homeTeam = gameObj.homeTeam;
-      // gameObj.awayTeam = gameObj.awayTeam;
       return gameObj;
     });
   }
@@ -128,7 +144,9 @@ export class GameService {
         gameKey: games[0].gameKey,
         uploader: games[0].uploader,
         homeTeam: games[0].homeTeam,
-        awayTeam: games[0].awayTeam
+        awayTeam: games[0].awayTeam,
+        uploadStatus: games[0].uploadStatus,
+        report: (games[0] as any).report
       });
     }
     
@@ -139,20 +157,18 @@ export class GameService {
   }
 
   async findAllGames(): Promise<GameInfo[]> {
-    console.log(`🔍 모든 경기 조회 (completed 상태만)`);
+    console.log(`🔍 모든 경기 조회 (pending + completed 상태)`);
     
     const games = await this.gameInfoModel
-      .find({ uploadStatus: 'completed' }) // 👈 Admin도 완료된 것만
+      .find({ uploadStatus: { $in: ['pending', 'completed'] } }) // 👈 Admin도 모든 상태 조회
+      .sort({ date: -1 }) // 최신순 정렬
       .exec();
     
-    console.log(`📊 전체 완료된 경기 수: ${games.length}개`);
+    console.log(`📊 전체 경기 수: ${games.length}개 (pending + completed)`);
     
     // 팀명 수정 적용
     return games.map(game => {
       const gameObj = game.toObject();
-      // 팀명은 그대로 사용
-      // gameObj.homeTeam = gameObj.homeTeam;
-      // gameObj.awayTeam = gameObj.awayTeam;
       return gameObj;
     });
   }
@@ -211,6 +227,7 @@ export class GameService {
     // uploadStatus가 있으면 추가
     if (gameData.uploadStatus) {
       updateData.uploadStatus = gameData.uploadStatus;
+      console.log(`📝 updateGameInfo에서 uploadStatus 업데이트: ${gameData.uploadStatus}`);
     }
 
     // uploader가 있으면 추가
