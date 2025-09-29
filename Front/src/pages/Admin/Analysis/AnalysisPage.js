@@ -3,12 +3,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { FaChevronDown, FaVideo, FaUpload } from 'react-icons/fa';
-import { useAuth } from '../../context/AuthContext.js';
-import { fetchPendingGames } from '../../api/gameAPI.js';
+import { useAuth } from '../../../context/AuthContext.js';
+import { fetchPendingGames } from '../../../api/gameAPI.js';
 import './AnalysisPage.css';
-import { TEAMS, TEAM_BY_ID } from '../../data/TEAMS';
-import CalendarDropdown from '../../components/Calendar.jsx';
-import defaultLogo from '../../assets/images/logos/Stechlogo.svg';
+import { TEAMS, TEAM_BY_ID } from '../../../data/TEAMS';
+import CalendarDropdown from '../../../components/Calendar.jsx';
+import defaultLogo from '../../../assets/images/logos/Stechlogo.svg';
 
 /* ===== 상수 ===== */
 const TYPES = ['Scrimmage', 'Friendly match', 'Season'];

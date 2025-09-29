@@ -2,11 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaPlay, FaVideo } from 'react-icons/fa';
-import { useAuth } from '../../context/AuthContext.js';
-import { fetchGameClips } from '../../api/gameAPI.js';
+import { useAuth } from '../../../context/AuthContext.js';
+import { fetchGameClips } from '../../../api/gameAPI.js';
 import './AnalysisClipsPage.css';
-import { TEAMS, TEAM_BY_ID } from '../../data/TEAMS';
-import defaultLogo from '../../assets/images/logos/Stechlogo.svg';
+import { TEAMS, TEAM_BY_ID } from '../../../data/TEAMS.js';
+import defaultLogo from '../../../assets/images/logos/Stechlogo.svg';
 
 export default function AnalysisClipsPage() {
   const { gameKey } = useParams();
