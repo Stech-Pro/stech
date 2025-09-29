@@ -1,13 +1,11 @@
-/* src/pages/Analysis/AnalysisPage.css */
-
-.analysis-page-root {
+.APanalysis-page-root {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   padding: 20px;
 }
 
 /* ===== 헤더 ===== */
-.analysis-header {
+.APanalysis-header {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -15,32 +13,32 @@
   padding: 24px;
 }
 
-.analysis-header-container {
+.APanalysis-header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 24px;
 }
 
-.analysis-title-box {
+.APanalysis-title-box {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.analysis-icon {
+.APanalysis-icon {
   font-size: 24px;
   color: #4f46e5;
 }
 
-.analysis-title {
+.APanalysis-title {
   font-size: 24px;
   font-weight: 700;
   color: #1f2937;
   margin: 0;
 }
 
-.analysis-subtitle {
+.APanalysis-subtitle {
   font-size: 14px;
   color: #6b7280;
   background: #f3f4f6;
@@ -49,7 +47,7 @@
 }
 
 /* ===== 필터 ===== */
-.analysis-filters .filterGroup {
+.APanalysis-filters .APfilterGroup {
   display: flex;
   gap: 12px;
   align-items: center;
@@ -71,18 +69,18 @@
   justify-content: space-between;
 }
 
-.filterButton:hover {
+.APfilterButton:hover {
   border-color: #4f46e5;
   background: #fafbff;
 }
 
-.filterButton.active {
+.APfilterButton.active {
   border-color: #4f46e5;
   background: #4f46e5;
   color: white;
 }
 
-.resetButton {
+.APresetButton {
   background: #ef4444;
   color: white;
   border: none;
@@ -93,19 +91,19 @@
   transition: background 0.2s ease;
 }
 
-.resetButton:hover {
+.APresetButton:hover {
   background: #dc2626;
 }
 
 /* 드롭다운들 */
-.datePickerWrap,
-.typePickerWrap,
-.uploaderPickerWrap {
+.APdatePickerWrap,
+.APtypePickerWrap,
+.APuploaderPickerWrap {
   position: relative;
 }
 
-.typeDropdown,
-.uploaderDropdown {
+.APtypeDropdown,
+.APuploaderDropdown {
   position: absolute;
   top: 100%;
   left: 0;
@@ -120,13 +118,13 @@
   margin-top: 4px;
 }
 
-.typeDropdown li,
-.uploaderDropdown li {
+.APtypeDropdown li,
+.APuploaderDropdown li {
   list-style: none;
 }
 
-.typeItem,
-.uploaderItem {
+.APtypeItem,
+.APuploaderItem {
   width: 100%;
   background: none;
   border: none;
@@ -140,18 +138,18 @@
   font-size: 14px;
 }
 
-.typeItem:hover,
-.uploaderItem:hover {
+.APtypeItem:hover,
+.APuploaderItem:hover {
   background: #f3f4f6;
 }
 
-.typeItem.active,
-.uploaderItem.active {
+.APtypeItem.active,
+.APuploaderItem.active {
   background: #4f46e5;
   color: white;
 }
 
-.uploader-team-logo {
+.APuploader-team-logo {
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -161,28 +159,28 @@
   justify-content: center;
 }
 
-.uploader-team-logo-img {
+.APuploader-team-logo-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
 /* ===== 경기 목록 ===== */
-.analysis-container {
+.APanalysis-container {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
-.analysis-header-row {
+.APanalysis-header-row {
   display: grid;
   grid-template-columns: 120px 2fr 1fr 1fr 100px 120px;
   background: #f8fafc;
   border-bottom: 1px solid #e5e7eb;
 }
 
-.analysis-header-cell {
+.APanalysis-header-cell {
   padding: 16px;
   font-weight: 600;
   color: #374151;
@@ -190,28 +188,28 @@
   border-right: 1px solid #e5e7eb;
 }
 
-.analysis-header-cell:last-child {
+.APanalysis-header-cell:last-child {
   border-right: none;
 }
 
-.analysis-list {
+.APanalysis-list {
   min-height: 200px;
 }
 
-.analysis-loading,
-.analysis-error,
-.analysis-empty {
+.APanalysis-loading,
+.APanalysis-error,
+.APanalysis-empty {
   padding: 40px;
   text-align: center;
   color: #6b7280;
   font-size: 16px;
 }
 
-.analysis-error {
+.APanalysis-error {
   color: #ef4444;
 }
 
-.analysis-card {
+.APanalysis-card {
   display: grid;
   grid-template-columns: 120px 2fr 1fr 1fr 100px 120px;
   border-bottom: 1px solid #f3f4f6;
@@ -219,21 +217,21 @@
   transition: all 0.2s ease;
 }
 
-.analysis-card:hover {
+.APanalysis-card:hover {
   background: #fafbff;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.analysis-card:last-child {
+.APanalysis-card:last-child {
   border-bottom: none;
 }
 
 /* 개별 셀 스타일 */
-.analysis-date,
-.analysis-location,
-.analysis-video-count,
-.analysis-status {
+.APanalysis-date,
+.APanalysis-location,
+.APanalysis-video-count,
+.APanalysis-status {
   padding: 16px;
   display: flex;
   align-items: center;
@@ -242,12 +240,12 @@
   font-size: 14px;
 }
 
-.analysis-date {
+.APanalysis-date {
   font-weight: 600;
   color: #374151;
 }
 
-.analysis-game {
+.APanalysis-game {
   padding: 16px;
   display: flex;
   align-items: center;
@@ -255,19 +253,19 @@
   border-right: 1px solid #f3f4f6;
 }
 
-.analysis-teams {
+.APanalysis-teams {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.analysis-team {
+.APanalysis-team {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.analysis-team-logo {
+.APanalysis-team-logo {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -277,25 +275,25 @@
   justify-content: center;
 }
 
-.analysis-team-logo-img {
+.APanalysis-team-logo-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.analysis-team-name {
+.APanalysis-team-name {
   font-weight: 600;
   color: #374151;
   font-size: 14px;
 }
 
-.analysis-vs {
+.APanalysis-vs {
   font-weight: 700;
   color: #6b7280;
   font-size: 12px;
 }
 
-.analysis-uploader {
+.APanalysis-uploader {
   padding: 16px;
   display: flex;
   align-items: center;
@@ -304,7 +302,7 @@
   border-right: 1px solid #f3f4f6;
 }
 
-.analysis-uploader-logo {
+.APanalysis-uploader-logo {
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -314,86 +312,86 @@
   justify-content: center;
 }
 
-.analysis-uploader-logo-img {
+.APanalysis-uploader-logo-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.analysis-uploader-name {
+.APanalysis-uploader-name {
   font-size: 14px;
   color: #374151;
 }
 
-.analysis-video-count {
+.APanalysis-video-count {
   gap: 6px;
   color: #4f46e5;
 }
 
-.video-icon {
+.APvideo-icon {
   font-size: 14px;
 }
 
-.analysis-status {
+.APanalysis-status {
   gap: 6px;
   border-right: none;
 }
 
-.analysis-status.pending {
+.APanalysis-status.APpending {
   color: #f59e0b;
 }
 
-.status-icon {
+.APstatus-icon {
   font-size: 14px;
 }
 
 /* 반응형 */
 @media (max-width: 1200px) {
-  .analysis-header-row,
-  .analysis-card {
+  .APanalysis-header-row,
+  .APanalysis-card {
     grid-template-columns: 100px 2fr 1fr 1fr 80px 100px;
   }
   
-  .analysis-header-cell,
-  .analysis-date,
-  .analysis-location,
-  .analysis-video-count,
-  .analysis-status,
-  .analysis-game,
-  .analysis-uploader {
+  .APanalysis-header-cell,
+  .APanalysis-date,
+  .APanalysis-location,
+  .APanalysis-video-count,
+  .APanalysis-status,
+  .APanalysis-game,
+  .APanalysis-uploader {
     padding: 12px 8px;
     font-size: 13px;
   }
 }
 
 @media (max-width: 768px) {
-  .analysis-header-container {
+  .APanalysis-header-container {
     flex-direction: column;
     gap: 16px;
   }
   
-  .analysis-filters .filterGroup {
+  .APanalysis-filters .APfilterGroup {
     flex-wrap: wrap;
     gap: 8px;
   }
   
-  .filterButton {
+  .APfilterButton {
     min-width: 80px;
     padding: 6px 12px;
     font-size: 13px;
   }
   
-  .analysis-header-row,
-  .analysis-card {
+  .APanalysis-header-row,
+  .APanalysis-card {
     grid-template-columns: 1fr 2fr 1fr;
   }
   
-  .analysis-header-cell:nth-child(4),
-  .analysis-header-cell:nth-child(5),
-  .analysis-header-cell:nth-child(6),
-  .analysis-uploader,
-  .analysis-video-count,
-  .analysis-status {
+  .APanalysis-header-cell:nth-child(4),
+  .APanalysis-header-cell:nth-child(5),
+  .APanalysis-header-cell:nth-child(6),
+  .APanalysis-uploader,
+  .APanalysis-video-count,
+  .APanalysis-status {
     display: none;
   }
 }

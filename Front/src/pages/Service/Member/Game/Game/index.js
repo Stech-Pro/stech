@@ -10,6 +10,7 @@ import { TEAMS, TEAM_BY_ID } from '../../../../../data/TEAMS';
 import CalendarDropdown from '../../../../../components/Calendar.jsx';
 import UploadVideoModal from '../../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
+import { IoMdNotificationsOutline } from 'react-icons/io';
 
 /* ===== 상수 ===== */
 const TYPES = ['Scrimmage', 'Friendly match', 'Season'];
@@ -23,7 +24,6 @@ const REGION_LABEL = {
   Amateur: '사회인',
 };
 
-
 export default function GamePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -34,11 +34,11 @@ export default function GamePage() {
 
   /* ===== 내 팀 (고정 표기) ===== */
   // 백엔드/스토리지에 따라 teamId가 다양한 키에 있을 수 있으니 방어적으로 가져오기
-  const MY_TEAM_ID =   user?.team || user?.teamName ;
+  const MY_TEAM_ID = user?.team || user?.teamName;
 
   const selfTeam = useMemo(
     () => (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || TEAMS[0] || null,
-    [MY_TEAM_ID]
+    [MY_TEAM_ID],
   );
   const logoSrc = selfTeam?.logo || defaultLogo;
   const label = selfTeam?.name || 'Choose Team';
@@ -94,7 +94,7 @@ export default function GamePage() {
   useEffect(() => {
     if (showOpps) {
       setActiveLeague((cur) =>
-        cur && teamsByLeague[cur]?.length ? cur : leaguesList[0] || null
+        cur && teamsByLeague[cur]?.length ? cur : leaguesList[0] || null,
       );
     }
   }, [showOpps, leaguesList, teamsByLeague]);
@@ -139,7 +139,8 @@ export default function GamePage() {
   /* 필터 적용 (모두 id 기준) */
   const filteredGames = useMemo(() => {
     return games.filter((g) => {
-      if (selectedDate && !dayjs(g.date).isSame(selectedDate, 'day')) return false;
+      if (selectedDate && !dayjs(g.date).isSame(selectedDate, 'day'))
+        return false;
       if (selectedType && g.type !== selectedType) return false;
       if (selectedOpps) {
         const oppId = selectedOpps.id;
@@ -156,7 +157,7 @@ export default function GamePage() {
       setShowAnalysisAlert(true);
       return;
     }
-    
+
     navigate(`/service/game/${game.gameKey}/clip`, { state: { game } });
   };
 
@@ -185,7 +186,9 @@ export default function GamePage() {
               {/* 날짜 */}
               <div className="datePickerWrap" ref={dateWrapRef}>
                 <button
-                  className={`filterButton ${showDate || selectedDate ? 'active' : ''}`}
+                  className={`filterButton ${
+                    showDate || selectedDate ? 'active' : ''
+                  }`}
                   onClick={() => setShowDate(!showDate)}
                 >
                   {selectedDate ? selectedDate.format('YYYY-MM-DD') : '날짜'}{' '}
@@ -215,7 +218,9 @@ export default function GamePage() {
                     {TYPES.map((t) => (
                       <li key={t}>
                         <button
-                          className={`typeItem ${selectedType === t ? 'active' : ''}`}
+                          className={`typeItem ${
+                            selectedType === t ? 'active' : ''
+                          }`}
                           onClick={() => {
                             setSelectedType(t);
                             setShowType(false);
@@ -235,7 +240,8 @@ export default function GamePage() {
                   className={`filterButton ${selectedOpps ? 'active' : ''}`}
                   onClick={() => setShowOpps((v) => !v)}
                 >
-                  {selectedOpps ? selectedOpps.name : '상대'} <FaChevronDown size={10} />
+                  {selectedOpps ? selectedOpps.name : '상대'}{' '}
+                  <FaChevronDown size={10} />
                 </button>
 
                 {showOpps && (
@@ -246,7 +252,9 @@ export default function GamePage() {
                         <li key={lg}>
                           <button
                             type="button"
-                            className={`leagueItem ${activeLeague === lg ? 'active' : ''}`}
+                            className={`leagueItem ${
+                              activeLeague === lg ? 'active' : ''
+                            }`}
                             onMouseEnter={() => setActiveLeague(lg)}
                             onFocus={() => setActiveLeague(lg)}
                             onClick={() => setActiveLeague(lg)}
@@ -275,7 +283,9 @@ export default function GamePage() {
                                   src={t.logo}
                                   alt={t.name}
                                   className={`opps-team-logo-img ${
-                                    t.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                                    t.logo.endsWith('.svg')
+                                      ? 'svg-logo'
+                                      : 'png-logo'
                                   }`}
                                 />
                               </div>
@@ -284,7 +294,8 @@ export default function GamePage() {
                           </button>
                         </li>
                       ))}
-                      {(!activeLeague || (teamsByLeague[activeLeague] || []).length === 0) && (
+                      {(!activeLeague ||
+                        (teamsByLeague[activeLeague] || []).length === 0) && (
                         <li className="oppsEmpty">해당 리그 팀이 없습니다</li>
                       )}
                     </ul>
@@ -298,10 +309,17 @@ export default function GamePage() {
               </button>
             </div>
 
-            {/* 업로드 모달 버튼 */}
-            <button className="newVideoButton" onClick={() => setShowUpload(true)}>
-              경기 업로드
-            </button>
+            <div className="header-right-group">
+              <button
+                className="newVideoButton"
+                onClick={() => setShowUpload(true)}
+              >
+                경기 업로드
+              </button>
+              <button className="notificationButton">
+                <IoMdNotificationsOutline className='notification-button' size={24} />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -323,16 +341,23 @@ export default function GamePage() {
 
         {/* 분석 중 알림 모달 */}
         {showAnalysisAlert && (
-          <div className="modal-overlay" onClick={() => setShowAnalysisAlert(false)}>
-            <div className="analysis-alert-modal" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-overlay"
+            onClick={() => setShowAnalysisAlert(false)}
+          >
+            <div
+              className="analysis-alert-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="analysis-alert-content">
                 <div className="analysis-alert-icon">⏳</div>
                 <h3 className="analysis-alert-title">영상 분석 중입니다</h3>
                 <p className="analysis-alert-message">
-                  분석팀에서 영상을 분석하고 있습니다.<br />
+                  분석팀에서 영상을 분석하고 있습니다.
+                  <br />
                   잠시만 기다려주세요.
                 </p>
-                <button 
+                <button
                   className="analysis-alert-button"
                   onClick={() => setShowAnalysisAlert(false)}
                 >
@@ -345,8 +370,11 @@ export default function GamePage() {
       </header>
 
       {/* ===== 경기 표 ===== */}
-    
-      <div className="game-container" style={{ display: loading ? 'none' : 'block' }}>
+
+      <div
+        className="game-container"
+        style={{ display: loading ? 'none' : 'block' }}
+      >
         <div className="game-header">
           <div className="game-header-cell">날짜</div>
           <div className="game-header-cell">경기 결과</div>
@@ -356,8 +384,8 @@ export default function GamePage() {
         </div>
 
         <div className="game-list">
-            {loading && <div className="game-loading">불러오는 중…</div>}
-            {error && <div className="game-error">{error}</div>}
+          {loading && <div className="game-loading">불러오는 중…</div>}
+          {error && <div className="game-error">{error}</div>}
 
           {filteredGames.map((g) => {
             const homeMeta = TEAM_BY_ID[g.homeId];
@@ -382,12 +410,16 @@ export default function GamePage() {
                           src={homeMeta.logo}
                           alt={`${homeMeta.name} 로고`}
                           className={`game-team-logo-img ${
-                            homeMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                            homeMeta.logo.endsWith('.svg')
+                              ? 'svg-logo'
+                              : 'png-logo'
                           }`}
                         />
                       </div>
                     )}
-                    <span className="game-team-name">{homeMeta?.name || g.homeId}</span>
+                    <span className="game-team-name">
+                      {homeMeta?.name || g.homeId}
+                    </span>
                   </div>
 
                   <div className="game-score">
@@ -401,12 +433,16 @@ export default function GamePage() {
                           src={awayMeta.logo}
                           alt={`${awayMeta.name} 로고`}
                           className={`game-team-logo-img ${
-                            awayMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                            awayMeta.logo.endsWith('.svg')
+                              ? 'svg-logo'
+                              : 'png-logo'
                           }`}
                         />
                       </div>
                     )}
-                    <span className="game-team-name">{awayMeta?.name || g.awayId}</span>
+                    <span className="game-team-name">
+                      {awayMeta?.name || g.awayId}
+                    </span>
                   </div>
                 </div>
 
@@ -414,7 +450,9 @@ export default function GamePage() {
                   <span>{g.location}</span>
                 </div>
 
-                <div className={`game-report ${g.report ? 'reportY' : 'reportN'}`}>
+                <div
+                  className={`game-report ${g.report ? 'reportY' : 'reportN'}`}
+                >
                   <span className="report-text">
                     {g.report ? '보고서 생성됨' : '보고서 생성 중…'}
                   </span>

@@ -441,7 +441,29 @@
 .analysis-alert-button:hover {
   background: #2563eb;
 }
+.header-right-group{
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
 
+.notificationButton {
+  width: 3.444rem;
+  height: 3.444rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.notificationButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
 /* 반응형 컬럼 축소 */
 @media (max-width: 1080px) {
   .game-header,
@@ -454,3 +476,4 @@
     display: none;
   }
 }
+
