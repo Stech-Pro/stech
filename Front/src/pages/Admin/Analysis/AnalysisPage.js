@@ -191,7 +191,7 @@ export default function AnalysisPage() {
               {/* 날짜 */}
               <div className="datePickerWrap" ref={dateWrapRef}>
                 <button
-                  className={`filterButton ${showDate || selectedDate ? 'active' : ''}`}
+                  className={`APfilterButton ${showDate || selectedDate ? 'active' : ''}`}
                   onClick={() => setShowDate(!showDate)}
                 >
                   {selectedDate ? selectedDate.format('YYYY-MM-DD') : '날짜'}{' '}
@@ -211,7 +211,7 @@ export default function AnalysisPage() {
               {/* 유형 */}
               <div className="typePickerWrap" ref={typeWrapRef}>
                 <button
-                  className={`filterButton ${selectedType ? 'active' : ''}`}
+                  className={`APfilterButton ${selectedType ? 'active' : ''}`}
                   onClick={() => setShowType(!showType)}
                 >
                   {selectedType ?? '유형'} <FaChevronDown size={10} />
@@ -238,7 +238,7 @@ export default function AnalysisPage() {
               {/* 업로더 팀 */}
               <div className="uploaderPickerWrap" ref={uploaderWrapRef}>
                 <button
-                  className={`filterButton ${selectedUploader ? 'active' : ''}`}
+                  className={`APfilterButton ${selectedUploader ? 'active' : ''}`}
                   onClick={() => setShowUploader(!showUploader)}
                 >
                   {selectedUploader ? selectedUploader.name : '업로더'} <FaChevronDown size={10} />
