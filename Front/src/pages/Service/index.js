@@ -6,3 +6,4 @@ export { default as VideoPlayer } from './Video';
 
 export * from './Guest';
 export * from './Member';
+export * from './Admin';

@@ -1,12 +1,11 @@
-// src/pages/Analysis/AnalysisClipsPage.js
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaPlay, FaVideo } from 'react-icons/fa';
-import { useAuth } from '../../../context/AuthContext.js';
-import { fetchGameClips } from '../../../api/gameAPI.js';
+import { useAuth } from '../../../../../context/AuthContext.js';
+import { fetchGameClips } from '../../../../../api/gameAPI.js';
 import './AnalysisClipsPage.css';
-import { TEAMS, TEAM_BY_ID } from '../../../data/TEAMS.js';
-import defaultLogo from '../../../assets/images/logos/Stechlogo.svg';
+import { TEAMS, TEAM_BY_ID } from '../../../../../data/TEAMS.js';
+import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
 
 export default function AnalysisClipsPage() {
   const { gameKey } = useParams();
@@ -19,22 +18,18 @@ export default function AnalysisClipsPage() {
   const [clips, setClips] = useState([]);
   const [gameInfo, setGameInfo] = useState(null);
 
-  // 관리자 권한 확인
   useEffect(() => {
-    // user가 로드되었고, admin이 아닌 경우에만 리다이렉트
     if (user && user.role !== 'admin') {
       navigate('/service');
     }
   }, [user, navigate]);
 
-  // location state에서 게임 정보 가져오기
   useEffect(() => {
     if (location.state?.game) {
       setGameInfo(location.state.game);
     }
   }, [location.state]);
 
-  // 클립 데이터 로드
   useEffect(() => {
     if (!gameKey) return;
 
@@ -63,13 +58,11 @@ export default function AnalysisClipsPage() {
     };
   }, [gameKey]);
 
-  // 뒤로가기
   const goBack = () => {
     navigate('/analysis');
   };
 
-  // 영상 재생
-  const playVideo = (clip, index) => {
+  const playVideo = (clip) => {
     if (clip.clipUrl) {
       window.open(clip.clipUrl, '_blank');
     } else {
@@ -77,7 +70,6 @@ export default function AnalysisClipsPage() {
     }
   };
 
-  // 팀 정보 가져오기
   const getTeamInfo = (teamId) => {
     return TEAM_BY_ID[teamId] || { id: teamId, name: teamId, logo: defaultLogo };
   };
@@ -85,7 +77,6 @@ export default function AnalysisClipsPage() {
   const homeTeam = gameInfo ? getTeamInfo(gameInfo.homeTeam) : null;
   const awayTeam = gameInfo ? getTeamInfo(gameInfo.awayTeam) : null;
 
-  // 쿼터별로 클립 그룹화
   const clipsByQuarter = clips.reduce((acc, clip, index) => {
     const quarter = clip.quarter || 1;
     if (!acc[quarter]) acc[quarter] = [];
@@ -93,7 +84,6 @@ export default function AnalysisClipsPage() {
     return acc;
   }, {});
 
-  // 로딩 중이거나 권한이 없으면 렌더링하지 않음
   if (!user) {
     return <div>로그인 확인 중...</div>;
   }
@@ -103,150 +93,150 @@ export default function AnalysisClipsPage() {
   }
 
   return (
-    <div className="analysis-clips-page">
+    <div className="APanalysis-clips-page">
       {/* 헤더 */}
-      <header className="analysis-clips-header">
-        <div className="analysis-clips-header-container">
-          <button className="back-button" onClick={goBack}>
+      <header className="APanalysis-clips-header">
+        <div className="APanalysis-clips-header-container">
+          <button className="APback-button" onClick={goBack}>
             <FaArrowLeft />
             <span>분석 대시보드로 돌아가기</span>
           </button>
 
           {gameInfo && (
-            <div className="game-info-header">
-              <div className="game-teams">
-                <div className="team-info">
+            <div className="APgame-info-header">
+              <div className="APgame-teams">
+                <div className="APteam-info">
                   {homeTeam?.logo && (
                     <img
                       src={homeTeam.logo}
                       alt={homeTeam.name}
-                      className="team-logo"
+                      className="APteam-logo"
                     />
                   )}
-                  <span className="team-name">{homeTeam?.name || gameInfo.homeTeam}</span>
+                  <span className="APteam-name">{homeTeam?.name || gameInfo.homeTeam}</span>
                 </div>
                 
-                <div className="vs-score">
-                  <span className="score">
+                <div className="APvs-score">
+                  <span className="APscore">
                     {gameInfo.score?.home || 0} : {gameInfo.score?.away || 0}
                   </span>
-                  <span className="vs">VS</span>
+                  <span className="APvs">VS</span>
                 </div>
 
-                <div className="team-info">
+                <div className="APteam-info">
                   {awayTeam?.logo && (
                     <img
                       src={awayTeam.logo}
                       alt={awayTeam.name}
-                      className="team-logo"
+                      className="APteam-logo"
                     />
                   )}
-                  <span className="team-name">{awayTeam?.name || gameInfo.awayTeam}</span>
+                  <span className="APteam-name">{awayTeam?.name || gameInfo.awayTeam}</span>
                 </div>
               </div>
 
-              <div className="game-details">
-                <span className="game-date">{gameInfo.date}</span>
-                <span className="game-location">{gameInfo.location}</span>
-                <span className="game-type">{gameInfo.type}</span>
+              <div className="APgame-details">
+                <span className="APgame-date">{gameInfo.date}</span>
+                <span className="APgame-location">{gameInfo.location}</span>
+                <span className="APgame-type">{gameInfo.type}</span>
               </div>
             </div>
           )}
 
-          <div className="clips-count">
-            <FaVideo className="clips-icon" />
+          <div className="APclips-count">
+            <FaVideo className="APclips-icon" />
             <span>총 {clips.length}개 클립</span>
           </div>
         </div>
       </header>
 
       {/* 클립 목록 */}
-      <main className="analysis-clips-main">
+      <main className="APanalysis-clips-main">
         {loading && (
-          <div className="analysis-clips-loading">
-            <div className="spinner"></div>
+          <div className="APanalysis-clips-loading">
+            <div className="APspinner"></div>
             <span>클립을 불러오는 중...</span>
           </div>
         )}
 
         {error && (
-          <div className="analysis-clips-error">
+          <div className="APanalysis-clips-error">
             <p>{error}</p>
             <button onClick={() => window.location.reload()}>다시 시도</button>
           </div>
         )}
 
         {!loading && !error && clips.length === 0 && (
-          <div className="analysis-clips-empty">
-            <FaVideo className="empty-icon" />
+          <div className="APanalysis-clips-empty">
+            <FaVideo className="APempty-icon" />
             <p>이 경기의 클립 데이터가 없습니다.</p>
             <p>영상 업로드는 완료되었지만 분석 JSON이 아직 업로드되지 않았을 수 있습니다.</p>
           </div>
         )}
 
         {!loading && !error && clips.length > 0 && (
-          <div className="quarters-container">
+          <div className="APquarters-container">
             {[1, 2, 3, 4].map(quarter => {
               const quarterClips = clipsByQuarter[quarter] || [];
               
               if (quarterClips.length === 0) return null;
 
               return (
-                <div key={quarter} className="quarter-section">
-                  <div className="quarter-header">
+                <div key={quarter} className="APquarter-section">
+                  <div className="APquarter-header">
                     <h3>{quarter}쿼터</h3>
-                    <span className="quarter-count">{quarterClips.length}개 클립</span>
+                    <span className="APquarter-count">{quarterClips.length}개 클립</span>
                   </div>
 
-                  <div className="clips-grid">
+                  <div className="APclips-grid">
                     {quarterClips.map((clip, index) => (
                       <div
                         key={`${quarter}-${index}`}
-                        className="clip-card"
+                        className="APclip-card"
                         onClick={() => playVideo(clip, clip.originalIndex)}
                       >
-                        <div className="clip-header">
-                          <div className="clip-number">#{clip.originalIndex + 1}</div>
-                          <div className="play-button">
+                        <div className="APclip-header">
+                          <div className="APclip-number">#{clip.originalIndex + 1}</div>
+                          <div className="APplay-button">
                             <FaPlay />
                           </div>
                         </div>
 
-                        <div className="clip-info">
-                          <div className="clip-basic">
-                            <span className="clip-quarter">{quarter}Q</span>
-                            <span className="clip-down">
+                        <div className="APclip-info">
+                          <div className="APclip-basic">
+                            <span className="APclip-quarter">{quarter}Q</span>
+                            <span className="APclip-down">
                               {clip.down ? `${clip.down}다운` : '-'}
                             </span>
-                            <span className="clip-yard">
+                            <span className="APclip-yard">
                               {clip.gainYard ? `${clip.gainYard}야드` : '0야드'}
                             </span>
                           </div>
 
-                          <div className="clip-type">
+                          <div className="APclip-type">
                             {clip.playType || '플레이 타입 미정'}
                           </div>
 
                           {clip.significantPlays && clip.significantPlays.some(play => play) && (
-                            <div className="significant-plays">
+                            <div className="APsignificant-plays">
                               {clip.significantPlays
                                 .filter(play => play)
                                 .map((play, i) => (
-                                  <span key={i} className="significant-play">
+                                  <span key={i} className="APsignificant-play">
                                     {play}
                                   </span>
                                 ))}
                             </div>
                           )}
 
-                          <div className="clip-players">
+                          <div className="APclip-players">
                             {clip.car && clip.car.num && (
-                              <span className="player car">
+                              <span className="APplayer car">
                                 CAR: #{clip.car.num} ({clip.car.pos || '-'})
                               </span>
                             )}
                             {clip.tkl && clip.tkl.num && (
-                              <span className="player tkl">
+                              <span className="APplayer tkl">
                                 TKL: #{clip.tkl.num} ({clip.tkl.pos || '-'})
                               </span>
                             )}
@@ -254,7 +244,7 @@ export default function AnalysisClipsPage() {
                         </div>
 
                         {!clip.clipUrl && (
-                          <div className="no-video-warning">
+                          <div className="APno-video-warning">
                             영상 URL 없음
                           </div>
                         )}

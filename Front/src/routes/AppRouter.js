@@ -4,7 +4,7 @@ import * as LandingPages from '../pages/Landing';
 import * as ServicePages from '../pages/Service';
 import * as AuthPages from '../pages/Auth';
 import * as CommonPages from '../pages/Common';
-import * as AdminPages from '../pages/Admin';
+import * as AdminPages from '../pages/Service/Admin';
 
 
 export default function AppRouter() {
@@ -71,8 +71,8 @@ export default function AppRouter() {
 
         <Route path="admin" element={<AdminPages.AdminLayout />}>
           <Route index element={<AdminPages.JsonEx />} />
-          <Route path="analysis" element={<AdminPages.AnalysisPage />} >
-
+          <Route path="analysis" element={<AdminPages.AnalysisLayout />} >
+            <Route index element={<AdminPages.AnalysisPage />} />
             <Route path=":gameKey/clips" element={<AdminPages.AnalysisClipsPage />} />
           </Route>
         </Route>
