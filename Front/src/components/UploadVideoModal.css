@@ -426,9 +426,8 @@
 }
 
 /* 팝오버 컨테이너 */
-.dtpPopover {
-  width: 48.75rem;  
-  height: 40rem;
+.dtpPopover { 
+  height: 18rem;
   position: absolute;
   z-index: 10100;
   top: calc(100% + 8px);
@@ -442,25 +441,23 @@
 
 /* 내부 래퍼 - 달력과 사이드바 레이아웃 */
 .dtpWrap {
-  width: 100%;
-  height: 100%;
- display:grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: stretch;
-
+  height: 18rem;
+  display: flex;
+  align-items: center;
   gap: 0;
 }
 
-/* 달력 영역 */
 .dtpCalendar {
-  width: 20rem;
-  padding: 16px;
+    height: 16rem;
+  padding: .5rem;
   border-right: 1px solid #3a3d45;
+  display: flex;
 }
 
-/* 우측 사이드 영역 */
+
 .dtpSide {
   width: 20rem;
+  height: 16rem;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -563,144 +560,72 @@
   border-color: #6b7280;
 }
 
-/* ============ CalendarDropdown 스타일 ============ */
-.calendarBox {
-  background: #2a2c32;
+/* DateTimeDropdown 전용 캘린더 스타일 */
+.dtpCal-box {
+  width: 250px;
+  padding: .5rem;
+  background: #1c1d21;
+  border: 1px solid #303136;
   border-radius: 8px;
-  padding: 12px;
-  width: 100%;
-}
-
-/* 헤더 (년/월 표시 + 네비게이션) */
-.calHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  padding: 0 4px;
-}
-
-.calHeader button {
-  background: transparent;
-  border: 1px solid #3a3d45;
+  z-index: 120;
   color: #e5e7eb;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  transition: all 0.2s;
-}
-
-.calHeader button:hover {
-  background: #3a3d45;
-  border-color: #4a4d55;
-}
-
-.calHeader span {
-  color: #fff;
-  font-weight: 600;
   font-size: 14px;
 }
 
-/* 요일 행 */
-.calWeekRow {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  margin-bottom: 8px;
+.dtpCal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
-.calWeekCell {
-  color: #9aa0aa;
+.dtpCal-header .dtpCal-nav {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.dtpCal-title {
   font-weight: 600;
-  font-size: 12px;
+}
+
+.dtpCal-weekrow,
+.dtpCal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.dtpCal-weekcell {
   text-align: center;
   padding: 4px 0;
+  font-weight: 600;
 }
 
-/* 날짜 그리드 */
-.calGrid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-}
-
-/* 각 날짜 셀 */
-.calCell {
-  aspect-ratio: 1;
+.dtpCal-cell {
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  color: #e5e7eb;
+  border: none;
+  color: inherit;
   cursor: pointer;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  min-height: 36px;
+  border-radius: 6px; /* hover/selected 모양 부드럽게 */
 }
 
-.calCell:hover:not(.selected):not(.dim) {
-  background: #3a3d45;
-  border-color: #4a4d55;
+.dtpCal-cell.dim {
+  color: #555;
 }
 
-/* 이번 달이 아닌 날짜 (흐리게) */
-.calCell.dim {
-  color: #6b7280;
-  opacity: 0.4;
+.dtpCal-cell.today {
+  border-bottom: 2px solid #3b82f6;
 }
 
-.calCell.dim:hover {
-  background: #33363f;
-  opacity: 0.6;
+.dtpCal-cell.selected {
+  background: #3b82f620;
 }
 
-/* 오늘 날짜 */
-.calCell.today {
-  border-color: #6366f1;
-  font-weight: 600;
-}
-
-/* 선택된 날짜 */
-.calCell.selected {
-  background: #2563eb;
-  color: #fff;
-  border-color: #2563eb;
-  font-weight: 600;
-}
-
-.calCell.selected:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
-}
-
-/* ============ 스크롤바 스타일 ============ */
-.fpm-body::-webkit-scrollbar,
-.teamSelect-menu::-webkit-scrollbar,
-.oppsTeams::-webkit-scrollbar,
-.dtpSelect::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.fpm-body::-webkit-scrollbar-thumb,
-.teamSelect-menu::-webkit-scrollbar-thumb,
-.oppsTeams::-webkit-scrollbar-thumb,
-.dtpSelect::-webkit-scrollbar-thumb {
-  background: #3a3d45;
-  border-radius: 10px;
-}
-
-.dtpSelect::-webkit-scrollbar-track {
-  background: #1f2126;
-}
-
-.dtpSelect::-webkit-scrollbar-thumb:hover {
-  background: #4a4d55;
+.dtpCal-cell:hover {
+  background: #2a2b30;
 }

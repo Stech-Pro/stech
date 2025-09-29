@@ -1,8 +1,65 @@
+// src/components/DateTimeDropdown.jsx
 import { useMemo, useState, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
-import CalendarDropdown from './Calendar.jsx';
 import './DateTimeDropdown.css';
 
+/* ======================= 내부 전용 캘린더 ======================= */
+function DTPCalendarInner({ value, onChange }) {
+  const init = dayjs(value || new Date()).startOf('day');
+  const [viewDate, setViewDate] = useState(init);
+
+  const prevMonth = () => setViewDate((d) => d.subtract(1, 'month'));
+  const nextMonth = () => setViewDate((d) => d.add(1, 'month'));
+
+  const start = useMemo(() => viewDate.startOf('month').startOf('week'), [viewDate]);
+  const end   = useMemo(() => viewDate.endOf('month').endOf('week'), [viewDate]);
+
+  const days = useMemo(() => {
+    const total = end.diff(start, 'day') + 1;
+    return Array.from({ length: total }, (_, i) => start.add(i, 'day'));
+  }, [start, end]);
+
+  return (
+    <div className="dtpCal-box">
+      <div className="dtpCal-header">
+        <button type="button" className="dtpCal-nav" onClick={prevMonth} aria-label="이전 달">‹</button>
+        <span className="dtpCal-title">{viewDate.format('YYYY')} / {viewDate.format('MM')}</span>
+        <button type="button" className="dtpCal-nav" onClick={nextMonth} aria-label="다음 달">›</button>
+      </div>
+
+      <div className="dtpCal-weekrow">
+        {['일','월','화','수','목','금','토'].map((d) => (
+          <div key={d} className="dtpCal-weekcell">{d}</div>
+        ))}
+      </div>
+
+      <div className="dtpCal-grid">
+        {days.map((d) => {
+          const isToday   = d.isSame(dayjs(), 'day');
+          const isCurrent = d.isSame(viewDate, 'month');
+          const isSelect  = value ? d.isSame(dayjs(value), 'day') : false;
+          return (
+            <button
+              key={d.format('YYYY-MM-DD')}
+              type="button"
+              className={[
+                'dtpCal-cell',
+                isCurrent ? '' : 'dim',
+                isToday ? 'today' : '',
+                isSelect ? 'selected' : '',
+              ].filter(Boolean).join(' ')}
+              onClick={() => onChange?.(d)}
+            >
+              {d.format('D')}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ======================= DateTimeDropdown 본체 ======================= */
 export default function DateTimeDropdown({
   value,
   onChange,
@@ -12,15 +69,17 @@ export default function DateTimeDropdown({
   const init = dayjs(value || new Date());
   const [date, setDate] = useState(init.startOf('day'));
   const [hour, setHour] = useState(init.hour());
-  const [minute, setMinute] = useState(Math.floor(init.minute() / minuteStep) * minuteStep);
+  const [minute, setMinute] = useState(
+    Math.floor(init.minute() / minuteStep) * minuteStep
+  );
 
-  // 최신 핸들러를 ref로 유지 (의존성 루프 방지)
+  // 최신 핸들러 ref (루프 방지)
   const onChangeRef = useRef(onChange);
   const onCloseRef  = useRef(onClose);
   useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
   useEffect(() => { onCloseRef.current  = onClose;  }, [onClose]);
 
-  // 바깥 클릭 닫기 (핸들러는 ref로, 의존성 없음)
+  // 바깥 클릭 닫기
   const popRef = useRef(null);
   useEffect(() => {
     const out = (e) => {
@@ -41,43 +100,41 @@ export default function DateTimeDropdown({
   useEffect(() => {
     const next = date.hour(hour).minute(minute).second(0).millisecond(0);
     const ts = next.valueOf();
-
-    // NaN 방어
     if (Number.isNaN(ts)) return;
-
     if (prevTsRef.current !== ts) {
       prevTsRef.current = ts;
       onChangeRef.current?.(next);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, hour, minute]); // ref 의존성은 제외(의도)
+  }, [date, hour, minute]);
 
-  // 외부 value ←→ 내부 state 동기화 (외부가 바뀔 때만)
+  // 외부 value → 내부 동기화 (외부가 바뀔 때만)
   useEffect(() => {
     if (!value) return;
     const v = dayjs(value).second(0).millisecond(0);
     const roundedMin = Math.floor(v.minute() / minuteStep) * minuteStep;
     const want = v.minute(roundedMin);
     const cur  = date.hour(hour).minute(minute).second(0).millisecond(0);
-
     if (cur.valueOf() !== want.valueOf()) {
       setDate(want.startOf('day'));
       setHour(want.hour());
       setMinute(roundedMin);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, minuteStep]); // 내부 state 의존성 제외(루프 방지)
+  }, [value, minuteStep]);
 
   return (
     <div className="dtpPopover" ref={popRef} role="dialog" aria-label="날짜/시간 선택">
       <div className="dtpWrap">
+        {/* 왼쪽: 달력 (내장) */}
         <div className="dtpCalendar">
-          <CalendarDropdown
+          <DTPCalendarInner
             value={date}
             onChange={(d) => setDate(dayjs(d).startOf('day'))}
           />
         </div>
 
+        {/* 오른쪽: 시간/분 드롭다운 */}
         <div className="dtpSide">
           <div className="dtpPreview">
             {date.hour(hour).minute(minute).format('YYYY-MM-DD (ddd) HH:mm')}

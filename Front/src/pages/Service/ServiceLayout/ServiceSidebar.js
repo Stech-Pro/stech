@@ -4,10 +4,7 @@ import './ServiceSidebar.css';
 import { useAuth } from '../../../context/AuthContext';
 import Logo from '../../../assets/images/logos/stech.png';
 import { CiLogin, CiLogout } from 'react-icons/ci';
-import {
-  GoHome,
-  GoLightBulb,
-} from 'react-icons/go';
+import { GoHome, GoLightBulb } from 'react-icons/go';
 import { BsPlayBtn } from 'react-icons/bs';
 import { BiSolidBarChartAlt2 } from 'react-icons/bi';
 import { MdOutlineSupportAgent, MdOutlineQuiz } from 'react-icons/md';
@@ -15,13 +12,12 @@ import { IoSettingsOutline } from 'react-icons/io5';
 import { CgProfile } from 'react-icons/cg';
 
 const ServiceSidebar = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [hoveredItem, setHoveredItem] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState({}); // 펼쳐진 메뉴 상태 관리
-
 
   // Menu Items (Guest)
   //Description 수정
@@ -129,6 +125,71 @@ const ServiceSidebar = () => {
     },
   ];
 
+  const adminMenuItems = [
+    {
+      path: '/service',
+      label: '홈',
+      icon: <GoHome />,
+      description: 'Dashboard overview',
+    },
+    {
+      path: '/service/game',
+      label: '소속팀 경기',
+      icon: <BsPlayBtn />,
+      description: 'Video analysis',
+    },
+    {
+      path: '/service/stat/league',
+      label: '스탯',
+      icon: <BiSolidBarChartAlt2 />,
+      description: 'Performance analytics',
+      hasSubmenu: true,
+      submenu: [
+        {
+          path: '/service/stat/league',
+          label: '리그 순위',
+          icon: <BiSolidBarChartAlt2 />,
+          description: 'League rankings',
+        },
+        {
+          path: '/service/stat/team',
+          label: '리그 팀 순위',
+          icon: <BiSolidBarChartAlt2 />,
+          description: 'Team rankings',
+        },
+        {
+          path: '/service/stat/position',
+          label: '리그 포지션 순위',
+          icon: <BiSolidBarChartAlt2 />,
+          description: 'Position rankings',
+        },
+      ],
+    },
+    {
+      path: '/service/highlight',
+      label: '경기 하이라이트',
+      icon: <BsPlayBtn />,
+      description: 'Video analysis',
+    },
+    {
+      path: '/service/suggestion',
+      label: 'Stech 제안',
+      icon: <GoLightBulb />,
+      description: 'AI recommendations',
+      badge: 'βeta', // 베타 태그 추가
+    },
+    {
+      path: '/service/admin/analysis',
+      label: 'Analysis',
+      icon: <BiSolidBarChartAlt2 />,
+    },
+    {
+      path: '/service/admin',
+      label: 'JSON Explorer',
+      icon: <BiSolidBarChartAlt2 />,
+    },
+  ];
+
   // Footer Items
   const memberFooterItems = [
     {
@@ -167,16 +228,15 @@ const ServiceSidebar = () => {
   ];
 
   // 로그아웃 핸들러 (로딩 효과 추가)
- const handleLogout = async () => {
+  const handleLogout = async () => {
     setIsLoading(true);
     try {
-      await logout();                
-      navigate('/service');    
+      await logout();
+      navigate('/service');
     } finally {
       setIsLoading(false);
     }
   };
-
 
   // 로그인 핸들러
   const handleLogin = () => {
@@ -330,8 +390,7 @@ const ServiceSidebar = () => {
               <div className="logoutIcon">
                 {isLoading ? <div className="spinner" /> : <CiLogout />}
               </div>
-              <span className="logoutText">로그아웃
-              </span>
+              <span className="logoutText">로그아웃</span>
             </button>
           ) : (
             <button onClick={handleLogin} className="loginButton">
@@ -348,7 +407,11 @@ const ServiceSidebar = () => {
       <nav className="sidebarNav">
         <div className="menuSection">
           <div className="sectionTitle">Main Menu</div>
-          {isAuthenticated ? (
+          {user?.role === 'admin' ? (
+            <ul className="navMenu">
+              {adminMenuItems.map((item) => renderMenuItem(item))}
+            </ul>
+          ) : isAuthenticated ? (
             <ul className="navMenu">
               {memberMenuItems.map((item) => renderMenuItem(item))}
             </ul>
