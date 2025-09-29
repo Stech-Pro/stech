@@ -18,6 +18,9 @@ import {
 } from '../schemas/team-total-stats.schema';
 import { S3Service } from '../common/services/s3.service';
 import { VideoUploadService } from '../videoupload/videoupload.service';
+import { NotificationModule } from '../notification/notification.module';
+import { AuthModule } from '../auth/auth.module';
+import { User, UserSchema } from '../schemas/user.schema';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -30,6 +33,7 @@ import { ConfigModule } from '@nestjs/config';
       { name: GameClips.name, schema: GameClipsSchema },
       { name: TeamGameStats.name, schema: TeamGameStatsSchema },
       { name: TeamTotalStats.name, schema: TeamTotalStatsSchema },
+      { name: User.name, schema: UserSchema }, // User 스키마 추가
     ]),
     // Multer 설정 - 파일 업로드 처리
     MulterModule.register({
@@ -53,6 +57,8 @@ import { ConfigModule } from '@nestjs/config';
     forwardRef(() => PlayerModule),
     // TeamModule을 import하여 TeamStatsAnalyzerService 사용
     forwardRef(() => TeamModule),
+    // NotificationModule을 import하여 NotificationService 사용
+    NotificationModule,
   ],
   controllers: [GameController, GameDocsController],
   providers: [GameService, S3Service, VideoUploadService],

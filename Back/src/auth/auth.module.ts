@@ -19,6 +19,6 @@ import { EmailService } from '../utils/email.service';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, EmailService],
-  exports: [AuthService],
+  exports: [AuthService, MongooseModule], // MongooseModule도 export하여 User 모델 사용 가능
 })
 export class AuthModule {}

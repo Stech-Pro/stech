@@ -28,9 +28,13 @@ import { TeamStatsAnalyzerService } from '../team/team-stats-analyzer.service';
 import { GameService } from './game.service';
 import { S3Service } from '../common/services/s3.service';
 import { VideoUploadService } from '../videoupload/videoupload.service';
+import { NotificationService } from '../notification/notification.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { AdminGuard } from '../common/guards/admin.guard';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User } from '../schemas/user.schema';
 import {
   GameUploadSuccessDto,
   GameUploadErrorDto,
@@ -52,6 +56,8 @@ export class GameController {
     private readonly gameService: GameService,
     private readonly s3Service: S3Service,
     private readonly videoUploadService: VideoUploadService,
+    private readonly notificationService: NotificationService,
+    @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
   @Post('upload-data')
@@ -126,6 +132,39 @@ export class GameController {
           });
           
           console.log('📝 업데이트 후 상태:', updatedGame?.uploadStatus);
+          
+          // 🔔 알림 생성: pending → completed로 변경된 경우
+          if (updatedGame && existingGame.uploadStatus === 'pending') {
+            console.log('🔔 경기 분석 완료 알림 생성 시작');
+            
+            try {
+              // 해당 팀의 모든 사용자 조회
+              const teamUsers = await this.userModel.find({
+                team: existingGame.uploader, // 업로더 팀의 사용자들에게 알림
+                role: { $in: ['player', 'coach'] }
+              }).select('username team');
+              
+              console.log(`📋 ${existingGame.uploader} 팀 사용자 ${teamUsers.length}명 발견`);
+              
+              // 팀의 모든 사용자들에게 알림 생성
+              const userIds = teamUsers.map(user => user.username);
+              await this.notificationService.createTeamNotifications(
+                existingGame.uploader,
+                processedGameData.gameKey,
+                {
+                  homeTeam: processedGameData.homeTeam,
+                  awayTeam: processedGameData.awayTeam,
+                  date: processedGameData.date || new Date().toISOString(),
+                },
+                userIds,
+              );
+              
+              console.log('✅ 알림 생성 완료');
+            } catch (notificationError) {
+              console.error('❌ 알림 생성 실패:', notificationError.message);
+              // 알림 실패해도 게임 업로드는 계속 진행
+            }
+          }
         } else {
           // 새 경기면 완료 상태로 생성
           const { team: uploaderTeam } = req.user;

@@ -13,6 +13,7 @@ import { GameModule } from './game/game.module';
 import { AdminModule } from './admin/admin.module';
 import { ContactModule } from './contact/contact.module';
 import { VideoUploadModule } from './videoupload/videoupload.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { VideoUploadModule } from './videoupload/videoupload.module';
     AdminModule,
     ContactModule,
     VideoUploadModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
