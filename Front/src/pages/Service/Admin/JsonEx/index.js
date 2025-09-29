@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import axios from "axios";
-import { API_CONFIG } from '../../../config/api';
-import { normalizeTeamName } from '../../../data/TEAMS';
-import { useAuth } from '../../../context/AuthContext';
+import { API_CONFIG } from '../../../../config/api';
+import { normalizeTeamName } from '../../../../data/TEAMS';
+import { useAuth } from '../../../../context/AuthContext';
 import './index.css';
 
 /**
