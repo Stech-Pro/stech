@@ -26,7 +26,7 @@ export class Notification {
   @Prop({ default: false })
   isRead: boolean; // 읽음 여부
 
-  @Prop()
+  @Prop({ type: Object })
   gameInfo?: {
     homeTeam: string;
     awayTeam: string;
