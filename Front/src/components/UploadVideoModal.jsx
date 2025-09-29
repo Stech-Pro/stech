@@ -29,7 +29,7 @@ function isVideo(file) {
 
 function FilePreviewModal({ open, onClose, filesByQuarter }) {
   const tabs = ['Q1', 'Q2', 'Q3', 'Q4'];
-  
+
   const [active, setActive] = useState('Q1');
   const [urls, setUrls] = useState([]);
 
@@ -52,7 +52,7 @@ function FilePreviewModal({ open, onClose, filesByQuarter }) {
       file: f,
       url: URL.createObjectURL(f),
     }));
-    
+
     setUrls(created);
 
     // cleanup
@@ -195,7 +195,13 @@ const STADIUMS = {
     '영남대학교',
     '한동대학교',
   ],
-  'Gyeonggi-Gangwon': [],
+  'Gyeonggi-Gangwon': [
+    '한림대학교 대운동장',
+    '홍천 서면체육공원',
+    '단국대학교 대운동장 (죽전)',
+    '용인대학교 종합운동장',
+    '천안종합운동장',
+  ],
   Amateur: ['군위 종합운동장'],
 };
 
@@ -279,7 +285,7 @@ function LeagueTeamSelect({
 
   useEffect(() => {
     if (!open) return;
-    
+
     // teamsByLeague의 첫 번째 키를 기본값으로 설정
     const firstLeague = leaguesList[0];
     if (firstLeague && !activeLeague) {
@@ -440,7 +446,7 @@ const UploadVideoModal = ({
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const closePreview = useCallback(() => setPreviewOpen(false), []);
 
   const isLeague = gameType === '리그';
@@ -500,7 +506,7 @@ const UploadVideoModal = ({
     setStadiumMode(hasList ? 'select' : 'custom');
     setStadium(''); // 지역 바뀌면 초기화
   }, [isLeague, regionKey]);
-  
+
   const weekOptions = useMemo(() => {
     if (!isLeague || !regionKey) return [];
     const max = WEEK_LIMITS[regionKey] ?? 0;
@@ -674,7 +680,7 @@ const UploadVideoModal = ({
       setDeleteLoading(false);
     }
   };
-  
+
   const canShowStep3 = useMemo(() => {
     if (!gameType) return false;
     if (gameType !== '리그') return true;

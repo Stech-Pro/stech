@@ -1,14 +1,13 @@
-// src/pages/Analysis/AnalysisPage.js
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { FaChevronDown, FaVideo, FaUpload } from 'react-icons/fa';
-import { useAuth } from '../../../context/AuthContext.js';
-import { fetchPendingGames } from '../../../api/gameAPI.js';
+import { useAuth } from '../../../../../context/AuthContext.js';
+import { fetchPendingGames } from '../../../../../api/gameAPI.js';
 import './AnalysisPage.css';
-import { TEAMS, TEAM_BY_ID } from '../../../data/TEAMS';
-import CalendarDropdown from '../../../components/Calendar.jsx';
-import defaultLogo from '../../../assets/images/logos/Stechlogo.svg';
+import { TEAMS, TEAM_BY_ID } from '../../../../../data/TEAMS.js';
+import CalendarDropdown from '../../../../../components/Calendar.jsx';
+import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
 
 /* ===== 상수 ===== */
 const TYPES = ['Scrimmage', 'Friendly match', 'Season'];
@@ -25,10 +24,6 @@ const REGION_LABEL = {
 export default function AnalysisPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-
-  // 디버깅용 로그
-  console.log('AnalysisPage - user:', user);
-  console.log('AnalysisPage - role:', user?.role);
 
   // 로딩/에러
   const [loading, setLoading] = useState(false);
@@ -74,10 +69,7 @@ export default function AnalysisPage() {
 
   // 관리자 권한 확인
   useEffect(() => {
-    // user가 로드되었고, admin이 아닌 경우에만 리다이렉트
-    if (user && user.role !== 'admin') {
-      navigate('/service');
-    }
+    if (user && user.role !== 'admin') navigate('/service');
   }, [user, navigate]);
 
   useEffect(() => {
@@ -96,9 +88,7 @@ export default function AnalysisPage() {
       }
     }
     load();
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, []);
 
   // 업로더 팀 목록 추출
@@ -119,79 +109,49 @@ export default function AnalysisPage() {
 
   /* 클립 페이지로 이동 */
   const openClips = (game) => {
-    navigate(`/analysis/${game.gameKey}/clips`, { state: { game } });
+    navigate(`/service/admin/analysis/${game.gameKey}/clips`, { state: { game } });
   };
 
-  // 영상 개수 계산 - 실제 비디오 파일 개수 우선 표시
+  // 영상 개수 계산
   const getVideoCount = (game) => {
-    console.log('🎬=== getVideoCount 시작 ===');
-    console.log('🎬 게임 키:', game.gameKey);
-    console.log('🎬 totalVideos:', game.totalVideos, '(타입:', typeof game.totalVideos, ')');
-    console.log('🎬 totalClips:', game.totalClips, '(타입:', typeof game.totalClips, ')');
-    
-    // 실제 비디오 파일이 있는 경우 우선 표시
     if (typeof game.totalVideos === 'number' && game.totalVideos > 0) {
-      console.log('✅ 실제 비디오 파일 개수 표시:', game.totalVideos);
       return `영상 ${game.totalVideos}개`;
     }
-    
-    // 비디오는 없지만 클립 데이터가 있는 경우
     if (typeof game.totalClips === 'number' && game.totalClips > 0) {
-      console.log('📊 클립 데이터만 있음:', game.totalClips);
-      // totalVideos가 명시적으로 0이면 비디오 없음 표시
-      if (typeof game.totalVideos === 'number' && game.totalVideos === 0) {
-        return 'URL 없음';
-      }
+      if (typeof game.totalVideos === 'number' && game.totalVideos === 0) return 'URL 없음';
       return `클립 ${game.totalClips}개`;
     }
-    
-    // 기존 videoUrls 기반 로직 (fallback)
     if (game.videoUrls) {
       try {
         const count = Object.values(game.videoUrls).flat().length;
-        console.log('🔄 videoUrls 기반 계산:', count);
-        if (count > 0) {
-          return `영상 ${count}개`;
-        }
-      } catch (error) {
-        console.error('❌ videoUrls 계산 오류:', error);
-      }
+        if (count > 0) return `영상 ${count}개`;
+      } catch {}
     }
-    
-    // 모든 정보가 없는 경우
-    console.log('❌ 영상 정보 없음 - 분석 대기 반환');
-    console.log('🎬=== getVideoCount 끝 ===');
     return '분석 대기';
   };
 
-  // 로딩 중이거나 권한이 없으면 렌더링하지 않음
-  if (!user) {
-    return <div>로그인 확인 중...</div>;
-  }
-  
-  if (user.role !== 'admin') {
-    return <div>접근 권한이 없습니다.</div>;
-  }
+  if (!user) return <div>로그인 확인 중...</div>;
+  if (user.role !== 'admin') return <div>접근 권한이 없습니다.</div>;
 
   return (
-    <div className="analysis-page-root">
+    <div className="APanalysis-page-root">
       {/* ===== 헤더 ===== */}
-      <header className="analysis-header">
-        <div className="analysis-header-container">
+      <header className="APanalysis-header">
+        <div className="APanalysis-header-container">
           {/* 왼쪽: 제목 */}
-          <div className="analysis-title-box">
-            <FaVideo className="analysis-icon" />
-            <h1 className="analysis-title">분석팀 대시보드</h1>
-            <span className="analysis-subtitle">영상 분석 대기중 경기</span>
+          <div className="APanalysis-title-box">
+            <FaVideo className="APanalysis-icon" />
+            <h1 className="APanalysis-title">분석팀 대시보드</h1>
+            <span className="APanalysis-subtitle">영상 분석 대기중 경기</span>
           </div>
 
           {/* 오른쪽: 필터 */}
-          <div className="analysis-filters">
-            <div className="filterGroup">
+          <div className="APanalysis-filters">
+            <div className="APfilterGroup">
               {/* 날짜 */}
-              <div className="datePickerWrap" ref={dateWrapRef}>
+              <div className="APdatePickerWrap" ref={dateWrapRef}>
                 <button
-                  className={`filterButton ${showDate || selectedDate ? 'active' : ''}`}
+                  className={`APfilterButton ${showDate || selectedDate ? 'active' : ''}`}
                   onClick={() => setShowDate(!showDate)}
                 >
                   {selectedDate ? selectedDate.format('YYYY-MM-DD') : '날짜'}{' '}
@@ -209,19 +169,19 @@ export default function AnalysisPage() {
               </div>
 
               {/* 유형 */}
-              <div className="typePickerWrap" ref={typeWrapRef}>
+              <div className="APtypePickerWrap" ref={typeWrapRef}>
                 <button
-                  className={`filterButton ${selectedType ? 'active' : ''}`}
+                  className={`APfilterButton ${selectedType ? 'active' : ''}`}
                   onClick={() => setShowType(!showType)}
                 >
                   {selectedType ?? '유형'} <FaChevronDown size={10} />
                 </button>
                 {showType && (
-                  <ul className="typeDropdown">
+                  <ul className="APtypeDropdown">
                     {TYPES.map((t) => (
                       <li key={t}>
                         <button
-                          className={`typeItem ${selectedType === t ? 'active' : ''}`}
+                          className={`APtypeItem ${selectedType === t ? 'active' : ''}`}
                           onClick={() => {
                             setSelectedType(t);
                             setShowType(false);
@@ -236,30 +196,30 @@ export default function AnalysisPage() {
               </div>
 
               {/* 업로더 팀 */}
-              <div className="uploaderPickerWrap" ref={uploaderWrapRef}>
+              <div className="APuploaderPickerWrap" ref={uploaderWrapRef}>
                 <button
-                  className={`filterButton ${selectedUploader ? 'active' : ''}`}
+                  className={`APfilterButton ${selectedUploader ? 'active' : ''}`}
                   onClick={() => setShowUploader(!showUploader)}
                 >
                   {selectedUploader ? selectedUploader.name : '업로더'} <FaChevronDown size={10} />
                 </button>
                 {showUploader && (
-                  <ul className="uploaderDropdown">
+                  <ul className="APuploaderDropdown">
                     {uploaderTeams.map((team) => (
                       <li key={team.id}>
                         <button
-                          className={`uploaderItem ${selectedUploader?.id === team.id ? 'active' : ''}`}
+                          className={`APuploaderItem ${selectedUploader?.id === team.id ? 'active' : ''}`}
                           onClick={() => {
                             setSelectedUploader(team);
                             setShowUploader(false);
                           }}
                         >
                           {team.logo && (
-                            <div className="uploader-team-logo">
+                            <div className="APuploader-team-logo">
                               <img
                                 src={team.logo}
                                 alt={team.name}
-                                className={`uploader-team-logo-img ${
+                                className={`APuploader-team-logo-img ${
                                   team.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
                                 }`}
                               />
@@ -274,7 +234,7 @@ export default function AnalysisPage() {
               </div>
 
               {/* 초기화 */}
-              <button className="resetButton" onClick={resetFilters}>
+              <button className="APresetButton" onClick={resetFilters}>
                 초기화
               </button>
             </div>
@@ -283,22 +243,22 @@ export default function AnalysisPage() {
       </header>
 
       {/* ===== 경기 표 ===== */}
-      <div className="analysis-container" style={{ display: loading ? 'none' : 'block' }}>
-        <div className="analysis-header-row">
-          <div className="analysis-header-cell">날짜</div>
-          <div className="analysis-header-cell">경기</div>
-          <div className="analysis-header-cell">장소</div>
-          <div className="analysis-header-cell">업로더</div>
-          <div className="analysis-header-cell">영상 수</div>
-          <div className="analysis-header-cell">상태</div>
+      <div className="APanalysis-container" style={{ display: loading ? 'none' : 'block' }}>
+        <div className="APanalysis-header-row">
+          <div className="APanalysis-header-cell">날짜</div>
+          <div className="APanalysis-header-cell">경기</div>
+          <div className="APanalysis-header-cell">장소</div>
+          <div className="APanalysis-header-cell">업로더</div>
+          <div className="APanalysis-header-cell">영상 수</div>
+          <div className="APanalysis-header-cell">상태</div>
         </div>
 
-        <div className="analysis-list">
-          {loading && <div className="analysis-loading">불러오는 중…</div>}
-          {error && <div className="analysis-error">{error}</div>}
+        <div className="APanalysis-list">
+          {loading && <div className="APanalysis-loading">불러오는 중…</div>}
+          {error && <div className="APanalysis-error">{error}</div>}
 
           {!loading && !error && filteredGames.length === 0 && (
-            <div className="analysis-empty">분석 대기중인 경기가 없습니다.</div>
+            <div className="APanalysis-empty">분석 대기중인 경기가 없습니다.</div>
           )}
 
           {filteredGames.map((g) => {
@@ -310,74 +270,74 @@ export default function AnalysisPage() {
             return (
               <div
                 key={g.gameKey}
-                className="analysis-card"
+                className="APanalysis-card"
                 onClick={() => openClips(g)}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && openClips(g)}
               >
-                <div className="analysis-date">{g.date}</div>
+                <div className="APanalysis-date">{g.date}</div>
 
-                <div className="analysis-game">
-                  <div className="analysis-teams">
-                    <div className="analysis-team">
+                <div className="APanalysis-game">
+                  <div className="APanalysis-teams">
+                    <div className="APanalysis-team">
                       {homeMeta?.logo && (
-                        <div className="analysis-team-logo">
+                        <div className="APanalysis-team-logo">
                           <img
                             src={homeMeta.logo}
                             alt={`${homeMeta.name} 로고`}
-                            className={`analysis-team-logo-img ${
+                            className={`APanalysis-team-logo-img ${
                               homeMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
                             }`}
                           />
                         </div>
                       )}
-                      <span className="analysis-team-name">{homeMeta?.name || g.homeTeam}</span>
+                      <span className="APanalysis-team-name">{homeMeta?.name || g.homeTeam}</span>
                     </div>
 
-                    <div className="analysis-vs">VS</div>
+                    <div className="APanalysis-vs">VS</div>
 
-                    <div className="analysis-team">
+                    <div className="APanalysis-team">
                       {awayMeta?.logo && (
-                        <div className="analysis-team-logo">
+                        <div className="APanalysis-team-logo">
                           <img
                             src={awayMeta.logo}
                             alt={`${awayMeta.name} 로고`}
-                            className={`analysis-team-logo-img ${
+                            className={`APanalysis-team-logo-img ${
                               awayMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
                             }`}
                           />
                         </div>
                       )}
-                      <span className="analysis-team-name">{awayMeta?.name || g.awayTeam}</span>
+                      <span className="APanalysis-team-name">{awayMeta?.name || g.awayTeam}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="analysis-location">{g.location}</div>
+                <div className="APanalysis-location">{g.location}</div>
 
-                <div className="analysis-uploader">
+                <div className="APanalysis-uploader">
                   {uploaderMeta?.logo && (
-                    <div className="analysis-uploader-logo">
+                    <div className="APanalysis-uploader-logo">
                       <img
                         src={uploaderMeta.logo}
                         alt={`${uploaderMeta.name} 로고`}
-                        className={`analysis-uploader-logo-img ${
+                        className={`APanalysis-uploader-logo-img ${
                           uploaderMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
                         }`}
                       />
                     </div>
                   )}
-                  <span className="analysis-uploader-name">{uploaderMeta?.name || g.uploader}</span>
+                  <span className="APanalysis-uploader-name">{uploaderMeta?.name || g.uploader}</span>
                 </div>
 
-                <div className="analysis-video-count">
-                  <FaVideo className="video-icon" />
+                <div className="APanalysis-video-count">
+                  <FaVideo className="APvideo-icon" />
                   <span>{typeof videoCount === 'number' ? `${videoCount}개` : videoCount}</span>
                 </div>
 
-                <div className="analysis-status pending">
-                  <FaUpload className="status-icon" />
+                <div className="APanalysis-status APpending">
+                  <FaUpload className="APstatus-icon" />
                   <span>분석 대기</span>
                 </div>
               </div>
