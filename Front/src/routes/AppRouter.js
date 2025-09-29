@@ -4,8 +4,8 @@ import * as LandingPages from '../pages/Landing';
 import * as ServicePages from '../pages/Service';
 import * as AuthPages from '../pages/Auth';
 import * as CommonPages from '../pages/Common';
-import AnalysisPage from '../pages/Analysis/AnalysisPage';
-import AnalysisClipsPage from '../pages/Analysis/AnalysisClipsPage';
+import * as AdminPages from '../pages/Admin';
+
 
 export default function AppRouter() {
   return (
@@ -68,13 +68,17 @@ export default function AppRouter() {
             />
           </Route>
         </Route>
+
+        <Route path="admin" element={<AdminPages.AdminLayout />}>
+          <Route index element={<AdminPages.JsonEx />} />
+          <Route path="analysis" element={<AdminPages.AnalysisPage />} >
+
+            <Route path=":gameKey/clips" element={<AdminPages.AnalysisClipsPage />} />
+          </Route>
+        </Route>
       </Route>
 
-      {/* Analysis Pages (Admin Only) */}
-      <Route path="/analysis">
-        <Route index element={<AnalysisPage />} />
-        <Route path=":gameKey/clips" element={<AnalysisClipsPage />} />
-      </Route>
+
 
       {/* Auth Pages*/}
       <Route path="auth" element={<AuthPages.AuthLayout />}>
@@ -90,7 +94,6 @@ export default function AppRouter() {
         <Route path="findsuccess" element={<AuthPages.FindSuccessPage />} />
       </Route>
       {/* 404 Not Found */}
-      <Route path="json" element={<CommonPages.JsonEx />} />
       <Route path="videoupload" element={<CommonPages.VideoUpload />} />
       <Route path="*" element={<CommonPages.NotFoundPage />} />
     </Routes>
