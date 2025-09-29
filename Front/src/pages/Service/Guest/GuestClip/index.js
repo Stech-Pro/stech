@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { TEAMS } from '../../../../data/TEAMS';
+import { GUEST_TEAMS } from '../../../../data/TEAMS';
 import { GUEST_CLIPS } from '../../../../data/guestClips';
 import { useClipFilter } from '../../../../hooks/useClipFilter';
 import UploadVideoModal from '../../../../components/UploadVideoModal';
@@ -117,14 +117,14 @@ const findTeamMeta = (raw) => {
   if (!raw) return { name: '', logo: null, display: '' };
   const key = normTeam(raw);
   const hit =
-    TEAMS.find((t) =>
+    GUEST_TEAMS.find((t) =>
       [t.name, t.enName, t.code].some((v) => normTeam(v) === key),
     ) || null;
   if (hit) return { ...hit, display: compactTeam(hit.name || raw) };
   return { name: String(raw), logo: null, display: compactTeam(raw) };
 };
 
-const TEAM_BY_ID = TEAMS.reduce((m, t) => ((m[t.id] = t), m), {});
+const TEAM_BY_ID = GUEST_TEAMS.reduce((m, t) => ((m[t.id] = t), m), {});
 
 export default function GuestClipPage() {
   const { gameKey } = useParams();
@@ -134,7 +134,7 @@ export default function GuestClipPage() {
 
   const MY_TEAM_ID = 'GCF';
   const selfTeam = useMemo(
-    () => (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || TEAMS[0] || null,
+    () => (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || GUEST_TEAMS[0] || null,
     [MY_TEAM_ID],
   );
   const logoSrc = selfTeam?.logo || defaultLogo;
