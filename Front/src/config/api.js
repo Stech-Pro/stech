@@ -37,5 +37,11 @@ export const API_CONFIG = {
     //Video Upload
     PREPARE_MATCH_UPLOAD: '/game/prepare-match-upload',
     COMPLETE_MATCH_UPLOAD: '/game/complete-match-upload',
+
+  
+    //Notification
+    NOTI_LIST: '/api/notifications',
+    NOTI_READ_ALL: '/notifications/read-all',
+    NOTI_UNREAD_COUNT: '/api/notifications/unread-count',
   },
 };
