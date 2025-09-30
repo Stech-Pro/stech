@@ -419,8 +419,17 @@ export class GameController {
       }
 
       // 5-1. 전체 경기 클립 데이터 저장 (하이라이트용)
-      console.log('💾 경기 클립 데이터 저장 시작...');
-      await this.gameService.saveGameClips(gameData);
+      console.log('🎬🎬🎬 경기 클립 데이터 저장 시작... 🎬🎬🎬');
+      // 기존 uploader 유지 (영상을 업로드한 팀 정보)
+      const existingGame = await this.gameService.findGameByKey(gameData.gameKey);
+      const uploaderTeam = existingGame?.uploader || req.user.team;
+      console.log(`📋 uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${req.user.team}, 최종=${uploaderTeam}`);
+      
+      const gameClipsData = {
+        ...gameData,
+        uploader: uploaderTeam, // 영상을 업로드한 팀으로 유지
+      };
+      await this.gameService.saveGameClips(gameClipsData);
       console.log('✅ 경기 클립 데이터 저장 완료');
 
       // 6. 팀 스탯 자동 계산
