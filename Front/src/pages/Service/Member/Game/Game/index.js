@@ -10,7 +10,7 @@ import { TEAMS, TEAM_BY_ID } from '../../../../../data/TEAMS';
 import CalendarDropdown from '../../../../../components/Calendar.jsx';
 import UploadVideoModal from '../../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
-import { IoMdNotificationsOutline } from 'react-icons/io';
+import NotificationHoverIcon from '../../../../../components/Notifications/NotificationHoverIcon';
 
 /* ===== 상수 ===== */
 const TYPES = ['Scrimmage', 'Friendly match', 'Season'];
@@ -316,9 +316,7 @@ export default function GamePage() {
               >
                 경기 업로드
               </button>
-              <button className="notificationButton">
-                <IoMdNotificationsOutline className='notification-button' size={24} />
-              </button>
+               <NotificationHoverIcon className="notificationButton" iconSize={24} />
             </div>
           </div>
         </div>
