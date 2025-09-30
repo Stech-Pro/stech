@@ -407,30 +407,56 @@ export class GameController {
       // 5. 경기 정보 저장
       console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
       try {
-        const { team: uploaderTeam } = req.user;
-        const gameDataWithUploader = {
-          ...gameData,
-          uploader: uploaderTeam,
-        };
-        await this.gameService.createGameInfo(gameDataWithUploader);
-        console.log('✅✅✅ 경기 정보 저장 완료 ✅✅✅');
+        // 기존 게임 정보 확인
+        const existingGame = await this.gameService.findGameByKey(gameData.gameKey);
+        if (existingGame) {
+          // 기존 경기가 있으면 uploader 유지하면서 업데이트
+          await this.gameService.updateGameInfo(gameData.gameKey, {
+            ...gameData,
+            uploadStatus: 'completed',
+            uploader: existingGame.uploader, // 기존 uploader 유지
+            report: true,
+          });
+          console.log('✅✅✅ 경기 정보 업데이트 완료 (기존 uploader 유지) ✅✅✅');
+        } else {
+          // 새 경기면 현재 사용자로 생성
+          const { team: uploaderTeam } = req.user;
+          const gameDataWithUploader = {
+            ...gameData,
+            uploader: uploaderTeam,
+            uploadStatus: 'completed',
+          };
+          await this.gameService.createGameInfo(gameDataWithUploader);
+          console.log('✅✅✅ 새 경기 정보 생성 완료 ✅✅✅');
+        }
       } catch (gameInfoError) {
         console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
       }
 
       // 5-1. 전체 경기 클립 데이터 저장 (하이라이트용)
       console.log('🎬🎬🎬 경기 클립 데이터 저장 시작... 🎬🎬🎬');
-      // 기존 uploader 유지 (영상을 업로드한 팀 정보)
-      const existingGame = await this.gameService.findGameByKey(gameData.gameKey);
-      const uploaderTeam = existingGame?.uploader || req.user.team;
-      console.log(`📋 uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${req.user.team}, 최종=${uploaderTeam}`);
-      
-      const gameClipsData = {
-        ...gameData,
-        uploader: uploaderTeam, // 영상을 업로드한 팀으로 유지
-      };
-      await this.gameService.saveGameClips(gameClipsData);
-      console.log('✅ 경기 클립 데이터 저장 완료');
+      try {
+        // 기존 uploader 유지 (영상을 업로드한 팀 정보)
+        const existingGame = await this.gameService.findGameByKey(gameData.gameKey);
+        const uploaderTeam = existingGame?.uploader || req.user.team;
+        console.log(`📋 uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${req.user.team}, 최종=${uploaderTeam}`);
+        
+        const gameClipsData = {
+          ...gameData,
+          uploader: uploaderTeam, // 영상을 업로드한 팀으로 유지
+        };
+        console.log(`🔍 saveGameClips에 전달할 데이터 확인:`, {
+          gameKey: gameClipsData.gameKey,
+          uploader: gameClipsData.uploader,
+          homeTeam: gameClipsData.homeTeam,
+          awayTeam: gameClipsData.awayTeam
+        });
+        await this.gameService.saveGameClips(gameClipsData);
+        console.log('✅ 경기 클립 데이터 저장 완료');
+      } catch (clipsError) {
+        console.error('❌❌❌ 경기 클립 데이터 저장 실패:', clipsError.message);
+        throw clipsError;
+      }
 
       // 6. 팀 스탯 자동 계산
       console.log('📊 팀 스탯 계산 시작...');
