@@ -48,8 +48,10 @@ export class GameService {
     const existingGame = await this.gameInfoModel.findOne({ gameKey: gameData.gameKey });
     if (existingGame) {
       console.log(`⚠️ 게임 데이터 중복: ${gameData.gameKey} 이미 존재함. 덮어쓰기 진행.`);
+      console.log(`🔍 기존 게임의 uploader: ${existingGame.uploader}`);
+      console.log(`🔍 전달된 gameData.uploader: ${gameData.uploader}`);
       
-      // 기존 데이터 업데이트
+      // 기존 데이터 업데이트 - uploader는 절대 삭제하지 않음
       const updateData: any = {
         date: gameData.date,
         type: gameData.type,
@@ -58,8 +60,20 @@ export class GameService {
         location: gameData.location,
         homeTeam: fixedHomeTeam,
         awayTeam: fixedAwayTeam,
-        uploader: gameData.uploader || existingGame.uploader,
       };
+      
+      // uploader 처리: 새 값이 있으면 사용, 없으면 기존 값 유지
+      if (gameData.uploader) {
+        updateData.uploader = gameData.uploader;
+        console.log(`📝 새로운 uploader로 변경: ${gameData.uploader}`);
+      } else if (existingGame.uploader) {
+        updateData.uploader = existingGame.uploader;
+        console.log(`📝 기존 uploader 유지: ${existingGame.uploader}`);
+      } else {
+        console.log(`❌ 경고: uploader가 없습니다!`);
+      }
+      
+      console.log(`📝 최종 updateData.uploader: ${updateData.uploader}`);
       
       // uploadStatus가 있으면 포함
       if (gameData.uploadStatus) {
@@ -75,7 +89,7 @@ export class GameService {
       
       const updatedGame = await this.gameInfoModel.findOneAndUpdate(
         { gameKey: gameData.gameKey },
-        updateData,
+        { $set: updateData },  // $set을 명시적으로 사용하여 특정 필드만 업데이트
         { new: true }
       );
       console.log('✅ GameInfo 업데이트 성공:', updatedGame._id);
@@ -136,6 +150,7 @@ export class GameService {
     
     const games = await this.gameInfoModel
       .find({ uploader: uploaderTeam })
+      .sort({ date: -1 }) // 최신순 정렬
       .exec();
     
     console.log(`📊 ${uploaderTeam} 업로드 경기 수: ${games.length}개`);
@@ -243,10 +258,22 @@ export class GameService {
       console.log(`📝 updateGameInfo에서 기존 uploader 유지: ${existingGame.uploader}`);
     }
 
+    // report가 있으면 추가
+    if (gameData.report !== undefined) {
+      updateData.report = gameData.report;
+      console.log(`📝 updateGameInfo에서 report 업데이트: ${gameData.report}`);
+    }
+
+    // videoUrls가 있으면 추가
+    if (gameData.videoUrls) {
+      updateData.videoUrls = gameData.videoUrls;
+      console.log(`📝 updateGameInfo에서 videoUrls 업데이트`);
+    }
+
     console.log(`📝 GameInfo 업데이트: ${gameKey}`, updateData);
 
     return this.gameInfoModel
-      .findOneAndUpdate({ gameKey }, updateData, { new: true, upsert: true })
+      .findOneAndUpdate({ gameKey }, updateData, { new: true })
       .exec();
   }
 
