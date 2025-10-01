@@ -424,7 +424,11 @@ export class PlayerController {
       // GameClips 저장
       console.log('🎬🎬🎬 경기 클립 데이터 저장 시작... 🎬🎬🎬');
       try {
-        await this.gameService.saveGameClips(gameData);
+        const gameClipsData = {
+          ...gameData,
+          uploader: user.team,
+        };
+        await this.gameService.saveGameClips(gameClipsData);
         console.log('✅✅✅ 경기 클립 데이터 저장 완료 ✅✅✅');
       } catch (gameClipsError) {
         console.error('❌❌❌ 경기 클립 데이터 저장 실패:', gameClipsError.message);

@@ -830,11 +830,11 @@ export class GameController {
         accessLevel: 'admin',
       };
     } else {
-      // 일반 사용자는 자기 팀 경기만 조회
-      const games = await this.gameService.findGamesByTeam(userTeam);
+      // 일반 사용자는 자신이 업로드한 경기만 조회
+      const games = await this.gameService.findGamesByUploader(userTeam);
       return {
         success: true,
-        message: `${userTeam} 팀의 경기 정보 조회 성공`,
+        message: `${userTeam} 팀이 업로드한 경기 정보 조회 성공`,
         data: games,
         totalGames: games.length,
         accessLevel: 'team',
