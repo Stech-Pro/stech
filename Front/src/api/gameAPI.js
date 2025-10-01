@@ -95,7 +95,7 @@ export async function getCoachHighlights() {
     headers: { 'Content-Type': 'application/json' },
   });
   const data = await jsonOrText(res);
-
+  console.log('getCoachHighlights data:', data);
   if (!res.ok) {
     throw new APIError(
       typeof data === 'object' ? data.message || '하이라이트 조회 실패' : '하이라이트 조회 실패',
