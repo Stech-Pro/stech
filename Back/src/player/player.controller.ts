@@ -282,6 +282,10 @@ export class PlayerController {
       teamStatsUpdated: false,
       errors: [] as string[],
     };
+    
+    // 알림 관련 변수들을 메서드 스코프에 선언
+    let existingGameForNotification = null;
+    let shouldSendNotification = false;
 
     try {
       // ClipAnalyzer를 사용한 전체 선수 분석
