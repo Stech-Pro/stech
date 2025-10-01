@@ -38,6 +38,7 @@ export class GameService {
     console.log('  homeTeam:', gameData.homeTeam);
     console.log('  awayTeam:', gameData.awayTeam);
     console.log('  uploadStatus:', gameData.uploadStatus);
+    console.log('  uploader:', gameData.uploader);
 
     // 팀명은 그대로 사용
     const fixedHomeTeam = gameData.homeTeam;
@@ -213,6 +214,9 @@ export class GameService {
   }
 
   async updateGameInfo(gameKey: string, gameData: any): Promise<GameInfo> {
+    // 기존 게임 정보 가져오기 (uploader 보존을 위해)
+    const existingGame = await this.gameInfoModel.findOne({ gameKey });
+    
     const updateData: any = {
       gameKey: gameData.gameKey,
       date: gameData.date,
@@ -230,9 +234,13 @@ export class GameService {
       console.log(`📝 updateGameInfo에서 uploadStatus 업데이트: ${gameData.uploadStatus}`);
     }
 
-    // uploader가 있으면 추가
+    // uploader는 명시적으로 전달된 경우에만 업데이트, 아니면 기존 값 유지
     if (gameData.uploader) {
       updateData.uploader = gameData.uploader;
+      console.log(`📝 updateGameInfo에서 uploader 업데이트: ${gameData.uploader}`);
+    } else if (existingGame?.uploader) {
+      updateData.uploader = existingGame.uploader;
+      console.log(`📝 updateGameInfo에서 기존 uploader 유지: ${existingGame.uploader}`);
     }
 
     console.log(`📝 GameInfo 업데이트: ${gameKey}`, updateData);
