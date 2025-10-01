@@ -40,8 +40,8 @@ export const API_CONFIG = {
 
   
     //Notification
-    NOTI_LIST: '/api/notifications',
+    NOTI_LIST: '/notifications',
     NOTI_READ_ALL: '/notifications/read-all',
-    NOTI_UNREAD_COUNT: '/api/notifications/unread-count',
+    NOTI_UNREAD_COUNT: '/notifications/unread-count',
   },
 };

@@ -13,6 +13,12 @@ import {
 } from '../api/videoUploadAPI';
 import DateTimeDropdown from './DateTimeDropdown.js';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const KST = 'Asia/Seoul';
 
 /* ───────── 파일 미리보기 유틸/모달 ───────── */
 function formatBytes(bytes = 0) {
@@ -234,12 +240,10 @@ const REGION_OPTIONS = (() => {
 
 function getLeagueName(matchDate, regionKey) {
   const year = matchDate
-    ? new Date(matchDate).getFullYear()
-    : new Date().getFullYear();
+    ? dayjs(matchDate).tz(KST).year()
+    : dayjs().tz(KST).year();
   const regionLabel = REGION_LABEL[regionKey] || regionKey || '';
-  if (regionKey === 'Amateur') {
-    return `${year} 사회인`;
-  }
+  if (regionKey === 'Amateur') return `${year} 사회인`;
   return `${year} ${regionLabel} 추계`;
 }
 
@@ -538,7 +542,7 @@ const UploadVideoModal = ({
     setError('');
 
     if (!gameType) return setError('경기 유형을 선택해 주세요.');
-    if (isLeague && !regionKey)
+    if (gameType === '리그' && !regionKey)
       return setError('리그 경기의 지역을 선택해 주세요.');
     if (!stadium) return setError('경기장을 입력/선택해 주세요.');
     if (!home || !away) return setError('홈/원정 팀을 선택해 주세요.');
@@ -551,28 +555,39 @@ const UploadVideoModal = ({
     try {
       setLoading(true);
 
-      const leagueNameAuto = isLeague
-        ? getLeagueName(matchDate, regionKey)
-        : undefined;
+      // ── 날짜 포맷: YYYY-MM-DD(요일) HH:mm ─────────────────────────────
+      // dayjs를 이용해 현지(브라우저) 시간 기준으로 처리 (UTC 변환 금지)
+      const d = dayjs(matchDate).tz(KST);
+      const DOW = ['일', '월', '화', '수', '목', '금', '토'];
+      const dow = DOW[d.day()];
+      const dateWithKoreanDow = `${d.format('YYYY-MM-DD')}(${dow}) ${d.format(
+        'HH:mm',
+      )}`;
 
+      // ── 리그명 자동 생성 (연도 계산은 dayjs 기준) ─────────────────────
+      const leagueNameAuto =
+        gameType === '리그'
+          ? getLeagueName(d, regionKey) // 내부에서 연도만 쓰면 Date/Dayjs 어느 쪽이든 OK
+          : undefined;
+
+      // ── gameKey: 홈 앞2 + 원정 앞2 + YYYYMMDD (로컬 기준) ────────────
       const gameKey = `${String(home.id).slice(0, 2).toUpperCase()}${String(
         away.id,
       )
         .slice(0, 2)
-        .toUpperCase()}${new Date(matchDate)
-        .toISOString()
-        .slice(0, 10)
-        .replace(/-/g, '')}`;
+        .toUpperCase()}${d.format('YYYYMMDD')}`;
 
+      // ── 서버로 보낼 본문 ──────────────────────────────────────────────
       const gameInfo = {
         homeTeam: home.id,
         awayTeam: away.id,
-        date: matchDate, // 예: "2025-09-20T15:00"
+        // 요구사항: 'YYYY-MM-DD(요일) HH:mm' 형태로 date 전송
+        date: dateWithKoreanDow,
         type: toBackendGameType(gameType),
         score: { home: Number(scoreHome || 0), away: Number(scoreAway || 0) },
         location: stadium,
         region: regionKey,
-        ...(isLeague ? { week, leagueName: leagueNameAuto } : {}),
+        ...(gameType === '리그' ? { week, leagueName: leagueNameAuto } : {}),
       };
 
       const quarterVideoCounts = {
@@ -582,6 +597,7 @@ const UploadVideoModal = ({
         Q4: q4.length,
       };
 
+      // 1) 업로드 준비
       const prep = await prepareMatchUpload({
         gameKey,
         gameInfo,
@@ -592,7 +608,7 @@ const UploadVideoModal = ({
       // 2) S3 업로드
       const fileMap = { Q1: q1, Q2: q2, Q3: q3, Q4: q4 };
       const uploadPromises = [];
-      Object.keys(data.uploadUrls).forEach((quarter) => {
+      Object.keys(data.uploadUrls || {}).forEach((quarter) => {
         const urlList = data.uploadUrls[quarter] || [];
         urlList.forEach((u, idx) => {
           const f = fileMap[quarter]?.[idx];
@@ -602,7 +618,7 @@ const UploadVideoModal = ({
       });
       await Promise.all(uploadPromises);
 
-      // 3) 완료단계
+      // 3) 완료 보고
       const uploadedVideos = {
         Q1: (data.uploadUrls.Q1 || []).map((u) => u.fileName),
         Q2: (data.uploadUrls.Q2 || []).map((u) => u.fileName),
@@ -627,9 +643,9 @@ const UploadVideoModal = ({
       return;
     }
 
-    // gameKey = 홈코드(앞2) + 원정코드(앞2) + YYYYMMDD
-    const gameDate = new Date(matchDate);
-    const formattedDate = gameDate.toISOString().slice(0, 10).replace(/-/g, '');
+    // gameKey = 홈코드(앞2) + 원정코드(앞2) + YYYYMMDD (KST 기준)
+    const d = dayjs(matchDate).tz(KST);
+    const formattedDate = d.format('YYYYMMDD');
     const normCode = (s) =>
       String(s || '')
         .slice(0, 2)
@@ -891,18 +907,18 @@ const UploadVideoModal = ({
                       onClick={() => setDtOpen((v) => !v)}
                     >
                       {matchDate
-                        ? dayjs(matchDate).format('YYYY-MM-DD HH:mm')
+                        ? dayjs(matchDate).tz(KST).format('YYYY-MM-DD HH:mm')
                         : '날짜/시간 선택'}
                     </button>
 
                     {dtOpen && (
                       <DateTimeDropdown
-                        value={matchDate ? dayjs(matchDate) : dayjs()}
-                        onChange={(d) =>
-                          setMatchDate(d.format('YYYY-MM-DDTHH:mm'))
+                        value={
+                          matchDate ? dayjs(matchDate).tz(KST) : dayjs().tz(KST)
                         }
+                        onChange={(d) => setMatchDate(d.tz(KST).format())} // 예: 2025-09-20T15:00:00+09:00
                         onClose={() => setDtOpen(false)}
-                        minuteStep={10} // 옵션으로 10분 간격
+                        minuteStep={10}
                       />
                     )}
                   </div>
