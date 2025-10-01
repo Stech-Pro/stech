@@ -2,10 +2,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../context/AuthContext';
-import {
-  getPlayerHighlights,
-  getCoachHighlights,
-} from '../../../../api/gameAPI';
+import { getPlayerHighlights, getCoachHighlights } from '../../../../api/gameAPI';
 import HighlightModal from '../../../../components/HighlightModal';
 import { TEAMS, TEAM_BY_ID } from '../../../../data/TEAMS';
 import { fetchTeamStatsByKey } from '../../../../api/teamAPI';
