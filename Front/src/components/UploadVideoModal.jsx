@@ -457,36 +457,19 @@ const UploadVideoModal = ({
   const [lastGameKey, setLastGameKey] = useState('');
 
   const handleChangeGameType = (val) => {
-  setGameType(val);
-  if (val === '리그') {
-    // 리그 진입: 지역/주차/경기장은 리그 로직(useEffect)에서 정리됨
-    setStadium('');           // 새로 선택하게
-  } else {
-    // 비리그 진입: 지역/주차 초기화, 경기장은 전체 목록 선택 가능 상태로
-    setRegionKey('');
-    setWeek('');
-    setStadium('');
-    setStadiumMode('select');
-  }
-};
+    setGameType(val);
+    if (val === '리그') {
+      // 리그 진입: 지역/주차/경기장은 리그 로직(useEffect)에서 정리됨
+      setStadium(''); // 새로 선택하게
+    } else {
+      // 비리그 진입: 지역/주차 초기화, 경기장은 전체 목록 선택 가능 상태로
+      setRegionKey('');
+      setWeek('');
+      setStadium('');
+      setStadiumMode('select');
+    }
+  };
 
-const withTimeout = (promise, ms = 60000, label = '요청') => {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), ms);
-  return Promise.race([
-    (async () => {
-      try {
-        const res = await promise(ctrl.signal);
-        return res;
-      } finally {
-        clearTimeout(t);
-      }
-    })(),
-  ]).catch((e) => {
-    if (e.name === 'AbortError') throw new Error(`${label} 타임아웃(${ms}ms)`);
-    throw e;
-  });
-};
   const closePreview = useCallback(() => setPreviewOpen(false), []);
 
   const isLeague = gameType === '리그';
@@ -642,49 +625,71 @@ const withTimeout = (promise, ms = 60000, label = '요청') => {
       });
       const { data } = prep; // { uploadUrls: {Q1:[...], Q2:[...]}, ... }
 
-          // 2) S3 업로드 (타임아웃 + allSettled로 실패 수집)
       const fileMap = { Q1: q1, Q2: q2, Q3: q3, Q4: q4 };
-      const tasks = [];
-      const uploadUrls = data?.uploadUrls || {};
+      const uploadUrls = data.uploadUrls || {};
 
+      const pairs = [];
       Object.keys(uploadUrls).forEach((quarter) => {
-        const urlList = uploadUrls[quarter] || [];
-        urlList.forEach((u, idx) => {
+        (uploadUrls[quarter] || []).forEach((u, idx) => {
           const f = fileMap[quarter]?.[idx];
-          if (!f) return;
-          // 각 업로드에 2분 타임아웃 적용
-          tasks.push(withTimeout(putToS3(u.uploadUrl, f), 120000, `S3 업로드(${quarter} #${idx + 1})`));
+          if (f) pairs.push({ quarter, idx, url: u.uploadUrl, file: f });
         });
       });
+      if (pairs.length === 0) throw new Error('업로드할 파일/URL이 없습니다.');
 
-      if (tasks.length === 0) {
-        throw new Error('업로드할 파일/URL이 없습니다. (uploadUrls empty)');
+      const batchSize = 3; // 동시 3개
+      for (let i = 0; i < pairs.length; i += batchSize) {
+        const batch = pairs.slice(i, i + batchSize);
+
+        // 1차: Content-Type 헤더 생략(omit) — preflight/서명 헤더 불일치 우회
+        const first = await Promise.allSettled(
+          batch.map((p) =>
+            putToS3(p.url, p.file, {
+              contentTypeStrategy: 'omit',
+              timeoutMs: 300000, // 5분
+            }),
+          ),
+        );
+
+        // 실패 건만 2차 재시도: 파일 MIME 사용
+        const retryTargets = batch.filter(
+          (_, idx) => first[idx].status === 'rejected',
+        );
+        if (retryTargets.length) {
+          const second = await Promise.allSettled(
+            retryTargets.map((p) =>
+              putToS3(p.url, p.file, {
+                contentTypeStrategy: 'file',
+                timeoutMs: 300000,
+              }),
+            ),
+          );
+          const failCnt = second.filter((r) => r.status === 'rejected').length;
+          if (failCnt) {
+            console.error('S3 업로드 실패 배치:', { batch, first, second });
+            throw new Error(`S3 업로드 실패 ${failCnt}개`);
+          }
+        }
       }
 
-      const results = await Promise.allSettled(tasks);
-      const failed = results.filter((r) => r.status === 'rejected');
-      if (failed.length > 0) {
-        console.error('S3 업로드 실패 목록:', failed);
-        throw new Error(`S3 업로드 실패: ${failed.length}개 파일`);
-      }
-
-      // 3) 완료 보고 (타임아웃 적용)
+      // ── 3) 완료 보고 (내부 타임아웃 사용: 기본 120초, 원하면 조절) ──
       const uploadedVideos = {
         Q1: (uploadUrls.Q1 || []).map((u) => u.fileName),
         Q2: (uploadUrls.Q2 || []).map((u) => u.fileName),
         Q3: (uploadUrls.Q3 || []).map((u) => u.fileName),
         Q4: (uploadUrls.Q4 || []).map((u) => u.fileName),
       };
-console.log('[completeMatchUpload] payload', { gameKey, uploadedVideos });
- await withTimeout(
-   (signal) => completeMatchUpload({ gameKey, uploadedVideos, signal }),
-   60000,
-   '업로드 완료 보고'
- );
 
+      await completeMatchUpload(
+        { gameKey, uploadedVideos },
+        { timeoutMs: 120000 },
+      );
+
+      // 성공 처리
       onUploaded?.();
-      setSuccess(true);
-      setLastGameKey(gameKey);
+      // 배너 쓰면 아래 2줄 사용, 아니면 바로 닫기만
+      // setSuccess(true); setLastGameKey(gameKey);
+      // setTimeout(() => { setSuccess(false); handleClose(); }, 1200);
       handleClose();
     } catch (err) {
       setError(err?.message || '업로드 중 오류가 발생했습니다.');
@@ -793,7 +798,10 @@ console.log('[completeMatchUpload] payload', { gameKey, uploadedVideos });
             <div className="uvm-row">
               <div className="uvm-field two">
                 <label>경기 유형</label>
-                <select value={gameType} onChange={(e) => handleChangeGameType(e.target.value)}>
+                <select
+                  value={gameType}
+                  onChange={(e) => handleChangeGameType(e.target.value)}
+                >
                   <option value="" disabled hidden>
                     경기 유형 선택
                   </option>
