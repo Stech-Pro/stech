@@ -21,6 +21,7 @@ import { StatsManagementService } from '../common/services/stats-management.serv
 import { GameService } from '../game/game.service';
 import { TeamModule } from '../team/team.module';
 import { AuthModule } from '../auth/auth.module';
+import { NotificationModule } from '../notification/notification.module';
 import { Player, PlayerSchema } from '../schemas/player.schema';
 import { Team, TeamSchema } from '../schemas/team.schema';
 import { User, UserSchema } from '../schemas/user.schema';
@@ -63,6 +64,7 @@ import { GameClips, GameClipsSchema } from '../schemas/game-clips.schema';
     ]),
     forwardRef(() => TeamModule),
     forwardRef(() => AuthModule),
+    NotificationModule,
   ],
   controllers: [
     PlayerController,

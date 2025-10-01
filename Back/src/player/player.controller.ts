@@ -31,6 +31,10 @@ import { TeamStatsAnalyzerService } from '../team/team-stats-analyzer.service';
 import { GameService } from '../game/game.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { User } from '../common/decorators/user.decorator';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User as UserSchema, UserDocument } from '../schemas/user.schema';
+import { NotificationService } from '../notification/notification.service';
 
 @ApiTags('Player')
 @Controller('player')
@@ -40,6 +44,8 @@ export class PlayerController {
     private readonly statsManagementService: StatsManagementService,
     private readonly teamStatsService: TeamStatsAnalyzerService,
     private readonly gameService: GameService,
+    @InjectModel(UserSchema.name) private userModel: Model<UserDocument>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   @Post('reset-all')
@@ -405,13 +411,23 @@ export class PlayerController {
 
       console.log('✅ 팀 스탯 업데이트 완료');
 
+      // GameInfo 생성 전에 상태 저장
+      let existingGameForNotification = null;
+      let shouldSendNotification = false;
+      
       // GameInfo 생성
       console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
       try {
         // 기존 게임이 있는지 확인하고 uploader 유지
         const existingGame = await this.gameService.findGameByKey(gameData.gameKey);
+        existingGameForNotification = existingGame; // 나중에 알림 생성용으로 저장
+        const wasAlreadyCompleted = existingGame?.uploadStatus === 'completed';
         const uploaderTeam = existingGame?.uploader || user.team;
         console.log(`🔍 GameInfo uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${user.team}, 최종=${uploaderTeam}`);
+        console.log(`📝 기존 uploadStatus: ${existingGame?.uploadStatus}`);
+        
+        // 알림 조건 확인: pending → completed 변경인 경우
+        shouldSendNotification = existingGame && existingGame.uploadStatus === 'pending' && !wasAlreadyCompleted;
         
         const gameDataWithUploader = {
           ...gameData,
@@ -424,6 +440,7 @@ export class PlayerController {
       } catch (gameInfoError) {
         console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
         results.errors.push(`GameInfo 생성: ${gameInfoError.message}`);
+        shouldSendNotification = false; // 실패 시 알림 안 보냄
       }
 
       // GameClips 저장
@@ -452,6 +469,48 @@ export class PlayerController {
         `오류 발생: ${error.message}\n`,
       );
       results.errors.push(`전체 분석: ${error.message}`);
+      shouldSendNotification = false; // 전체 오류 발생 시 알림 안 보냄
+    }
+
+    // 🔔 모든 처리가 성공적으로 완료되고 알림 조건이 충족된 경우에만 알림 생성
+    if (shouldSendNotification && results.errors.length === 0 && existingGameForNotification) {
+      console.log('🔔 경기 분석 완료 알림 생성 시작');
+      
+      try {
+        const uploaderTeam = existingGameForNotification.uploader || user.team;
+        
+        // 해당 팀의 모든 사용자 조회
+        const teamUsers = await this.userModel.find({
+          team: uploaderTeam,
+          role: { $in: ['player', 'coach'] }
+        }).select('username team');
+        
+        console.log(`📋 ${uploaderTeam} 팀 사용자 ${teamUsers.length}명 발견`);
+        
+        // 팀의 모든 사용자들에게 알림 생성
+        if (teamUsers.length > 0) {
+          const userIds = teamUsers.map(user => user.username);
+          await this.notificationService.createTeamNotifications(
+            uploaderTeam,
+            gameData.gameKey,
+            {
+              homeTeam: gameData.homeTeam,
+              awayTeam: gameData.awayTeam,
+              date: gameData.date || new Date().toISOString(),
+            },
+            userIds,
+          );
+          
+          console.log('✅ 알림 생성 완료');
+        } else {
+          console.log('⚠️ 해당 팀에 사용자가 없어 알림을 생성하지 않음');
+        }
+      } catch (notificationError) {
+        console.error('❌ 알림 생성 실패:', notificationError.message);
+        // 알림 실패는 전체 프로세스에 영향을 주지 않음
+      }
+    } else if (!shouldSendNotification) {
+      console.log('ℹ️ 알림 생성 조건 미충족 (이미 completed 상태이거나 에러 발생)');
     }
 
     return {
