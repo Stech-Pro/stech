@@ -47,7 +47,7 @@ export class GameService {
     // 중복 체크: 같은 gameKey가 이미 존재하는지 확인
     const existingGame = await this.gameInfoModel.findOne({ gameKey: gameData.gameKey });
     if (existingGame) {
-      console.log(`⚠️ 게임 데이터 중복: ${gameData.gameKey} 이미 존재함. 덮어쓰기 진행.`);
+      console.log(`📝 기존 게임 업데이트: ${gameData.gameKey} (${existingGame.uploadStatus} → ${gameData.uploadStatus || existingGame.uploadStatus})`);
       console.log(`🔍 기존 게임의 uploader: ${existingGame.uploader}`);
       console.log(`🔍 전달된 gameData.uploader: ${gameData.uploader}`);
       

@@ -415,9 +415,7 @@ export class PlayerController {
 
       console.log('✅ 팀 스탯 업데이트 완료');
 
-      // GameInfo 생성 전에 상태 저장
-      let existingGameForNotification = null;
-      let shouldSendNotification = false;
+      // GameInfo 생성 전에 상태 업데이트 (변수는 이미 외부에 선언됨)
       
       // GameInfo 생성
       console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
@@ -432,6 +430,11 @@ export class PlayerController {
         
         // 알림 조건 확인: pending → completed 변경인 경우
         shouldSendNotification = existingGame && existingGame.uploadStatus === 'pending' && !wasAlreadyCompleted;
+        console.log(`🔍 알림 조건 디버깅:`);
+        console.log(`  - existingGame: ${!!existingGame}`);
+        console.log(`  - uploadStatus === 'pending': ${existingGame?.uploadStatus === 'pending'}`);
+        console.log(`  - !wasAlreadyCompleted: ${!wasAlreadyCompleted}`);
+        console.log(`  - shouldSendNotification: ${shouldSendNotification}`);
         
         const gameDataWithUploader = {
           ...gameData,
@@ -477,6 +480,12 @@ export class PlayerController {
     }
 
     // 🔔 모든 처리가 성공적으로 완료되고 알림 조건이 충족된 경우에만 알림 생성
+    console.log(`🔍 최종 알림 조건 확인:`);
+    console.log(`  - shouldSendNotification: ${shouldSendNotification}`);
+    console.log(`  - results.errors.length === 0: ${results.errors.length === 0}`);
+    console.log(`  - existingGameForNotification: ${!!existingGameForNotification}`);
+    console.log(`  - errors: ${JSON.stringify(results.errors)}`);
+    
     if (shouldSendNotification && results.errors.length === 0 && existingGameForNotification) {
       console.log('🔔 경기 분석 완료 알림 생성 시작');
       
@@ -485,9 +494,9 @@ export class PlayerController {
         
         // 해당 팀의 모든 사용자 조회
         const teamUsers = await this.userModel.find({
-          team: uploaderTeam,
+          teamName: uploaderTeam,
           role: { $in: ['player', 'coach'] }
-        }).select('username team');
+        }).select('username teamName');
         
         console.log(`📋 ${uploaderTeam} 팀 사용자 ${teamUsers.length}명 발견`);
         

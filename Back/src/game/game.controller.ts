@@ -1742,7 +1742,7 @@ export class GameController {
     description: '❌ 경기를 찾을 수 없음',
   })
   @ApiBody({
-    description: '업로드 완료된 영상 정보',
+    description: '업로드 완료된 영상 정보 및 게임 정보',
     schema: {
       example: {
         gameKey: 'YSKM20250920',
@@ -1751,13 +1751,24 @@ export class GameController {
           Q2: ['YSKM20250920_clip4.mp4', 'YSKM20250920_clip5.mp4'],
           Q3: ['YSKM20250920_clip7.mp4'],
           Q4: ['YSKM20250920_clip9.mp4', 'YSKM20250920_clip10.mp4']
+        },
+        gameInfo: {
+          date: '2025-02-01(토) 15:00',
+          type: 'League',
+          homeTeam: 'YSeagles',
+          awayTeam: 'SNgreenterrors',
+          location: '서울대 운동장',
+          region: 'Seoul',
+          score: { home: 0, away: 0 }
         }
       }
     }
   })
-  async completeMatchUpload(@Body() body: any) {
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async completeMatchUpload(@Body() body: any, @Req() req: any) {
     try {
-      const { gameKey, uploadedVideos } = body;
+      const { gameKey, uploadedVideos, gameInfo } = body;
 
       if (!gameKey || !uploadedVideos) {
         throw new HttpException(
@@ -1771,27 +1782,70 @@ export class GameController {
       }
 
       console.log(`🎯 경기 업로드 완료 처리 시작: ${gameKey}`);
+      console.log(`👤 업로드 사용자: ${req.user?.team || req.user?.username}`);
 
       // 업로드된 영상들 검증
       const totalUploaded = Object.values(uploadedVideos).flat().length;
       console.log(`📊 업로드된 영상 수: ${totalUploaded}개`);
 
-      // 경기 상태를 완료로 업데이트
-      const updatedGame = await this.gameService.updateGameInfo(gameKey, {
-        uploadStatus: 'pending',
-        videoUrls: uploadedVideos,
-        uploadCompletedAt: new Date().toISOString(),
-      });
+      // 기존 게임이 있는지 확인
+      const existingGame = await this.gameService.findGameByKey(gameKey);
+      
+      if (existingGame) {
+        console.log(`📝 기존 게임 발견, 비디오 정보 업데이트: ${gameKey}`);
+        
+        // 기존 게임에 비디오 정보 추가
+        const updatedGame = await this.gameService.updateGameInfo(gameKey, {
+          uploadStatus: 'pending',
+          videoUrls: uploadedVideos,
+          uploadCompletedAt: new Date().toISOString(),
+        });
 
-      if (!updatedGame) {
-        throw new HttpException(
-          {
-            success: false,
-            message: `${gameKey} 경기를 찾을 수 없습니다`,
-            code: 'GAME_NOT_FOUND',
-          },
-          HttpStatus.NOT_FOUND,
-        );
+        if (!updatedGame) {
+          throw new HttpException(
+            {
+              success: false,
+              message: `${gameKey} 경기 업데이트에 실패했습니다`,
+              code: 'GAME_UPDATE_FAILED',
+            },
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
+      } else {
+        console.log(`🆕 새 게임 생성: ${gameKey}`);
+        
+        // 게임 정보가 없으면 기본값 사용
+        const defaultGameInfo = {
+          date: new Date().toISOString(),
+          type: 'League',
+          homeTeam: 'Team A',
+          awayTeam: 'Team B',
+          location: '경기장',
+          region: 'Seoul',
+          score: { home: 0, away: 0 },
+        };
+
+        const gameData = {
+          gameKey,
+          ...(gameInfo || defaultGameInfo), // gameInfo가 있으면 사용, 없으면 기본값
+          uploader: req.user?.team || req.user?.username,
+          uploadStatus: 'pending',
+          videoUrls: uploadedVideos,
+          uploadCompletedAt: new Date().toISOString(),
+        };
+
+        const createdGame = await this.gameService.createGameInfo(gameData);
+        
+        if (!createdGame) {
+          throw new HttpException(
+            {
+              success: false,
+              message: `${gameKey} 경기 생성에 실패했습니다`,
+              code: 'GAME_CREATE_FAILED',
+            },
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
       }
 
       console.log(`✅ ${gameKey} 경기 업로드 완료 처리 성공`);
