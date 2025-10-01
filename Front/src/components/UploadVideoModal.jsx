@@ -211,6 +211,8 @@ const STADIUMS = {
   Amateur: ['군위 종합운동장'],
 };
 
+const ALL_STADIUMS = Array.from(new Set(Object.values(STADIUMS).flat()));
+
 /* region 라벨 매핑 (TEAMS.region → 한글) */
 const REGION_LABEL = {
   Seoul: '서울',
@@ -451,6 +453,40 @@ const UploadVideoModal = ({
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const [success, setSuccess] = useState(false);
+  const [lastGameKey, setLastGameKey] = useState('');
+
+  const handleChangeGameType = (val) => {
+  setGameType(val);
+  if (val === '리그') {
+    // 리그 진입: 지역/주차/경기장은 리그 로직(useEffect)에서 정리됨
+    setStadium('');           // 새로 선택하게
+  } else {
+    // 비리그 진입: 지역/주차 초기화, 경기장은 전체 목록 선택 가능 상태로
+    setRegionKey('');
+    setWeek('');
+    setStadium('');
+    setStadiumMode('select');
+  }
+};
+
+const withTimeout = (promise, ms = 60000, label = '요청') => {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  return Promise.race([
+    (async () => {
+      try {
+        const res = await promise(ctrl.signal);
+        return res;
+      } finally {
+        clearTimeout(t);
+      }
+    })(),
+  ]).catch((e) => {
+    if (e.name === 'AbortError') throw new Error(`${label} 타임아웃(${ms}ms)`);
+    throw e;
+  });
+};
   const closePreview = useCallback(() => setPreviewOpen(false), []);
 
   const isLeague = gameType === '리그';
@@ -472,7 +508,8 @@ const UploadVideoModal = ({
 
   /** 리그에서 선택 가능한 경기장 목록 */
   const stadiumOptions = useMemo(() => {
-    if (!isLeague || !regionKey) return [];
+    if (!isLeague) return ALL_STADIUMS;
+    if (!regionKey) return [];
     return STADIUMS[regionKey] ?? [];
   }, [isLeague, regionKey]);
 
@@ -497,7 +534,7 @@ const UploadVideoModal = ({
   /** 경기장 입력 모드 전환 */
   useEffect(() => {
     if (!isLeague) {
-      setStadiumMode('custom'); // 친선전/스크리미지: 바로 직접입력
+      setStadiumMode('select');
       return;
     }
     // 리그: 지역 선택 전이면 선택모드 유지, 선택 후엔 옵션 유무로 모드 결정
@@ -605,29 +642,49 @@ const UploadVideoModal = ({
       });
       const { data } = prep; // { uploadUrls: {Q1:[...], Q2:[...]}, ... }
 
-      // 2) S3 업로드
+          // 2) S3 업로드 (타임아웃 + allSettled로 실패 수집)
       const fileMap = { Q1: q1, Q2: q2, Q3: q3, Q4: q4 };
-      const uploadPromises = [];
-      Object.keys(data.uploadUrls || {}).forEach((quarter) => {
-        const urlList = data.uploadUrls[quarter] || [];
+      const tasks = [];
+      const uploadUrls = data?.uploadUrls || {};
+
+      Object.keys(uploadUrls).forEach((quarter) => {
+        const urlList = uploadUrls[quarter] || [];
         urlList.forEach((u, idx) => {
           const f = fileMap[quarter]?.[idx];
           if (!f) return;
-          uploadPromises.push(putToS3(u.uploadUrl, f));
+          // 각 업로드에 2분 타임아웃 적용
+          tasks.push(withTimeout(putToS3(u.uploadUrl, f), 120000, `S3 업로드(${quarter} #${idx + 1})`));
         });
       });
-      await Promise.all(uploadPromises);
 
-      // 3) 완료 보고
+      if (tasks.length === 0) {
+        throw new Error('업로드할 파일/URL이 없습니다. (uploadUrls empty)');
+      }
+
+      const results = await Promise.allSettled(tasks);
+      const failed = results.filter((r) => r.status === 'rejected');
+      if (failed.length > 0) {
+        console.error('S3 업로드 실패 목록:', failed);
+        throw new Error(`S3 업로드 실패: ${failed.length}개 파일`);
+      }
+
+      // 3) 완료 보고 (타임아웃 적용)
       const uploadedVideos = {
-        Q1: (data.uploadUrls.Q1 || []).map((u) => u.fileName),
-        Q2: (data.uploadUrls.Q2 || []).map((u) => u.fileName),
-        Q3: (data.uploadUrls.Q3 || []).map((u) => u.fileName),
-        Q4: (data.uploadUrls.Q4 || []).map((u) => u.fileName),
+        Q1: (uploadUrls.Q1 || []).map((u) => u.fileName),
+        Q2: (uploadUrls.Q2 || []).map((u) => u.fileName),
+        Q3: (uploadUrls.Q3 || []).map((u) => u.fileName),
+        Q4: (uploadUrls.Q4 || []).map((u) => u.fileName),
       };
-      await completeMatchUpload({ gameKey, uploadedVideos });
+console.log('[completeMatchUpload] payload', { gameKey, uploadedVideos });
+ await withTimeout(
+   (signal) => completeMatchUpload({ gameKey, uploadedVideos, signal }),
+   60000,
+   '업로드 완료 보고'
+ );
 
       onUploaded?.();
+      setSuccess(true);
+      setLastGameKey(gameKey);
       handleClose();
     } catch (err) {
       setError(err?.message || '업로드 중 오류가 발생했습니다.');
@@ -732,14 +789,11 @@ const UploadVideoModal = ({
           <section className="uvm-col left">
             <h3 className="uvm-section-title">경기 정보 입력</h3>
 
-            {/* ── 1행: 경기 유형 + (리그일 때) 지역 선택 ── */}
+            {/* ── 1행: 경기 유형 + (리그=지역 / 비리그=경기장) ── */}
             <div className="uvm-row">
               <div className="uvm-field two">
                 <label>경기 유형</label>
-                <select
-                  value={gameType}
-                  onChange={(e) => setGameType(e.target.value)}
-                >
+                <select value={gameType} onChange={(e) => handleChangeGameType(e.target.value)}>
                   <option value="" disabled hidden>
                     경기 유형 선택
                   </option>
@@ -751,6 +805,7 @@ const UploadVideoModal = ({
                 </select>
               </div>
 
+              {/* 리그면 지역 선택, 비리그면 경기장 선택/입력 */}
               {gameType === '리그' ? (
                 <div className="uvm-field two">
                   <label>지역(리그)</label>
@@ -769,38 +824,6 @@ const UploadVideoModal = ({
                   </select>
                 </div>
               ) : (
-                // 리그가 아니면 빈 칸(자리 유지용)
-                <div className="uvm-spacer" aria-hidden />
-              )}
-            </div>
-
-            {/* ── 2행: (리그 + 지역 선택 시) 주차 + 경기장 ── */}
-            {gameType === '리그' && regionKey && (
-              <div className="uvm-row">
-                {/* 주차 선택 (Week1 ~ WeekN) */}
-                <div className="uvm-field two">
-                  <label>주차</label>
-                  <select
-                    value={week}
-                    onChange={(e) => setWeek(e.target.value)}
-                    disabled={
-                      !isLeague || !regionKey || weekOptions.length === 0
-                    }
-                  >
-                    {!week && (
-                      <option value="" disabled>
-                        주차 선택
-                      </option>
-                    )}
-                    {weekOptions.map((w) => (
-                      <option key={w} value={w}>
-                        {w}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 경기장 선택/입력 (지금 쓰던 로직 그대로) */}
                 <div className="uvm-field two">
                   <label>경기장</label>
 
@@ -834,7 +857,93 @@ const UploadVideoModal = ({
                     </div>
                   )}
 
-                  {/* 직접 입력 모드 (경기강원 기본) */}
+                  {/* 직접 입력 모드 */}
+                  {(stadiumMode === 'custom' ||
+                    stadiumOptions.length === 0) && (
+                    <div className="stadium-input-line">
+                      <input
+                        value={stadium}
+                        onChange={(e) => setStadium(e.target.value)}
+                        placeholder="경기장을 입력하세요"
+                      />
+                      {stadiumOptions.length > 0 && (
+                        <button
+                          type="button"
+                          className="btn ghost"
+                          onClick={() => {
+                            setStadium('');
+                            setStadiumMode('select');
+                          }}
+                          style={{ marginLeft: 8 }}
+                        >
+                          목록에서 선택
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* ── 2행: 리그일 때만 주차 + (리그 전용) 경기장 ── */}
+            {gameType === '리그' && regionKey && (
+              <div className="uvm-row">
+                {/* 주차 */}
+                <div className="uvm-field two">
+                  <label>주차</label>
+                  <select
+                    value={week}
+                    onChange={(e) => setWeek(e.target.value)}
+                    disabled={
+                      !isLeague || !regionKey || weekOptions.length === 0
+                    }
+                  >
+                    {!week && (
+                      <option value="" disabled>
+                        주차 선택
+                      </option>
+                    )}
+                    {weekOptions.map((w) => (
+                      <option key={w} value={w}>
+                        {w}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* (리그 전용) 경기장 선택/입력 */}
+                <div className="uvm-field two">
+                  <label>경기장</label>
+
+                  {stadiumMode === 'select' && stadiumOptions.length > 0 && (
+                    <div className="stadium-select-line">
+                      <select
+                        value={stadium || ''}
+                        onChange={(e) => setStadium(e.target.value)}
+                      >
+                        <option value="" disabled hidden>
+                          경기장 선택
+                        </option>
+                        {stadiumOptions.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        className="btn ghost"
+                        onClick={() => {
+                          setStadium('');
+                          setStadiumMode('custom');
+                        }}
+                        style={{ marginLeft: 8 }}
+                      >
+                        직접 입력
+                      </button>
+                    </div>
+                  )}
+
                   {(stadiumMode === 'custom' ||
                     stadiumOptions.length === 0) && (
                     <div className="stadium-input-line">
@@ -862,7 +971,7 @@ const UploadVideoModal = ({
               </div>
             )}
 
-            {/* ── 3행 이후: 팀, 날짜, 스코어, 리그명 ── */}
+            {/* ── 3행 이후: 팀, 날짜, 스코어 ── */}
             {canShowStep3 && (
               <>
                 {/* 팀 선택: HOME : AWAY 한 줄 */}
@@ -945,17 +1054,7 @@ const UploadVideoModal = ({
                     </div>
                   </div>
                 </div>
-                {/* 비리그(친선/스크리미지): 경기장 직접입력 */}
-                {gameType !== '리그' && (
-                  <div className="uvm-field two">
-                    <label>경기장</label>
-                    <input
-                      value={stadium}
-                      onChange={(e) => setStadium(e.target.value)}
-                      placeholder="경기장을 입력하세요"
-                    />
-                  </div>
-                )}
+                {/* ⛔️ 기존의 '비리그: 경기장 직접입력' 별도 블록은 제거됨 (2행에서 공통 처리) */}
               </>
             )}
           </section>
