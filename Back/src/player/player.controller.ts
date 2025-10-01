@@ -408,9 +408,14 @@ export class PlayerController {
       // GameInfo 생성
       console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
       try {
+        // 기존 게임이 있는지 확인하고 uploader 유지
+        const existingGame = await this.gameService.findGameByKey(gameData.gameKey);
+        const uploaderTeam = existingGame?.uploader || user.team;
+        console.log(`🔍 GameInfo uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${user.team}, 최종=${uploaderTeam}`);
+        
         const gameDataWithUploader = {
           ...gameData,
-          uploader: user.team,
+          uploader: uploaderTeam, // 기존 uploader 유지 또는 새 사용자
           uploadStatus: 'completed', // JSON 업로드 시 완료 상태로 설정
           report: true, // 보고서 생성 완료 표시
         };
@@ -424,9 +429,14 @@ export class PlayerController {
       // GameClips 저장
       console.log('🎬🎬🎬 경기 클립 데이터 저장 시작... 🎬🎬🎬');
       try {
+        // 기존 게임 정보에서 uploader 가져오기
+        const existingGame = await this.gameService.findGameByKey(gameData.gameKey);
+        const uploaderTeam = existingGame?.uploader || user.team;
+        console.log(`🔍 GameClips uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${user.team}, 최종=${uploaderTeam}`);
+        
         const gameClipsData = {
           ...gameData,
-          uploader: user.team,
+          uploader: uploaderTeam,
         };
         await this.gameService.saveGameClips(gameClipsData);
         console.log('✅✅✅ 경기 클립 데이터 저장 완료 ✅✅✅');
