@@ -59,7 +59,7 @@ export default function AnalysisClipsPage() {
   }, [gameKey]);
 
   const goBack = () => {
-    navigate('/analysis');
+    navigate(-1);
   };
 
   const playVideo = (clip) => {
