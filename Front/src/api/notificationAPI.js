@@ -30,6 +30,7 @@ export async function fetchNotifications(limit = 20) {
   const url = `${withBase(API_CONFIG.ENDPOINTS.NOTI_LIST)}?limit=${limit}`;
   const res = await fetch(url, { headers: authHeaders() });
   const data = await jsonOrText(res);
+  console.log(data);
   if (!res.ok) throw new APIError(data?.message || '알림 목록 조회 실패', res.status, data);
   return data?.data?.notifications ?? [];
 }
@@ -39,6 +40,8 @@ export async function fetchUnreadCount() {
   const url = withBase(API_CONFIG.ENDPOINTS.NOTI_UNREAD_COUNT);
   const res = await fetch(url, { headers: authHeaders() });
   const data = await jsonOrText(res);
+    console.log(data);
+
   if (!res.ok) throw new APIError(data?.message || '안 읽은 개수 조회 실패', res.status, data);
   return data?.data?.unreadCount ?? 0;
 }
@@ -48,6 +51,8 @@ export async function markNotificationRead(id) {
   const url = withBase(`${API_CONFIG.ENDPOINTS.NOTI_LIST}/${encodeURIComponent(id)}/read`);
   const res = await fetch(url, { method: 'PUT', headers: authHeaders() });
   const data = await jsonOrText(res);
+    console.log(data);
+
   if (!res.ok) throw new APIError(data?.message || '알림 읽음 처리 실패', res.status, data);
   return true;
 }
@@ -57,6 +62,8 @@ export async function markAllNotificationsRead() {
   const url = withBase(API_CONFIG.ENDPOINTS.NOTI_READ_ALL);
   const res = await fetch(url, { method: 'PUT', headers: authHeaders() });
   const data = await jsonOrText(res);
+    console.log(data);
+
   if (!res.ok) throw new APIError(data?.message || '전체 읽음 처리 실패', res.status, data);
   return true;
 }

@@ -5,3 +5,9 @@ color:white;
 .game-stat-small{
   color:white;
 }
+.thumb-error-badge{
+  position:absolute; top:.5rem; left:.5rem;
+  padding:.15rem .4rem; font-size:.75rem;
+  background:#c0392b; color:#fff; border-radius:.35rem;
+  z-index:2;
+}

@@ -8,136 +8,138 @@ import { TEAMS, TEAM_BY_ID } from '../../../../data/TEAMS';
 import { fetchTeamStatsByKey } from '../../../../api/teamAPI';
 import './HighlightPage.css';
 
-function cloudinaryThumbFromVideo(url) {
-  try {
-    const u = new URL(url);
-    if (!u.hostname.includes('res.cloudinary.com')) return null;
-    // /video/upload/(옵션)/.../file.mp4  →  /video/upload/(옵션)/.../file.jpg
-    // 타임프레임: so_1 (1초 지점) - 필요에 따라 so_0.5 등 변경 가능
-    const parts = u.pathname.split('/');
-    const i = parts.findIndex((p) => p === 'upload');
-    if (i === -1) return null;
-    // 이미 변환 옵션이 있든 없든, so_1을 하나 추가
-    if (parts[i + 1] && !parts[i + 1].includes('.')) {
-      // 이미 옵션 존재 -> so_1 추가
-      parts[i + 1] = `so_1,${parts[i + 1]}`;
-    } else {
-      // 옵션 없음 -> so_1 삽입
-      parts.splice(i + 1, 0, 'so_1');
-    }
-    // 확장자 .mp4 → .jpg
-    const last = parts[parts.length - 1];
-    const dot = last.lastIndexOf('.');
-    parts[parts.length - 1] =
-      dot > 0 ? `${last.slice(0, dot)}.jpg` : `${last}.jpg`;
-    u.pathname = parts.join('/');
-    return u.toString();
-  } catch {
-    return null;
-  }
-}
-
-// 비디오 프레임 캡처 → dataURL
-async function captureFrameAsDataURL(videoUrl, timeSec = 0.5) {
-  return new Promise((resolve, reject) => {
-    const video = document.createElement('video');
-    video.crossOrigin = 'anonymous'; // CORS 허용 서버여야 함
-    video.preload = 'auto';
-    video.muted = true; // 일부 브라우저 정책 우회
-    video.src = videoUrl;
-
-    const onError = () => {
-      cleanup();
-      reject(new Error('video load error'));
-    };
-    const onLoaded = () => {
-      // 메타데이터 로드 후 시크
-      const go = () => {
-        try {
-          const canvas = document.createElement('canvas');
-          canvas.width = video.videoWidth || 480;
-          canvas.height = video.videoHeight || 270;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const url = canvas.toDataURL('image/jpeg', 0.8);
-          cleanup();
-          resolve(url);
-        } catch (e) {
-          cleanup();
-          reject(e);
-        }
-      };
-      const onSeeked = () => go();
-      video.currentTime = Math.min(timeSec, (video.duration || 1) - 0.01);
-      video.addEventListener('seeked', onSeeked, { once: true });
-    };
-    const cleanup = () => {
-      video.removeEventListener('error', onError);
-      video.removeEventListener('loadedmetadata', onLoaded);
-      video.src = '';
-      video.load();
-    };
-
-    video.addEventListener('error', onError);
-    video.addEventListener('loadedmetadata', onLoaded, { once: true });
-    // iOS 일부 환경에서 play()가 필요할 수 있으나, 썸네일 용도라 생략
+// === 디버그 가능한 썸네일 비디오 (drop-in) ===
+function VideoThumb({ src, alt = '썸네일' }) {
+  const ref = React.useRef(null);
+  const [state, setState] = React.useState({
+    ready: false,
+    error: null,
+    lastEvt: 'init',
   });
-}
-
-// 썸네일 렌더러: 1) clip.thumbnailUrl → 2) cloudinary 변환 → 3) 캡처
-function GameThumbnail({ clip, alt = '썸네일' }) {
-  const [src, setSrc] = React.useState(null);
-  const [triedCapture, setTriedCapture] = React.useState(false);
 
   React.useEffect(() => {
-    let alive = true;
-    (async () => {
-      // 1) 명시적 썸네일
-      if (clip?.thumbnailUrl) {
-        if (alive) setSrc(clip.thumbnailUrl);
-        return;
-      }
-      // 2) Cloudinary 변환
-      const cloud = clip?.clipUrl
-        ? cloudinaryThumbFromVideo(clip.clipUrl)
-        : null;
-      if (cloud) {
-        if (alive) setSrc(cloud);
-        return;
-      }
-      // 3) 클라이언트 캡처 (CORS 필요)
-      try {
-        const dataUrl = await captureFrameAsDataURL(clip?.clipUrl);
-        if (alive) setSrc(dataUrl);
-        setTriedCapture(true);
-      } catch {
-        if (alive) {
-          setSrc(null);
-          setTriedCapture(true);
-        }
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, [clip?.thumbnailUrl, clip?.clipUrl]);
+    const v = ref.current;
+    if (!v || !src) return;
 
-  // 간단한 스켈레톤/플레이스홀더
+    let raf = null;
+    let tm = null;
+    let done = false;
+
+    const finish = (why) => {
+      if (done) return;
+      done = true;
+      setState((s) => ({ ...s, ready: true, lastEvt: why || s.lastEvt }));
+      try { v.pause(); } catch {}
+      if (raf) cancelAnimationFrame(raf);
+      if (tm) clearTimeout(tm);
+    };
+
+    // 3초 안전망: 어떤 이벤트도 못 받으면 강제로 표시
+    tm = setTimeout(() => finish('timeout-3s'), 3000);
+
+    const tag = (name) => {
+      setState((s) => ({ ...s, lastEvt: name }));
+      // 이벤트 로그 (필요하면 끄기)
+      // eslint-disable-next-line no-console
+      console.log(`[VideoThumb] ${name}`, { src });
+    };
+
+    const onPlaying = () => { tag('playing'); raf = requestAnimationFrame(() => finish('playing')); };
+    const onCanPlay = () => { tag('canplay'); raf = requestAnimationFrame(() => finish('canplay')); };
+    const onLoadedData = () => { tag('loadeddata'); raf = requestAnimationFrame(() => finish('loadeddata')); };
+    const onLoadedMeta = () => {
+      tag('loadedmetadata');
+      try {
+        const seekTo = Math.min(0.8, (v.duration || 1) - 0.05);
+        v.currentTime = seekTo;
+      } catch {}
+    };
+    const onError = () => {
+      const err = (v.error && v.error.message) || 'video error';
+      tag(`error:${err}`);
+      setState((s) => ({ ...s, error: err }));
+      finish('error');
+    };
+    const onStalled = () => tag('stalled');
+    const onSuspend = () => tag('suspend');
+    const onWaiting = () => tag('waiting');
+
+    // autoplay 시도
+    Promise.resolve(v.play()).catch(() => {
+      tag('autoplay-blocked');
+      // autoplay가 막혀도 canplay/loadeddata가 오면 finish 처리됨
+    });
+
+    v.addEventListener('playing', onPlaying);
+    v.addEventListener('canplay', onCanPlay);
+    v.addEventListener('loadeddata', onLoadedData);
+    v.addEventListener('loadedmetadata', onLoadedMeta);
+    v.addEventListener('error', onError);
+    v.addEventListener('stalled', onStalled);
+    v.addEventListener('suspend', onSuspend);
+    v.addEventListener('waiting', onWaiting);
+
+    return () => {
+      v.removeEventListener('playing', onPlaying);
+      v.removeEventListener('canplay', onCanPlay);
+      v.removeEventListener('loadeddata', onLoadedData);
+      v.removeEventListener('loadedmetadata', onLoadedMeta);
+      v.removeEventListener('error', onError);
+      v.removeEventListener('stalled', onStalled);
+      v.removeEventListener('suspend', onSuspend);
+      v.removeEventListener('waiting', onWaiting);
+      if (raf) cancelAnimationFrame(raf);
+      if (tm) clearTimeout(tm);
+      try { v.pause(); } catch {}
+    };
+  }, [src]);
+
+  const { ready, error, lastEvt } = state;
+  const cls = `thumb-wrap ${ready ? 'is-ready' : 'is-loading'} ${error ? 'has-error' : ''}`;
+
+  return (
+    <div className={cls} title={lastEvt}>
+      {!ready && (
+        <div className="thumb-skeleton">
+          <div className="shimmer" />
+        </div>
+      )}
+      {error && (
+        <div className="thumb-error-badge">
+          썸네일 오류
+        </div>
+      )}
+      {/* NOTE: 항상 렌더. key로 강제 리로드 */}
+      <video
+        key={src}
+        ref={ref}
+        src={src}
+        preload="metadata"
+        muted
+        autoPlay
+        playsInline
+        controls={false}
+        aria-label={alt}
+        className="thumb-video"
+      />
+    </div>
+  );
+}
+
+function GameThumbnail({ clip, alt = '썸네일' }) {
+  const src = clip?.clipUrl;
   if (!src) {
     return (
-      <div
-        className="game-thumb placeholder"
-        aria-label="thumbnail placeholder"
-      >
-        <div className="shimmer" />
-        {!triedCapture && (
-          <span className="visually-hidden">썸네일 생성 중…</span>
-        )}
+      <div className="thumb-wrap is-loading">
+        <div className="thumb-skeleton"><div className="shimmer" /></div>
       </div>
     );
   }
-  return <img className="game-thumb" src={src} alt={alt} loading="lazy" />;
+  return <VideoThumb src={src} alt={alt} />;
 }
+
+
+
 
 const normalizeTeamStats = (s) => {
   if (!s) {
@@ -176,6 +178,7 @@ const GameItem = ({
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState(null);
   const [enemyName, setEnemyName] = useState('');
+
   useEffect(() => {
     if (!gameKey) return;
 
@@ -198,13 +201,11 @@ const GameItem = ({
         if (home.teamName && home.teamName === myTeamName) {
           mine = home;
           setEnemyName(away.teamName);
-        }
-        else if (away.teamName && away.teamName === myTeamName) {
+        } else if (away.teamName && away.teamName === myTeamName) {
           mine = away;
           setEnemyName(home.teamName);
         }
         setTeamStats(mine);
-        // 부모에도 저장 (게임키별로 모으기 위함)
         onStats?.(gameKey, mine);
       } catch (e) {
         if (!signal.aborted) {
@@ -221,12 +222,13 @@ const GameItem = ({
     run();
     return () => controller.abort();
   }, [gameKey, myTeamName, onStats]);
-
+          console.log('Rendering GameThumbnail with firstClip:', firstClip);
   return (
-    <div className="game-item">
+    <div className="game-item" onClick={onClick} role="button" tabIndex={0}>
       <div className="game-thumbanil">
         <div className="game-thumbnail-box">
           {/* 🔹 썸네일 */}
+
           {firstClip ? (
             <GameThumbnail clip={firstClip} alt={`${gameKey} 첫 클립 썸네일`} />
           ) : (
@@ -243,31 +245,31 @@ const GameItem = ({
       {teamStats &&
         (console.log('Rendering teamStats:', teamStats) || (
           <div className="game-stat small">
-            <div className='h-game-title'> vs {enemyName}</div>
-            <div className='h-stat-rows'>
-              <div className='h-row'>
-                <div className='h-label'> 총 야드 </div>
-                <div className='h-value'> {teamStats.totalYards} </div>
+            <div className="h-game-title">vs {enemyName}</div>
+            <div className="h-stat-rows">
+              <div className="h-row">
+                <div className="h-label">총 야드</div>
+                <div className="h-value">{teamStats.totalYards}</div>
               </div>
-              <div className='h-row'>
-                <div className='h-label'> 패싱 야드 </div>
-                <div className='h-value'> {teamStats.passingYards} </div>
+              <div className="h-row">
+                <div className="h-label">패싱 야드</div>
+                <div className="h-value">{teamStats.passingYards}</div>
               </div>
-              <div className='h-row'>
-                <div className='h-label'> 러싱 야드 </div>
-                <div className='h-value'> {teamStats.rushingYards} </div>     
-              </div>  
-              <div className='h-row'> 
-                <div className='h-label'> 3rd Down % </div>
-                <div className='h-value'> {teamStats.thirdDownPct}% </div>     
+              <div className="h-row">
+                <div className="h-label">러싱 야드</div>
+                <div className="h-value">{teamStats.rushingYards}</div>
               </div>
-              <div className='h-row'>
-                <div className='h-label'> 턴오버 </div>
-                <div className='h-value'> {teamStats.turnovers} </div>     
+              <div className="h-row">
+                <div className="h-label">3rd Down %</div>
+                <div className="h-value">{teamStats.thirdDownPct}%</div>
               </div>
-              <div className='h-row'>
-                <div className='h-label'> 페널티 야드 </div>
-                <div className='h-value'> {teamStats.penaltyYards} </div>     
+              <div className="h-row">
+                <div className="h-label">턴오버</div>
+                <div className="h-value">{teamStats.turnovers}</div>
+              </div>
+              <div className="h-row">
+                <div className="h-label">페널티 야드</div>
+                <div className="h-value">{teamStats.penaltyYards}</div>
               </div>
             </div>
           </div>
@@ -281,8 +283,7 @@ const ClipItem = ({ clip, onClick }) => (
     <button type="button" onClick={onClick} title={clip?.clipKey}>
       <span className="clip-key">{clip?.clipKey}</span>
       <span className="clip-meta">
-        Q{clip?.quarter ?? '-'} • {clip?.playType ?? '-'} •{' '}
-        {clip?.gainYard ?? 0}yd
+        Q{clip?.quarter ?? '-'} • {clip?.playType ?? '-'} • {clip?.gainYard ?? 0}yd
       </span>
     </button>
   </li>
@@ -308,10 +309,12 @@ export default function HighlightPage() {
     [MY_TEAM_ID],
   );
   const logoSrc = selfTeam?.logo;
+
   const [myTeamStatsByGame, setMyTeamStatsByGame] = useState({});
   const handleStats = useCallback((gameKey, stat) => {
     setMyTeamStatsByGame((prev) => ({ ...prev, [gameKey]: stat }));
   }, []);
+
   useEffect(() => {
     let alive = true;
 
@@ -387,8 +390,7 @@ export default function HighlightPage() {
   );
 
   const totalHighlights = useMemo(
-    () =>
-      Object.values(byGame).reduce((sum, arr) => sum + (arr?.length ?? 0), 0),
+    () => Object.values(byGame).reduce((sum, arr) => sum + (arr?.length ?? 0), 0),
     [byGame],
   );
 
@@ -409,12 +411,8 @@ export default function HighlightPage() {
   if (error)
     return (
       <div className="highlight-error-wrap">
-        <p className="highlight-error" role="alert">
-          ⚠ {error}
-        </p>
-        <button type="button" onClick={() => navigate(-1)}>
-          닫기
-        </button>
+        <p className="highlight-error" role="alert">⚠ {error}</p>
+        <button type="button" onClick={() => navigate(-1)}>닫기</button>
       </div>
     );
 
@@ -432,9 +430,7 @@ export default function HighlightPage() {
               <img
                 src={logoSrc}
                 alt={selfTeam?.name || '팀 로고'}
-                className={`header-team-logo-img ${
-                  logoSrc?.endsWith('.svg') ? 'svg-logo' : 'png-logo'
-                }`}
+                className={`header-team-logo-img ${logoSrc?.endsWith('.svg') ? 'svg-logo' : 'png-logo'}`}
               />
             </div>
             <span className="header-team-name">{selfTeam?.name}</span>
