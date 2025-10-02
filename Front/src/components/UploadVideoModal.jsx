@@ -33,61 +33,111 @@ function isVideo(file) {
   return /^video\//.test(file?.type || '');
 }
 
-function FilePreviewModal({ open, onClose, filesByQuarter }) {
-  const tabs = ['Q1', 'Q2', 'Q3', 'Q4'];
+function useObjectURL(file) {
+  const [url, setUrl] = useState(null);
+  const fileRef = useRef(null);
 
-  const [active, setActive] = useState('Q1');
-  const [urls, setUrls] = useState([]);
-
-  // 모달이 열릴 때마다 Q1으로 리셋
   useEffect(() => {
-    if (open) {
-      setActive('Q1');
-    }
-  }, [open]);
-
-  // active 탭의 파일들에 대한 URL 생성
-  useEffect(() => {
-    if (!open) {
-      setUrls([]);
+    if (!file) {
+      setUrl(null);
       return;
     }
+    // 같은 파일이면 재생성 X
+    const same =
+      fileRef.current &&
+      fileRef.current.name === file.name &&
+      fileRef.current.size === file.size &&
+      fileRef.current.lastModified === file.lastModified;
+    if (same && url) return;
 
-    const files = filesByQuarter?.[active] || [];
-    const created = files.map((f) => ({
-      file: f,
-      url: URL.createObjectURL(f),
-    }));
+    fileRef.current = file;
+    const u = URL.createObjectURL(file);
+    setUrl(u);
 
-    setUrls(created);
-
-    // cleanup
     return () => {
-      created.forEach(({ url }) => URL.revokeObjectURL(url));
+      URL.revokeObjectURL(u);
     };
-  }, [open, active]); // filesByQuarter를 의존성에서 제거
+  }, [file]);
+
+  return url;
+}
+
+function PreviewListItem({ file, onDelete }) {
+  const url = useObjectURL(file);
+  const isVid = /^video\//.test(file?.type || '');
+  const key = `${file.name}-${file.size}-${file.lastModified || 0}`;
+
+  return (
+    <li key={key} className="fpm-item">
+      <div className="fpm-meta">
+        <div className="fpm-name" title={file.name}>
+          {file.name}
+        </div>
+        <div className="fpm-sub">
+          <span>{formatBytes(file.size)}</span>
+          <span className="sep">•</span>
+          <span>{file.type || 'unknown'}</span>
+        </div>
+      </div>
+
+      <div className="fpm-preview">
+        {isVid ? (
+          <video
+            className="fpm-video"
+            src={url || undefined}
+            controls
+            preload="metadata"
+            onError={(e) =>
+              console.warn('Video error for', file.name, url, e?.nativeEvent)
+            }
+          />
+        ) : (
+          <div className="fpm-nonvideo">미리보기 불가</div>
+        )}
+
+        <div className="fpm-actions-inline">
+          <a
+            className="fpm-download"
+            href={url || '#'}
+            download={file.name}
+            onClick={(e) => {
+              if (!url) e.preventDefault();
+            }}
+          >
+            다운로드
+          </a>
+          <button
+            type="button"
+            className="fpm-delete"
+            onClick={onDelete}
+            title="이 파일 삭제"
+          >
+            삭제
+          </button>
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function FilePreviewModal({ open, onClose, filesByQuarter, onRemove }) {
+  const tabs = ['Q1', 'Q2', 'Q3', 'Q4'];
+  const [active, setActive] = useState('Q1');
+
+  useEffect(() => {
+    if (open) setActive('Q1');
+  }, [open]);
 
   if (!open) return null;
 
   const handleTabChange = (newTab) => {
-    // 탭 변경 전 모든 비디오 일시정지
-    const vids = document.querySelectorAll('.fpm-video');
-    vids.forEach((v) => {
-      if (v && typeof v.pause === 'function') {
-        v.pause();
-      }
-    });
+    // 탭 바꾸기 전에 재생 중지
+    document.querySelectorAll('.fpm-video').forEach((v) => v?.pause?.());
     setActive(newTab);
   };
 
   const handleClose = () => {
-    // 모달 닫기 전 모든 비디오 일시정지
-    const vids = document.querySelectorAll('.fpm-video');
-    vids.forEach((v) => {
-      if (v && typeof v.pause === 'function') {
-        v.pause();
-      }
-    });
+    document.querySelectorAll('.fpm-video').forEach((v) => v?.pause?.());
     onClose();
   };
 
@@ -126,34 +176,12 @@ function FilePreviewModal({ open, onClose, filesByQuarter }) {
             <div className="fpm-empty">파일이 없습니다.</div>
           ) : (
             <ul className="fpm-list">
-              {urls.map(({ file, url }, idx) => (
-                <li key={`${file.name}-${idx}`} className="fpm-item">
-                  <div className="fpm-meta">
-                    <div className="fpm-name" title={file.name}>
-                      {file.name}
-                    </div>
-                    <div className="fpm-sub">
-                      <span>{formatBytes(file.size)}</span>
-                      <span className="sep">•</span>
-                      <span>{file.type || 'unknown'}</span>
-                    </div>
-                  </div>
-                  <div className="fpm-preview">
-                    {isVideo(file) ? (
-                      <video
-                        className="fpm-video"
-                        src={url}
-                        controls
-                        preload="metadata"
-                      />
-                    ) : (
-                      <div className="fpm-nonvideo">미리보기 불가</div>
-                    )}
-                    <a className="fpm-download" href={url} download={file.name}>
-                      다운로드
-                    </a>
-                  </div>
-                </li>
+              {files.map((file, idx) => (
+                <PreviewListItem
+                  key={`${file.name}-${file.size}-${file.lastModified || 0}`}
+                  file={file}
+                  onDelete={() => onRemove?.(active, idx)}
+                />
               ))}
             </ul>
           )}
@@ -168,6 +196,7 @@ function FilePreviewModal({ open, onClose, filesByQuarter }) {
     </div>
   );
 }
+
 const WEEK_LIMITS = {
   Seoul: 6,
   'Gyeonggi-Gangwon': 3,
@@ -395,14 +424,14 @@ function QuarterRow({ q, files, onPick, onClear }) {
         }}
       />
       <button
-        className="btn primary"
+        className="qbtn primary"
         type="button"
         onClick={() => inputRef.current?.click()}
       >
-        {q} 영상 추가
+        {q} 경기 영상 업로드
       </button>
       <button
-        className="btn ghost"
+        className="qbtn ghost"
         type="button"
         disabled={files.length === 0}
         onClick={onClear}
@@ -556,7 +585,13 @@ const UploadVideoModal = ({
     }
   }, [isLeague, regionKey, week]);
 
-  /** 제출 */
+  const handleRemoveFile = (quarter, index) => {
+    const updaters = { Q1: setQ1, Q2: setQ2, Q3: setQ3, Q4: setQ4 };
+    const setFn = updaters[quarter];
+    if (!setFn) return;
+    setFn((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -698,67 +733,6 @@ const UploadVideoModal = ({
     }
   };
 
-  /** 삭제 */
-  const handleDeleteVideos = async () => {
-    if (!home || !away || !matchDate) {
-      setError('홈팀, 원정팀, 경기 날짜를 먼저 선택해주세요.');
-      return;
-    }
-
-    // gameKey = 홈코드(앞2) + 원정코드(앞2) + YYYYMMDD (KST 기준)
-    const d = dayjs(matchDate).tz(KST);
-    const formattedDate = d.format('YYYYMMDD');
-    const normCode = (s) =>
-      String(s || '')
-        .slice(0, 2)
-        .toUpperCase();
-    const homeCode = normCode(home.id);
-    const awayCode = normCode(away.id);
-    const gameKey = `${homeCode}${awayCode}${formattedDate}`;
-
-    const confirmDelete = window.confirm(
-      `정말로 ${gameKey} 경기의 모든 비디오를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`,
-    );
-    if (!confirmDelete) return;
-
-    try {
-      setDeleteLoading(true);
-      setError('');
-
-      const token = getToken?.();
-      const resp = await fetch(
-        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.DELETE_VIDEOS}/${gameKey}`,
-        {
-          method: 'DELETE',
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-        },
-      );
-
-      if (!resp.ok) {
-        const errorData = await resp.text();
-        throw new Error(errorData || '비디오 삭제 실패');
-      }
-
-      const result = await resp.json();
-      if (result?.success) {
-        alert(
-          `성공적으로 ${result.deletedCount}개의 비디오 파일을 삭제했습니다.`,
-        );
-        setQ1([]);
-        setQ2([]);
-        setQ3([]);
-        setQ4([]);
-      } else {
-        throw new Error(result?.message || '비디오 삭제 실패');
-      }
-    } catch (err) {
-      console.error('비디오 삭제 오류:', err);
-      setError(err?.message || '비디오 삭제 중 오류가 발생했습니다.');
-    } finally {
-      setDeleteLoading(false);
-    }
-  };
-
   const canShowStep3 = useMemo(() => {
     if (!gameType) return false;
     if (gameType !== '리그') return true;
@@ -777,15 +751,13 @@ const UploadVideoModal = ({
       <div className="uvm-card" onClick={(e) => e.stopPropagation()}>
         {/* 상단: 로고 + 닫기 */}
         <div className="uvm-topbar">
-          <img className="uvm-logo" src={Stechlogo} alt="Stech" />
-          <button
-            type="button"
-            className="uvm-close"
-            onClick={handleClose}
-            aria-label="닫기"
-          >
-            <IoCloseCircleOutline />
-          </button>
+          <div className="uvm-topbar-col1"></div>
+          <div className="uvm-topbar-col2">
+            <img className="uvm-logo" src={Stechlogo} alt="Stech" />
+          </div>
+          <div className="uvm-topbar-col3">
+            <IoCloseCircleOutline className="uvm-close" onClick={handleClose} />
+          </div>
         </div>
 
         {/* 본문: 좌우 2단 */}
@@ -813,8 +785,9 @@ const UploadVideoModal = ({
                 </select>
               </div>
 
-              {/* 리그면 지역 선택, 비리그면 경기장 선택/입력 */}
-              {gameType === '리그' ? (
+              {!gameType ? (
+                <div className="uvm-field two uvm-spacer" />
+              ) : gameType === '리그' ? (
                 <div className="uvm-field two">
                   <label>지역(리그)</label>
                   <select
@@ -834,9 +807,7 @@ const UploadVideoModal = ({
               ) : (
                 <div className="uvm-field two">
                   <label>경기장</label>
-
-                  {/* 선택 모드 */}
-                  {stadiumMode === 'select' && stadiumOptions.length > 0 && (
+                  {stadiumMode === 'select' && stadiumOptions.length > 0 ? (
                     <div className="stadium-select-line">
                       <select
                         value={stadium || ''}
@@ -863,11 +834,7 @@ const UploadVideoModal = ({
                         직접 입력
                       </button>
                     </div>
-                  )}
-
-                  {/* 직접 입력 모드 */}
-                  {(stadiumMode === 'custom' ||
-                    stadiumOptions.length === 0) && (
+                  ) : (
                     <div className="stadium-input-line">
                       <input
                         value={stadium}
@@ -1070,43 +1037,36 @@ const UploadVideoModal = ({
           {/* 오른쪽: 분기 업로드 */}
           <section className="uvm-col right">
             <h3 className="uvm-section-title">경기 영상 업로드</h3>
+            <div className="uvm-quarter-rows">
+              <QuarterRow
+                q="Q1"
+                files={q1}
+                onPick={(f) => setQ1((p) => [...p, ...f])}
+                onClear={() => setQ1([])}
+              />
+              <QuarterRow
+                q="Q2"
+                files={q2}
+                onPick={(f) => setQ2((p) => [...p, ...f])}
+                onClear={() => setQ2([])}
+              />
+              <QuarterRow
+                q="Q3"
+                files={q3}
+                onPick={(f) => setQ3((p) => [...p, ...f])}
+                onClear={() => setQ3([])}
+              />
+              <QuarterRow
+                q="Q4"
+                files={q4}
+                onPick={(f) => setQ4((p) => [...p, ...f])}
+                onClear={() => setQ4([])}
+              />
 
-            <QuarterRow
-              q="Q1"
-              files={q1}
-              onPick={(f) => setQ1((p) => [...p, ...f])}
-              onClear={() => setQ1([])}
-            />
-            <QuarterRow
-              q="Q2"
-              files={q2}
-              onPick={(f) => setQ2((p) => [...p, ...f])}
-              onClear={() => setQ2([])}
-            />
-            <QuarterRow
-              q="Q3"
-              files={q3}
-              onPick={(f) => setQ3((p) => [...p, ...f])}
-              onClear={() => setQ3([])}
-            />
-            <QuarterRow
-              q="Q4"
-              files={q4}
-              onPick={(f) => setQ4((p) => [...p, ...f])}
-              onClear={() => setQ4([])}
-            />
-
-            {error && <p className="uvm-error">{error}</p>}
+              {error && <p className="uvm-error">{error}</p>}
+            </div>
 
             <div className="uvm-actions">
-              <button
-                type="button"
-                className="btn ghost"
-                onClick={handleClose}
-                disabled={loading || deleteLoading}
-              >
-                닫기
-              </button>
               <button
                 type="button"
                 className="btn"
@@ -1122,19 +1082,6 @@ const UploadVideoModal = ({
               </button>
 
               <button
-                type="button"
-                className="btn danger"
-                onClick={handleDeleteVideos}
-                disabled={loading || deleteLoading}
-                style={{
-                  backgroundColor: '#dc3545',
-                  color: 'white',
-                  marginRight: 8,
-                }}
-              >
-                {deleteLoading ? '삭제 중…' : '비디오 삭제'}
-              </button>
-              <button
                 type="submit"
                 className="btn primary"
                 disabled={loading || deleteLoading}
@@ -1148,6 +1095,7 @@ const UploadVideoModal = ({
           open={previewOpen}
           onClose={closePreview}
           filesByQuarter={filesByQuarter}
+          onRemove={handleRemoveFile}
         />
       </div>
     </div>

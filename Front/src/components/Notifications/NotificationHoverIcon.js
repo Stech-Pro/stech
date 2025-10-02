@@ -1,19 +1,24 @@
+// NotificationHoverIcon.jsx
 import { useEffect, useRef, useState } from 'react';
 import { IoMdNotificationsOutline } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../hooks/useNotifications';
+import { useAuth } from '../../context/AuthContext';
 import './NotificationHoverIcon.css';
 
 export default function NotificationHoverIcon({
   limit = 20,
-  pollMs = 0,          // 아직 API만이면 폴링 0으로
+  pollMs = 0,
   iconSize = 24,
   className = '',
+  staleMs = 60_000,
 }) {
-  const { items, unread, loading, refresh, readOne, readAll } =
+  const { items, unread, loading, refresh, readOne, readAll, clearLocal } =
     useNotifications({ limit, pollMs });
+  const { isInitialized, isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const closeTimer = useRef(null);
+  const lastRefreshAt = useRef(0);
   const nav = useNavigate();
 
   const openPanel = () => { if (closeTimer.current) clearTimeout(closeTimer.current); setOpen(true); };
@@ -22,24 +27,67 @@ export default function NotificationHoverIcon({
     closeTimer.current = setTimeout(() => setOpen(false), ms);
   };
 
+  // ✅ 로그인 완료 시 1회 fetch
   useEffect(() => {
-    const onKey = e => e.key === 'Escape' && setOpen(false);
+    if (!isInitialized) return;
+    if (isAuthenticated) {
+      (async () => {
+        await refresh();
+        lastRefreshAt.current = Date.now();
+      })();
+    } else {
+      // 로그아웃 시 처리(선택)
+      setOpen(false);
+      clearLocal?.();
+      lastRefreshAt.current = 0;
+    }
+  }, [isInitialized, isAuthenticated, refresh, clearLocal]);
+
+  // ✅ 창 포커스/가시성 복귀 시 오래됐으면만 갱신
+  useEffect(() => {
+    const maybeRefresh = async () => {
+      if (!isAuthenticated) return;
+      const now = Date.now();
+      if (now - lastRefreshAt.current >= staleMs) {
+        await refresh();
+        lastRefreshAt.current = now;
+      }
+    };
+    const onFocus = () => { if (!document.hidden) maybeRefresh(); };
+    const onVis = () => { if (!document.hidden) maybeRefresh(); };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, [isAuthenticated, refresh, staleMs]);
+
+  useEffect(() => {
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
+  // 호버 시엔 패널만 열고, stale일 때만 조건부 새로고침
+  const ensureFresh = async () => {
+    if (!isAuthenticated) return;
+    const now = Date.now();
+    if (now - lastRefreshAt.current >= staleMs) {
+      await refresh();
+      lastRefreshAt.current = now;
+    }
+  };
+  const onMouseEnter = () => { openPanel(); ensureFresh(); };
+
   const onClickItem = (n) => {
-    if (!n.isRead) readOne(n._id);
+    if (!n.isRead) readOne(n._id); // 낙관적 업데이트
     if (n.gameKey) nav(`/service/member/game/${encodeURIComponent(n.gameKey)}`);
     setOpen(false);
   };
 
   return (
-    <div
-      className={`nh-wrap ${className}`}
-      onMouseEnter={() => { refresh(); openPanel(); }}
-      onMouseLeave={() => closeSoon()}
-    >
+    <div className={`nh-wrap ${className}`} onMouseEnter={onMouseEnter} onMouseLeave={() => closeSoon()}>
       <button type="button" className="nh-bell" aria-haspopup="true" aria-expanded={open}>
         <IoMdNotificationsOutline size={iconSize} />
         {unread > 0 && <span className="nh-badge">{unread}</span>}
@@ -58,14 +106,8 @@ export default function NotificationHoverIcon({
           <div className="nh-list">
             {loading && items.length === 0 && <div className="nh-empty">불러오는 중…</div>}
             {!loading && items.length === 0 && <div className="nh-empty">알림이 없습니다</div>}
-
-            {items.map(n => (
-              <button
-                key={n._id}
-                className={`nh-item ${n.isRead ? 'read' : 'unread'}`}
-                onClick={() => onClickItem(n)}
-                title={n.message}
-              >
+            {items.map((n) => (
+              <button key={n._id} className={`nh-item ${n.isRead ? 'read' : 'unread'}`} onClick={() => onClickItem(n)} title={n.message}>
                 <div className="nh-top">
                   <span className="nh-type">{labelType(n.type)}</span>
                   {!n.isRead && <span className="nh-dot" />}

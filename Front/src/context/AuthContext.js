@@ -201,7 +201,7 @@
         setUserData(userData);
       },
       
-      setAuthToken: (token) => {
+      Token: (token) => {
         localStorage.setItem('token', token);
         // 토큰 설정 후 사용자 정보도 새로 가져오기
       },
