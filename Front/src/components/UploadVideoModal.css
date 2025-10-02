@@ -1,6 +1,4 @@
 /* UploadVideoModal.css - 모든 스타일 통합 */
-
-/* ============ 기존 모달 스타일 ============ */
 .teamSelect {
   position: relative;
 }
@@ -121,34 +119,74 @@
   z-index: 9999;
 }
 .uvm-card {
+    display: flex;
+  flex-direction: column;
+  overflow: hidden; /* 자식 넘침 감추기 */
+
   background: #2c2c2c;
   border-radius: 12px;
   width: 100rem;
   height: 56.25rem;
   overflow: auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  padding: 20px;
+  padding: 2.5rem;
 }
 .uvm-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  height: 10rem;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   margin-bottom: 12px;
 }
+.uvm-topbar-col1 {
+}
+.uvm-topbar-col2 {
+  height: 6rem;
+  align-self: center;
+
+}
+.uvm-topbar-col3{
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+
+}
 .uvm-logo {
-  height: 36px;
+  height: 100%;
 }
 .uvm-close {
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 32px;
+  font-size: 64px;
   cursor: pointer;
 }
 .uvm-body {
+  flex: 1 1 auto;  
+  min-height: 0;  
+  overflow: auto;  
+
+  border-top: 2px solid #3a3d45;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 6fr 4fr;
   gap: 24px;
+}
+.uvm-col.left{
+  border-right: 2px solid #3a3d45;
+  height: 100%;
+  padding-right: 12px;
+}
+
+.uvm-col.right{
+  display: flex;
+  flex-direction: column;
+  padding-left: 12px;
+  gap: 10px;
+}
+.uvm-quarter-rows{
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
 }
 .uvm-section-title {
   color: #fff;
@@ -194,6 +232,23 @@
   border: 1px solid #5a5f6b;
   color: #d1d5db;
 }
+.qbtn {
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.qbtn.primary {
+  width: 260px;
+  height: 43px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+}
+.qbtn.ghost {
+  background: transparent;
+  border: 1px solid #5a5f6b;
+  color: #d1d5db;
+}
 .uvm-actions {
   display: flex;
   gap: 8px;
@@ -208,7 +263,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 10px;
+  padding-bottom: 10px;
+
 }
 .uvm-spacer {
   /* 시각적 공간만 차지 */
@@ -628,4 +684,36 @@
 
 .dtpCal-cell:hover {
   background: #2a2b30;
+}
+.fpm-actions-inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.fpm-delete {
+  border: 1px solid #dc3545;
+  background: #fff;
+  color: #dc3545;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.fpm-delete:hover {
+  background: #ffe9ec;
+}
+
+/* 스코어 입력 스피너 제거 (Chrome/Safari/Edge) */
+.uvm-field input[type="number"]::-webkit-outer-spin-button,
+.uvm-field input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 스코어 입력 스피너 제거 (Firefox) */
+.uvm-field input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield; /* 신규 브라우저 */
 }

@@ -2,7 +2,8 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
 import './DateTimeDropdown.css';
-
+import 'dayjs/locale/ko';      // ← 추가
+dayjs.locale('ko');  
 /* ======================= 내부 전용 캘린더 ======================= */
 function DTPCalendarInner({ value, onChange }) {
   const init = dayjs(value || new Date()).startOf('day');

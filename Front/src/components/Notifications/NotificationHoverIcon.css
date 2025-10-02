@@ -26,12 +26,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 3.444rem;
+  height: 3.444rem;
   border: 1px solid var(--nh-border);
-  border-radius: 10px;
-  background: transparent;
+  border-radius: 50%;
+  background: #545454;
   cursor: pointer;
+  color: #DEDEDE;
   transition: transform .12s ease, background-color .12s ease, border-color .12s ease;
 }
 .nh-bell:hover { background: var(--nh-hover); border-color: #353842; }
@@ -52,7 +53,7 @@
   align-items: center;
   justify-content: center;
   background: var(--nh-accent);
-  color: #0b1222; /* 대비용 어두운 텍스트 */
+  color: #0b1222; 
   font-weight: 700;
   box-shadow: 0 2px 6px var(--nh-shadow);
 }
