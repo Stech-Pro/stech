@@ -1166,8 +1166,51 @@ export class GameController {
     description: '❌ 클립 데이터를 찾을 수 없음',
   })
   async getGameClips(@Param('gameKey') gameKey: string) {
-    // 분석 대시보드용: 항상 GameInfo에서 영상 파일 기반으로 임시 클립 생성
-    console.log(`📹 ${gameKey}: 분석 대시보드용 영상 클립 생성 시작`);
+    console.log(`📹 ${gameKey}: 클립 데이터 조회 시작`);
+    
+    // 먼저 저장된 GameClips 데이터 조회
+    const savedClips = await this.gameService.getGameClipsByKey(gameKey);
+    
+    if (savedClips && savedClips.Clips && savedClips.Clips.length > 0) {
+      console.log(`✅ ${gameKey}: 저장된 클립 데이터 발견 - ${savedClips.Clips.length}개 클립`);
+      
+      try {
+        // S3에서 비디오 URL들 가져오기
+        const videoUrls = await this.s3Service.generateClipUrls(
+          gameKey,
+          savedClips.Clips.length,
+        );
+
+        // 클립 데이터에 videoUrl 추가
+        const clipsWithUrls = savedClips.Clips.map((clip, index) => ({
+          ...clip,
+          clipUrl: videoUrls[index] || null,
+        }));
+
+        return {
+          success: true,
+          message: `${gameKey} 경기 클립 데이터 조회 성공`,
+          data: {
+            ...savedClips,
+            Clips: clipsWithUrls,
+          },
+          totalClips: savedClips.Clips.length,
+        };
+      } catch (error) {
+        console.error(`❌ ${gameKey} 비디오 URL 생성 실패:`, error);
+        
+        // S3 오류가 있어도 클립 데이터는 반환
+        return {
+          success: true,
+          message: `${gameKey} 경기 클립 데이터 조회 성공`,
+          data: savedClips,
+          totalClips: savedClips.Clips.length,
+        };
+      }
+    }
+    
+    // 저장된 클립이 없으면 분석 대시보드용 임시 클립 생성
+    console.log(`⚠️ ${gameKey}: 저장된 클립 없음, 임시 클립 생성`);
     const gameInfo = await this.gameService.findGameByKey(gameKey);
     
     if (!gameInfo) {
