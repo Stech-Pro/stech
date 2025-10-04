@@ -124,7 +124,9 @@ const LoginForm = ({
         <label className="LoginformLabel PW" htmlFor="password">
           비밀번호
           {showForgotPassword && (
-            <a href="/auth/find" className="forgotPasswordLink">
+            <a href="/auth/find"
+             tabIndex={-1}  
+              className="forgotPasswordLink">
               비밀번호 찾기
             </a>
           )}
