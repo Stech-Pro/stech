@@ -18,17 +18,12 @@ dayjs.extend(timezone);
 
 const KST = 'Asia/Seoul';
 
-/* ───────── 파일 미리보기 유틸/모달 ───────── */
+/* ───────── 파일 미리보기 유틸 ───────── */
 function formatBytes(bytes = 0) {
   if (bytes === 0) return '0 B';
-  const k = 1024,
-    sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const k = 1024, sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
-}
-
-function isVideo(file) {
-  return /^video\//.test(file?.type || '');
 }
 
 function useObjectURL(file) {
@@ -40,7 +35,6 @@ function useObjectURL(file) {
       setUrl(null);
       return;
     }
-    // 같은 파일이면 재생성 X
     const same =
       fileRef.current &&
       fileRef.current.name === file.name &&
@@ -68,9 +62,7 @@ function PreviewListItem({ file, onDelete }) {
   return (
     <li key={key} className="fpm-item">
       <div className="fpm-meta">
-        <div className="fpm-name" title={file.name}>
-          {file.name}
-        </div>
+        <div className="fpm-name" title={file.name}>{file.name}</div>
         <div className="fpm-sub">
           <span>{formatBytes(file.size)}</span>
           <span className="sep">•</span>
@@ -118,83 +110,7 @@ function PreviewListItem({ file, onDelete }) {
   );
 }
 
-function FilePreviewModal({ open, onClose, filesByQuarter, onRemove }) {
-  const tabs = ['Q1', 'Q2', 'Q3', 'Q4'];
-  const [active, setActive] = useState('Q1');
-
-  useEffect(() => {
-    if (open) setActive('Q1');
-  }, [open]);
-
-  if (!open) return null;
-
-  const handleTabChange = (newTab) => {
-    // 탭 바꾸기 전에 재생 중지
-    document.querySelectorAll('.fpm-video').forEach((v) => v?.pause?.());
-    setActive(newTab);
-  };
-
-  const handleClose = () => {
-    document.querySelectorAll('.fpm-video').forEach((v) => v?.pause?.());
-    onClose();
-  };
-
-  const files = filesByQuarter?.[active] || [];
-
-  return (
-    <div className="fpm-overlay" onClick={handleClose}>
-      <div className="fpm-card" onClick={(e) => e.stopPropagation()}>
-        <div className="fpm-top">
-          <h3 className="fpm-title">분기별 영상 확인</h3>
-          <button
-            type="button"
-            className="fpm-close"
-            onClick={handleClose}
-            aria-label="닫기"
-          >
-            ×
-          </button>
-        </div>
-
-        <div className="fpm-tabs">
-          {tabs.map((t) => (
-            <button
-              key={t}
-              type="button"
-              className={`fpm-tab ${active === t ? 'active' : ''}`}
-              onClick={() => handleTabChange(t)}
-            >
-              {t} ({(filesByQuarter?.[t] || []).length})
-            </button>
-          ))}
-        </div>
-
-        <div className="fpm-body">
-          {files.length === 0 ? (
-            <div className="fpm-empty">파일이 없습니다.</div>
-          ) : (
-            <ul className="fpm-list">
-              {files.map((file, idx) => (
-                <PreviewListItem
-                  key={`${file.name}-${file.size}-${file.lastModified || 0}`}
-                  file={file}
-                  onDelete={() => onRemove?.(active, idx)}
-                />
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="fpm-actions">
-          <button type="button" className="btn ghost" onClick={handleClose}>
-            닫기
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
+/* ───────── 상수/라벨 ───────── */
 const WEEK_LIMITS = {
   Seoul: 6,
   'Gyeonggi-Gangwon': 3,
@@ -203,12 +119,10 @@ const WEEK_LIMITS = {
   Amateur: 12,
 };
 
-/** 화면 표시용 팀: Admin 제외 */
 const VISIBLE_TEAMS = TEAMS.filter(
   (t) => t.id !== 'ADMIN' && t.region !== 'Admin',
 );
 
-/** 지역별 기본 경기장 목록 (경기강원은 빈 배열 → 직접 입력) */
 const STADIUMS = {
   Seoul: [
     '서울대학교 대운동장',
@@ -240,7 +154,6 @@ const STADIUMS = {
 
 const ALL_STADIUMS = Array.from(new Set(Object.values(STADIUMS).flat()));
 
-/* region 라벨 매핑 (TEAMS.region → 한글) */
 const REGION_LABEL = {
   Seoul: '서울',
   'Gyeonggi-Gangwon': '경기강원',
@@ -250,20 +163,12 @@ const REGION_LABEL = {
 };
 
 const REGION_ORDER = [
-  'Seoul',
-  'Gyeonggi-Gangwon',
-  'Daegu-Gyeongbuk',
-  'Busan-Gyeongnam',
-  'Amateur',
+  'Seoul', 'Gyeonggi-Gangwon', 'Daegu-Gyeongbuk', 'Busan-Gyeongnam', 'Amateur',
 ];
 
 const REGION_OPTIONS = (() => {
-  const uniq = Array.from(new Set(VISIBLE_TEAMS.map((t) => t.region))).filter(
-    Boolean,
-  );
-  const ordered = uniq.sort(
-    (a, b) => REGION_ORDER.indexOf(a) - REGION_ORDER.indexOf(b),
-  );
+  const uniq = Array.from(new Set(VISIBLE_TEAMS.map((t) => t.region))).filter(Boolean);
+  const ordered = uniq.sort((a, b) => REGION_ORDER.indexOf(a) - REGION_ORDER.indexOf(b));
   return ordered.map((key) => ({ key, label: REGION_LABEL[key] || key }));
 })();
 
@@ -276,12 +181,11 @@ function getLeagueName(matchDate, regionKey) {
   return `${year} ${regionLabel} 추계`;
 }
 
-/** 게임 유형 + 백엔드 매핑 */
 const GAME_TYPES = ['리그', '친선전', '스크리미지'];
 const toBackendGameType = (t) =>
   t === '리그' ? 'League' : t === '친선전' ? 'Friendly' : 'Scrimmage';
 
-/** 리그 → 팀 2단 드롭다운 (원정팀 전용) */
+/* ───────── 팀 선택 2단 드롭다운 ───────── */
 function LeagueTeamSelect({
   value,
   options = [],
@@ -318,13 +222,10 @@ function LeagueTeamSelect({
 
   useEffect(() => {
     if (!open) return;
-
-    // teamsByLeague의 첫 번째 키를 기본값으로 설정
     const firstLeague = leaguesList[0];
-    if (firstLeague && !activeLeague) {
-      setActiveLeague(firstLeague);
-    }
-  }, [open]); // teamsByLeague와 leaguesList을 의존성에서 제거
+    if (firstLeague && !activeLeague) setActiveLeague(firstLeague);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   return (
     <div className="teamSelect" ref={boxRef}>
@@ -354,9 +255,7 @@ function LeagueTeamSelect({
               <li key={lg}>
                 <button
                   type="button"
-                  className={`leagueItem ${
-                    activeLeague === lg ? 'active' : ''
-                  }`}
+                  className={`leagueItem ${activeLeague === lg ? 'active' : ''}`}
                   onMouseEnter={() => setActiveLeague(lg)}
                   onFocus={() => setActiveLeague(lg)}
                   onClick={() => setActiveLeague(lg)}
@@ -384,9 +283,7 @@ function LeagueTeamSelect({
                         src={t.logo}
                         alt={t.name}
                         className={`opps-team-logo-img ${
-                          String(t.logo).endsWith('.svg')
-                            ? 'svg-logo'
-                            : 'png-logo'
+                          String(t.logo).endsWith('.svg') ? 'svg-logo' : 'png-logo'
                         }`}
                       />
                     </span>
@@ -406,7 +303,7 @@ function LeagueTeamSelect({
   );
 }
 
-/** Q1~Q4 업로드 라인 */
+/* ───────── 분기 업로드 라인 ───────── */
 function QuarterRow({ q, files, onPick, onClear }) {
   const inputRef = useRef(null);
   return (
@@ -438,9 +335,7 @@ function QuarterRow({ q, files, onPick, onClear }) {
         초기화
       </button>
       <span className="quarterFilename">
-        {files.length > 0
-          ? `${files.length}개 파일 선택됨`
-          : '선택된 파일 없음'}
+        {files.length > 0 ? `${files.length}개 파일 선택됨` : '선택된 파일 없음'}
       </span>
     </div>
   );
@@ -453,10 +348,13 @@ const UploadVideoModal = ({
   defaultHomeTeam,
   defaultAwayTeam,
 }) => {
-  // 팀 소스: VISIBLE_TEAMS 사용
   const teamsList = VISIBLE_TEAMS;
 
-  // 기본값
+  // View 전환 상태: 'form' | 'preview'
+  const [view, setView] = useState('form');
+  const [activeTab, setActiveTab] = useState('Q1');
+
+  // 폼 상태
   const [gameType, setGameType] = useState('');
   const [regionKey, setRegionKey] = useState(defaultHomeTeam?.region ?? '');
   const [home, setHome] = useState(defaultHomeTeam ?? null);
@@ -468,28 +366,27 @@ const UploadVideoModal = ({
   const [week, setWeek] = useState('Week1');
   const [stadium, setStadium] = useState('');
   const [stadiumMode, setStadiumMode] = useState('select'); // 'select' | 'custom'
-  const [previewOpen, setPreviewOpen] = useState(false);
 
+  // 파일 상태
   const [q1, setQ1] = useState([]);
   const [q2, setQ2] = useState([]);
   const [q3, setQ3] = useState([]);
   const [q4, setQ4] = useState([]);
 
+  // UI 상태
   const [dtOpen, setDtOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const [success, setSuccess] = useState(false);
-  const [lastGameKey, setLastGameKey] = useState('');
+  const closePreviewVideos = () => {
+    document.querySelectorAll('.fpm-video').forEach((v) => v?.pause?.());
+  };
 
   const handleChangeGameType = (val) => {
     setGameType(val);
     if (val === '리그') {
-      // 리그 진입: 지역/주차/경기장은 리그 로직(useEffect)에서 정리됨
-      setStadium(''); // 새로 선택하게
+      setStadium('');
     } else {
-      // 비리그 진입: 지역/주차 초기화, 경기장은 전체 목록 선택 가능 상태로
       setRegionKey('');
       setWeek('');
       setStadium('');
@@ -497,39 +394,30 @@ const UploadVideoModal = ({
     }
   };
 
-  const closePreview = useCallback(() => setPreviewOpen(false), []);
-
   const isLeague = gameType === '리그';
 
-  /** 팀 선택지: 리그면 region 필터, 아니면 전체 */
   const selectableHomes = useMemo(() => {
-    const base = isLeague
-      ? teamsList.filter((t) => t.region === regionKey)
-      : teamsList;
+    const base = isLeague ? teamsList.filter((t) => t.region === regionKey) : teamsList;
     return base;
   }, [teamsList, isLeague, regionKey]);
 
   const selectableAways = useMemo(() => {
-    const base = isLeague
-      ? teamsList.filter((t) => t.region === regionKey)
-      : teamsList;
+    const base = isLeague ? teamsList.filter((t) => t.region === regionKey) : teamsList;
     return base.filter((t) => t?.id !== home?.id);
   }, [teamsList, isLeague, regionKey, home]);
 
-  /** 리그에서 선택 가능한 경기장 목록 */
   const stadiumOptions = useMemo(() => {
     if (!isLeague) return ALL_STADIUMS;
     if (!regionKey) return [];
     return STADIUMS[regionKey] ?? [];
   }, [isLeague, regionKey]);
 
-  /** 닫기 */
   const handleClose = () => {
-    if (loading || deleteLoading) return;
+    if (loading) return;
     onClose?.();
   };
 
-  /** 리그 모드에서 지역/팀 일관성 유지 */
+  // 리그 모드 일관성
   useEffect(() => {
     if (!isLeague) return;
     if (home?.region && home.region !== regionKey) setRegionKey(home.region);
@@ -541,13 +429,12 @@ const UploadVideoModal = ({
     if (away && away.region !== regionKey) setAway(null);
   }, [regionKey, isLeague, home, away]);
 
-  /** 경기장 입력 모드 전환 */
+  // 경기장 입력 모드 전환
   useEffect(() => {
     if (!isLeague) {
       setStadiumMode('select');
       return;
     }
-    // 리그: 지역 선택 전이면 선택모드 유지, 선택 후엔 옵션 유무로 모드 결정
     if (!regionKey) {
       setStadiumMode('select');
       setStadium('');
@@ -555,7 +442,7 @@ const UploadVideoModal = ({
     }
     const hasList = (STADIUMS[regionKey] ?? []).length > 0;
     setStadiumMode(hasList ? 'select' : 'custom');
-    setStadium(''); // 지역 바뀌면 초기화
+    setStadium('');
   }, [isLeague, regionKey]);
 
   const weekOptions = useMemo(() => {
@@ -564,21 +451,15 @@ const UploadVideoModal = ({
     return Array.from({ length: max }, (_, i) => `Week${i + 1}`);
   }, [isLeague, regionKey]);
 
-  /** 지역 변경 시 현재 week를 상한에 맞춰 보정 */
   useEffect(() => {
     if (!isLeague || !regionKey) return;
     const max = WEEK_LIMITS[regionKey] ?? 0;
     if (!max) {
-      setWeek(''); // 상한 없으면 비움
+      setWeek('');
       return;
     }
-    // 현재 선택이 범위 밖이면 Week1로 리셋
     const cur = String(week || '');
-    if (
-      !cur ||
-      !/^Week\d+$/.test(cur) ||
-      Number(cur.replace('Week', '')) > max
-    ) {
+    if (!cur || !/^Week\d+$/.test(cur) || Number(cur.replace('Week', '')) > max) {
       setWeek('Week1');
     }
   }, [isLeague, regionKey, week]);
@@ -589,6 +470,17 @@ const UploadVideoModal = ({
     if (!setFn) return;
     setFn((prev) => prev.filter((_, i) => i !== index));
   };
+
+  const filesByQuarter = useMemo(
+    () => ({ Q1: q1, Q2: q2, Q3: q3, Q4: q4 }),
+    [q1, q2, q3, q4],
+  );
+
+  const canShowStep3 = useMemo(() => {
+    if (!gameType) return false;
+    if (gameType !== '리그') return true;
+    return Boolean(regionKey && week && stadium);
+  }, [gameType, regionKey, week, stadium]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -608,33 +500,21 @@ const UploadVideoModal = ({
     try {
       setLoading(true);
 
-      // ── 날짜 포맷: YYYY-MM-DD(요일) HH:mm ─────────────────────────────
-      // dayjs를 이용해 현지(브라우저) 시간 기준으로 처리 (UTC 변환 금지)
       const d = dayjs(matchDate).tz(KST);
       const DOW = ['일', '월', '화', '수', '목', '금', '토'];
       const dow = DOW[d.day()];
-      const dateWithKoreanDow = `${d.format('YYYY-MM-DD')}(${dow}) ${d.format(
-        'HH:mm',
-      )}`;
+      const dateWithKoreanDow = `${d.format('YYYY-MM-DD')}(${dow}) ${d.format('HH:mm')}`;
 
-      // ── 리그명 자동 생성 (연도 계산은 dayjs 기준) ─────────────────────
       const leagueNameAuto =
-        gameType === '리그'
-          ? getLeagueName(d, regionKey) // 내부에서 연도만 쓰면 Date/Dayjs 어느 쪽이든 OK
-          : undefined;
+        gameType === '리그' ? getLeagueName(d, regionKey) : undefined;
 
-      // ── gameKey: 홈 앞2 + 원정 앞2 + YYYYMMDD (로컬 기준) ────────────
-      const gameKey = `${String(home.id).slice(0, 2).toUpperCase()}${String(
-        away.id,
-      )
+      const gameKey = `${String(home.id).slice(0, 2).toUpperCase()}${String(away.id)
         .slice(0, 2)
         .toUpperCase()}${d.format('YYYYMMDD')}`;
 
-      // ── 서버로 보낼 본문 ──────────────────────────────────────────────
       const gameInfo = {
         homeTeam: home.id,
         awayTeam: away.id,
-        // 요구사항: 'YYYY-MM-DD(요일) HH:mm' 형태로 date 전송
         date: dateWithKoreanDow,
         type: toBackendGameType(gameType),
         score: { home: Number(scoreHome || 0), away: Number(scoreAway || 0) },
@@ -644,10 +524,7 @@ const UploadVideoModal = ({
       };
 
       const quarterVideoCounts = {
-        Q1: q1.length,
-        Q2: q2.length,
-        Q3: q3.length,
-        Q4: q4.length,
+        Q1: q1.length, Q2: q2.length, Q3: q3.length, Q4: q4.length,
       };
 
       // 1) 업로드 준비
@@ -670,24 +547,22 @@ const UploadVideoModal = ({
       });
       if (pairs.length === 0) throw new Error('업로드할 파일/URL이 없습니다.');
 
-      const batchSize = 3; // 동시 3개
+      const batchSize = 3;
       for (let i = 0; i < pairs.length; i += batchSize) {
         const batch = pairs.slice(i, i + batchSize);
 
-        // 1차: Content-Type 헤더 생략(omit) — preflight/서명 헤더 불일치 우회
+        // 1차: Content-Type 헤더 omit
         const first = await Promise.allSettled(
           batch.map((p) =>
             putToS3(p.url, p.file, {
               contentTypeStrategy: 'omit',
-              timeoutMs: 300000, // 5분
+              timeoutMs: 300000,
             }),
           ),
         );
 
-        // 실패 건만 2차 재시도: 파일 MIME 사용
-        const retryTargets = batch.filter(
-          (_, idx) => first[idx].status === 'rejected',
-        );
+        // 실패만 2차 재시도
+        const retryTargets = batch.filter((_, idx) => first[idx].status === 'rejected');
         if (retryTargets.length) {
           const second = await Promise.allSettled(
             retryTargets.map((p) =>
@@ -705,7 +580,7 @@ const UploadVideoModal = ({
         }
       }
 
-      // ── 3) 완료 보고 (내부 타임아웃 사용: 기본 120초, 원하면 조절) ──
+      // 3) 완료 보고
       const uploadedVideos = {
         Q1: (uploadUrls.Q1 || []).map((u) => u.fileName),
         Q2: (uploadUrls.Q2 || []).map((u) => u.fileName),
@@ -713,16 +588,9 @@ const UploadVideoModal = ({
         Q4: (uploadUrls.Q4 || []).map((u) => u.fileName),
       };
 
-      await completeMatchUpload(
-        { gameKey, uploadedVideos },
-        { timeoutMs: 120000 },
-      );
+      await completeMatchUpload({ gameKey, uploadedVideos }, { timeoutMs: 120000 });
 
-      // 성공 처리
       onUploaded?.();
-      // 배너 쓰면 아래 2줄 사용, 아니면 바로 닫기만
-      // setSuccess(true); setLastGameKey(gameKey);
-      // setTimeout(() => { setSuccess(false); handleClose(); }, 1200);
       handleClose();
     } catch (err) {
       setError(err?.message || '업로드 중 오류가 발생했습니다.');
@@ -731,17 +599,6 @@ const UploadVideoModal = ({
     }
   };
 
-  const canShowStep3 = useMemo(() => {
-    if (!gameType) return false;
-    if (gameType !== '리그') return true;
-    return Boolean(regionKey && week && stadium);
-  }, [gameType, regionKey, week, stadium]);
-
-  const filesByQuarter = useMemo(
-    () => ({ Q1: q1, Q2: q2, Q3: q3, Q4: q4 }),
-    [q1, q2, q3, q4],
-  );
-
   if (!isOpen) return null;
 
   return (
@@ -749,7 +606,7 @@ const UploadVideoModal = ({
       <div className="uvm-card" onClick={(e) => e.stopPropagation()}>
         {/* 상단: 로고 + 닫기 */}
         <div className="uvm-topbar">
-          <div className="uvm-topbar-col1"></div>
+          <div className="uvm-topbar-col1" />
           <div className="uvm-topbar-col2">
             <img className="uvm-logo" src={Stechlogo} alt="Stech" />
           </div>
@@ -758,343 +615,376 @@ const UploadVideoModal = ({
           </div>
         </div>
 
-        {/* 본문: 좌우 2단 */}
-        <form className="uvm-body" onSubmit={handleSubmit}>
-          {/* 왼쪽: 경기 정보 입력 */}
-          <section className="uvm-col left">
-            <h3 className="uvm-section-title">경기 정보 입력</h3>
+        {/* 본문: 뷰 전환 (form | preview) */}
+        {view === 'form' ? (
+          <form className="uvm-body" onSubmit={handleSubmit}>
+            {/* 왼쪽: 경기 정보 입력 */}
+            <section className="uvm-col left">
+              <h3 className="uvm-section-title">경기 정보 입력</h3>
 
-            {/* ── 1행: 경기 유형 + (리그=지역 / 비리그=경기장) ── */}
-            <div className="uvm-row">
-              <div className="uvm-field two">
-                <label>경기 유형</label>
-                <select
-                  value={gameType}
-                  onChange={(e) => handleChangeGameType(e.target.value)}
-                >
-                  <option value="" disabled hidden>
-                    경기 유형 선택
-                  </option>
-                  {GAME_TYPES.map((gt) => (
-                    <option key={gt} value={gt}>
-                      {gt}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {!gameType ? (
-                <div className="uvm-field two uvm-spacer" />
-              ) : gameType === '리그' ? (
+              {/* 1행: 경기 유형 + (리그=지역 / 비리그=경기장 또는 비표시) */}
+              <div className="uvm-row">
                 <div className="uvm-field two">
-                  <label>지역(리그)</label>
+                  <label>경기 유형</label>
                   <select
-                    value={regionKey}
-                    onChange={(e) => setRegionKey(e.target.value)}
+                    value={gameType}
+                    onChange={(e) => handleChangeGameType(e.target.value)}
                   >
                     <option value="" disabled hidden>
-                      지역 선택
+                      경기 유형 선택
                     </option>
-                    {REGION_OPTIONS.map((r) => (
-                      <option key={r.key} value={r.key}>
-                        {r.label}
+                    {GAME_TYPES.map((gt) => (
+                      <option key={gt} value={gt}>
+                        {gt}
                       </option>
                     ))}
                   </select>
                 </div>
-              ) : (
-                <div className="uvm-field two">
-                  <label>경기장</label>
-                  {stadiumMode === 'select' && stadiumOptions.length > 0 ? (
-                    <div className="stadium-select-line">
-                      <select
-                        value={stadium || ''}
-                        onChange={(e) => setStadium(e.target.value)}
-                      >
-                        <option value="" disabled hidden>
-                          경기장 선택
+
+                {!gameType ? (
+                  <div className="uvm-field two uvm-spacer" />
+                ) : gameType === '리그' ? (
+                  <div className="uvm-field two">
+                    <label>지역(리그)</label>
+                    <select
+                      value={regionKey}
+                      onChange={(e) => setRegionKey(e.target.value)}
+                    >
+                      <option value="" disabled hidden>
+                        지역 선택
+                      </option>
+                      {REGION_OPTIONS.map((r) => (
+                        <option key={r.key} value={r.key}>
+                          {r.label}
                         </option>
-                        {stadiumOptions.map((s) => (
-                          <option key={s} value={s}>
-                            {s}
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="uvm-field two">
+                    <label>경기장</label>
+                    {stadiumMode === 'select' && stadiumOptions.length > 0 ? (
+                      <div className="stadium-select-line">
+                        <select
+                          value={stadium || ''}
+                          onChange={(e) => setStadium(e.target.value)}
+                        >
+                          <option value="" disabled hidden>
+                            경기장 선택
                           </option>
-                        ))}
-                      </select>
-                      <button
-                        type="button"
-                        className="btn ghost"
-                        onClick={() => {
-                          setStadium('');
-                          setStadiumMode('custom');
-                        }}
-                        style={{ marginLeft: 8 }}
-                      >
-                        직접 입력
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="stadium-input-line">
-                      <input
-                        value={stadium}
-                        onChange={(e) => setStadium(e.target.value)}
-                        placeholder="경기장을 입력하세요"
-                      />
-                      {stadiumOptions.length > 0 && (
+                          {stadiumOptions.map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
                         <button
                           type="button"
                           className="btn ghost"
                           onClick={() => {
                             setStadium('');
-                            setStadiumMode('select');
+                            setStadiumMode('custom');
                           }}
                           style={{ marginLeft: 8 }}
                         >
-                          목록에서 선택
+                          직접 입력
                         </button>
+                      </div>
+                    ) : (
+                      <div className="stadium-input-line">
+                        <input
+                          value={stadium}
+                          onChange={(e) => setStadium(e.target.value)}
+                          placeholder="경기장을 입력하세요"
+                        />
+                        {stadiumOptions.length > 0 && (
+                          <button
+                            type="button"
+                            className="btn ghost"
+                            onClick={() => {
+                              setStadium('');
+                              setStadiumMode('select');
+                            }}
+                            style={{ marginLeft: 8 }}
+                          >
+                            목록에서 선택
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* 2행: 리그일 때만 주차 + (리그 전용) 경기장 */}
+              {gameType === '리그' && regionKey && (
+                <div className="uvm-row">
+                  <div className="uvm-field two">
+                    <label>주차</label>
+                    <select
+                      value={week}
+                      onChange={(e) => setWeek(e.target.value)}
+                      disabled={!isLeague || !regionKey || weekOptions.length === 0}
+                    >
+                      {!week && (
+                        <option value="" disabled>
+                          주차 선택
+                        </option>
                       )}
-                    </div>
-                  )}
+                      {weekOptions.map((w) => (
+                        <option key={w} value={w}>
+                          {w}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="uvm-field two">
+                    <label>경기장</label>
+
+                    {stadiumMode === 'select' && stadiumOptions.length > 0 && (
+                      <div className="stadium-select-line">
+                        <select
+                          value={stadium || ''}
+                          onChange={(e) => setStadium(e.target.value)}
+                        >
+                          <option value="" disabled hidden>
+                            경기장 선택
+                          </option>
+                          {stadiumOptions.map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          className="btn ghost"
+                          onClick={() => {
+                            setStadium('');
+                            setStadiumMode('custom');
+                          }}
+                          style={{ marginLeft: 8 }}
+                        >
+                          직접 입력
+                        </button>
+                      </div>
+                    )}
+
+                    {(stadiumMode === 'custom' || stadiumOptions.length === 0) && (
+                      <div className="stadium-input-line">
+                        <input
+                          value={stadium}
+                          onChange={(e) => setStadium(e.target.value)}
+                          placeholder="경기장을 입력하세요"
+                        />
+                        {stadiumOptions.length > 0 && (
+                          <button
+                            type="button"
+                            className="btn ghost"
+                            onClick={() => {
+                              setStadium('');
+                              setStadiumMode('select');
+                            }}
+                            style={{ marginLeft: 8 }}
+                          >
+                            목록에서 선택
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
-            </div>
 
-            {/* ── 2행: 리그일 때만 주차 + (리그 전용) 경기장 ── */}
-            {gameType === '리그' && regionKey && (
-              <div className="uvm-row">
-                {/* 주차 */}
-                <div className="uvm-field two">
-                  <label>주차</label>
-                  <select
-                    value={week}
-                    onChange={(e) => setWeek(e.target.value)}
-                    disabled={
-                      !isLeague || !regionKey || weekOptions.length === 0
-                    }
-                  >
-                    {!week && (
-                      <option value="" disabled>
-                        주차 선택
-                      </option>
-                    )}
-                    {weekOptions.map((w) => (
-                      <option key={w} value={w}>
-                        {w}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              {/* 3행 이후: 팀, 날짜, 스코어 */}
+              {canShowStep3 && (
+                <>
+                  <div className="uvm-row">
+                    <div className="uvm-field two">
+                      <label>홈팀 (HOME)</label>
+                      <LeagueTeamSelect
+                        value={home}
+                        options={selectableHomes}
+                        onChange={setHome}
+                        placeholder={
+                          gameType === '리그' ? '해당 지역 홈팀 선택' : '홈팀 선택'
+                        }
+                      />
+                    </div>
 
-                {/* (리그 전용) 경기장 선택/입력 */}
-                <div className="uvm-field two">
-                  <label>경기장</label>
+                    <div className="uvm-field two">
+                      <label>원정팀 (AWAY)</label>
+                      <LeagueTeamSelect
+                        value={away}
+                        options={selectableAways}
+                        onChange={setAway}
+                        placeholder={
+                          gameType === '리그' ? '해당 지역 원정팀 선택' : '원정팀 선택'
+                        }
+                      />
+                    </div>
+                  </div>
 
-                  {stadiumMode === 'select' && stadiumOptions.length > 0 && (
-                    <div className="stadium-select-line">
-                      <select
-                        value={stadium || ''}
-                        onChange={(e) => setStadium(e.target.value)}
-                      >
-                        <option value="" disabled hidden>
-                          경기장 선택
-                        </option>
-                        {stadiumOptions.map((s) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        ))}
-                      </select>
+                  <div className="uvm-row">
+                    <div className="uvm-field two uvm-dtp-wrap">
+                      <label>경기 날짜/시간</label>
+
                       <button
                         type="button"
-                        className="btn ghost"
-                        onClick={() => {
-                          setStadium('');
-                          setStadiumMode('custom');
-                        }}
-                        style={{ marginLeft: 8 }}
+                        className="dtpButton uvm-dtp"
+                        onClick={() => setDtOpen((v) => !v)}
                       >
-                        직접 입력
+                        {matchDate
+                          ? dayjs(matchDate).tz(KST).format('YYYY-MM-DD HH:mm')
+                          : '날짜/시간 선택'}
                       </button>
-                    </div>
-                  )}
 
-                  {(stadiumMode === 'custom' ||
-                    stadiumOptions.length === 0) && (
-                    <div className="stadium-input-line">
-                      <input
-                        value={stadium}
-                        onChange={(e) => setStadium(e.target.value)}
-                        placeholder="경기장을 입력하세요"
-                      />
-                      {stadiumOptions.length > 0 && (
-                        <button
-                          type="button"
-                          className="btn ghost"
-                          onClick={() => {
-                            setStadium('');
-                            setStadiumMode('select');
-                          }}
-                          style={{ marginLeft: 8 }}
-                        >
-                          목록에서 선택
-                        </button>
+                      {dtOpen && (
+                        <DateTimeDropdown
+                          value={matchDate ? dayjs(matchDate).tz(KST) : dayjs().tz(KST)}
+                          onChange={(d) => setMatchDate(d.tz(KST).format())}
+                          onClose={() => setDtOpen(false)}
+                          minuteStep={10}
+                        />
                       )}
                     </div>
-                  )}
-                </div>
-              </div>
-            )}
 
-            {/* ── 3행 이후: 팀, 날짜, 스코어 ── */}
-            {canShowStep3 && (
-              <>
-                {/* 팀 선택: HOME : AWAY 한 줄 */}
-                <div className="uvm-row">
-                  <div className="uvm-field two">
-                    <label>홈팀 (HOME)</label>
-                    <LeagueTeamSelect
-                      value={home}
-                      options={selectableHomes}
-                      onChange={setHome}
-                      placeholder={
-                        gameType === '리그'
-                          ? '해당 지역 홈팀 선택'
-                          : '홈팀 선택'
-                      }
-                    />
-                  </div>
-
-                  <div className="uvm-field two">
-                    <label>원정팀 (AWAY)</label>
-                    <LeagueTeamSelect
-                      value={away}
-                      options={selectableAways}
-                      onChange={setAway}
-                      placeholder={
-                        gameType === '리그'
-                          ? '해당 지역 원정팀 선택'
-                          : '원정팀 선택'
-                      }
-                    />
-                  </div>
-                </div>
-
-                {/* 날짜/시간은 한 줄 전체 사용 */}
-                <div className="uvm-row">
-                  <div className="uvm-field two uvm-dtp-wrap">
-                    <label>경기 날짜/시간</label>
-
-                    <button
-                      type="button"
-                      className="dtpButton uvm-dtp"
-                      onClick={() => setDtOpen((v) => !v)}
-                    >
-                      {matchDate
-                        ? dayjs(matchDate).tz(KST).format('YYYY-MM-DD HH:mm')
-                        : '날짜/시간 선택'}
-                    </button>
-
-                    {dtOpen && (
-                      <DateTimeDropdown
-                        value={
-                          matchDate ? dayjs(matchDate).tz(KST) : dayjs().tz(KST)
-                        }
-                        onChange={(d) => setMatchDate(d.tz(KST).format())} // 예: 2025-09-20T15:00:00+09:00
-                        onClose={() => setDtOpen(false)}
-                        minuteStep={10}
-                      />
-                    )}
-                  </div>
-
-                  {/* 스코어: HOME : AWAY */}
-                  <div className="uvm-field two">
-                    <label>스코어 (홈팀 | 어웨이팀)</label>
-                    <div className="uvm-row uvm-row-3col">
-                      <input
-                        type="number"
-                        min="0"
-                        value={scoreHome}
-                        onChange={(e) => setScoreHome(e.target.value)}
-                        placeholder="HOME"
-                      />
-                      <span className="uvm-sep">:</span>
-                      <input
-                        type="number"
-                        min="0"
-                        value={scoreAway}
-                        onChange={(e) => setScoreAway(e.target.value)}
-                        placeholder="AWAY"
-                      />
+                    <div className="uvm-field two">
+                      <label>스코어 (홈팀 | 어웨이팀)</label>
+                      <div className="uvm-row uvm-row-3col">
+                        <input
+                          type="number"
+                          min="0"
+                          value={scoreHome}
+                          onChange={(e) => setScoreHome(e.target.value)}
+                          placeholder="HOME"
+                        />
+                        <span className="uvm-sep">:</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={scoreAway}
+                          onChange={(e) => setScoreAway(e.target.value)}
+                          placeholder="AWAY"
+                        />
+                      </div>
                     </div>
                   </div>
+                </>
+              )}
+            </section>
+
+            {/* 오른쪽: 업로드 */}
+            <section className="uvm-col right">
+              <h3 className="uvm-section-title">경기 영상 업로드</h3>
+              <div className="uvm-quarter-rows">
+                <QuarterRow
+                  q="Q1"
+                  files={q1}
+                  onPick={(f) => setQ1((p) => [...p, ...f])}
+                  onClear={() => setQ1([])}
+                />
+                <QuarterRow
+                  q="Q2"
+                  files={q2}
+                  onPick={(f) => setQ2((p) => [...p, ...f])}
+                  onClear={() => setQ2([])}
+                />
+                <QuarterRow
+                  q="Q3"
+                  files={q3}
+                  onPick={(f) => setQ3((p) => [...p, ...f])}
+                  onClear={() => setQ3([])}
+                />
+                <QuarterRow
+                  q="Q4"
+                  files={q4}
+                  onPick={(f) => setQ4((p) => [...p, ...f])}
+                  onClear={() => setQ4([])}
+                />
+
+                {error && <p className="uvm-error">{error}</p>}
+              </div>
+
+              <div className="uvm-actions">
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => {
+                    setActiveTab('Q1');
+                    setView('preview');
+                  }}
+                  disabled={
+                    loading || (q1.length + q2.length + q3.length + q4.length === 0)
+                  }
+                  style={{ marginRight: 8 }}
+                >
+                  영상 확인
+                </button>
+
+                <button
+                  type="submit"
+                  className="btn primary"
+                  disabled={loading}
+                >
+                  {loading ? '업로드 중…' : '경기 업로드'}
+                </button>
+              </div>
+            </section>
+          </form>
+        ) : (
+          /* ===== PREVIEW VIEW ===== */
+          <div className="uvm-body uvm-body-preview">
+            <section className="uvm-col left" style={{ gridColumn: '1 / -1' }}>
+              <div className="uvm-preview-head">
+                <h3 className="uvm-section-title">분기별 영상 확인</h3>
+                <div className="uvm-tabline">
+                  {['Q1', 'Q2', 'Q3', 'Q4'].map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      className={`fpm-tab inline ${activeTab === t ? 'active' : ''}`}
+                      onClick={() => {
+                        closePreviewVideos();
+                        setActiveTab(t);
+                      }}
+                    >
+                      {t} ({(filesByQuarter?.[t] || []).length})
+                    </button>
+                  ))}
+                  <div className="spacer" />
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    onClick={() => {
+                      closePreviewVideos();
+                      setView('form');
+                    }}
+                  >
+                    돌아가기
+                  </button>
                 </div>
-                {/* ⛔️ 기존의 '비리그: 경기장 직접입력' 별도 블록은 제거됨 (2행에서 공통 처리) */}
-              </>
-            )}
-          </section>
+              </div>
 
-          {/* 오른쪽: 분기 업로드 */}
-          <section className="uvm-col right">
-            <h3 className="uvm-section-title">경기 영상 업로드</h3>
-            <div className="uvm-quarter-rows">
-              <QuarterRow
-                q="Q1"
-                files={q1}
-                onPick={(f) => setQ1((p) => [...p, ...f])}
-                onClear={() => setQ1([])}
-              />
-              <QuarterRow
-                q="Q2"
-                files={q2}
-                onPick={(f) => setQ2((p) => [...p, ...f])}
-                onClear={() => setQ2([])}
-              />
-              <QuarterRow
-                q="Q3"
-                files={q3}
-                onPick={(f) => setQ3((p) => [...p, ...f])}
-                onClear={() => setQ3([])}
-              />
-              <QuarterRow
-                q="Q4"
-                files={q4}
-                onPick={(f) => setQ4((p) => [...p, ...f])}
-                onClear={() => setQ4([])}
-              />
-
-              {error && <p className="uvm-error">{error}</p>}
-            </div>
-
-            <div className="uvm-actions">
-              <button
-                type="button"
-                className="btn"
-                onClick={() => setPreviewOpen(true)}
-                disabled={
-                  loading ||
-                  deleteLoading ||
-                  q1.length + q2.length + q3.length + q4.length === 0
-                }
-                style={{ marginRight: 8 }}
-              >
-                영상 확인
-              </button>
-
-              <button
-                type="submit"
-                className="btn primary"
-                disabled={loading || deleteLoading}
-              >
-                {loading ? '업로드 중…' : '경기 업로드'}
-              </button>
-            </div>
-          </section>
-        </form>
-        <FilePreviewModal
-          open={previewOpen}
-          onClose={closePreview}
-          filesByQuarter={filesByQuarter}
-          onRemove={handleRemoveFile}
-        />
+              <div className="fpm-body inline">
+                {(filesByQuarter?.[activeTab] || []).length === 0 ? (
+                  <div className="fpm-empty">파일이 없습니다.</div>
+                ) : (
+                  <ul className="fpm-list inline">
+                    {(filesByQuarter?.[activeTab] || []).map((file, idx) => (
+                      <PreviewListItem
+                        key={`${file.name}-${file.size}-${file.lastModified || 0}`}
+                        file={file}
+                        onDelete={() => handleRemoveFile(activeTab, idx)}
+                      />
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </section>
+          </div>
+        )}
       </div>
     </div>
   );
