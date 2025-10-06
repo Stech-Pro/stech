@@ -19,6 +19,7 @@ export const API_CONFIG = {
     VERIFY_TOKEN: '/auth/verify-token',
 
 
+    //video upload
     UPLOAD_VIDEO: '/video/upload',
     JSON_EX: '/player/analyze-game-data',
     DELETE_VIDEOS: '/videoupload',
@@ -28,6 +29,7 @@ export const API_CONFIG = {
     GET_CLIPS_BY_TEAM: '/game/clips',
     GET_PLAYER_HIGHLIGHTS: '/game/highlights/player',
     GET_COACH_HIGHLIGHTS: '/game/highlights/coach',
+    DELETE_GAMES: '/game',
     //Team
     GET_TEAM_TOTAL_STATS: '/team/total-stats',
     GET_TEAM_STATS_BY_KEY: '/team/stats',
@@ -37,7 +39,6 @@ export const API_CONFIG = {
     //Video Upload
     PREPARE_MATCH_UPLOAD: '/game/prepare-match-upload',
     COMPLETE_MATCH_UPLOAD: '/game/complete-match-upload',
-
   
     //Notification
     NOTI_LIST: '/notifications',

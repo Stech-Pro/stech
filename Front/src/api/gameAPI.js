@@ -163,3 +163,23 @@ export async function fetchPendingGames() {
   // 서버 스키마 그대로 반환 (분석팀용이므로 추가 변환 불필요)
   return games;
 }
+
+export async function deleteGameByKey(gameKey) {
+  if (!gameKey) throw new Error('gameKey가 필요합니다.');
+  const url = `${API_CONFIG.ENDPOINTS.DELETE_GAME}/${encodeURIComponent(gameKey)}`;
+
+  const res = await apiFetch(url, { method: 'DELETE' });
+  const data = await jsonOrText(res);
+
+  if (!res.ok) {
+    // 404 메시지 등 백엔드 응답을 그대로 보여줌
+    const msg = typeof data === 'object' && data?.message
+      ? data.message
+      : `게임 삭제 실패 (HTTP ${res.status})`;
+    const err = new Error(msg);
+    err.status = res.status;
+    err.data = data;
+    throw err;
+  }
+  return data;
+}

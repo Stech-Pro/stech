@@ -84,3 +84,21 @@ export async function putToS3(
   }
   return true;
 }
+
+export async function deleteGameVideos(gameKey) {
+  if (!gameKey) throw new Error('gameKey가 필요합니다.');
+  const url = `${API_CONFIG.ENDPOINTS.DELETE_VIDEOS}/${encodeURIComponent(gameKey)}`;
+
+  const res = await apiFetch(url, { method: 'DELETE' });
+  const data = await jsonOrText(res);
+
+  if (!res.ok) {
+    const msg = typeof data === 'object' && data?.message
+      ? data.message
+      : `비디오 삭제 실패 (HTTP ${res.status})`;
+    const err = new Error(msg);
+    err.status = res.status;
+    err.data = data;
+    throw err;
+  }
+  return data;}
