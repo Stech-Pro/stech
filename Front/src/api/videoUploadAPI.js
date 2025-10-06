@@ -1,6 +1,7 @@
 // src/api/videoUploadAPI.js
 import { API_CONFIG } from '../config/api';
 import { getToken } from '../utils/tokenUtils';
+import { apiFetch } from '../common/apiFetch';
 
 const jsonOrText = async (res) => {
   const ct = res.headers.get('content-type') || '';
