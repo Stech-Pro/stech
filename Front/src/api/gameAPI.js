@@ -61,6 +61,40 @@ export async function fetchTeamGames(teamNameOrId) {
   }));
 }
 
+export async function fetchGameByKey(gameKey) {
+  if (!gameKey) throw new Error('gameKey가 필요합니다.');
+  const url = `${API_CONFIG.ENDPOINTS.GET_GAME_BY_KEY}/${encodeURIComponent(gameKey)}`;
+
+  const res = await apiFetch(url, { method: 'GET' });
+  const data = await jsonOrText(res);
+
+  if (!res.ok) {
+    throw new APIError(
+      typeof data === 'object' ? data.message || '경기 조회 실패' : '경기 조회 실패',
+      res.status,
+      data
+    );
+  }
+
+  // 응답 형태 방어적 파싱: {success:true,data:{...}} | {...}
+  const g = (typeof data === 'object' && data?.success ? data.data : data) || {};
+
+  // GamePage에서 쓰는 형태로 매핑
+  return {
+    gameKey: g.gameKey,
+    date: (g.date || '').slice(0, 10),     // 'YYYY-MM-DD'
+    type: g.type || 'Season',
+    location: g.location || '',
+    homeId: g.homeTeam,
+    awayId: g.awayTeam,
+    homeScore: g?.score?.home ?? 0,
+    awayScore: g?.score?.away ?? 0,
+    length: g.length || '-',
+    report: !!g.report,
+    uploadStatus: g.uploadStatus || 'completed', // pending | completed
+  };
+}
+
 /* 특정 경기의 클립 목록: GET /api/game/clips/{gameKey} (ENDPOINTS.GET_CLIPS_BY_TEAM에 매핑돼 있다면 그대로 사용) */
 export async function fetchGameClips(gameKey) {
   if (!gameKey) return [];
