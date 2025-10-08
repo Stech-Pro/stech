@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../hooks/useNotifications';
 import { useAuth } from '../../context/AuthContext';
 import './NotificationHoverIcon.css';
+import { fetchGameByKey } from '../../api/gameAPI';
+
 
 export default function NotificationHoverIcon({
   limit = 20,
@@ -21,11 +23,16 @@ export default function NotificationHoverIcon({
   const lastRefreshAt = useRef(0);
   const nav = useNavigate();
 
-  const openPanel = () => { if (closeTimer.current) clearTimeout(closeTimer.current); setOpen(true); };
+  const openPanel = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpen(true);
+  };
   const closeSoon = (ms = 120) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     closeTimer.current = setTimeout(() => setOpen(false), ms);
   };
+
+
 
   // ✅ 로그인 완료 시 1회 fetch
   useEffect(() => {
@@ -53,8 +60,12 @@ export default function NotificationHoverIcon({
         lastRefreshAt.current = now;
       }
     };
-    const onFocus = () => { if (!document.hidden) maybeRefresh(); };
-    const onVis = () => { if (!document.hidden) maybeRefresh(); };
+    const onFocus = () => {
+      if (!document.hidden) maybeRefresh();
+    };
+    const onVis = () => {
+      if (!document.hidden) maybeRefresh();
+    };
     window.addEventListener('focus', onFocus);
     document.addEventListener('visibilitychange', onVis);
     return () => {
@@ -78,17 +89,32 @@ export default function NotificationHoverIcon({
       lastRefreshAt.current = now;
     }
   };
-  const onMouseEnter = () => { openPanel(); ensureFresh(); };
-
-  const onClickItem = (n) => {
-    if (!n.isRead) readOne(n._id); // 낙관적 업데이트
-    if (n.gameKey) nav(`/service/member/game/${encodeURIComponent(n.gameKey)}`);
-    setOpen(false);
+  const onMouseEnter = () => {
+    openPanel();
+    ensureFresh();
   };
 
+  const onClickItem = async (n) => {
+  if (!n.isRead) readOne(n._id);
+  if (n.gameKey) {
+    const game = await fetchGameByKey(n.gameKey);
+    nav(`/service/game/${encodeURIComponent(n.gamekey)}/clip`, { state: { game } });
+  }
+  setOpen(false);
+};
+
   return (
-    <div className={`nh-wrap ${className}`} onMouseEnter={onMouseEnter} onMouseLeave={() => closeSoon()}>
-      <button type="button" className="nh-bell" aria-haspopup="true" aria-expanded={open}>
+    <div
+      className={`nh-wrap ${className}`}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={() => closeSoon()}
+    >
+      <button
+        type="button"
+        className="nh-bell"
+        aria-haspopup="true"
+        aria-expanded={open}
+      >
         <IoMdNotificationsOutline size={iconSize} />
         {unread > 0 && <span className="nh-badge">{unread}</span>}
       </button>
@@ -98,16 +124,29 @@ export default function NotificationHoverIcon({
           <div className="nh-header">
             <strong>알림</strong>
             <div className="nh-grow" />
-            <button className="nh-readall" onClick={() => readAll()} disabled={unread === 0}>
+            <button
+              className="nh-readall"
+              onClick={() => readAll()}
+              disabled={unread === 0}
+            >
               전체 읽음
             </button>
           </div>
 
           <div className="nh-list">
-            {loading && items.length === 0 && <div className="nh-empty">불러오는 중…</div>}
-            {!loading && items.length === 0 && <div className="nh-empty">알림이 없습니다</div>}
+            {loading && items.length === 0 && (
+              <div className="nh-empty">불러오는 중…</div>
+            )}
+            {!loading && items.length === 0 && (
+              <div className="nh-empty">알림이 없습니다</div>
+            )}
             {items.map((n) => (
-              <button key={n._id} className={`nh-item ${n.isRead ? 'read' : 'unread'}`} onClick={() => onClickItem(n)} title={n.message}>
+              <button
+                key={n._id}
+                className={`nh-item ${n.isRead ? 'read' : 'unread'}`}
+                onClick={() => onClickItem(n)}
+                title={n.message}
+              >
                 <div className="nh-top">
                   <span className="nh-type">{labelType(n.type)}</span>
                   {!n.isRead && <span className="nh-dot" />}
@@ -128,8 +167,11 @@ export default function NotificationHoverIcon({
 
 function labelType(t) {
   switch (t) {
-    case 'game_analysis_complete': return '경기 분석 완료';
-    case 'clip_analysis_complete': return '클립 분석 완료';
-    default: return '알림';
+    case 'game_analysis_complete':
+      return '경기 분석 완료';
+    case 'clip_analysis_complete':
+      return '클립 분석 완료';
+    default:
+      return '알림';
   }
 }

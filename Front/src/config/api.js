@@ -29,7 +29,9 @@ export const API_CONFIG = {
     GET_CLIPS_BY_TEAM: '/game/clips',
     GET_PLAYER_HIGHLIGHTS: '/game/highlights/player',
     GET_COACH_HIGHLIGHTS: '/game/highlights/coach',
+    GET_GAME_BY_KEY: '/game',
     DELETE_GAMES: '/game',
+    
     //Team
     GET_TEAM_TOTAL_STATS: '/team/total-stats',
     GET_TEAM_STATS_BY_KEY: '/team/stats',
