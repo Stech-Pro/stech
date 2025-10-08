@@ -30,7 +30,7 @@ export class MemoService {
       gameKey,
       clipKey,
       content,
-      teamId: user.profile?.team || user.team,
+      teamId: user.teamName,
       userId: user._id,
       userName: user.profile?.realName || user.username,
       userRole: user.role,
@@ -58,7 +58,7 @@ export class MemoService {
       throw new BadRequestException('사용자를 찾을 수 없습니다.');
     }
 
-    const teamId = user.profile?.team || user.team;
+    const teamId = user.teamName;
     
     const query: any = {
       isDeleted: false,
@@ -94,7 +94,7 @@ export class MemoService {
       throw new BadRequestException('사용자를 찾을 수 없습니다.');
     }
 
-    const userTeamId = user.profile?.team || user.team;
+    const userTeamId = user.teamName;
 
     // 권한 체크: 같은 팀의 공개 메모이거나 본인이 작성한 메모만 조회 가능
     if (memo.isPrivate && memo.userId !== userId) {
@@ -123,7 +123,7 @@ export class MemoService {
     }
 
     memo.content = content;
-    memo.updatedAt = new Date();
+    // updatedAt은 timestamps: true로 자동 관리됨
     await memo.save();
 
     return {
@@ -155,14 +155,11 @@ export class MemoService {
 
   // 팀 알림 발송
   private async sendTeamNotification(user: UserDocument, gameKey: string, memoId: string) {
-    const teamId = user.profile?.team || user.team;
+    const teamId = user.teamName;
     
     // 같은 팀의 모든 사용자 조회
     const teamMembers = await this.userModel.find({
-      $or: [
-        { 'profile.team': teamId },
-        { team: teamId }
-      ],
+      teamName: teamId,
       _id: { $ne: user._id }, // 작성자 본인 제외
     });
 
@@ -170,17 +167,19 @@ export class MemoService {
     const userRole = user.role === 'player' ? '선수' : user.role === 'coach' ? '코치' : '';
     
     const notificationPromises = teamMembers.map(member =>
-      this.notificationService.createNotification(
-        member._id.toString(),
-        'memo',
-        `${userName} ${userRole}가 ${gameKey} 경기에서 메모를 남겼습니다.`,
-        {
-          gameKey,
+      this.notificationService.createNotification({
+        userId: member._id.toString(),
+        team: teamId,
+        gameKey: gameKey,
+        type: 'memo',
+        title: '새로운 메모',
+        message: `${userName} ${userRole}가 ${gameKey} 경기에서 메모를 남겼습니다.`,
+        gameInfo: {
           memoId,
           authorId: user._id.toString(),
           authorName: userName,
         },
-      ),
+      }),
     );
 
     await Promise.all(notificationPromises);
