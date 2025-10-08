@@ -12,7 +12,12 @@ import {
   IoPlayCircleOutline,
   IoPauseCircleOutline,
   IoClose,
+  IoVolumeMedium,
+  IoVolumeMute,
 } from 'react-icons/io5';
+import { GoScreenFull, GoScreenNormal } from 'react-icons/go';
+import { TbArrowForwardUpDouble } from 'react-icons/tb';
+import { TbPlayerTrackNext } from 'react-icons/tb';
 import { HiOutlineMenuAlt3 } from 'react-icons/hi';
 import { FaPencilAlt, FaStickyNote } from 'react-icons/fa';
 import './index.css';
@@ -21,6 +26,7 @@ import { useClipFilter } from '../../../hooks/useClipFilter';
 import MagicPencil from '../../../components/MagicPencil/MagicPencil';
 import VideoMemo from '../../../components/VideoMemo/VideoMemo';
 import GameDataEditModal from '../../../components/GameDataEditModal/GameDataEditModal';
+import VideoSettingModal from '../../../components/VideoSettingModal';
 
 /* ================= Dropdown ================= */
 function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
@@ -126,17 +132,24 @@ const getDownDisplay = (c) => {
 function PlayerCore({ stateData }) {
   const navigate = useNavigate();
   const { settings } = useVideoSettings();
+  const containerRef = useRef(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [volume, setVolume] = useState(0.6);
 
-  const { rawClips, initialFilters, teamOptions, teamMeta, initialPlayId } = stateData;
+  const { rawClips, initialFilters, teamOptions, teamMeta, initialPlayId } =
+    stateData;
 
   // useClipFilter를 실제 데이터가 변경될 때마다 업데이트되도록 수정
-  const clipFilterParams = useMemo(() => ({
-    rawClips: rawClips || [],
-    initialFilters: initialFilters || {},
-    teamOptions: teamOptions || [],
-    opposites: OPPOSITES,
-    persistKey: `videoPlayerFilters:${teamMeta?.homeName || 'default'}`,
-  }), [rawClips, initialFilters, teamOptions, teamMeta?.homeName]); // 실제 의존성 추가
+  const clipFilterParams = useMemo(
+    () => ({
+      rawClips: rawClips || [],
+      initialFilters: initialFilters || {},
+      teamOptions: teamOptions || [],
+      opposites: OPPOSITES,
+      persistKey: `videoPlayerFilters:${teamMeta?.homeName || 'default'}`,
+    }),
+    [rawClips, initialFilters, teamOptions, teamMeta?.homeName],
+  ); // 실제 의존성 추가
 
   const {
     clips = [],
@@ -172,18 +185,21 @@ function PlayerCore({ stateData }) {
     y: 0,
   });
   const [showGameDataModal, setShowGameDataModal] = useState(false);
+  const [showVideoSettingModal, setShowVideoSettingModal] = useState(false);
 
   // 초기화를 한 번만 수행
   const initializationDone = useRef(false);
-  
+
   useEffect(() => {
     if (initializationDone.current) return;
-    
+
     if (clips && clips.length > 0) {
       // initialPlayId는 clipKey 값이므로 clipKey로 매칭해서 실제 id를 찾아야 함
-      const targetClip = initialPlayId && clips.find(c => String(c.clipKey) === String(initialPlayId));
+      const targetClip =
+        initialPlayId &&
+        clips.find((c) => String(c.clipKey) === String(initialPlayId));
       const targetId = targetClip ? String(targetClip.id) : String(clips[0].id);
-      
+
       setSelectedId(targetId);
       initializationDone.current = true;
     }
@@ -192,8 +208,10 @@ function PlayerCore({ stateData }) {
   // 필터 변경 시 현재 클립이 결과에 없으면 첫 번째 클립으로 이동
   useEffect(() => {
     if (!selectedId || !clips || clips.length === 0) return;
-    
-    const isCurrentClipInResults = clips.some(c => String(c.id) === String(selectedId));
+
+    const isCurrentClipInResults = clips.some(
+      (c) => String(c.id) === String(selectedId),
+    );
     if (!isCurrentClipInResults && clips.length > 0) {
       setSelectedId(String(clips[0].id));
       setIsPlaying(false);
@@ -220,6 +238,30 @@ function PlayerCore({ stateData }) {
     });
   };
 
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.volume = volume;
+  }, [volume, selectedId]);
+
+  const toggleFullscreen = useCallback(() => {
+    const el = containerRef.current;
+    if (!document.fullscreenElement) {
+      el?.requestFullscreen?.()
+        .then(() => setIsFullscreen(true))
+        .catch(() => {});
+    } else {
+      document
+        .exitFullscreen?.()
+        .then(() => setIsFullscreen(false))
+        .catch(() => {});
+    }
+  }, []);
+
+  useEffect(() => {
+    const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => document.removeEventListener('fullscreenchange', onFsChange);
+  }, []);
+
   const handleVideoContextMenu = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -231,19 +273,25 @@ function PlayerCore({ stateData }) {
     [],
   );
 
-  const handleSystemSettings = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigate('../Member/Settings');
-    closeContextMenu();
-  }, [closeContextMenu, navigate]);
+  const handleSystemSettings = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setShowVideoSettingModal(true);
+      closeContextMenu();
+    },
+    [closeContextMenu, navigate],
+  );
 
-  const handleEditGameData = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowGameDataModal(true);
-    closeContextMenu();
-  }, [closeContextMenu]);
+  const handleEditGameData = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setShowGameDataModal(true);
+      closeContextMenu();
+    },
+    [closeContextMenu],
+  );
 
   useEffect(() => {
     const handleClickOutside = () => contextMenu.visible && closeContextMenu();
@@ -272,50 +320,67 @@ function PlayerCore({ stateData }) {
     (id) => String(id) === selectedId,
     [selectedId],
   );
+  useEffect(() => {
+    if (selected && selected.clipUrl && videoRef.current) {
+      console.log('🎥 Loading new video:', {
+        id: selected.id,
+        clipUrl: selected.clipUrl,
+        currentSrc: videoRef.current.src,
+      });
+      videoRef.current.load();
+    }
+  }, [selected?.clipUrl]);
 
   // selectPlay를 단순화
-  const selectPlay = useCallback((id, options = {}) => {
-    const newId = String(id);
-    if (newId === selectedId) return;
-    
-    setSelectedId(newId);
-    
-    if (options.autoplay) {
-      pendingAutoplayRef.current = true;
-    }
-    
-    setIsPlaying(false);
-    setHasError(false);
-    setIsLoading(true);
-    setCurrentTime(0);
-    setDuration(0);
-  }, [selectedId]);
+  const selectPlay = useCallback(
+    (id, options = {}) => {
+      const newId = String(id);
+      if (newId === selectedId) return;
+
+      setSelectedId(newId);
+
+      if (options.autoplay) {
+        pendingAutoplayRef.current = true;
+      }
+
+      setIsPlaying(false);
+      setHasError(false);
+      setIsLoading(true);
+      setCurrentTime(0);
+      setDuration(0);
+    },
+    [selectedId],
+  );
 
   // 현재 클립의 위치 정보
   const getCurrentClipPosition = useCallback(() => {
     if (!selectedId || !clips || clips.length === 0) return null;
-    
-    const currentIndex = clips.findIndex(c => String(c.id) === String(selectedId));
+
+    const currentIndex = clips.findIndex(
+      (c) => String(c.id) === String(selectedId),
+    );
     if (currentIndex === -1) return null;
-    
+
     return {
       current: currentIndex + 1,
       total: clips.length,
       isFirst: currentIndex === 0,
-      isLast: currentIndex === clips.length - 1
+      isLast: currentIndex === clips.length - 1,
     };
-  }, [selectedId, clips]);
+  }, [selectedId]);
 
   const clipPosition = getCurrentClipPosition();
 
   // 필터링된 클립들 기준으로 네비게이션
   const goNextClip = useCallback(() => {
     if (!selectedId || !clips || clips.length === 0) return;
-    
-    const currentIndex = clips.findIndex(c => String(c.id) === String(selectedId));
-    
+
+    const currentIndex = clips.findIndex(
+      (c) => String(c.id) === String(selectedId),
+    );
+
     if (currentIndex === -1 || currentIndex >= clips.length - 1) return;
-    
+
     const nextClip = clips[currentIndex + 1];
     if (nextClip) {
       setSelectedId(String(nextClip.id));
@@ -330,11 +395,13 @@ function PlayerCore({ stateData }) {
 
   const goPrevClip = useCallback(() => {
     if (!selectedId || !clips || clips.length === 0) return;
-    
-    const currentIndex = clips.findIndex(c => String(c.id) === String(selectedId));
-    
+
+    const currentIndex = clips.findIndex(
+      (c) => String(c.id) === String(selectedId),
+    );
+
     if (currentIndex <= 0) return;
-    
+
     const prevClip = clips[currentIndex - 1];
     if (prevClip) {
       setSelectedId(String(prevClip.id));
@@ -427,29 +494,41 @@ function PlayerCore({ stateData }) {
   );
 
   // 이벤트 전파 차단을 포함한 핸들러들
-  const handleTogglePlay = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    togglePlay();
-  }, [togglePlay]);
+  const handleTogglePlay = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      togglePlay();
+    },
+    [togglePlay],
+  );
 
-  const handleStepTime = useCallback((e, seconds) => {
-    e.preventDefault();
-    e.stopPropagation();
-    stepTime(seconds);
-  }, [stepTime]);
+  const handleStepTime = useCallback(
+    (e, seconds) => {
+      e.preventDefault();
+      e.stopPropagation();
+      stepTime(seconds);
+    },
+    [stepTime],
+  );
 
-  const handleGoNextClip = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    goNextClip();
-  }, [goNextClip]);
+  const handleGoNextClip = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      goNextClip();
+    },
+    [goNextClip],
+  );
 
-  const handleGoPrevClip = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    goPrevClip();
-  }, [goPrevClip]);
+  const handleGoPrevClip = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      goPrevClip();
+    },
+    [goPrevClip],
+  );
 
   const handleTimelineClick = useCallback(
     (e) => {
@@ -547,7 +626,8 @@ function PlayerCore({ stateData }) {
     };
 
     document.addEventListener('keydown', onKey, { capture: true });
-    return () => document.removeEventListener('keydown', onKey, { capture: true });
+    return () =>
+      document.removeEventListener('keydown', onKey, { capture: true });
   }, [
     togglePlay,
     stepTime,
@@ -574,8 +654,8 @@ function PlayerCore({ stateData }) {
   const awayName = teamMeta?.awayName || 'Away';
   const homeLogo = teamMeta?.homeLogo || null;
   const awayLogo = teamMeta?.awayLogo || null;
-const scoreHome = selected?.StartScore?.[0]?.Home ?? selected?.scoreHome ?? 0;
-const scoreAway = selected?.StartScore?.[0]?.Away ?? selected?.scoreAway ?? 0;
+  const scoreHome = selected?.StartScore?.[0]?.Home ?? selected?.scoreHome ?? 0;
+  const scoreAway = selected?.StartScore?.[0]?.Away ?? selected?.scoreAway ?? 0;
   const quarter = selected?.quarter ?? 1;
 
   const teamSummary = summaries.team;
@@ -592,9 +672,13 @@ const scoreAway = selected?.StartScore?.[0]?.Away ?? selected?.scoreAway ?? 0;
 
   return (
     <div className="videoPlayerPage">
-      <div className="videoContainer" onClick={handleContainerClick}>
-        <button 
-          className="videoBackButton" 
+      <div
+        className="videoContainer"
+        ref={containerRef}
+        onClick={handleContainerClick}
+      >
+        <button
+          className="videoBackButton"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -726,29 +810,27 @@ const scoreAway = selected?.StartScore?.[0]?.Away ?? selected?.scoreAway ?? 0;
                 <IoPlayCircleOutline size={32} />
               )}
             </button>
-            <div className="videoTimeInfo">
-              <span className="videoCurrentTime">
-                {formatTime(currentTime)}
-              </span>
-              <span className="videoTimeDivider">/</span>
-              <span className="videoDuration">{formatTime(duration)}</span>
-            </div>
+
             <div className="videoFrameNavigation">
               <button
-                className="videoFrameStepButton"
+                className="skipSquare skipSquare--back"
                 onClick={(e) => handleStepTime(e, -settings.skipTime)}
                 disabled={hasError || !selected}
                 title={`Previous ${settings.skipTime}s (A)`}
               >
-                ◀ {settings.skipTime}s
+                <TbArrowForwardUpDouble className="skipSquare__icon" />
+                <span className="skipSquare__sec">{settings.skipTime}</span>
               </button>
+
+              {/* 앞으로 */}
               <button
-                className="videoFrameStepButton"
+                className="skipSquare"
                 onClick={(e) => handleStepTime(e, settings.skipTime)}
                 disabled={hasError || !selected}
                 title={`Next ${settings.skipTime}s (D)`}
               >
-                {settings.skipTime}s ▶
+                <TbArrowForwardUpDouble className="skipSquare__icon" />
+                <span className="skipSquare__sec">{settings.skipTime}</span>
               </button>
               <button
                 className="videoFrameStepButton"
@@ -756,7 +838,13 @@ const scoreAway = selected?.StartScore?.[0]?.Away ?? selected?.scoreAway ?? 0;
                 disabled={!selected || !clipPosition || clipPosition.isFirst}
                 title="Previous Clip (M)"
               >
-                이전 클립
+                <TbPlayerTrackNext
+                  className="prevClipIcon"
+                  style={{
+                    transform: 'scaleX(-1)',
+                    transformOrigin: '50% 50%',
+                  }}
+                />
               </button>
               <button
                 className="videoFrameStepButton"
@@ -764,37 +852,74 @@ const scoreAway = selected?.StartScore?.[0]?.Away ?? selected?.scoreAway ?? 0;
                 disabled={!selected || !clipPosition || clipPosition.isLast}
                 title="Next Clip (N)"
               >
-                다음 클립
+                <TbPlayerTrackNext className="nextClipIcon" />
               </button>
             </div>
           </div>
           <div className="videoTimelineContainer">
+            <div className="timeLabel">{formatTime(currentTime)}</div>
             <div
               ref={timelineRef}
-              className="videoTimeline"
+              className="ctrl timeline"
               onMouseDown={handleMouseDown}
+              role="slider"
+              aria-valuemin={0}
+              aria-valuemax={duration || 0}
+              aria-valuenow={currentTime || 0}
             >
-              <div className="videoTimelineTrack">
-                <div
-                  className="videoTimelineProgress"
-                  style={{
-                    width:
-                      duration > 0
-                        ? `${(currentTime / duration) * 100}%`
-                        : '0%',
-                  }}
-                />
-                <div
-                  className="videoTimelineHandle"
-                  style={{
-                    left:
-                      duration > 0
-                        ? `${(currentTime / duration) * 100}%`
-                        : '0%',
-                  }}
-                />
-              </div>
+              <div className="timelineTrack" />
+              <div
+                className="timelineProgress"
+                style={{
+                  width:
+                    duration > 0 ? `${(currentTime / duration) * 100}%` : '0%',
+                }}
+              />
+              <div
+                className="timelineHandle"
+                style={{
+                  left:
+                    duration > 0 ? `${(currentTime / duration) * 100}%` : '0%',
+                }}
+              />
             </div>
+
+            <div className="timeLabel dim">{formatTime(duration)}</div>
+
+            <div className="volume">
+              <button
+                className="ctrl volBtn"
+                onClick={() => setVolume((v) => (v > 0 ? 0 : 0.6))}
+                title="Mute/Unmute"
+              >
+                {volume > 0 ? (
+                  <IoVolumeMedium size={18} />
+                ) : (
+                  <IoVolumeMute size={18} />
+                )}
+              </button>
+              <input
+                className="volSlider"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={(e) => setVolume(parseFloat(e.target.value))}
+              />
+            </div>
+
+            <button
+              className="ctrl fsBtn"
+              onClick={toggleFullscreen}
+              title="Fullscreen"
+            >
+              {isFullscreen ? (
+                <GoScreenNormal size={18} />
+              ) : (
+                <GoScreenFull size={18} />
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -984,8 +1109,8 @@ const scoreAway = selected?.StartScore?.[0]?.Away ?? selected?.scoreAway ?? 0;
                   >
                     모두 해제
                   </button>
-                  <button 
-                    className="ff-dd-close" 
+                  <button
+                    className="ff-dd-close"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -1112,6 +1237,10 @@ const scoreAway = selected?.StartScore?.[0]?.Away ?? selected?.scoreAway ?? 0;
           playType: selected?.playType,
           time: formatTime(currentTime),
         }}
+      />
+          <VideoSettingModal
+        isVisible={showVideoSettingModal}
+        onClose={() => setShowVideoSettingModal(false)}
       />
     </div>
   );
