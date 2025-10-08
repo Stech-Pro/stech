@@ -14,6 +14,7 @@ import { AdminModule } from './admin/admin.module';
 import { ContactModule } from './contact/contact.module';
 import { VideoUploadModule } from './videoupload/videoupload.module';
 import { NotificationModule } from './notification/notification.module';
+import { MemoModule } from './memo/memo.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { NotificationModule } from './notification/notification.module';
     ContactModule,
     VideoUploadModule,
     NotificationModule,
+    MemoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
