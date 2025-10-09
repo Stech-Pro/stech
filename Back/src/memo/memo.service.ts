@@ -113,12 +113,14 @@ export class MemoService {
 
   // 메모 수정
   async updateMemo(userId: string, memoId: string, content: string) {
+    // userId가 ObjectId일 수 있으므로 문자열로 변환
+    const userIdString = userId.toString();
     const memo = await this.memoModel.findById(memoId);
     if (!memo || memo.isDeleted) {
       throw new NotFoundException('메모를 찾을 수 없습니다.');
     }
 
-    if (memo.userId.toString() !== userId) {
+    if (memo.userId.toString() !== userIdString) {
       throw new ForbiddenException('본인이 작성한 메모만 수정할 수 있습니다.');
     }
 
@@ -135,6 +137,8 @@ export class MemoService {
 
   // 메모 삭제 (soft delete)
   async deleteMemo(userId: string, memoId: string) {
+    // userId가 ObjectId일 수 있으므로 문자열로 변환
+    const userIdString = userId.toString();
     const memo = await this.memoModel.findById(memoId);
     if (!memo || memo.isDeleted) {
       throw new NotFoundException('메모를 찾을 수 없습니다.');
@@ -144,12 +148,13 @@ export class MemoService {
       memoUserId: memo.userId,
       memoUserIdString: memo.userId.toString(),
       currentUserId: userId,
+      currentUserIdString: userIdString,
       memoUserIdType: typeof memo.userId,
       currentUserIdType: typeof userId,
-      isEqual: memo.userId.toString() === userId
+      isEqual: memo.userId.toString() === userIdString
     });
 
-    if (memo.userId.toString() !== userId) {
+    if (memo.userId.toString() !== userIdString) {
       throw new ForbiddenException('본인이 작성한 메모만 삭제할 수 있습니다.');
     }
 
