@@ -407,6 +407,7 @@ const getDownDisplay = (c) => {
         initialPlayId: String(c.clipKey),
         initialPlayIndex: c.playIndex, // (선택) clipKey 중복 대비
         clipKey: c.clipKey,
+        gameKey: resolvedGameKey,
         teamMeta: {
           homeName: homeMeta?.name,
           awayName: awayMeta?.name,
