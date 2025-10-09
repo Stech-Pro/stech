@@ -102,7 +102,6 @@ export async function fetchGameClips(gameKey) {
   const url = `${API_CONFIG.ENDPOINTS.GET_CLIPS_BY_TEAM}/${encodeURIComponent(gameKey)}`;
   const res = await apiFetch(url, { method: 'GET' });
   const data = await jsonOrText(res);
-
   if (!res.ok) {
     throw new APIError(
       typeof data === 'object' ? data.message || '클립 조회 실패' : '클립 조회 실패',
