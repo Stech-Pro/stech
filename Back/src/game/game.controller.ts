@@ -29,6 +29,7 @@ import { GameService } from './game.service';
 import { S3Service } from '../common/services/s3.service';
 import { VideoUploadService } from '../videoupload/videoupload.service';
 import { NotificationService } from '../notification/notification.service';
+import { SlackService } from '../common/services/slack.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { AdminGuard } from '../common/guards/admin.guard';
@@ -57,6 +58,7 @@ export class GameController {
     private readonly s3Service: S3Service,
     private readonly videoUploadService: VideoUploadService,
     private readonly notificationService: NotificationService,
+    private readonly slackService: SlackService,
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
