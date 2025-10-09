@@ -136,7 +136,7 @@ function PlayerCore({ stateData }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [volume, setVolume] = useState(0.6);
 
-  const { rawClips, initialFilters, teamOptions, teamMeta, initialPlayId } =
+  const { gameKey, rawClips, initialFilters, teamOptions, teamMeta, initialPlayId } =
     stateData;
 
   // useClipFilter를 실제 데이터가 변경될 때마다 업데이트되도록 수정
@@ -1230,6 +1230,7 @@ function PlayerCore({ stateData }) {
         clipId={selectedId}
         memos={memos}
         onSaveMemo={handleSaveMemo}
+        gameKey={gameKey}
         clipInfo={{
           quarter,
           down: selected?.down,
@@ -1247,7 +1248,7 @@ function PlayerCore({ stateData }) {
 }
 
 /* ================= Shell ================= */
-export default function VideoPlayer() {
+export default function VideoPlayer({ }) {
   const location = useLocation();
   const navigate = useNavigate();
 

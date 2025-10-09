@@ -103,10 +103,15 @@ export class GameController {
 
       console.log(`📊 게임 데이터 검증 완료: ${gameData.clips.length}개 클립`);
 
-      // 2. 데이터 형식 변환 (Clips -> clips)
+      // 2. 데이터 형식 변환 및 clipKey 표준화
+      const standardizedClips = gameData.clips.map((clip, index) => ({
+        ...clip,
+        clipKey: `${gameData.gameKey}_clip${index + 1}`, // 표준 형식으로 변환
+      }));
+
       const processedGameData = {
         ...gameData,
-        Clips: gameData.clips, // 백엔드에서 Clips 속성을 기대하므로 변환
+        Clips: standardizedClips, // 표준화된 clipKey를 가진 clips
       };
 
       // 3. 선수 데이터 처리

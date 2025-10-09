@@ -46,5 +46,8 @@ export const API_CONFIG = {
     NOTI_LIST: '/notifications',
     NOTI_READ_ALL: '/notifications/read-all',
     NOTI_UNREAD_COUNT: '/notifications/unread-count',
+
+    //memo
+    MEMOS: '/memos',
   },
 };
