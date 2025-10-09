@@ -14,7 +14,10 @@ export class Notification {
   @Prop({ required: true })
   gameKey: string; // 관련 경기 키
 
-  @Prop({ required: true, enum: ['game_analysis_complete', 'game_deleted', 'system'] })
+  @Prop({
+    required: true,
+    enum: ['game_analysis_complete', 'game_deleted', 'system', 'memo'],
+  })
   type: string; // 알림 타입
 
   @Prop({ required: true })
