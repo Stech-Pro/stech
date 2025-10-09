@@ -35,6 +35,7 @@ export async function createMemo(payload, token = getToken()) {
     body: JSON.stringify(payload),
   });
   const data = await jsonOrText(res);
+  console.log('createMemo response data:', data);
   if (res.ok || res.status === 201) return data;
   throw new APIError(
     typeof data === 'object' ? data.message || '메모 작성 실패' : '메모 작성 실패',

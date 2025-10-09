@@ -6,6 +6,7 @@ import {
   createMemo as apiCreateMemo,
   listMemos as apiListMemos,
   deleteMemo as apiDeleteMemo,
+  updateMemo as apiUpdateMemo, // ✅ 수정 추가
 } from '../../api/memoAPI';
 import { useAuth } from '../../context/AuthContext';
 
@@ -16,16 +17,21 @@ const safeString = (v) => (typeof v === 'string' ? v : '');
 export default function VideoMemo({
   isVisible,
   onClose,
-  gameKey,   
-  clipKey,   
-  clipInfo = {}, 
+  gameKey,
+  clipKey,
+  clipInfo = {},
 }) {
-  const { token } = useAuth(); // 🔐 토큰만 사용
+  const { token } = useAuth(); // 🔐 토큰
   const [isPrivate, setIsPrivate] = useState(false);
   const [memoContent, setMemoContent] = useState('');
   const [serverMemos, setServerMemos] = useState([]);
   const [saving, setSaving] = useState(false);
   const [removingIds, setRemovingIds] = useState(new Set());
+
+  // ✏️ 편집 상태
+  const [editingId, setEditingId] = useState(null);
+  const [editValue, setEditValue] = useState('');
+  const [editSaving, setEditSaving] = useState(false);
 
   /* 메모 목록 가져오기 */
   useEffect(() => {
@@ -111,6 +117,52 @@ export default function VideoMemo({
     }
   };
 
+  /* ✏️ 수정 시작 */
+  const startEdit = (memo) => {
+    setEditingId(memo._id);
+    setEditValue(safeString(memo.content));
+  };
+
+  /* ✏️ 수정 취소 */
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditValue('');
+  };
+
+  /* ✅ 수정 저장 */
+  const submitEdit = async (memo) => {
+    if (!editingId || !token || editSaving) return;
+    const nextContent = safeTrim(editValue);
+    if (!nextContent) {
+      alert('내용을 입력하세요.');
+      return;
+    }
+
+    try {
+      setEditSaving(true);
+      // 서버 호출
+      const res = await apiUpdateMemo(memo._id, { content: nextContent, isPrivate: memo.isPrivate }, token);
+      const updated = res?.memo ?? { ...memo, content: nextContent, updatedAt: new Date().toISOString() };
+
+      // 상태 반영
+      setServerMemos((prev) =>
+        prev
+          .map((m) => (m._id === memo._id ? updated : m))
+          .sort(
+            (a, b) =>
+              new Date(b.updatedAt || b.createdAt || 0) -
+              new Date(a.updatedAt || a.createdAt || 0),
+          ),
+      );
+      cancelEdit();
+    } catch (e) {
+      console.error('메모 수정 실패:', e);
+      alert(e?.message || '메모 수정 실패');
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -171,36 +223,84 @@ export default function VideoMemo({
               <div className="memoListHeader">
                 <h4>저장된 메모 ({serverMemos.length})</h4>
               </div>
-              {serverMemos.map((memo) => (
-                <div key={memo._id} className="memoItem">
-                  <div className="memoItemHeader">
-                    <div className="memoAuthorInfo">
-                      <span className="memoAuthor">
-                        {memo.userName || memo.user?.name || '사용자'}
-                      </span>
-                      {memo.isPrivate ? (
-                        <span className="memoType">🔒 개인</span>
-                      ) : (
-                        <span className="memoType">💬 팀</span>
-                      )}
+              {serverMemos.map((memo) => {
+                const isEditing = editingId === memo._id;
+                return (
+                  <div key={memo._id} className="memoItem">
+                    <div className="memoItemHeader">
+                      <div className="memoAuthorInfo">
+                        <span className="memoAuthor">
+                          {memo.userName || memo.user?.name || '사용자'}
+                        </span>
+                        {memo.isPrivate ? (
+                          <span className="memoType">🔒 개인</span>
+                        ) : (
+                          <span className="memoType">💬 팀</span>
+                        )}
+                      </div>
+                      <div className="memoActions">
+                        <span className="memoDate">
+                          {new Date(memo.createdAt || memo.updatedAt || Date.now()).toLocaleString('ko-KR')}
+                        </span>
+
+                        {/* ✏️ 수정 버튼 */}
+                        {!isEditing ? (
+                          <button
+                            className="memoEditBtn"
+                            onClick={() => startEdit(memo)}
+                            title="메모 수정"
+                          >
+                            ✏️
+                          </button>
+                        ) : (
+                          <>
+                            <button
+                              className="memoEditSaveBtn"
+                              onClick={() => submitEdit(memo)}
+                              disabled={editSaving}
+                              title="수정 저장"
+                            >
+                              저장
+                            </button>
+                            <button
+                              className="memoEditCancelBtn"
+                              onClick={cancelEdit}
+                              disabled={editSaving}
+                              title="수정 취소"
+                            >
+                              취소
+                            </button>
+                          </>
+                        )}
+
+                        {/* 🗑 삭제 버튼 */}
+                        <button
+                          className="memoDeleteBtn"
+                          onClick={() => removeMemo(memo._id)}
+                          disabled={removingIds.has(memo._id)}
+                          title="메모 삭제"
+                        >
+                          <IoTrash size={16} />
+                        </button>
+                      </div>
                     </div>
-                    <div className="memoActions">
-                      <span className="memoDate">
-                        {new Date(memo.createdAt || memo.updatedAt || Date.now()).toLocaleString('ko-KR')}
-                      </span>
-                      <button
-                        className="memoDeleteBtn"
-                        onClick={() => removeMemo(memo._id)}
-                        disabled={removingIds.has(memo._id)}
-                        title="메모 삭제"
-                      >
-                        <IoTrash size={16} />
-                      </button>
-                    </div>
+
+                    {/* 내용 or 편집 UI */}
+                    {!isEditing ? (
+                      <div className="memoItemContent">{safeString(memo.content)}</div>
+                    ) : (
+                      <textarea
+                        className="memoEditTextarea"
+                        rows={4}
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        placeholder="메모 내용을 수정하세요..."
+                        disabled={editSaving}
+                      />
+                    )}
                   </div>
-                  <div className="memoItemContent">{safeString(memo.content)}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
