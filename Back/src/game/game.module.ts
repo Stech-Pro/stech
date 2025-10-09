@@ -17,6 +17,7 @@ import {
   TeamTotalStatsSchema,
 } from '../schemas/team-total-stats.schema';
 import { S3Service } from '../common/services/s3.service';
+import { SlackService } from '../common/services/slack.service';
 import { VideoUploadService } from '../videoupload/videoupload.service';
 import { NotificationModule } from '../notification/notification.module';
 import { AuthModule } from '../auth/auth.module';
@@ -61,7 +62,7 @@ import { ConfigModule } from '@nestjs/config';
     NotificationModule,
   ],
   controllers: [GameController, GameDocsController],
-  providers: [GameService, S3Service, VideoUploadService],
+  providers: [GameService, S3Service, SlackService, VideoUploadService],
   exports: [GameService],
 })
 export class GameModule {}
