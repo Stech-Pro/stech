@@ -118,7 +118,7 @@ export class MemoService {
       throw new NotFoundException('메모를 찾을 수 없습니다.');
     }
 
-    if (memo.userId !== userId) {
+    if (memo.userId.toString() !== userId) {
       throw new ForbiddenException('본인이 작성한 메모만 수정할 수 있습니다.');
     }
 
@@ -140,7 +140,16 @@ export class MemoService {
       throw new NotFoundException('메모를 찾을 수 없습니다.');
     }
 
-    if (memo.userId !== userId) {
+    console.log('🔍 삭제 권한 체크:', {
+      memoUserId: memo.userId,
+      memoUserIdString: memo.userId.toString(),
+      currentUserId: userId,
+      memoUserIdType: typeof memo.userId,
+      currentUserIdType: typeof userId,
+      isEqual: memo.userId.toString() === userId
+    });
+
+    if (memo.userId.toString() !== userId) {
       throw new ForbiddenException('본인이 작성한 메모만 삭제할 수 있습니다.');
     }
 
