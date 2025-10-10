@@ -28,6 +28,7 @@ import { TeamStatsAnalyzerService } from '../team/team-stats-analyzer.service';
 import { GameService } from './game.service';
 import { S3Service } from '../common/services/s3.service';
 import { VideoUploadService } from '../videoupload/videoupload.service';
+import { GameDataEditRequestDto } from './dto/game-edit-request.dto';
 import { NotificationService } from '../notification/notification.service';
 import { SlackService } from '../common/services/slack.service';
 import { UseGuards } from '@nestjs/common';
@@ -1923,6 +1924,86 @@ export class GameController {
           message: '경기 업로드 완료 처리 중 오류가 발생했습니다',
           code: 'COMPLETE_UPLOAD_ERROR',
           details: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('request-edit')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: '📝 게임 데이터 수정 요청',
+    description: `
+    클립 영상의 게임 데이터 수정을 요청하는 API입니다.
+    
+    ### 📋 기능
+    - 선수/코치가 경기 데이터 수정을 요청
+    - Slack 채널로 자동 알림 전송
+    - 수정 사유 포함 가능
+    
+    ### 🔔 Slack 알림 내용
+    - 게임/클립 정보
+    - 요청자 정보 (이름, 팀, 역할)
+    - 요청 시간
+    - 수정 사유 (선택사항)
+    `,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 수정 요청 성공',
+    schema: {
+      example: {
+        success: true,
+        message: 'Slack 메시지가 성공적으로 전송되었습니다.',
+        slackResponse: {
+          ok: true,
+          channel: 'C09CRFMURD5',
+          ts: '1234567890.123456',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: '❌ 잘못된 요청 데이터',
+  })
+  @ApiResponse({
+    status: 500,
+    description: '❌ Slack 전송 실패',
+  })
+  async requestGameDataEdit(
+    @Body() requestDto: GameDataEditRequestDto,
+    @Req() req: any,
+  ) {
+    try {
+      // 요청 시간 추가
+      const requestData = {
+        ...requestDto,
+        requestTime: new Date().toLocaleString('ko-KR', {
+          timeZone: 'Asia/Seoul',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
+      };
+
+      // Slack 서비스 호출
+      const result = await this.slackService.sendGameDataEditRequest(requestData);
+
+      return result;
+    } catch (error) {
+      console.error('❌ 게임 데이터 수정 요청 실패:', error);
+      
+      throw new HttpException(
+        {
+          success: false,
+          message: error.message || '수정 요청 처리 중 오류가 발생했습니다',
+          code: 'EDIT_REQUEST_ERROR',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
