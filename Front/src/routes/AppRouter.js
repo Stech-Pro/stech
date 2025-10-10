@@ -33,7 +33,7 @@ export default function AppRouter() {
             element={<ServicePages.LeaguePositionPage />}
           />
         </Route>
-        <Route path="highlight" element={<ServicePages.HighlightPage />} />
+        {/* <Route path="highlight" element={<ServicePages.HighlightPage />} /> */}
         <Route path="suggestion" element={<ServicePages.SuggestionPage />} />
         <Route path="support" element={<ServicePages.SupportPage />} />
         <Route path="faq" element={<ServicePages.FAQPage />} />
