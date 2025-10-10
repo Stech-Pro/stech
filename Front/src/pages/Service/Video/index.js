@@ -27,6 +27,8 @@ import MagicPencil from '../../../components/MagicPencil/MagicPencil';
 import VideoMemo from '../../../components/VideoMemo/VideoMemo';
 import GameDataEditModal from '../../../components/GameDataEditModal/GameDataEditModal';
 import VideoSettingModal from '../../../components/VideoSettingModal';
+import {listMemos} from '../../../api/memoAPI';
+import { useAuth } from '../../../context/AuthContext';
 
 /* ================= Dropdown ================= */
 function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
@@ -135,6 +137,7 @@ function PlayerCore({ stateData }) {
   const containerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [volume, setVolume] = useState(0.6);
+  const {token} = useAuth();
 
   const {
     gameKey,
@@ -185,6 +188,8 @@ function PlayerCore({ stateData }) {
     return saved ? JSON.parse(saved) : {};
   });
 
+  const [memoCounts, setMemoCounts] = useState({});
+
   const [contextMenu, setContextMenu] = useState({
     visible: false,
     x: 0,
@@ -227,6 +232,45 @@ function PlayerCore({ stateData }) {
       setDuration(0);
     }
   }, [clips, selectedId]);
+
+useEffect(() => {
+    if (!gameKey || !token) return;
+
+    const fetchAllMemoCounts = async () => {
+      try {
+        // 1. 기존 API를 호출하여 게임의 모든 메모 '목록'을 가져옵니다.
+        const response = await listMemos({ gameKey }, token);
+        const allMemos = Array.isArray(response?.memos) ? response.memos : [];
+
+        // 2. 받아온 메모 목록을 { clipKey: count } 형태의 '맵'으로 가공합니다.
+        const countsMap = allMemos.reduce((acc, memo) => {
+          const key = memo.clipKey; // 각 메모 객체에서 clipKey를 가져옵니다.
+          if (key) {
+            acc[key] = (acc[key] || 0) + 1;
+          }
+          return acc;
+        }, {}); 
+        
+
+        setMemoCounts(countsMap);
+
+      } catch (e) {
+        console.error('전체 메모 개수 조회 및 가공 실패:', e);
+        setMemoCounts({});
+      }
+    };
+
+    fetchAllMemoCounts();
+  }, [gameKey, token]);
+
+  const handleMemoCountChange = useCallback((clipId, count) => {
+    if (clipId) {
+      setMemoCounts((prevCounts) => ({
+        ...prevCounts,
+        [clipId]: count,
+      }));
+    }
+  }, []);
 
   const handleSaveMemo = (clipId, memoData, playerID) => {
     setMemos((prev) => {
@@ -320,6 +364,9 @@ function PlayerCore({ stateData }) {
     () => clips.find((p) => String(p.id) === selectedId) || null,
     [clips, selectedId],
   );
+
+  const currentClipKey = selected?.clipKey || selectedId;
+  const currentMemoCount = memoCounts[currentClipKey] || 0;
 
   const hasNoVideo = !!selected && !selected.clipUrl;
   const isPlaySelected = useCallback(
@@ -788,7 +835,9 @@ function PlayerCore({ stateData }) {
             title="메모 작성"
           >
             <FaStickyNote size={24} />
-            {memos[selectedId] && <span className="memoIndicator"></span>}
+            {currentMemoCount > 0 && (
+              <span className="memo-badge">{currentMemoCount}</span>
+            )}
           </button>
           <button
             className="floatingToolBtn magicPencilBtn"
@@ -1238,6 +1287,7 @@ function PlayerCore({ stateData }) {
         teamId={teamMeta?.teamId} // 있으면 전달
         memos={memos}
         onSaveMemo={handleSaveMemo}
+        onMemoCountChange={handleMemoCountChange}
         clipInfo={{
           quarter,
           down: selected?.down,
