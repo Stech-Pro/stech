@@ -57,7 +57,7 @@ const GameDataEditModal = ({ isVisible, onClose, clipKey, gameKey }) => {
       return;
     }
 
-    const requesterName = user?.username || 'Unknown User';
+    const requesterName = user?.playerID || 'Unknown User';
 
     const requesterTeam =
       TEAM_BY_ID?.[user?.teamName]?.name ?? 
