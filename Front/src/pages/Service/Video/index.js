@@ -1222,8 +1222,8 @@ function PlayerCore({ stateData }) {
       <GameDataEditModal
         isVisible={showGameDataModal}
         onClose={() => setShowGameDataModal(false)}
-        clipId={selectedId}
-        gameId={teamMeta?.gameId}
+        clipKey={selectedId}
+        gameKey={gameKey}
       />
       <MagicPencil
         videoElement={videoRef.current}
