@@ -12,6 +12,7 @@ import {
   Inject,
   forwardRef,
   Req,
+  Res,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -31,6 +32,7 @@ import { VideoUploadService } from '../videoupload/videoupload.service';
 import { GameDataEditRequestDto } from './dto/game-edit-request.dto';
 import { NotificationService } from '../notification/notification.service';
 import { SlackService } from '../common/services/slack.service';
+import { join } from 'path';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { AdminGuard } from '../common/guards/admin.guard';
@@ -2008,5 +2010,26 @@ export class GameController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  @Get('test-slack')
+  @ApiOperation({
+    summary: '🧪 Slack API 테스트 페이지',
+    description: 'Slack 게임 데이터 수정 요청 기능을 테스트할 수 있는 HTML 페이지를 제공합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 테스트 페이지 반환',
+    content: {
+      'text/html': {
+        schema: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  getTestSlackPage(@Res() res) {
+    const filePath = join(process.cwd(), 'public', 'test-slack.html');
+    return res.sendFile(filePath);
   }
 }
