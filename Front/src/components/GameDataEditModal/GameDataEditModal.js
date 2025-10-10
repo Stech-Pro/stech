@@ -1,79 +1,51 @@
+// src/components/GameDataEditModal/GameDataEditModal.jsx
 import React, { useState, useEffect } from 'react';
 import { IoClose } from 'react-icons/io5';
 import './GameDataEditModal.css';
+import { useAuth } from '../../context/AuthContext';
+import { requestGameEdit } from '../../api/gameAPI';
 
-const GameDataEditModal = ({ isVisible, onClose, clipId, gameId }) => {
-  const [gameData, setGameData] = useState({
-    gameId: '',
-    clipId: '',
-  });
+const GameDataEditModal = ({ isVisible, onClose, clipKey, gameKey }) => {
+  const { user } = useAuth(); // ✅ 그냥 호출
+  const [gameData, setGameData] = useState({ gameKey: '', clipKey: '' });
   const [requestContent, setRequestContent] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 모달이 열릴 때 백엔드에서 경기 ID와 클립 ID 조회
   useEffect(() => {
-    const fetchGameData = async () => {
-      if (!isVisible || !clipId) return;
+    if (!isVisible) return;
+    setGameData({
+      gameKey: gameKey || '',
+      clipKey: clipKey || '',
+    });
+  }, [isVisible, gameKey, clipKey]);
 
-      setIsLoading(true);
-      try {
-        // 백엔드 API 호출 - 실제 API 엔드포인트로 변경해주세요
-        const response = await fetch(`/api/clips/${clipId}/game-info`);
-        const data = await response.json();
-
-        setGameData({
-          gameId: data.gameId || '',
-          clipId: data.clipId || clipId,
-        });
-      } catch (error) {
-        console.error('게임 데이터 조회 실패:', error);
-        // 실패 시 기본값 설정
-        setGameData({
-          gameId: gameId || '',
-          clipId: clipId || '',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchGameData();
-  }, [isVisible, clipId, gameId]);
-
-  // 수정 요청 제출
   const handleSubmit = async () => {
-    if (!requestContent.trim()) {
+    const reason = requestContent.trim();
+    if (!reason) {
       alert('수정 요청 사항을 입력해주세요.');
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      // Slack 알림 전송 API 호출
-      const response = await fetch('/api/game-data/edit-request', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          gameId: gameData.gameId,
-          clipId: gameData.clipId,
-          requestContent: requestContent.trim(),
-          timestamp: new Date().toISOString(),
-        }),
-      });
+    const requesterName =
+      user?.realName || user?.playerID || user?.username || user?.email || 'Unknown User';
+    const requesterRole =
+      user?.role || (user?.isAdmin ? 'admin' : 'player');
 
-      if (response.ok) {
-        alert('수정 요청이 전송되었습니다.');
-        setRequestContent('');
-        onClose();
-      } else {
-        throw new Error('요청 전송에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('수정 요청 전송 실패:', error);
-      alert('수정 요청 전송에 실패했습니다. 다시 시도해주세요.');
+    try {
+      setIsSubmitting(true);
+      await requestGameEdit({
+        gameKey: gameData.gameKey,
+        clipKey: gameData.clipKey,
+        requesterName,
+        requesterRole,
+        reason,
+      });
+      alert('수정 요청이 전송되었습니다.');
+      setRequestContent('');
+      onClose();
+    } catch (err) {
+      console.error('수정 요청 전송 실패:', err);
+      alert(err?.message || '수정 요청 전송에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsSubmitting(false);
     }
@@ -92,7 +64,7 @@ const GameDataEditModal = ({ isVisible, onClose, clipId, gameId }) => {
       <div className="gameDataEditModal">
         <div className="gameDataEditHeader">
           <h3>경기 데이터 수정 요청</h3>
-          <button className="gameDataEditCloseBtn" onClick={handleClose}>
+          <button className="gameDataEditCloseBtn" onClick={handleClose} aria-label="닫기">
             <IoClose size={24} />
           </button>
         </div>
@@ -100,24 +72,12 @@ const GameDataEditModal = ({ isVisible, onClose, clipId, gameId }) => {
         <div className="gameDataEditContent">
           <div className="gameDataEditRow">
             <label className="gameDataEditLabel">경기 ID</label>
-            <input
-              type="text"
-              className="gameDataEditInput"
-              value={isLoading ? '로딩 중...' : gameData.gameId}
-              readOnly
-              placeholder="경기 ID를 불러오는 중..."
-            />
+            <input type="text" className="gameDataEditInput" value={gameData.gameKey} readOnly />
           </div>
 
           <div className="gameDataEditRow">
             <label className="gameDataEditLabel">클립 ID</label>
-            <input
-              type="text"
-              className="gameDataEditInput"
-              value={isLoading ? '로딩 중...' : gameData.clipId}
-              readOnly
-              placeholder="클립 ID를 불러오는 중..."
-            />
+            <input type="text" className="gameDataEditInput" value={gameData.clipKey} readOnly />
           </div>
 
           <div className="gameDataEditRow">
@@ -128,7 +88,6 @@ const GameDataEditModal = ({ isVisible, onClose, clipId, gameId }) => {
               onChange={(e) => setRequestContent(e.target.value)}
               placeholder="수정이 필요한 내용을 상세히 작성해주세요."
               rows={6}
-              disabled={isLoading}
             />
           </div>
         </div>
@@ -137,7 +96,7 @@ const GameDataEditModal = ({ isVisible, onClose, clipId, gameId }) => {
           <button
             className="gameDataEditSubmitBtn"
             onClick={handleSubmit}
-            disabled={isSubmitting || isLoading || !requestContent.trim()}
+            disabled={isSubmitting || !requestContent.trim()}
           >
             {isSubmitting ? '전송 중...' : '수정 요청'}
           </button>

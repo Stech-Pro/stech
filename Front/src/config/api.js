@@ -31,7 +31,8 @@ export const API_CONFIG = {
     GET_COACH_HIGHLIGHTS: '/game/highlights/coach',
     GET_GAME_BY_KEY: '/game',
     DELETE_GAMES: '/game',
-    
+    REQUEST_EDIT: '/game/request-edit',
+
     //Team
     GET_TEAM_TOTAL_STATS: '/team/total-stats',
     GET_TEAM_STATS_BY_KEY: '/team/stats',
@@ -49,5 +50,7 @@ export const API_CONFIG = {
 
     //memo
     MEMOS: '/memos',
+
+
   },
 };
