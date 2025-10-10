@@ -219,7 +219,7 @@ export async function deleteGameByKey(gameKey) {
 
 
 export async function requestGameEdit(
-  { gameKey, clipKey, requesterName, requesterRole, reason },
+  { gameKey, clipKey, requesterName, requesterTeam, requesterRole, reason },
 ) {
   if (!gameKey || !clipKey) {
     throw new APIError('gameKey/clipKey가 필요합니다.', 400);
@@ -232,7 +232,7 @@ const url = `${API_CONFIG.ENDPOINTS.REQUEST_EDIT}`
   const res = await apiFetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' }, // apiFetch가 토큰/BASE_URL은 알아서 처리한다고 가정
-    body: JSON.stringify({ gameKey, clipKey, requesterName, requesterRole, reason }),
+    body: JSON.stringify({ gameKey, clipKey, requesterName, requesterTeam, requesterRole, reason }),
   });
 
   const data = await jsonOrText(res);
