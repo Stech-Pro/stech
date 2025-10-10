@@ -110,12 +110,12 @@ const ServiceSidebar = () => {
         },
       ],
     },
-    {
-      path: '/service/highlight',
-      label: '경기 하이라이트',
-      icon: <BsPlayBtn />,
-      description: 'Video analysis',
-    },
+    // {
+    //   path: '/service/highlight',
+    //   label: '경기 하이라이트',
+    //   icon: <BsPlayBtn />,
+    //   description: 'Video analysis',
+    // },
     {
       path: '/service/suggestion',
       label: 'Stech 제안',
@@ -165,12 +165,12 @@ const ServiceSidebar = () => {
         },
       ],
     },
-    {
-      path: '/service/highlight',
-      label: '경기 하이라이트',
-      icon: <BsPlayBtn />,
-      description: 'Video analysis',
-    },
+    // {
+    //   path: '/service/highlight',
+    //   label: '경기 하이라이트',
+    //   icon: <BsPlayBtn />,
+    //   description: 'Video analysis',
+    // },
     {
       path: '/service/suggestion',
       label: 'Stech 제안',
