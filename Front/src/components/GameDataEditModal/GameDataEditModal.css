@@ -16,8 +16,8 @@
   background: #2a2a2a;
   border-radius: 8px;
   width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
+  width: 900px;
+  height: 700px;;
   z-index: 10001;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
@@ -66,7 +66,7 @@
 
 .gameDataEditLabel {
   display: block;
-  color: #ccc;
+  color: #fff;
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 8px;
@@ -85,18 +85,6 @@
   transition: border-color 0.2s;
 }
 
-.gameDataEditInput:focus,
-.gameDataEditTextarea:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.gameDataEditInput:read-only {
-  background: #2a2a2a;
-  color: #888;
-  cursor: not-allowed;
-}
 
 .gameDataEditTextarea {
   resize: vertical;
@@ -151,3 +139,11 @@
     padding-right: 16px;
   }
 }
+.gd-toast {
+  font-size: 24px;    /* 기본 14 → 16~18 추천 */
+  line-height: 1.4;
+  padding: 14px 18px ;   /* 공간 더 주기 */
+  border-radius: 14px ;  /* 모서리도 조금 키움 */
+  box-shadow: 0 10px 28px rgba(0,0,0,.28) ;
+}
+

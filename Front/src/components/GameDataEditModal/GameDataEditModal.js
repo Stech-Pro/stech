@@ -5,6 +5,35 @@ import './GameDataEditModal.css';
 import { useAuth } from '../../context/AuthContext';
 import { requestGameEdit } from '../../api/gameAPI';
 import { TEAM_BY_ID } from '../../data/TEAMS';
+import toast from 'react-hot-toast';
+
+
+const toastBase = {
+  duration: 2600,
+  position: 'top-right',
+  className: 'gd-toast',
+  style: {
+    width: 400,
+    height: 100,
+    background: '#111827',          // slate-900
+    color: '#F9FAFB',               // gray-50
+    border: '1px solid #334155',    // slate-700
+    padding: '10px 14px',
+    borderRadius: '12px',
+    boxShadow: '0 8px 24px rgba(0,0,0,.22)',
+    fontWeight: 600,
+    letterSpacing: '-0.01em',
+  },
+};
+const toastSuccess = {
+  ...toastBase,
+  iconTheme: { primary: '#10b981', secondary: '#ffffff' }, // emerald
+};
+const toastError = {
+  ...toastBase,
+  iconTheme: { primary: '#ef4444', secondary: '#ffffff' }, // red
+  style: { ...toastBase.style, border: '1px solid #ef4444' },
+};
 
 const GameDataEditModal = ({ isVisible, onClose, clipKey, gameKey }) => {
   const { user } = useAuth(); // ✅ 그냥 호출
@@ -38,6 +67,7 @@ const GameDataEditModal = ({ isVisible, onClose, clipKey, gameKey }) => {
 
     try {
       setIsSubmitting(true);
+            const tid = toast.loading('전송 중...', toastBase);
       await requestGameEdit({
         gameKey: gameData.gameKey,
         clipKey: gameData.clipKey,
@@ -46,13 +76,14 @@ const GameDataEditModal = ({ isVisible, onClose, clipKey, gameKey }) => {
         requesterRole,
         reason,
       });
-      alert('수정 요청이 전송되었습니다.');
+      toast.success('수정 요청이 전송되었습니다.', { ...toastSuccess, id: tid });
       setRequestContent('');
       onClose();
     } catch (err) {
       console.error('수정 요청 전송 실패:', err);
-      alert(
+            toast.error(
         err?.message || '수정 요청 전송에 실패했습니다. 다시 시도해주세요.',
+        toastError
       );
     } finally {
       setIsSubmitting(false);
