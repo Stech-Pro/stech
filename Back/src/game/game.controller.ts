@@ -2012,7 +2012,7 @@ export class GameController {
     }
   }
 
-  @Get('test-slack')
+  @Get('tools/test-slack')
   @ApiOperation({
     summary: '🧪 Slack API 테스트 페이지',
     description: 'Slack 게임 데이터 수정 요청 기능을 테스트할 수 있는 HTML 페이지를 제공합니다.',
