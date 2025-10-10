@@ -20,6 +20,7 @@ export default function VideoMemo({
   gameKey,
   clipKey,
   clipInfo = {},
+  onMemoCountChange,
 }) {
   const { token } = useAuth(); // 🔐 토큰
   const [isPrivate, setIsPrivate] = useState(false);
@@ -32,6 +33,12 @@ export default function VideoMemo({
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [editSaving, setEditSaving] = useState(false);
+
+ useEffect(() => {
+    if (clipKey) {
+      onMemoCountChange?.(clipKey, serverMemos.length);
+    }
+  }, [serverMemos, clipKey, onMemoCountChange]);
 
   /* 메모 목록 가져오기 */
   useEffect(() => {
@@ -177,11 +184,9 @@ export default function VideoMemo({
           {/* 클립 정보 */}
           <div className="memoClipInfo">
             <span>Q{clipInfo.quarter}</span>
-            {clipInfo.down && <span>{clipInfo.down}번째 다운</span>}
+            {clipInfo.down && <span>{clipInfo.down}</span>}
             {clipInfo.playType && <span>{clipInfo.playType}</span>}
-            <span className="memoTime">
-              <IoTime size={14} /> {clipInfo.time}
-            </span>
+
           </div>
 
           {/* 나만 보기 */}
