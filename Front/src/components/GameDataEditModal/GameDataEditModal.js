@@ -35,20 +35,20 @@ const toastError = {
   style: { ...toastBase.style, border: '1px solid #ef4444' },
 };
 
-const GameDataEditModal = ({ isVisible, onClose, clipKey, gameKey }) => {
+const GameDataEditModal = ({ isVisible, onClose, clipKey, gameKey ,playType}) => {
   const { user } = useAuth(); // ✅ 그냥 호출
-  const [gameData, setGameData] = useState({ gameKey: '', clipKey: '' });
+  const [gameData, setGameData] = useState({ gameKey: '', clipKey: '' ,playType});
   const [requestContent, setRequestContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  console.log('Authenticated user:', user);
   useEffect(() => {
     if (!isVisible) return;
     setGameData({
       gameKey: gameKey || '',
       clipKey: clipKey || '',
+      playType: playType || '',
     });
-  }, [isVisible, gameKey, clipKey]);
+  }, [isVisible, gameKey, clipKey, playType]);
 
   const handleSubmit = async () => {
     const reason = requestContent.trim();
@@ -70,7 +70,7 @@ const GameDataEditModal = ({ isVisible, onClose, clipKey, gameKey }) => {
             const tid = toast.loading('전송 중...', toastBase);
       await requestGameEdit({
         gameKey: gameData.gameKey,
-        clipKey: gameData.clipKey,
+        clipKey: `${gameData.gameKey}_${gameData.clipKey}_${gameData.playType}`,
         requesterName,
         requesterTeam,
         requesterRole,

@@ -269,9 +269,6 @@ export default function VideoMemo({
               </div>
             </div>
 
-            <div className="memo-actions">
-              <button onClick={onClose} className="cancel-btn">닫기</button>
-            </div>
           </div>
 
           {/* 리사이저 핸들 */}

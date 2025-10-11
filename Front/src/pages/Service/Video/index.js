@@ -1271,7 +1271,7 @@ useEffect(() => {
       <GameDataEditModal
         isVisible={showGameDataModal}
         onClose={() => setShowGameDataModal(false)}
-        clipKey={selectedId}
+        clipKey={selected?.clipKey || selectedId}
         gameKey={gameKey}
       />
       <MagicPencil
@@ -1285,6 +1285,7 @@ useEffect(() => {
         gameKey={gameKey}
         clipKey={selected?.clipKey || selectedId}
         teamId={teamMeta?.teamId} // 있으면 전달
+        playType={selected?.playType}
         memos={memos}
         onSaveMemo={handleSaveMemo}
         onMemoCountChange={handleMemoCountChange}

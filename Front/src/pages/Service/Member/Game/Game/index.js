@@ -13,7 +13,7 @@ import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
 import NotificationHoverIcon from '../../../../../components/Notifications/NotificationHoverIcon';
 
 /* ===== 상수 ===== */
-const TYPES = ['Scrimmage', 'Friendly match', 'Season'];
+const TYPES = ['리그', '친선전', '스크리미지'];
 
 /** region 코드 → 한글 라벨 */
 const REGION_LABEL = {
