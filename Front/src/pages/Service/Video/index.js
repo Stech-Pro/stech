@@ -27,7 +27,7 @@ import MagicPencil from '../../../components/MagicPencil/MagicPencil';
 import VideoMemo from '../../../components/VideoMemo/VideoMemo';
 import GameDataEditModal from '../../../components/GameDataEditModal/GameDataEditModal';
 import VideoSettingModal from '../../../components/VideoSettingModal';
-import {listMemos} from '../../../api/memoAPI';
+import { listMemos } from '../../../api/memoAPI';
 import { useAuth } from '../../../context/AuthContext';
 
 /* ================= Dropdown ================= */
@@ -137,7 +137,7 @@ function PlayerCore({ stateData }) {
   const containerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [volume, setVolume] = useState(0.6);
-  const {token} = useAuth();
+  const { token } = useAuth();
 
   const {
     gameKey,
@@ -195,6 +195,7 @@ function PlayerCore({ stateData }) {
     x: 0,
     y: 0,
   });
+  const menuRef = useRef(null);
   const [showGameDataModal, setShowGameDataModal] = useState(false);
   const [showVideoSettingModal, setShowVideoSettingModal] = useState(false);
 
@@ -233,7 +234,7 @@ function PlayerCore({ stateData }) {
     }
   }, [clips, selectedId]);
 
-useEffect(() => {
+  useEffect(() => {
     if (!gameKey || !token) return;
 
     const fetchAllMemoCounts = async () => {
@@ -249,11 +250,9 @@ useEffect(() => {
             acc[key] = (acc[key] || 0) + 1;
           }
           return acc;
-        }, {}); 
-        
+        }, {});
 
         setMemoCounts(countsMap);
-
       } catch (e) {
         console.error('전체 메모 개수 조회 및 가공 실패:', e);
         setMemoCounts({});
@@ -344,14 +343,21 @@ useEffect(() => {
   );
 
   useEffect(() => {
-    const handleClickOutside = () => contextMenu.visible && closeContextMenu();
-    if (contextMenu.visible) {
-      document.addEventListener('click', handleClickOutside);
-      document.addEventListener('contextmenu', handleClickOutside);
-    }
+    if (!contextMenu.visible) return;
+    const onAnyPointer = (e) => {
+      if (menuRef.current && menuRef.current.contains(e.target)) return;
+      closeContextMenu();
+    };
+    document.addEventListener('mousedown', onAnyPointer, true);
+    document.addEventListener('contextmenu', onAnyPointer, true);
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeContextMenu();
+    };
+    document.addEventListener('keydown', onKey, true);
     return () => {
-      document.removeEventListener('click', handleClickOutside);
-      document.removeEventListener('contextmenu', handleClickOutside);
+      document.removeEventListener('mousedown', onAnyPointer, true);
+      document.removeEventListener('contextmenu', onAnyPointer, true);
+      document.removeEventListener('keydown', onKey, true);
     };
   }, [contextMenu.visible, closeContextMenu]);
 
@@ -752,14 +758,15 @@ useEffect(() => {
         </button>
         <div className="videoScoreboard">
           <div className="scoreTeam leftTeam">
-            {awayLogo ? (
-              <img src={awayLogo} alt={awayName} className="scoreTeamLogo" />
+            {homeLogo ? (
+              <img src={homeLogo} alt={homeName} className="scoreTeamLogo" />
             ) : (
-              <div className="scoreTeamLogo placeholder">{awayName[0]}</div>
+              <div className="scoreTeamLogo placeholder">{homeName[0]}</div>
             )}
+
             <div className="scoreTeamInfo">
-              <span className="scoreTeamName">{awayName}</span>
-              <span className="scoreTeamScore">{scoreAway}</span>
+              <span className="scoreTeamName">{homeName}</span>
+              <span className="scoreTeamScore">{scoreHome}</span>
             </div>
           </div>
           <div className="scoreCenter">
@@ -768,13 +775,13 @@ useEffect(() => {
           </div>
           <div className="scoreTeam rightTeam">
             <div className="scoreTeamInfo">
-              <span className="scoreTeamName">{homeName}</span>
-              <span className="scoreTeamScore">{scoreHome}</span>
+              <span className="scoreTeamName">{awayName}</span>
+              <span className="scoreTeamScore">{scoreAway}</span>
             </div>
-            {homeLogo ? (
-              <img src={homeLogo} alt={homeName} className="scoreTeamLogo" />
+            {awayLogo ? (
+              <img src={awayLogo} alt={awayName} className="scoreTeamLogo" />
             ) : (
-              <div className="scoreTeamLogo placeholder">{homeName[0]}</div>
+              <div className="scoreTeamLogo placeholder">{awayName[0]}</div>
             )}
           </div>
         </div>
@@ -1252,6 +1259,7 @@ useEffect(() => {
       )}
       {contextMenu.visible && (
         <div
+          ref={menuRef}
           className="customContextMenu"
           style={{
             position: 'fixed',
