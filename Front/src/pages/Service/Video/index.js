@@ -1281,6 +1281,7 @@ function PlayerCore({ stateData }) {
         onClose={() => setShowGameDataModal(false)}
         clipKey={selected?.clipKey || selectedId}
         gameKey={gameKey}
+        playType={selected?.playType}
       />
       <MagicPencil
         videoElement={videoRef.current}
