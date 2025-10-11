@@ -1010,6 +1010,21 @@ function PlayerCore({ stateData }) {
                   />
                 ) : (
                   <div className="videoTeamLogos placeholder">
+                    {homeName[0]}
+                  </div>
+                )}
+                <span>{homeName}</span>
+              </div>
+              <div>VS</div>
+              <div className="videoMatchAway">
+                {awayLogo ? (
+                  <img
+                    src={awayLogo}
+                    alt={awayName}
+                    className="videoTeamLogos"
+                  />
+                ) : (
+                  <div className="videoTeamLogos placeholder">
                     {awayName[0]}
                   </div>
                 )}

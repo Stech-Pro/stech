@@ -199,7 +199,7 @@ export async function fetchPendingGames() {
 
 export async function deleteGameByKey(gameKey) {
   if (!gameKey) throw new Error('gameKey가 필요합니다.');
-  const url = `${API_CONFIG.ENDPOINTS.DELETE_GAME}/${encodeURIComponent(gameKey)}`;
+  const url = `${API_CONFIG.ENDPOINTS.DELETE_GAMES}/${encodeURIComponent(gameKey)}`;
 
   const res = await apiFetch(url, { method: 'DELETE' });
   const data = await jsonOrText(res);

@@ -449,7 +449,7 @@ const SignupForm = ({ onSuccess, className = '' }) => {
         {isSubmitting ? '회원가입 중...' : '회원가입'}
       </button>
 
-      <div className="divider-container">
+      {/* <div className="divider-container">
         <div className="divider" />
         <span className="divider-text">or</span>
         <div className="divider" />
@@ -472,7 +472,7 @@ const SignupForm = ({ onSuccess, className = '' }) => {
           <img src={Kakao} alt="kakao" className="socialicon" />
           카카오로 회원가입
         </button>
-      </div>
+      </div> */}
     </form>
   );
 };

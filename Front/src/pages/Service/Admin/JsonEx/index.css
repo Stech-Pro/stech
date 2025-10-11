@@ -80,3 +80,277 @@
 .error-result button:hover {
   background-color: #c82333;
 }
+
+/* JsonEx 컴포넌트 전체 컨테이너 */
+.json-ex-container {
+  padding: 20px;
+  min-height: 100vh;
+  background-color: white;
+}
+
+/* 로그인 필요 페이지 스타일 */
+.login-required-container {
+  text-align: center;
+}
+
+.login-required-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* 위험 구역 (스탯 초기화) 스타일 */
+.danger-zone {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 2px solid #ff6b6b;
+  border-radius: 8px;
+  background-color: #ffe0e0;
+}
+
+.danger-zone h3 {
+  color: #d63031;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.danger-zone p {
+  margin-bottom: 15px;
+  color: #666;
+}
+
+.danger-zone-button {
+  padding: 10px 20px;
+  background-color: #d63031;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.danger-zone-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* 상태 메시지 (초기화 성공/실패) */
+.status-message {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.status-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* 게임 목록 컨테이너 */
+.game-list-section {
+  margin-top: 40px;
+}
+
+.section-divider {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 40px 0;
+}
+
+.game-list-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.game-list-controls h2 {
+  margin: 0;
+}
+
+.delete-selected-button {
+  padding: 8px 15px;
+  background-color: #d63031;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.delete-selected-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.game-list-wrapper {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.game-list-header,
+.game-list-item {
+  display: flex;
+  padding: 12px 15px;
+  align-items: center;
+}
+
+.game-list-header {
+  background-color: #f7f7f7;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+}
+
+.game-list-item {
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+  cursor: pointer; /* 행 전체가 클릭 가능함을 시각적으로 표시 */
+}
+
+.game-list-item:last-child {
+  border-bottom: none;
+}
+
+.game-list-item:hover {
+  background-color: #f9f9f9;
+}
+
+.game-list-item.selected {
+  background-color: #e8f0fe;
+}
+
+/* 각 셀(열)의 너비와 정렬 */
+.game-list-cell {
+  display: flex;
+  align-items: center;
+}
+
+.cell-checkbox {
+  flex: 0 0 40px;
+}
+.cell-date {
+  flex: 1 1 120px;
+}
+.cell-match {
+  flex: 2 1 0;
+}
+.cell-type {
+  flex: 1 1 100px;
+}
+.cell-key {
+  flex: 2 1 0;
+  font-family: monospace;
+  font-size: 12px;
+  color: #666;
+}
+
+/* 로딩 및 빈 상태 표시 */
+.list-placeholder {
+  padding: 20px;
+  text-align: center;
+}
+
+.upload-zone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f9f9f9;
+  margin: 20px 0;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.upload-zone:hover {
+  border-color: #007bff;
+  background-color: #f0f8ff;
+}
+.upload-zone.dragover {
+  border-color: #28a745;
+  background-color: #f0fff0;
+  transform: scale(1.02);
+}
+.hidden { display: none !important; }
+
+/* --- 상태 표시 UI (업로드, 성공, 에러) --- */
+.upload-progress, .success-result, .error-result {
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+.upload-progress { background-color: #fff3cd; border: 1px solid #ffeaa7; }
+.upload-progress h3 { margin-top: 0; color: #856404; }
+.success-result { background-color: #d4edda; border: 1px solid #c3e6cb; }
+.success-result h3 { margin-top: 0; color: #155724; }
+.error-result { background-color: #f8d7da; border: 1px solid #f5c6cb; }
+.error-result h3 { margin-top: 0; color: #721c24; }
+.error-result button {
+  background-color: #dc3545; color: white; border: none; padding: 8px 16px;
+  border-radius: 4px; cursor: pointer; margin-top: 10px;
+}
+.error-result button:hover { background-color: #c82333; }
+
+/* --- 페이지 전체 및 위험 구역 --- */
+.json-ex-container { padding: 20px; min-height: 100vh; background-color: white; }
+.danger-zone {
+  margin-bottom: 20px; padding: 15px; border: 2px solid #ff6b6b;
+  border-radius: 8px; background-color: #ffe0e0;
+}
+.danger-zone h3 { color: #d63031; margin-top: 0; margin-bottom: 10px; }
+.danger-zone p { margin-bottom: 15px; color: #666; }
+.danger-zone-button {
+  padding: 10px 20px; background-color: #d63031; color: white; border: none;
+  border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold;
+}
+.danger-zone-button:disabled { background-color: #ccc; cursor: not-allowed; }
+.status-message { margin-top: 10px; padding: 8px 12px; border-radius: 4px; }
+.status-message.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.status-message.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+/* --- 게임 목록 UI --- */
+.game-list-section { margin-top: 40px; }
+.section-divider { border: none; border-top: 1px solid #eee; margin: 40px 0; }
+.game-list-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.game-list-controls h2 { margin: 0; }
+.delete-selected-button {
+  padding: 8px 15px; background-color: #d63031; color: white; border: none;
+  border-radius: 4px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px;
+}
+.delete-selected-button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+.game-list-wrapper { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+.game-list-header, .game-list-item { display: flex; padding: 12px 15px; align-items: center; }
+.game-list-header { background-color: #f7f7f7; font-weight: bold; border-bottom: 1px solid #ddd; }
+.game-list-item { border-bottom: 1px solid #eee; transition: background-color 0.2s; cursor: pointer; }
+.game-list-item:last-child { border-bottom: none; }
+.game-list-item:hover { background-color: #f9f9f9; }
+.game-list-item.selected { background-color: #e8f0fe; }
+
+/* 각 셀(열) 스타일 */
+.game-list-cell { display: flex; align-items: center; }
+.cell-checkbox { flex: 0 0 40px; }
+.cell-date { flex: 1 1 120px; }
+.cell-match { flex: 1.5 1 0; }
+.cell-location { flex: 1 1 140px; } /* << 신규 추가 */
+.cell-type { flex: 1 1 100px; }
+.cell-key { flex: 1.5 1 0; font-family: monospace; font-size: 12px; color: #666; }
+.list-placeholder { padding: 20px; text-align: center; }
