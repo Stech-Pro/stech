@@ -173,7 +173,7 @@ const LoginForm = ({
         {isFormLoading ? 'Loading...' : '로그인'}
       </button>
 
-      <div className="divider-container">
+      {/* <div className="divider-container">
         <div className="divider" />
         <span className="divider-text">or</span>
         <div className="divider" />
@@ -196,7 +196,7 @@ const LoginForm = ({
           <img src={Kakao} alt="kakao" className="socialicon" />
           카카오로 로그인
         </button>
-      </div>
+      </div> */}
     </form>
   );
 };
