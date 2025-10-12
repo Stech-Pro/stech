@@ -13,8 +13,11 @@ import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
 import NotificationHoverIcon from '../../../../../components/Notifications/NotificationHoverIcon';
 
 /* ===== 상수 ===== */
-const TYPES = ['리그', '친선전', '스크리미지'];
-
+const TYPES_LABEL = {
+  League:'리그',
+  Friendly:'친선전',
+  Scrimmage: '스크리미지',
+}
 /** region 코드 → 한글 라벨 */
 const REGION_LABEL = {
   Seoul: '서울',
@@ -215,22 +218,24 @@ export default function GamePage() {
                 </button>
                 {showType && (
                   <ul className="typeDropdown">
-                    {TYPES.map((t) => (
-                      <li key={t}>
+                    {/* 수정된 부분: Object.entries를 사용해 객체를 배열로 변환 후 map 실행 */}
+                    {Object.entries(TYPES_LABEL).map(([key, label]) => (
+                      <li key={key}>
                         <button
-                          className={`typeItem ${
-                            selectedType === t ? 'active' : ''
-                          }`}
+                          className={`typeItem ${selectedType === key ? 'active' : ''}`}
                           onClick={() => {
-                            setSelectedType(t);
+                            // 상태에는 영문 key를 저장해야 필터링이 정상 동작합니다.
+                            setSelectedType(key);
                             setShowType(false);
                           }}
                         >
-                          {t}
+                          {/* 사용자에게는 한글 label을 보여줍니다. */}
+                          {label}
                         </button>
                       </li>
                     ))}
                   </ul>
+
                 )}
               </div>
 

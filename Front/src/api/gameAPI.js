@@ -27,6 +27,7 @@ export async function fetchTeamGames(teamNameOrId) {
   const res = await apiFetch(url, { method: 'GET' });
   const data = await jsonOrText(res);
 
+  console.log(data);
   if (!res.ok) {
     throw new APIError(
       typeof data === 'object' ? data.message || '팀 경기 조회 실패' : '팀 경기 조회 실패',
