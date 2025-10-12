@@ -80,7 +80,7 @@ export default function GamePage() {
   const teamsByLeague = useMemo(() => {
     const m = {};
     TEAMS.forEach((t) => {
-      if (t.id === selfTeam?.id) return; // 내 팀 제외
+      if (t.id === selfTeam?.id || t.id === 'ADMIN') return; // 내 팀 제외
       const label = REGION_LABEL[t.region] || '기타';
       (m[label] ||= []).push(t);
     });
