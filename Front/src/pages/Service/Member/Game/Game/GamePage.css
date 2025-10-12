@@ -60,7 +60,7 @@
 
 .filterButton,
 .resetButton {
-  width: 8.125rem;
+  min-width: 8.125rem;
   height: 3.444rem;
   font-size: 1.125rem;
   border-radius: 0.5rem;

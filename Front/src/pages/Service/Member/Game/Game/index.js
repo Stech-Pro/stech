@@ -214,7 +214,7 @@ export default function GamePage() {
                   className={`filterButton ${selectedType ? 'active' : ''}`}
                   onClick={() => setShowType(!showType)}
                 >
-                  {selectedType ?? '유형'} <FaChevronDown size={10} />
+                  {TYPES_LABEL[selectedType] ?? '유형'} <FaChevronDown size={10} />
                 </button>
                 {showType && (
                   <ul className="typeDropdown">
