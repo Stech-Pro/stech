@@ -78,7 +78,7 @@ export const PT_LABEL = {
   TPT: '2PT',
   FG: 'FG',
   SACK: '색',
-  NOPASS: '패스 실패',
+  NOPASS: '패스',
 };
 const PLAY_TYPES = {
   RUN: 'RUN',

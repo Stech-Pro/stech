@@ -318,6 +318,10 @@
   align-items: center;
   gap: 0.5rem;
 }
+.game-team.left {
+  justify-self: end;
+  text-align: right;
+}
 
 .game-team-logo {
   width: 1.563rem; /* 25px */

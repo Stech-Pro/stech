@@ -14,10 +14,10 @@ import NotificationHoverIcon from '../../../../../components/Notifications/Notif
 
 /* ===== 상수 ===== */
 const TYPES_LABEL = {
-  League:'리그',
-  Friendly:'친선전',
+  League: '리그',
+  Friendly: '친선전',
   Scrimmage: '스크리미지',
-}
+};
 /** region 코드 → 한글 라벨 */
 const REGION_LABEL = {
   Seoul: '서울',
@@ -214,7 +214,8 @@ export default function GamePage() {
                   className={`filterButton ${selectedType ? 'active' : ''}`}
                   onClick={() => setShowType(!showType)}
                 >
-                  {TYPES_LABEL[selectedType] ?? '유형'} <FaChevronDown size={10} />
+                  {TYPES_LABEL[selectedType] ?? '유형'}{' '}
+                  <FaChevronDown size={10} />
                 </button>
                 {showType && (
                   <ul className="typeDropdown">
@@ -222,7 +223,9 @@ export default function GamePage() {
                     {Object.entries(TYPES_LABEL).map(([key, label]) => (
                       <li key={key}>
                         <button
-                          className={`typeItem ${selectedType === key ? 'active' : ''}`}
+                          className={`typeItem ${
+                            selectedType === key ? 'active' : ''
+                          }`}
                           onClick={() => {
                             // 상태에는 영문 key를 저장해야 필터링이 정상 동작합니다.
                             setSelectedType(key);
@@ -235,7 +238,6 @@ export default function GamePage() {
                       </li>
                     ))}
                   </ul>
-
                 )}
               </div>
 
@@ -321,7 +323,10 @@ export default function GamePage() {
               >
                 경기 업로드
               </button>
-               <NotificationHoverIcon className="notificationButton" iconSize={24} />
+              <NotificationHoverIcon
+                className="notificationButton"
+                iconSize={24}
+              />
             </div>
           </div>
         </div>
@@ -407,6 +412,9 @@ export default function GamePage() {
 
                 <div className="game-results">
                   <div className="game-team left">
+                    <span className="game-team-name">
+                      {homeMeta?.name || g.homeId}
+                    </span>
                     {homeMeta?.logo && (
                       <div className="game-team-logo">
                         <img
@@ -420,9 +428,6 @@ export default function GamePage() {
                         />
                       </div>
                     )}
-                    <span className="game-team-name">
-                      {homeMeta?.name || g.homeId}
-                    </span>
                   </div>
 
                   <div className="game-score">
