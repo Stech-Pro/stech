@@ -318,7 +318,7 @@ export const FALL_2025_DATA = {
               ],
             },
           ],
-           final: [
+          final: [
             {
               stage: '결승전',
               date: '2025-10-03',
@@ -355,13 +355,13 @@ export const FALL_2025_DATA = {
           promotion: [
             {
               stage: '승강전',
-              date: '2025-10-11',
+              date: '2025-11-09',
               location: '효창운동장',
               home: '홍익대 카우보이스',
               away: '고려대 타이거스',
-              homeScore: 0,
-              awayScore: 0,
-              winner: '',
+              homeScore: 12,
+              awayScore: 22,
+              winner: '고려대 타이거스',
             },
           ],
         },
