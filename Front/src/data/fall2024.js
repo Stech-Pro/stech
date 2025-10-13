@@ -214,9 +214,7 @@ export const FALL_2024_DATA = {
 
       ],
     },
-
   },
-
 };
 
 // 2024 · 서울 · 1부 팀 스탯 (StatTeam에 바로 넣어 쓰는 형태)
@@ -484,16 +482,6 @@ export const TEAM_STATS_2024_SEOUL_1 = [
   },
 ];
 
-
-// src/data/guestPosition_2024_seoul1.js
-
-/**
- * 게스트용: "서울-1부-포지션별" 원시 텍스트 → StatPosition에서 쓰는 players 배열로 파싱
- * - 각 라인: "<등번호>번 <팀명> <스탯...>"
- * - 포지션/카테고리별 스키마에 맞춰 필드 매핑
- * - 동일 선수(포지션/팀/등번호)는 한 객체로 병합
- */
-
 const DIVISION = '1부';
 
 // 숫자/쌍(예: "4-7") 토큰 식별
@@ -642,7 +630,6 @@ function ingestBlock(playersMap, position, category, lines) {
     });
 }
 
-/* ---------------------- 원시 텍스트 데이터 ---------------------- */
 
 // QB - 패스
 const QB_PASS = [

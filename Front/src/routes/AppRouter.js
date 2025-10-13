@@ -67,6 +67,7 @@ export default function AppRouter() {
               element={<ServicePages.GuestLeaguePositionPage />}
             />
           </Route>
+          <Route path="video" element={<ServicePages.GuestVideo />} />
         </Route>
 
         <Route path="admin" element={<AdminPages.AdminLayout />}>

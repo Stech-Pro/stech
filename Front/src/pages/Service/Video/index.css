@@ -953,7 +953,16 @@ padding: 25px 30px;
 .videoPlaysList {
   color: white;
 }
-
+.clip-sig.vid{
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 10px;
+}
+.clip-type,.clip-down{
+  min-height: 1.2em; /* 폰트 크기에 비례하여 최소 높이를 확보 */
+  display: flex;
+  align-items: center; /* 내용이 있을 경우 세로 중앙 정렬 */
+}
 .vid-clip-row1,
 .vid-clip-row2 {
   min-width: 3rem;

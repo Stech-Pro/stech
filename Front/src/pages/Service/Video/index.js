@@ -67,33 +67,31 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
 export const PT_LABEL = {
   RUN: '런',
   PASS: '패스',
-  PASS_INCOMPLETE: '패스 실패',
-  KICKOFF: '킥오프',
+  RETURN: '리턴',
   PUNT: '펀트',
-  PAT: 'PAT',
-  TWOPT: '2PT',
-  FIELDGOAL: 'FG',
-};
-const PLAY_TYPES = {
-  RUN: 'RUN',
-  PASS: 'PASS',
-  KICKOFF: 'KICKOFF',
-  PUNT: 'PUNT',
+  FG: 'FG',
+  SACK: '색',
+  NOPASS: '패스',
 };
 
 const SIGNIFICANT_PLAYS = {
   TOUCHDOWN: '터치다운',
   TWOPTCONVGOOD: '2PT 성공',
   TWOPTCONVNOGOOD: '2PT 실패',
-  PATSUCCESS: 'PAT 성공',
-  PATFAIL: 'PAT 실패',
+  //PAT
+  PATGOOD: 'PAT 성공',
+  PATNOGOOD: 'PAT 실패',
+  //FG
   FIELDGOALGOOD: 'FG 성공',
   FIELDGOALNOGOOD: 'FG 실패',
-  PENALTY: '페널티',
+  'PENALTY.OFF': '공격팀 페널티',
+  'PENALTY.DEF': '수비팀 페널티',
   SACK: '색',
   TFL: 'TFL',
   FUMBLE: '펌블',
-  INTERCEPTION: '인터셉트',
+  FUMBLERECOFF: '공격팀 리커버리',
+  FUMBLERECDEF: '수비팀 리커버리',
+  INTERCEPT: '인터셉트',
   TURNOVER: '턴오버',
   SAFETY: '세이프티',
 };
@@ -104,6 +102,10 @@ const OPPOSITES = {
   'PAT 실패': 'PAT 성공',
   'FG 성공': 'FG 실패',
   'FG 실패': 'FG 성공',
+  '공격팀 페널티': '수비팀 페널티',
+  '수비팀 페널티': '공격팀 페널티',
+  '공격팀 리커버리': '수비팀 리커버리',
+  '수비팀 리커버리': '공격팀 리커버리',
 };
 
 const SPECIAL_DOWN_MAP = { TPT: '2PT', KICKOFF: '킥오프', PAT: 'PAT' };
@@ -148,17 +150,17 @@ function PlayerCore({ stateData }) {
     initialPlayId,
   } = stateData;
 
-  // useClipFilter를 실제 데이터가 변경될 때마다 업데이트되도록 수정
   const clipFilterParams = useMemo(
     () => ({
       rawClips: rawClips || [],
       initialFilters: initialFilters || {},
       teamOptions: teamOptions || [],
       opposites: OPPOSITES,
+      significantPlayField: 'displaySignificantPlays',
       persistKey: `videoPlayerFilters:${teamMeta?.homeName || 'default'}`,
     }),
     [rawClips, initialFilters, teamOptions, teamMeta?.homeName],
-  ); // 실제 의존성 추가
+  );
 
   const {
     clips = [],
@@ -198,29 +200,22 @@ function PlayerCore({ stateData }) {
   const menuRef = useRef(null);
   const [showGameDataModal, setShowGameDataModal] = useState(false);
   const [showVideoSettingModal, setShowVideoSettingModal] = useState(false);
-
-  // 초기화를 한 번만 수행
   const initializationDone = useRef(false);
 
   useEffect(() => {
     if (initializationDone.current) return;
-
     if (clips && clips.length > 0) {
-      // initialPlayId는 clipKey 값이므로 clipKey로 매칭해서 실제 id를 찾아야 함
       const targetClip =
         initialPlayId &&
         clips.find((c) => String(c.clipKey) === String(initialPlayId));
       const targetId = targetClip ? String(targetClip.id) : String(clips[0].id);
-
       setSelectedId(targetId);
       initializationDone.current = true;
     }
-  }, [clips, initialPlayId]); // 실제 clips 배열과 initialPlayId 변경 시 실행
+  }, [clips, initialPlayId]);
 
-  // 필터 변경 시 현재 클립이 결과에 없으면 첫 번째 클립으로 이동
   useEffect(() => {
     if (!selectedId || !clips || clips.length === 0) return;
-
     const isCurrentClipInResults = clips.some(
       (c) => String(c.id) === String(selectedId),
     );
@@ -236,39 +231,27 @@ function PlayerCore({ stateData }) {
 
   useEffect(() => {
     if (!gameKey || !token) return;
-
     const fetchAllMemoCounts = async () => {
       try {
-        // 1. 기존 API를 호출하여 게임의 모든 메모 '목록'을 가져옵니다.
         const response = await listMemos({ gameKey }, token);
         const allMemos = Array.isArray(response?.memos) ? response.memos : [];
-
-        // 2. 받아온 메모 목록을 { clipKey: count } 형태의 '맵'으로 가공합니다.
         const countsMap = allMemos.reduce((acc, memo) => {
-          const key = memo.clipKey; // 각 메모 객체에서 clipKey를 가져옵니다.
-          if (key) {
-            acc[key] = (acc[key] || 0) + 1;
-          }
+          const key = memo.clipKey;
+          if (key) acc[key] = (acc[key] || 0) + 1;
           return acc;
         }, {});
-
         setMemoCounts(countsMap);
       } catch (e) {
         console.error('전체 메모 개수 조회 및 가공 실패:', e);
         setMemoCounts({});
       }
     };
-
     fetchAllMemoCounts();
   }, [gameKey, token]);
 
   const handleMemoCountChange = useCallback((clipId, count) => {
-    if (clipId) {
-      setMemoCounts((prevCounts) => ({
-        ...prevCounts,
-        [clipId]: count,
-      }));
-    }
+    if (clipId)
+      setMemoCounts((prevCounts) => ({ ...prevCounts, [clipId]: count }));
   }, []);
 
   const handleSaveMemo = (clipId, memoData, playerID) => {
@@ -316,12 +299,10 @@ function PlayerCore({ stateData }) {
     e.stopPropagation();
     setContextMenu({ visible: true, x: e.clientX, y: e.clientY });
   }, []);
-
   const closeContextMenu = useCallback(
     () => setContextMenu({ visible: false, x: 0, y: 0 }),
     [],
   );
-
   const handleSystemSettings = useCallback(
     (e) => {
       e.preventDefault();
@@ -329,9 +310,8 @@ function PlayerCore({ stateData }) {
       setShowVideoSettingModal(true);
       closeContextMenu();
     },
-    [closeContextMenu, navigate],
+    [closeContextMenu],
   );
-
   const handleEditGameData = useCallback(
     (e) => {
       e.preventDefault();
@@ -370,38 +350,25 @@ function PlayerCore({ stateData }) {
     () => clips.find((p) => String(p.id) === selectedId) || null,
     [clips, selectedId],
   );
-
   const currentClipKey = selected?.clipKey || selectedId;
   const currentMemoCount = memoCounts[currentClipKey] || 0;
-
   const hasNoVideo = !!selected && !selected.clipUrl;
   const isPlaySelected = useCallback(
     (id) => String(id) === selectedId,
     [selectedId],
   );
+
   useEffect(() => {
-    if (selected && selected.clipUrl && videoRef.current) {
-      console.log('🎥 Loading new video:', {
-        id: selected.id,
-        clipUrl: selected.clipUrl,
-        currentSrc: videoRef.current.src,
-      });
+    if (selected && selected.clipUrl && videoRef.current)
       videoRef.current.load();
-    }
   }, [selected?.clipUrl]);
 
-  // selectPlay를 단순화
   const selectPlay = useCallback(
     (id, options = {}) => {
       const newId = String(id);
       if (newId === selectedId) return;
-
       setSelectedId(newId);
-
-      if (options.autoplay) {
-        pendingAutoplayRef.current = true;
-      }
-
+      if (options.autoplay) pendingAutoplayRef.current = true;
       setIsPlaying(false);
       setHasError(false);
       setIsLoading(true);
@@ -411,67 +378,31 @@ function PlayerCore({ stateData }) {
     [selectedId],
   );
 
-  // 현재 클립의 위치 정보
-  const getCurrentClipPosition = useCallback(() => {
+  const clipPosition = useMemo(() => {
     if (!selectedId || !clips || clips.length === 0) return null;
-
     const currentIndex = clips.findIndex(
       (c) => String(c.id) === String(selectedId),
     );
     if (currentIndex === -1) return null;
-
     return {
       current: currentIndex + 1,
       total: clips.length,
       isFirst: currentIndex === 0,
       isLast: currentIndex === clips.length - 1,
     };
-  }, [selectedId]);
-
-  const clipPosition = getCurrentClipPosition();
-
-  // 필터링된 클립들 기준으로 네비게이션
-  const goNextClip = useCallback(() => {
-    if (!selectedId || !clips || clips.length === 0) return;
-
-    const currentIndex = clips.findIndex(
-      (c) => String(c.id) === String(selectedId),
-    );
-
-    if (currentIndex === -1 || currentIndex >= clips.length - 1) return;
-
-    const nextClip = clips[currentIndex + 1];
-    if (nextClip) {
-      setSelectedId(String(nextClip.id));
-      pendingAutoplayRef.current = true;
-      setIsPlaying(false);
-      setHasError(false);
-      setIsLoading(true);
-      setCurrentTime(0);
-      setDuration(0);
-    }
   }, [selectedId, clips]);
+
+  const goNextClip = useCallback(() => {
+    if (!clipPosition || clipPosition.isLast) return;
+    const nextClip = clips[clipPosition.current];
+    if (nextClip) selectPlay(nextClip.id, { autoplay: true });
+  }, [clips, clipPosition, selectPlay]);
 
   const goPrevClip = useCallback(() => {
-    if (!selectedId || !clips || clips.length === 0) return;
-
-    const currentIndex = clips.findIndex(
-      (c) => String(c.id) === String(selectedId),
-    );
-
-    if (currentIndex <= 0) return;
-
-    const prevClip = clips[currentIndex - 1];
-    if (prevClip) {
-      setSelectedId(String(prevClip.id));
-      pendingAutoplayRef.current = true;
-      setIsPlaying(false);
-      setHasError(false);
-      setIsLoading(true);
-      setCurrentTime(0);
-      setDuration(0);
-    }
-  }, [selectedId, clips]);
+    if (!clipPosition || clipPosition.isFirst) return;
+    const prevClip = clips[clipPosition.current - 2];
+    if (prevClip) selectPlay(prevClip.id, { autoplay: true });
+  }, [clips, clipPosition, selectPlay]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -481,7 +412,6 @@ function PlayerCore({ stateData }) {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-
     const onLoadedMetadata = () => {
       setDuration(video.duration || 0);
       setIsLoading(false);
@@ -491,7 +421,7 @@ function PlayerCore({ stateData }) {
     const onTimeUpdate = () => setCurrentTime(video.currentTime || 0);
     const onEnded = () => {
       setIsPlaying(false);
-      goNextClip();
+      if (settings.autoNext) goNextClip();
     };
     const onError = () => {
       setHasError(true);
@@ -508,14 +438,12 @@ function PlayerCore({ stateData }) {
       }
     };
     const onLoadStart = () => setIsLoading(true);
-
     video.addEventListener('loadedmetadata', onLoadedMetadata);
     video.addEventListener('timeupdate', onTimeUpdate);
     video.addEventListener('ended', onEnded);
     video.addEventListener('error', onError);
     video.addEventListener('canplay', onCanPlay);
     video.addEventListener('loadstart', onLoadStart);
-
     return () => {
       video.removeEventListener('loadedmetadata', onLoadedMetadata);
       video.removeEventListener('timeupdate', onTimeUpdate);
@@ -524,7 +452,7 @@ function PlayerCore({ stateData }) {
       video.removeEventListener('canplay', onCanPlay);
       video.removeEventListener('loadstart', onLoadStart);
     };
-  }, [selectedId, goNextClip]);
+  }, [selectedId, goNextClip, settings.autoNext]);
 
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
@@ -552,7 +480,6 @@ function PlayerCore({ stateData }) {
     [duration, hasError],
   );
 
-  // 이벤트 전파 차단을 포함한 핸들러들
   const handleTogglePlay = useCallback(
     (e) => {
       e.preventDefault();
@@ -561,7 +488,6 @@ function PlayerCore({ stateData }) {
     },
     [togglePlay],
   );
-
   const handleStepTime = useCallback(
     (e, seconds) => {
       e.preventDefault();
@@ -570,7 +496,6 @@ function PlayerCore({ stateData }) {
     },
     [stepTime],
   );
-
   const handleGoNextClip = useCallback(
     (e) => {
       e.preventDefault();
@@ -579,7 +504,6 @@ function PlayerCore({ stateData }) {
     },
     [goNextClip],
   );
-
   const handleGoPrevClip = useCallback(
     (e) => {
       e.preventDefault();
@@ -610,9 +534,13 @@ function PlayerCore({ stateData }) {
     (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const video = videoRef.current;
-      const tl = timelineRef.current;
-      if (!video || !tl || hasError || duration === 0) return;
+      if (
+        !videoRef.current ||
+        !timelineRef.current ||
+        hasError ||
+        duration === 0
+      )
+        return;
       handleTimelineClick(e);
       const onMove = (me) => {
         me.preventDefault();
@@ -629,7 +557,6 @@ function PlayerCore({ stateData }) {
     [duration, hasError, handleTimelineClick],
   );
 
-  // 키보드 이벤트 중복 방지
   useEffect(() => {
     const onKey = (e) => {
       if (
@@ -638,20 +565,15 @@ function PlayerCore({ stateData }) {
         e.target?.tagName === 'INPUT' ||
         e.target?.tagName === 'TEXTAREA' ||
         e.target?.isContentEditable
-      ) {
+      )
         return;
-      }
-
       if (e.defaultPrevented) return;
-
       const key = e.key.toUpperCase();
       const backwardKey = settings?.hotkeys?.backward?.toUpperCase?.() || 'A';
       const forwardKey = settings?.hotkeys?.forward?.toUpperCase?.() || 'D';
       const nextKey = settings?.hotkeys?.nextVideo?.toUpperCase?.() || 'N';
       const prevKey = settings?.hotkeys?.prevVideo?.toUpperCase?.() || 'M';
-
       let handled = false;
-
       if (key === ' ' && !e.repeat) {
         e.preventDefault();
         e.stopPropagation();
@@ -678,12 +600,8 @@ function PlayerCore({ stateData }) {
         goPrevClip();
         handled = true;
       }
-
-      if (handled) {
-        e.stopImmediatePropagation();
-      }
+      if (handled) e.stopImmediatePropagation();
     };
-
     document.addEventListener('keydown', onKey, { capture: true });
     return () =>
       document.removeEventListener('keydown', onKey, { capture: true });
@@ -708,7 +626,6 @@ function PlayerCore({ stateData }) {
     () => (selected ? getDownDisplay(selected) : ''),
     [selected],
   );
-
   const homeName = teamMeta?.homeName || 'Home';
   const awayName = teamMeta?.awayName || 'Away';
   const homeLogo = teamMeta?.homeLogo || null;
@@ -716,15 +633,12 @@ function PlayerCore({ stateData }) {
   const scoreHome = selected?.StartScore?.[0]?.Home ?? selected?.scoreHome ?? 0;
   const scoreAway = selected?.StartScore?.[0]?.Away ?? selected?.scoreAway ?? 0;
   const quarter = selected?.quarter ?? 1;
-
   const teamSummary = summaries.team;
   const quarterSummary = summaries.quarter;
   const playTypeSummary = filters.playType
     ? PT_LABEL[filters.playType]
     : '유형';
   const significantSummary = summaries.significant;
-
-  // 컨테이너 클릭 이벤트 차단
   const handleContainerClick = useCallback((e) => {
     e.stopPropagation();
   }, []);
@@ -763,7 +677,6 @@ function PlayerCore({ stateData }) {
             ) : (
               <div className="scoreTeamLogo placeholder">{homeName[0]}</div>
             )}
-
             <div className="scoreTeamInfo">
               <span className="scoreTeamName">{homeName}</span>
               <span className="scoreTeamScore">{scoreHome}</span>
@@ -872,7 +785,6 @@ function PlayerCore({ stateData }) {
                 <IoPlayCircleOutline size={32} />
               )}
             </button>
-
             <div className="videoFrameNavigation">
               <button
                 className="skipSquare skipSquare--back"
@@ -880,18 +792,16 @@ function PlayerCore({ stateData }) {
                 disabled={hasError || !selected}
                 title={`Previous ${settings.skipTime}s (A)`}
               >
-                <TbArrowForwardUpDouble className="skipSquare__icon" />
+                <TbArrowForwardUpDouble className="skipSquare__icon" />{' '}
                 <span className="skipSquare__sec">{settings.skipTime}</span>
               </button>
-
-              {/* 앞으로 */}
               <button
                 className="skipSquare"
                 onClick={(e) => handleStepTime(e, settings.skipTime)}
                 disabled={hasError || !selected}
                 title={`Next ${settings.skipTime}s (D)`}
               >
-                <TbArrowForwardUpDouble className="skipSquare__icon" />
+                <TbArrowForwardUpDouble className="skipSquare__icon" />{' '}
                 <span className="skipSquare__sec">{settings.skipTime}</span>
               </button>
               <button
@@ -945,9 +855,7 @@ function PlayerCore({ stateData }) {
                 }}
               />
             </div>
-
             <div className="timeLabel dim">{formatTime(duration)}</div>
-
             <div className="volume">
               <button
                 className="ctrl volBtn"
@@ -970,7 +878,6 @@ function PlayerCore({ stateData }) {
                 onChange={(e) => setVolume(parseFloat(e.target.value))}
               />
             </div>
-
             <button
               className="ctrl fsBtn"
               onClick={toggleFullscreen}
@@ -1053,7 +960,8 @@ function PlayerCore({ stateData }) {
                     closeAllMenus();
                   }}
                 >
-                  전체
+                  {' '}
+                  전체{' '}
                 </button>
                 {[1, 2, 3, 4].map((q) => (
                   <button
@@ -1068,7 +976,8 @@ function PlayerCore({ stateData }) {
                       closeAllMenus();
                     }}
                   >
-                    Q{q}
+                    {' '}
+                    Q{q}{' '}
                   </button>
                 ))}
               </Dropdown>
@@ -1088,7 +997,8 @@ function PlayerCore({ stateData }) {
                     closeAllMenus();
                   }}
                 >
-                  전체
+                  {' '}
+                  전체{' '}
                 </button>
                 {teamOptions.map((opt) => (
                   <button
@@ -1103,10 +1013,11 @@ function PlayerCore({ stateData }) {
                       closeAllMenus();
                     }}
                   >
+                    {' '}
                     {opt.logo && (
                       <img className="ff-dd-avatar" src={opt.logo} alt="" />
-                    )}
-                    {opt.label || opt.value}
+                    )}{' '}
+                    {opt.label || opt.value}{' '}
                   </button>
                 ))}
               </Dropdown>
@@ -1130,9 +1041,10 @@ function PlayerCore({ stateData }) {
                     closeAllMenus();
                   }}
                 >
-                  전체
+                  {' '}
+                  전체{' '}
                 </button>
-                {Object.entries(PLAY_TYPES).map(([code]) => (
+                {Object.entries(PT_LABEL).map(([code]) => (
                   <button
                     key={code}
                     className={`ff-dd-item ${
@@ -1145,7 +1057,8 @@ function PlayerCore({ stateData }) {
                       closeAllMenus();
                     }}
                   >
-                    {PT_LABEL[code] || code}
+                    {' '}
+                    {PT_LABEL[code] || code}{' '}
                   </button>
                 ))}
               </Dropdown>
@@ -1157,9 +1070,9 @@ function PlayerCore({ stateData }) {
                 onClose={closeAllMenus}
               >
                 <div className="ff-dd-section">
-                  {Object.values(SIGNIFICANT_PLAYS).map((label) => (
+                  {Object.entries(SIGNIFICANT_PLAYS).map(([code, label]) => (
                     <button
-                      key={label}
+                      key={code}
                       className={`ff-dd-item ${
                         filters.significantPlay?.includes(label)
                           ? 'selected'
@@ -1171,7 +1084,8 @@ function PlayerCore({ stateData }) {
                         handleFilterChange('significantPlay', label);
                       }}
                     >
-                      {label}
+                      {' '}
+                      {label}{' '}
                     </button>
                   ))}
                 </div>
@@ -1184,7 +1098,8 @@ function PlayerCore({ stateData }) {
                       setFilters((p) => ({ ...p, significantPlay: [] }));
                     }}
                   >
-                    모두 해제
+                    {' '}
+                    모두 해제{' '}
                   </button>
                   <button
                     className="ff-dd-close"
@@ -1194,7 +1109,8 @@ function PlayerCore({ stateData }) {
                       closeAllMenus();
                     }}
                   >
-                    닫기
+                    {' '}
+                    닫기{' '}
                   </button>
                 </div>
               </Dropdown>
@@ -1209,7 +1125,8 @@ function PlayerCore({ stateData }) {
                   clearAllFilters();
                 }}
               >
-                초기화
+                {' '}
+                초기화{' '}
               </button>
             </div>
           </div>
@@ -1228,21 +1145,28 @@ function PlayerCore({ stateData }) {
                   }}
                 >
                   <div className="quarter-name">
-                    <div>{p.quarter}Q</div>
+                    {' '}
+                    <div>{p.quarter}Q</div>{' '}
                   </div>
                   <div className="clip-rows">
                     <div className="vid-clip-row1">
                       <div className="clip-down">{getDownDisplay(p)}</div>
-                      <div className="clip-type">
-                        #{PT_LABEL[p.playType] || p.playType}
-                      </div>
+                      {PT_LABEL[p.playType] ? (
+                        <div className="clip-type">#{PT_LABEL[p.playType]}</div>
+                      ):(<div className="clip-type"></div>)}
                     </div>
                     <div className="vid-clip-row2">
-                      <div className="clip-oT">{p.offensiveTeam}</div>
-                      {Array.isArray(p.significant) &&
-                      p.significant.length > 0 ? (
-                        <div className="clip-sig">
-                          {p.significant.map((t, idx) => (
+                      <div className="clip-oT">
+                        {p.offensiveTeam === 'Home'
+                          ? homeName
+                          : p.offensiveTeam === 'Away'
+                          ? awayName
+                          : p.offensiveTeam}
+                      </div>
+                      {Array.isArray(p.displaySignificantPlays) &&
+                      p.displaySignificantPlays.length > 0 ? (
+                        <div className="clip-sig vid">
+                          {p.displaySignificantPlays.map((t, idx) => (
                             <span key={`${p.id}-sig-${idx}`}>#{t}</span>
                           ))}
                         </div>
@@ -1255,7 +1179,8 @@ function PlayerCore({ stateData }) {
               ))
             ) : (
               <div className="videoNoPlaysMessage">
-                일치하는 클립이 없습니다.
+                {' '}
+                일치하는 클립이 없습니다.{' '}
               </div>
             )}
           </div>
@@ -1284,10 +1209,12 @@ function PlayerCore({ stateData }) {
           }}
         >
           <div className="contextMenuItem" onClick={handleSystemSettings}>
-            ⚙️ 시스템 설정
+            {' '}
+            ⚙️ 시스템 설정{' '}
           </div>
           <div className="contextMenuItem" onClick={handleEditGameData}>
-            📝 경기데이터 수정
+            {' '}
+            📝 경기데이터 수정{' '}
           </div>
         </div>
       )}
@@ -1308,7 +1235,7 @@ function PlayerCore({ stateData }) {
         onClose={() => setShowMemo(false)}
         gameKey={gameKey}
         clipKey={selected?.clipKey || selectedId}
-        teamId={teamMeta?.teamId} // 있으면 전달
+        teamId={teamMeta?.teamId}
         playType={selected?.playType}
         memos={memos}
         onSaveMemo={handleSaveMemo}
