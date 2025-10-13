@@ -13,11 +13,16 @@ export function useClipFilter({
   teamOptions = [],
   opposites = {},
   initialFilters = {},
+  // ===================== [변경점 1] 새로운 옵션 추가 =====================
+  // significantPlay 필터링에 사용할 필드 이름을 외부에서 지정할 수 있도록 합니다.
+  // 기본값은 'significantPlay'로 설정하여 기존 코드가 깨지지 않도록 합니다. (하위 호환성)
+  significantPlayField = 'significantPlay',
+  // ====================================================================
 }) {
   const hasInitialized = useRef(false);
   
+  // ... (useState, useEffect 등 다른 로직은 변경할 필요 없습니다)
   const [filters, setFilters] = useState(() => {
-    // 초기화 시에만 localStorage 또는 initialFilters 사용
     if (initialFilters && Object.keys(initialFilters).length > 0) {
       hasInitialized.current = true;
       return { ...DEFAULT_FILTERS, ...initialFilters };
@@ -39,7 +44,6 @@ export function useClipFilter({
     return { ...DEFAULT_FILTERS };
   });
 
-  // localStorage 저장은 디바운스로 처리
   const saveTimeoutRef = useRef(null);
   useEffect(() => {
     if (!hasInitialized.current) return;
@@ -52,7 +56,7 @@ export function useClipFilter({
       try { 
         localStorage.setItem(persistKey, JSON.stringify(filters)); 
       } catch {}
-    }, 500); // 500ms 디바운스
+    }, 500);
     
     return () => {
       if (saveTimeoutRef.current) {
@@ -61,7 +65,6 @@ export function useClipFilter({
     };
   }, [filters, persistKey]);
 
-  // 팀 옵션 변경 시에만 검증
   const prevTeamOptionsRef = useRef(teamOptions);
   useEffect(() => {
     if (JSON.stringify(prevTeamOptionsRef.current) !== JSON.stringify(teamOptions)) {
@@ -113,20 +116,31 @@ export function useClipFilter({
 
   const clips = useMemo(() => {
     if (!rawClips) return [];
-    return rawClips.filter((r) => {
-      if (filters.team && r.offensiveTeam !== filters.team) return false;
-      if (filters.quarter && r.quarter !== filters.quarter) return false;
-      if (filters.playType && r.playType !== filters.playType) return false;
+    return rawClips.filter((clip) => { // 'r'을 'clip'으로 변경하여 가독성 향상
+      if (filters.team && clip.offensiveTeam !== filters.team) return false;
+      if (filters.quarter && clip.quarter !== filters.quarter) return false;
+      if (filters.playType && clip.playType !== filters.playType) return false;
       if (filters.significantPlay?.length) {
-        if (!r.significantPlay || r.significantPlay.length === 0) return false;
-        const hasAny = r.significantPlay.some((s) => filters.significantPlay.includes(s));
+        // ============= [변경점 2] 동적 필드 이름을 사용하여 필터링 =============
+        // 기존: clip.significantPlay
+        // 변경: clip[significantPlayField]
+        // 이렇게 하면 'significantPlay' 또는 'displaySignificantPlays' 등 원하는 필드를 사용할 수 있습니다.
+        const targetArray = clip[significantPlayField];
+        if (!targetArray || !Array.isArray(targetArray) || targetArray.length === 0) return false;
+        
+        const hasAny = targetArray.some((s) => filters.significantPlay.includes(s));
         if (!hasAny) return false;
+        // ====================================================================
       }
       return true;
     });
-  }, [rawClips, filters]);
+  // =================== [변경점 3] 의존성 배열에 추가 ===================
+  }, [rawClips, filters, significantPlayField]);
+  // ====================================================================
+
 
   const summaries = useMemo(() => ({
+    // ... (이 부분은 변경할 필요 없습니다)
     team: filters.team || "공격팀",
     quarter: filters.quarter ? `Q${filters.quarter}` : "쿼터",
     playType: filters.playType || "유형",

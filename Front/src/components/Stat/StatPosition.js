@@ -1,10 +1,9 @@
-// StatPosition.jsx
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { RxTriangleDown } from 'react-icons/rx';
 import { FaChevronDown } from 'react-icons/fa';
 import './StatPosition.css';
 
-/* ─────────────────────────  공통 드롭다운  ───────────────────────── */
+/* ─────────────────────────  공통 드롭다운 (수정 없음)  ───────────────────────── */
 function Dropdown({
   value,
   options = [],
@@ -72,9 +71,9 @@ function Dropdown({
   );
 }
 
-/* ─────────────────────────  리그 매핑  ───────────────────────── */
+/* ─────────────────────────  상수 (수정 없음)  ───────────────────────── */
 const TEAM_TO_LEAGUE = {
-  // 서울
+  // ... (데이터는 변경 없음)
   '연세대 이글스': '서울',
   '서울대 그린테러스': '서울',
   '한양대 라이온스': '서울',
@@ -90,8 +89,6 @@ const TEAM_TO_LEAGUE = {
   '숭실대 크루세이더스': '서울',
   '서강대 알바트로스': '서울',
   '경희대 커맨더스': '서울',
-
-  // 경기강원
   '강원대 카프라스': '경기강원',
   '단국대 코디악베어스': '경기강원',
   '성균관대 로얄스': '경기강원',
@@ -99,8 +96,6 @@ const TEAM_TO_LEAGUE = {
   '인하대 틸 드래곤스': '경기강원',
   '한림대 피닉스': '경기강원',
   '한신대 킬러웨일스': '경기강원',
-
-  // 대구경북
   '경북대 오렌지파이터스': '대구경북',
   '경일대 블랙베어스': '대구경북',
   '계명대 슈퍼라이온스': '대구경북',
@@ -111,8 +106,6 @@ const TEAM_TO_LEAGUE = {
   '동국대 화이트엘리펀츠': '대구경북',
   '영남대 페가수스': '대구경북',
   '한동대 홀리램스': '대구경북',
-
-  // 부산경남
   '경성대 드래곤스': '부산경남',
   '동서대 블루돌핀스': '부산경남',
   '동아대 레오파즈': '부산경남',
@@ -122,8 +115,6 @@ const TEAM_TO_LEAGUE = {
   '신라대 데빌스': '부산경남',
   '울산대 유니콘스': '부산경남',
   '한국해양대 바이킹스': '부산경남',
-
-  // 사회인
   '군위 피닉스': '사회인',
   '부산 그리폰즈': '사회인',
   '삼성 블루스톰': '사회인',
@@ -132,11 +123,6 @@ const TEAM_TO_LEAGUE = {
   '서울 바이킹스': '사회인',
   '인천 라이노스': '사회인',
 };
-
-// (목데이터면 보통 프론트 팀명을 바로 쓰므로 필요 없을 수 있음)
-// const BACKEND_TO_FRONTEND_TEAM = { ... };
-
-/* ─────────────────────────  상수  ───────────────────────── */
 const POSITION_OPTIONS = [
   'QB',
   'RB',
@@ -149,7 +135,6 @@ const POSITION_OPTIONS = [
   'LB',
   'DB',
 ];
-
 const LOWER_IS_BETTER = new Set([
   'interceptions',
   'sacks',
@@ -159,16 +144,12 @@ const LOWER_IS_BETTER = new Set([
   'sacks_allowed',
   'touchback_percentage',
 ]);
-
-// "성공-시도" 형태(앞 숫자가 핵심) — K.field_goal
 const PAIR_FIRST_DESC = new Set(['field_goal']);
 const parsePair = (str) => {
   if (typeof str !== 'string') return [0, 0];
   const [a, b] = str.split('-').map((n) => parseFloat(n) || 0);
   return [a, b];
 };
-
-/* 포지션/카테고리 기본 정렬 키(주황 표시용) */
 const PRIMARY_METRIC = {
   QB: { 패스: 'passing_yards', 런: 'rushing_yards' },
   RB: {
@@ -189,7 +170,6 @@ const PRIMARY_METRIC = {
   LB: { default: 'tackles' },
   DB: { 수비: 'interceptions', 스페셜팀: 'kick_return_yards' },
 };
-
 const POSITION_CATEGORIES = {
   QB: ['패스', '런'],
   RB: ['패스', '런', '스페셜팀'],
@@ -202,7 +182,6 @@ const POSITION_CATEGORIES = {
   LB: ['default'],
   DB: ['수비', '스페셜팀'],
 };
-
 const statColumns = {
   QB: {
     패스: [
@@ -323,23 +302,25 @@ const statColumns = {
       { key: 'extra_points_made', label: 'PAT\n성공' },
       { key: 'field_goal', label: '필드골\n성공-시도' },
       { key: 'field_goal_percentage', label: '필드골\n성공률' },
-      { key: 'field_1_19', label: '1-19' },
-      { key: 'field_20_29', label: '20-29' },
-      { key: '30-39', label: '30-39' },
-      { key: '40-49', label: '40-49' },
-      { key: '50_plus', label: '50+' },
+      { key: 'field_goal_1_19', label: '1-19' },
+      { key: 'field_goal_20_29', label: '20-29' },
+      { key: 'field_goal_30_39', label: '30-39' },
+      { key: 'fiedl_goal_40_49', label: '40-49' },
+      { key: 'field_goal_50_plus', label: '50+' },
       { key: 'longest_field_goal', label: '가장 긴\n필드골' },
     ],
   },
   P: {
     스페셜팀: [
       { key: 'games', label: '경기 수' },
-      { key: 'punts', label: '펀트 수' },
-      { key: 'average_punt_yards', label: '평균\n펀트 거리' },
-      { key: 'longest_punt', label: '가장 긴\n펀트' },
-      { key: 'punt_yards', label: '펀트\n야드' },
+      { key: 'punt_count', label: '펀트 수' },
+      { key: 'punt_yards', label: '펀트 야드' },
+      { key: 'average_punt_yard', label: '평균\n펀트 거리' },
+      { key: 'longest_punt', label: '가장\n긴 펀트' },
+      { key: 'touchbacks', label: '터치백' },
       { key: 'touchback_percentage', label: '터치백 %' },
-      { key: 'punts_inside_20', label: '20 야드\n안쪽 펀트 %' },
+      { key: 'inside20', label: '20야드\n안쪽 펀트' },
+      { key: 'inside20_percentage', label: '20야드 안쪽펀트%' },
     ],
   },
   OL: {
@@ -379,34 +360,6 @@ const statColumns = {
       { key: 'touchdowns', label: '수비 터치다운' },
     ],
   },
-  K: {
-    스페셜팀: [
-      { key: 'games', label: '경기 수' },
-      { key: 'extra_points_attempted', label: 'PAT\n시도' },
-      { key: 'extra_points_made', label: 'PAT\n성공' },
-      { key: 'field_goal', label: '필드골 성공시도' },
-      { key: 'field_goal_percentage', label: '필드골\n성공률' },
-      { key: 'field_goal_1_19', label: '1-19' },
-      { key: 'field_goal_20_29', label: '20-29' },
-      { key: 'field_goal_30_39', label: '30-39' },
-      { key: 'fiedl_goal_40_49', label: '40-49' },
-      { key: 'field_goal_50_plus', label: '50+' },
-      { key: 'longest_field_goal', label: '가장 긴\n필드골' },
-    ],
-  },
-  P: {
-    스페셜팀: [
-      { key: 'games', label: '경기 수' },
-      { key: 'punt_count', label: '펀트 수' },
-      { key: 'punt_yards', label: '펀트 야드' },
-      { key: 'average_punt_yard', label: '평균\n펀트 거리' },
-      { key: 'longest_punt', label: '가장\n긴 펀트' },
-      { key: 'touchbacks', label: '터치백' },
-      { key: 'touchback_percentage', label: '터치백 %' },
-      { key: 'inside20', label: '20야드\n안쪽 펀트' },
-      { key: 'inside20_percentage', label: '20야드 안쪽펀트%' },
-    ],
-  },
   DB: {
     수비: [
       { key: 'games', label: '경기 수' },
@@ -436,14 +389,12 @@ const statColumns = {
 
 /* ─────────────────────────  컴포넌트  ───────────────────────── */
 export default function StatPosition({ data = [], teams = [] }) {
-  // 상태
   const [league, setLeague] = useState('서울');
   const [division, setDivision] = useState('1부');
   const [position, setPosition] = useState('QB');
   const [category, setCategory] = useState('패스');
   const [currentSort, setCurrentSort] = useState(null);
 
-  // 데이터 기반 리그/디비전 옵션
   const leagueOptions = useMemo(() => {
     const set = new Set();
     (Array.isArray(data) ? data : []).forEach((row) => {
@@ -475,39 +426,36 @@ export default function StatPosition({ data = [], teams = [] }) {
 
   const showDivision = league !== '사회인' && divisionOptions.length > 0;
 
-  // 카테고리/정렬 초기화
   const categories = useMemo(
     () => POSITION_CATEGORIES[position] || ['default'],
     [position],
   );
 
-  useEffect(() => {
-    const nextCategory = categories.includes(category)
-      ? category
-      : categories[0];
-    setCategory(nextCategory);
-    const baseKey =
-      PRIMARY_METRIC[position]?.[nextCategory] ??
-      PRIMARY_METRIC[position]?.default;
-    setCurrentSort(baseKey ? { key: baseKey, direction: 'desc' } : null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [position]);
+  // [수정] 포지션 변경 시 카테고리와 정렬을 함께 초기화하는 핸들러 함수
+  const handlePositionChange = (newPosition) => {
+    const availableCategories = POSITION_CATEGORIES[newPosition] || ['default'];
+    const defaultCategory = availableCategories[0];
+    const primaryKey =
+      PRIMARY_METRIC[newPosition]?.[defaultCategory] ??
+      PRIMARY_METRIC[newPosition]?.default;
 
+    setPosition(newPosition);
+    setCategory(defaultCategory);
+    setCurrentSort(primaryKey ? { key: primaryKey, direction: 'desc' } : null);
+  };
+
+  // [수정] 카테고리만 변경될 때 정렬을 초기화하는 간단한 useEffect
   useEffect(() => {
-    const safeCategory = categories.includes(category)
-      ? category
-      : categories[0];
-    if (safeCategory !== category) setCategory(safeCategory);
-    const baseKey =
-      PRIMARY_METRIC[position]?.[safeCategory] ??
-      PRIMARY_METRIC[position]?.default;
-    setCurrentSort(baseKey ? { key: baseKey, direction: 'desc' } : null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [category]);
+    if (!position || !category) return;
+    const primaryKey =
+      PRIMARY_METRIC[position]?.[category] ?? PRIMARY_METRIC[position]?.default;
+    setCurrentSort(primaryKey ? { key: primaryKey, direction: 'desc' } : null);
+  }, [category, position]); // [수정] position도 의존성에 추가하여, 포지션 변경 후 카테고리가 강제 변경될 때도 이 훅이 실행되도록 함
+
+  // [삭제] 불필요하고 충돌을 일으키는 useEffect를 완전히 제거했습니다.
 
   const currentColumns = statColumns[position]?.[category] || [];
 
-  // 정렬 토글
   const toggleSort = (key) => {
     setCurrentSort((prev) => {
       if (!prev || prev.key !== key) return { key, direction: 'desc' };
@@ -515,7 +463,6 @@ export default function StatPosition({ data = [], teams = [] }) {
     });
   };
 
-  // 정렬 적용
   const sortedPlayers = useMemo(() => {
     const mappedData = Array.isArray(data) ? data : [];
 
@@ -552,7 +499,6 @@ export default function StatPosition({ data = [], teams = [] }) {
     });
   }, [data, league, division, position, currentSort]);
 
-  // 동순위 처리
   const rankedPlayers = useMemo(() => {
     if (!sortedPlayers.length || !currentSort)
       return sortedPlayers.map((r, i) => ({ ...r, __rank: i + 1 }));
@@ -579,7 +525,6 @@ export default function StatPosition({ data = [], teams = [] }) {
     });
   }, [sortedPlayers, currentSort]);
 
-  // 값 포맷(퍼센트/소수점)
   const fmt = (key, v) => {
     if (typeof v === 'number') {
       const isPct = String(key).toLowerCase().includes('percentage');
@@ -590,7 +535,6 @@ export default function StatPosition({ data = [], teams = [] }) {
 
   return (
     <div className="stat-position">
-      {/* 드롭다운들 */}
       <div className="stat-header">
         <div className="stat-dropdown-group">
           <Dropdown
@@ -616,14 +560,14 @@ export default function StatPosition({ data = [], teams = [] }) {
             placeholder="포지션"
             value={position}
             options={POSITION_OPTIONS}
-            onChange={setPosition}
+            onChange={handlePositionChange}
           />
-          {(POSITION_CATEGORIES[position] || []).length > 1 && (
+          {categories.length > 1 && (
             <Dropdown
               label="Category"
               placeholder="유형"
               value={category}
-              options={POSITION_CATEGORIES[position]}
+              options={categories}
               onChange={setCategory}
             />
           )}
@@ -634,7 +578,6 @@ export default function StatPosition({ data = [], teams = [] }) {
         <div className="table-title">포지션별 선수 순위</div>
       </div>
 
-      {/* 테이블 */}
       <div className="table-wrapper">
         <div className="stat-table">
           <div className="table-head">
@@ -701,7 +644,7 @@ export default function StatPosition({ data = [], teams = [] }) {
 
               return (
                 <div
-                  key={row.id || row.name || idx}
+                  key={row.id || `${row.name}-${row.team}` || idx}
                   className={`table-rows ${rowClass}`}
                 >
                   <div className="table-row1">

@@ -17,14 +17,12 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
   useEffect(() => {
     const onClickOutside = (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
-        console.log('Clicking outside, closing dropdown'); // 디버깅용
         onClose?.();
       }
     };
 
     const onKey = (e) => {
       if (e.key === 'Escape') {
-        console.log('Escape key pressed, closing dropdown'); // 디버깅용
         onClose?.();
       }
     };
@@ -43,7 +41,6 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
   const handleToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Toggle clicked, current state:', isOpen); // 디버깅용
     onToggle();
   };
 
@@ -71,42 +68,30 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
 export const PT_LABEL = {
   RUN: '런',
   PASS: '패스',
-  KICKOFF: '킥오프',
   RETURN: '리턴',
   PUNT: '펀트',
-  PAT: 'PAT',
-  TPT: '2PT',
   FG: 'FG',
   SACK: '색',
   NOPASS: '패스',
 };
-const PLAY_TYPES = {
-  RUN: 'RUN',
-  PASS: 'PASS',
-  KICKOFF: 'KICKOFF',
-  RETURN: 'RETURN',
-  PUNT: 'PUNT',
-  PAT: 'PAT',
-  TWOPT: 'TWOPT',
-  FIELDGOAL: 'FIELDGOAL',
-  SACK: 'SACK',
-  NOPASS: 'NOPASS',
-};
+
 const SIGNIFICANT_PLAYS = {
   TOUCHDOWN: '터치다운',
-  'TWOPTCONV.GOOD': '2PT 성공',
-  'TWOPTCONV.NOGOOD': '2PT 실패',
+  TWOPTCONVGOOD: '2PT 성공',
+  TWOPTCONVNOGOOD: '2PT 실패',
+  //PAT
   PATGOOD: 'PAT 성공',
   PATNOGOOD: 'PAT 실패',
+  //FG
   FIELDGOALGOOD: 'FG 성공',
   FIELDGOALNOGOOD: 'FG 실패',
+  'PENALTY.OFF': '공격팀 페널티',
+  'PENALTY.DEF': '수비팀 페널티',
   SACK: '색',
   TFL: 'TFL',
-  KICKOFF: '킥오프',
-  PUNT: '펀트',
   FUMBLE: '펌블',
-  FUMBLERECOFF: '공격 펌블 리커버리',
-  FUMBLERECDEF: '수비 펌블 리커버리',
+  FUMBLERECOFF: '공격팀 리커버리',
+  FUMBLERECDEF: '수비팀 리커버리',
   INTERCEPT: '인터셉트',
   TURNOVER: '턴오버',
   SAFETY: '세이프티',
@@ -118,6 +103,10 @@ const OPPOSITES = {
   'PAT 실패': 'PAT 성공',
   'FG 성공': 'FG 실패',
   'FG 실패': 'FG 성공',
+  '공격팀 페널티': '수비팀 페널티',
+  '수비팀 페널티': '공격팀 페널티',
+  '공격팀 리커버리': '수비팀 리커버리',
+  '수비팀 리커버리': '공격팀 리커버리',
 };
 
 const normalizeTeamStats = (s) => {
@@ -154,7 +143,6 @@ const normalizeTeamStats = (s) => {
     },
   };
 };
-
 
 /* ========== 메인 컴포넌트 ========== */
 export default function ClipPage() {
@@ -270,44 +258,46 @@ export default function ClipPage() {
   };
 
   const ordinal = (n) => {
-  const num = Number(n);
-  if (!Number.isFinite(num)) return '';
-  const sfx = ['th', 'st', 'nd', 'rd'];
-  const v = num % 100;
-  return `${num}${sfx[(v - 20) % 10] || sfx[v] || sfx[0]}`;
-};
+    const num = Number(n);
+    if (!Number.isFinite(num)) return '';
+    const sfx = ['th', 'st', 'nd', 'rd'];
+    const v = num % 100;
+    return `${num}${sfx[(v - 20) % 10] || sfx[v] || sfx[0]}`;
+  };
 
-const getDownDisplay = (c) => {
-  const pt = String(c.playType || '').trim().toUpperCase();
-  const downRaw = c.down;
-  const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
+  const getDownDisplay = (c) => {
+    const pt = String(c.playType || '')
+      .trim()
+      .toUpperCase();
+    const downRaw = c.down;
+    const downStr = downRaw != null ? String(downRaw).trim().toUpperCase() : '';
 
-  // 1) down 값이 특수 문자열이면 그 라벨만 표시 (야드투고 X)
-  if (SPECIAL_DOWN_MAP[downStr]) return SPECIAL_DOWN_MAP[downStr];
+    // 1) down 값이 특수 문자열이면 그 라벨만 표시 (야드투고 X)
+    if (SPECIAL_DOWN_MAP[downStr]) return SPECIAL_DOWN_MAP[downStr];
 
-  // 2) playType으로도 특수 플레이라면 라벨만 표시
-  if (SPECIAL_DOWN_MAP[pt]) return SPECIAL_DOWN_MAP[pt];
+    // 2) playType으로도 특수 플레이라면 라벨만 표시
+    if (SPECIAL_DOWN_MAP[pt]) return SPECIAL_DOWN_MAP[pt];
 
-  // 3) 일반 다운: "1st & ytg" / "2nd & ytg" ...
-  const d =
-    typeof downRaw === 'number'
-      ? downRaw
-      : Number.isFinite(parseInt(downStr, 10))
-      ? parseInt(downStr, 10)
-      : null;
-
-  if (d != null) {
-    const ytg =
-      c.yardsToGo != null && Number.isFinite(Number(c.yardsToGo))
-        ? Number(c.yardsToGo)
+    // 3) 일반 다운: "1st & ytg" / "2nd & ytg" ...
+    const d =
+      typeof downRaw === 'number'
+        ? downRaw
+        : Number.isFinite(parseInt(downStr, 10))
+        ? parseInt(downStr, 10)
         : null;
-    // yardsToGo가 없으면 "& ..." 생략
-    return ytg != null ? `${ordinal(d)} & ${ytg}` : `${ordinal(d)}`;
-  }
 
-  // 다운 정보가 없으면 빈값/대시 등
-  return '';
-};
+    if (d != null) {
+      const ytg =
+        c.yardsToGo != null && Number.isFinite(Number(c.yardsToGo))
+          ? Number(c.yardsToGo)
+          : null;
+      // yardsToGo가 없으면 "& ..." 생략
+      return ytg != null ? `${ordinal(d)} & ${ytg}` : `${ordinal(d)}`;
+    }
+
+    // 다운 정보가 없으면 빈값/대시 등
+    return '';
+  };
 
   const [rawClips, setRawClips] = useState([]);
   const [clipsLoading, setClipsLoading] = useState(false);
@@ -326,7 +316,12 @@ const getDownDisplay = (c) => {
         const transformedClips = clipsData.map((clip, idx) => {
           const clipKey = String(clip.clipKey ?? clip.id ?? idx); // 도메인 식별자(필수)
           const uiId = `${clipKey}__${idx}`; // 렌더용 유니크 id
-
+          const significantPlaysRaw =
+            clip.significantPlays?.filter((p) => p != null) || [];
+          const displaySignificantPlays = significantPlaysRaw.map(
+            (token) =>
+              labelSignificant(clip, token, homeMeta?.name, awayMeta?.name), // homeMeta와 awayMeta의 name을 전달
+          );
           return {
             // 식별자들
             id: uiId,
@@ -338,11 +333,11 @@ const getDownDisplay = (c) => {
             playType: clip.playType,
             down: clip.down,
             yardsToGo: clip.toGoYard,
-            significantPlay:
-              clip.significantPlays?.filter((p) => p != null) || [],
             offensiveTeam: clip.offensiveTeam,
             gainYard: clip.gainYard,
             clipUrl: clip.clipUrl || null,
+            significantPlay: significantPlaysRaw, // 원본 데이터
+            displaySignificantPlays: displaySignificantPlays, // 새로 추가된 UI용 라벨 배열
           };
         });
         setRawClips(transformedClips);
@@ -381,6 +376,7 @@ const getDownDisplay = (c) => {
     rawClips,
     teamOptions,
     opposites: OPPOSITES,
+    significantPlayField: 'displaySignificantPlays',
   });
 
   /* 버튼 요약 텍스트 */
@@ -417,22 +413,15 @@ const getDownDisplay = (c) => {
       },
     });
   };
-  const getPenaltyLabel = (c, key, homeDisplay, awayDisplay) => {
-    // offensiveTeam은 붙여쓰기 display 사용
-    const offenseIsHome =
-      homeDisplay && c?.offensiveTeam ? c.offensiveTeam === homeDisplay : null;
+  const getPenaltyLabel = (c, key, homeName, awayName) => {
+    const offenseIsHome = c?.offensiveTeam === 'Home';
 
-    // PENALTY.HOME / PENALTY.AWAY
-    const penalizedIsHome = key.endsWith('.HOME')
-      ? true
-      : key.endsWith('.AWAY')
-      ? false
-      : null;
+    const penalizedIsHome = key.endsWith('.HOME');
 
-    if (offenseIsHome === null || penalizedIsHome === null) {
-      return '페널티'; // 정보 부족 시 일반 표기
-    }
-    // 같은 사이드면 "공격팀 페널티", 아니면 "수비팀 페널티"
+    if (key.endsWith('.OFF')) return '공격팀 페널티';
+    if (key.endsWith('.DEF')) return '수비팀 페널티';
+
+    // penalizedIsHome과 offenseIsHome이 같으면 공격팀 페널티
     return penalizedIsHome === offenseIsHome
       ? '공격팀 페널티'
       : '수비팀 페널티';
@@ -567,7 +556,7 @@ const getDownDisplay = (c) => {
                   >
                     전체
                   </button>
-                  {Object.entries(PLAY_TYPES).map(([code, label]) => (
+                  {Object.entries(PT_LABEL).map(([code, label]) => (
                     <button
                       key={code}
                       className={`ff-dd-item ${
@@ -696,7 +685,7 @@ const getDownDisplay = (c) => {
                     <div className="clip-row1">
                       <div className="clip-down">{getDownDisplay(c)}</div>
                       <div className="clip-type">
-                        #{PT_LABEL[c.playType] || c.playType}
+                        #{PT_LABEL[c.playType]}
                       </div>
                     </div>
 
@@ -707,19 +696,11 @@ const getDownDisplay = (c) => {
                           : `${awayMeta?.name}`}
                       </div>
 
-                      {Array.isArray(c.significantPlay) &&
-                      c.significantPlay.length > 0 ? (
+                      {Array.isArray(c.displaySignificantPlays) &&
+                      c.displaySignificantPlays.length > 0 ? (
                         <div className="clip-sig">
-                          {c.significantPlay.map((t, idx) => (
-                            <span key={`${safeKey}-sig-${idx}`}>
-                              #{' '}
-                              {labelSignificant(
-                                c,
-                                t,
-                                homeMeta?.display,
-                                awayMeta?.display,
-                              )}
-                            </span>
+                          {c.displaySignificantPlays.map((label, idx) => (
+                            <span key={`${safeKey}-sig-${idx}`}># {label}</span>
                           ))}
                         </div>
                       ) : (
