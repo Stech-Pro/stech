@@ -419,12 +419,12 @@ export class AuthService {
       );
     }
 
-    // 재시도 횟수 체크 (임시 비활성화)
-    // if (user.passwordResetAttempts >= 5) {
-    //   throw new BadRequestException(
-    //     '재시도 횟수를 초과했습니다. 1시간 후 다시 시도해주세요.',
-    //   );
-    // }
+    // 재시도 횟수 체크 (5회 제한)
+    if (user.passwordResetAttempts >= 5) {
+      throw new BadRequestException(
+        '재시도 횟수를 초과했습니다. 1시간 후 다시 시도해주세요.',
+      );
+    }
 
     // 6자리 인증코드 생성
     const resetCode = this.emailService.generateResetCode();
