@@ -60,7 +60,7 @@
 
 .filterButton,
 .resetButton {
-  width: 8.125rem;
+  min-width: 8.125rem;
   height: 3.444rem;
   font-size: 1.125rem;
   border-radius: 0.5rem;
@@ -317,6 +317,10 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+.game-team.left {
+  justify-self: end;
+  text-align: right;
 }
 
 .game-team-logo {
