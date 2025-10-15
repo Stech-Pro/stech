@@ -1191,20 +1191,37 @@ export class GameController {
           savedClips.Clips.length,
         );
 
-        // 클립 데이터에 videoUrl 추가
-        const clipsWithUrls = savedClips.Clips.map((clip, index) => ({
-          ...clip,
-          clipUrl: videoUrls[index] || null,
-        }));
+        // clipKey 기반으로 올바른 videoUrl 매핑
+        const clipsWithUrls = savedClips.Clips.map((clip) => {
+          const clipNumber = parseInt(clip.clipKey);
+          return {
+            ...clip,
+            clipUrl: videoUrls[clipNumber - 1] || null, // clipKey "1" → videoUrls[0]
+          };
+        });
+
+        // ClipKey 기준으로 중복 제거 - 첫 번째 클립만 유지
+        const seenClipKeys = new Set();
+        const filteredClips = clipsWithUrls.filter((clip) => {
+          const clipKey = clip.clipKey;
+          if (seenClipKeys.has(clipKey)) {
+            console.log(`🔄 중복 클립 제거: ${clipKey}`);
+            return false; // 중복된 클립은 제외
+          }
+          seenClipKeys.add(clipKey);
+          return true; // 첫 번째 클립은 포함
+        });
+
+        console.log(`📊 ${gameKey}: 중복 필터링 전 ${clipsWithUrls.length}개 → 후 ${filteredClips.length}개 클립`);
 
         return {
           success: true,
           message: `${gameKey} 경기 클립 데이터 조회 성공`,
           data: {
             ...savedClips,
-            Clips: clipsWithUrls,
+            Clips: filteredClips,
           },
-          totalClips: savedClips.Clips.length,
+          totalClips: filteredClips.length,
         };
       } catch (error) {
         console.error(`❌ ${gameKey} 비디오 URL 생성 실패:`, error);

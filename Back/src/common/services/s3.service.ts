@@ -184,7 +184,7 @@ export class S3Service {
   }
 
   /**
-   * 업로드용 Presigned URL 생성 (PUT 방식)
+   * 업로드용 Presigned URL 생성 (PUT 방식) - 다양한 비디오 형식 지원
    */
   async generatePresignedUploadUrl(
     fileKey: string,
@@ -192,15 +192,16 @@ export class S3Service {
     expiresIn: number = 3600,
   ): Promise<string> {
     try {
+      // Content-Type을 제한하지 않고 유연하게 처리
       const params = {
         Bucket: this.bucketName,
         Key: fileKey,
         Expires: expiresIn,
-        ContentType: contentType,
+        // ContentType 제거 - 업로드 시 클라이언트가 결정하도록 함
       };
 
       const uploadUrl = await this.s3.getSignedUrlPromise('putObject', params);
-      console.log(`🔗 업로드 URL 생성 성공: ${fileKey}`);
+      console.log(`🔗 업로드 URL 생성 성공: ${fileKey} (Content-Type 자유)`);
       return uploadUrl;
     } catch (error) {
       console.error(`❌ 업로드 URL 생성 실패 (${fileKey}):`, error.message);
