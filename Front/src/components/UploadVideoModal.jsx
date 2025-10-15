@@ -555,7 +555,7 @@ const UploadVideoModal = ({
         const first = await Promise.allSettled(
           batch.map((p) =>
             putToS3(p.url, p.file, {
-              contentTypeStrategy: 'omit',
+              contentTypeStrategy: 'file',
               timeoutMs: 300000,
             }),
           ),
