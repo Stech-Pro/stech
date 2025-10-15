@@ -68,7 +68,6 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
 export const PT_LABEL = {
   RUN: '런',
   PASS: '패스',
-  RETURN: '리턴',
   PUNT: '펀트',
   FG: 'FG',
   SACK: '색',
