@@ -53,6 +53,7 @@
   backdrop-filter: blur(10px);
 }
 
+
 .videoModalToggleButton:hover {
   background-color: rgba(238, 123, 26, 0.8);
   transform: scale(1.05);
