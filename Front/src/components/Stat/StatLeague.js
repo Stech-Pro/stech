@@ -914,7 +914,7 @@ export default function StatLeague({ data, teams = [] }) {
                         </div>
                       </div>
                     ))}
-                    <div className="group-section">
+                    <div className="group-section no-group">
                       <img
                         src={NoGroupImg}
                         alt={'no-group-section'}
