@@ -441,6 +441,17 @@ export default function ClipPage() {
     }
     return key;
   };
+  const renderPlayType = (v) => {
+    const pt = (v ?? '').toString().trim().toUpperCase();
+    if (pt === 'NONE' || !pt) {
+      return null;
+    }
+
+    const label = PT_LABEL[pt]; // PT_LABEL에서 라벨을 조회
+
+    // 조회된 라벨이 있을 경우에만 #을 붙여서 반환
+    return label ? `#${label}` : null;
+  };
 
   return (
     <div className="clip-root">
@@ -683,8 +694,9 @@ export default function ClipPage() {
                   <div className="clip-rows">
                     <div className="clip-row1">
                       <div className="clip-down">{getDownDisplay(c)}</div>
+
                       <div className="clip-type">
-                        #{PT_LABEL[c.playType]}
+                        {renderPlayType(c.playType)}
                       </div>
                     </div>
 
