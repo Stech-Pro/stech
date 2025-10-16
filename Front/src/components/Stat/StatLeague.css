@@ -48,13 +48,23 @@
   justify-content: space-between;
   gap: 1.25rem;
   padding-top: 3.125rem;
+  align-items: stretch;
 }
 .group-section {
   border-radius: 0.5rem;
   width: 45.625rem;
 }
+.group-section.no-group {
+
+  display: flex; /* <<-- 이 줄을 추가하세요 */
+  justify-content: center; 
+  align-items: center; 
+  overflow: hidden;
+}
+
 .no-group-img {
-  height: 400px;
+  align-self:center;
+height:100%;
   width: 100%;
   margin: 0 auto;
   object-fit: cover;
