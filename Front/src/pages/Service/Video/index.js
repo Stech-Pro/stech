@@ -73,15 +73,12 @@ export const PT_LABEL = {
   SACK: '색',
   NOPASS: '패스',
 };
-
 const SIGNIFICANT_PLAYS = {
   TOUCHDOWN: '터치다운',
   TWOPTCONVGOOD: '2PT 성공',
   TWOPTCONVNOGOOD: '2PT 실패',
-  //PAT
   PATGOOD: 'PAT 성공',
   PATNOGOOD: 'PAT 실패',
-  //FG
   FIELDGOALGOOD: 'FG 성공',
   FIELDGOALNOGOOD: 'FG 실패',
   'PENALTY.OFF': '공격팀 페널티',
@@ -107,7 +104,6 @@ const OPPOSITES = {
   '공격팀 리커버리': '수비팀 리커버리',
   '수비팀 리커버리': '공격팀 리커버리',
 };
-
 const SPECIAL_DOWN_MAP = { TPT: '2PT', KICKOFF: '킥오프', PAT: 'PAT' };
 
 const getDownDisplay = (c) => {
@@ -140,7 +136,8 @@ function PlayerCore({ stateData }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [volume, setVolume] = useState(0.6);
   const { token } = useAuth();
-
+  const videoRef = useRef(null);
+  const [showMagicPencil, setShowMagicPencil] = useState(false);
   const {
     gameKey,
     rawClips,
@@ -171,7 +168,6 @@ function PlayerCore({ stateData }) {
     clearAllFilters = () => {},
   } = useClipFilter(clipFilterParams);
 
-  const videoRef = useRef(null);
   const timelineRef = useRef(null);
   const pendingAutoplayRef = useRef(false);
 
@@ -183,15 +179,12 @@ function PlayerCore({ stateData }) {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [openMenu, setOpenMenu] = useState(null);
-  const [showMagicPencil, setShowMagicPencil] = useState(false);
   const [showMemo, setShowMemo] = useState(false);
   const [memos, setMemos] = useState(() => {
     const saved = localStorage.getItem(`videoMemos:${teamMeta?.gameId}`);
     return saved ? JSON.parse(saved) : {};
   });
-
   const [memoCounts, setMemoCounts] = useState({});
-
   const [contextMenu, setContextMenu] = useState({
     visible: false,
     x: 0,
@@ -299,10 +292,12 @@ function PlayerCore({ stateData }) {
     e.stopPropagation();
     setContextMenu({ visible: true, x: e.clientX, y: e.clientY });
   }, []);
+
   const closeContextMenu = useCallback(
     () => setContextMenu({ visible: false, x: 0, y: 0 }),
     [],
   );
+
   const handleSystemSettings = useCallback(
     (e) => {
       e.preventDefault();
@@ -312,6 +307,7 @@ function PlayerCore({ stateData }) {
     },
     [closeContextMenu],
   );
+
   const handleEditGameData = useCallback(
     (e) => {
       e.preventDefault();
@@ -557,51 +553,68 @@ function PlayerCore({ stateData }) {
     [duration, hasError, handleTimelineClick],
   );
 
-  useEffect(() => {
+ useEffect(() => {
     const onKey = (e) => {
+      // 입력 필드나 메모에 포커스가 있을 때만 단축키 비활성화
+      // showMagicPencil 조건을 제거하여 매직펜슬 사용 중에도 단축키 활성화
       if (
-        showMagicPencil ||
-        showMemo ||
+        showMemo || // 메모가 열려있을 때만 비활성화
         e.target?.tagName === 'INPUT' ||
         e.target?.tagName === 'TEXTAREA' ||
         e.target?.isContentEditable
       )
         return;
+      
       if (e.defaultPrevented) return;
+      
       const key = e.key.toUpperCase();
       const backwardKey = settings?.hotkeys?.backward?.toUpperCase?.() || 'A';
       const forwardKey = settings?.hotkeys?.forward?.toUpperCase?.() || 'D';
       const nextKey = settings?.hotkeys?.nextVideo?.toUpperCase?.() || 'N';
       const prevKey = settings?.hotkeys?.prevVideo?.toUpperCase?.() || 'M';
+      
       let handled = false;
+      
+      // 스페이스바 - 재생/일시정지
       if (key === ' ' && !e.repeat) {
         e.preventDefault();
         e.stopPropagation();
         togglePlay();
         handled = true;
-      } else if (key === backwardKey) {
+      } 
+      // A키 - 뒤로 이동
+      else if (key === backwardKey) {
         e.preventDefault();
         e.stopPropagation();
         stepTime(-settings.skipTime);
         handled = true;
-      } else if (key === forwardKey) {
+      } 
+      // D키 - 앞으로 이동
+      else if (key === forwardKey) {
         e.preventDefault();
         e.stopPropagation();
         stepTime(settings.skipTime);
         handled = true;
-      } else if (key === nextKey) {
+      } 
+      // N키 - 다음 클립
+      else if (key === nextKey) {
         e.preventDefault();
         e.stopPropagation();
         goNextClip();
         handled = true;
-      } else if (key === prevKey) {
+      } 
+      // M키 - 이전 클립
+      else if (key === prevKey) {
         e.preventDefault();
         e.stopPropagation();
         goPrevClip();
         handled = true;
       }
+      
       if (handled) e.stopImmediatePropagation();
     };
+    
+    // capture: true로 설정하여 이벤트를 먼저 캡처
     document.addEventListener('keydown', onKey, { capture: true });
     return () =>
       document.removeEventListener('keydown', onKey, { capture: true });
@@ -609,8 +622,7 @@ function PlayerCore({ stateData }) {
     togglePlay,
     stepTime,
     settings,
-    showMagicPencil,
-    showMemo,
+    showMemo, // showMagicPencil 제거
     goNextClip,
     goPrevClip,
   ]);
@@ -644,613 +656,629 @@ function PlayerCore({ stateData }) {
   }, []);
 
   return (
-    <div className="videoPlayerPage">
-      <div
-        className="videoContainer"
-        ref={containerRef}
-        onClick={handleContainerClick}
-      >
-        <button
-          className="videoBackButton"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            navigate(-1);
-          }}
+    <div
+      className={`videoPlayerPage ${showMagicPencil ? 'pencil-active' : ''}`}
+    >
+      <div className="player-main-content">
+        <div
+          className="videoContainer"
+          ref={containerRef}
+          onClick={handleContainerClick}
         >
-          <IoClose size={24} />
-        </button>
-        <button
-          className="videoModalToggleButton"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsModalOpen((o) => !o);
-          }}
-        >
-          <HiOutlineMenuAlt3 size={24} />
-        </button>
-        <div className="videoScoreboard">
-          <div className="scoreTeam leftTeam">
-            {homeLogo ? (
-              <img src={homeLogo} alt={homeName} className="scoreTeamLogo" />
-            ) : (
-              <div className="scoreTeamLogo placeholder">{homeName[0]}</div>
-            )}
-            <div className="scoreTeamInfo">
-              <span className="scoreTeamName">{homeName}</span>
-              <span className="scoreTeamScore">{scoreHome}</span>
-            </div>
-          </div>
-          <div className="scoreCenter">
-            <div className="scoreQuarter">Q{quarter}</div>
-            <div className="scoreDown">{downLabel}</div>
-          </div>
-          <div className="scoreTeam rightTeam">
-            <div className="scoreTeamInfo">
-              <span className="scoreTeamName">{awayName}</span>
-              <span className="scoreTeamScore">{scoreAway}</span>
-            </div>
-            {awayLogo ? (
-              <img src={awayLogo} alt={awayName} className="scoreTeamLogo" />
-            ) : (
-              <div className="scoreTeamLogo placeholder">{awayName[0]}</div>
-            )}
-          </div>
-        </div>
-        <div className="videoScreen">
-          <div className="videoPlaceholder">
-            <div className="videoContent">
-              {hasNoVideo && (
-                <div className="videoNoVideoMessage">
-                  <div className="videoNoVideoIcon">🎬</div>
-                  <div className="videoNoVideoText">비디오가 없습니다</div>
-                </div>
-              )}
-              {!selected && clips.length === 0 && (
-                <div className="videoNoVideoMessage">
-                  <div className="videoNoVideoIcon">🧐</div>
-                  <div className="videoNoVideoText">표시할 클립이 없습니다</div>
-                </div>
-              )}
-              {selected && (
-                <>
-                  {isLoading && (
-                    <div className="videoLoadingMessage">Loading...</div>
-                  )}
-                  {hasError && (
-                    <div className="videoErrorMessage">
-                      <div>비디오를 로드할 수 없습니다</div>
-                      <div className="videoErrorUrl">ID: {selected?.id}</div>
-                    </div>
-                  )}
-                  <video
-                    key={`${selected?.id}_${selected?.clipUrl}`}
-                    ref={videoRef}
-                    className={`videoElement ${
-                      isLoading || hasError ? 'hidden' : ''
-                    }`}
-                    src={selected?.clipUrl || ''}
-                    preload="metadata"
-                    controls={false}
-                    crossOrigin="anonymous"
-                    muted
-                    playsInline
-                    autoPlay={false}
-                    onContextMenu={handleVideoContextMenu}
-                  />
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="floatingToolButtons">
           <button
-            className="floatingToolBtn memoBtn"
+            className="videoBackButton"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              setShowMemo(true);
+              navigate(-1);
             }}
-            title="메모 작성"
           >
-            <FaStickyNote size={24} />
-            {currentMemoCount > 0 && (
-              <span className="memo-badge">{currentMemoCount}</span>
-            )}
+            <IoClose size={24} />
           </button>
           <button
-            className="floatingToolBtn magicPencilBtn"
+            className="videoModalToggleButton"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              setShowMagicPencil(true);
+              setIsModalOpen((o) => !o);
             }}
-            disabled={isPlaying || hasError || !selected || hasNoVideo}
-            title="매직펜슬 (일시정지 상태에서만 사용 가능)"
           >
-            <FaPencilAlt size={24} />
+            <HiOutlineMenuAlt3 size={24} />
           </button>
-        </div>
-        <div className="videoEditorControls">
-          <div className="videoControlsTop">
-            <button
-              className="videoPlayButton"
-              onClick={handleTogglePlay}
-              disabled={hasError || !selected || hasNoVideo}
-            >
-              {isPlaying ? (
-                <IoPauseCircleOutline size={32} />
+          <div className="videoScoreboard">
+            <div className="scoreTeam leftTeam">
+              {homeLogo ? (
+                <img src={homeLogo} alt={homeName} className="scoreTeamLogo" />
               ) : (
-                <IoPlayCircleOutline size={32} />
+                <div className="scoreTeamLogo placeholder">{homeName[0]}</div>
+              )}
+              <div className="scoreTeamInfo">
+                <span className="scoreTeamName">{homeName}</span>
+                <span className="scoreTeamScore">{scoreHome}</span>
+              </div>
+            </div>
+            <div className="scoreCenter">
+              <div className="scoreQuarter">Q{quarter}</div>
+              <div className="scoreDown">{downLabel}</div>
+            </div>
+            <div className="scoreTeam rightTeam">
+              <div className="scoreTeamInfo">
+                <span className="scoreTeamName">{awayName}</span>
+                <span className="scoreTeamScore">{scoreAway}</span>
+              </div>
+              {awayLogo ? (
+                <img src={awayLogo} alt={awayName} className="scoreTeamLogo" />
+              ) : (
+                <div className="scoreTeamLogo placeholder">{awayName[0]}</div>
+              )}
+            </div>
+          </div>
+          <div className="videoScreen">
+            <div className="videoPlaceholder">
+              <div className="videoContent">
+                {hasNoVideo && (
+                  <div className="videoNoVideoMessage">
+                    <div className="videoNoVideoIcon">🎬</div>
+                    <div className="videoNoVideoText">비디오가 없습니다</div>
+                  </div>
+                )}
+                {!selected && clips.length === 0 && (
+                  <div className="videoNoVideoMessage">
+                    <div className="videoNoVideoIcon">🧐</div>
+                    <div className="videoNoVideoText">
+                      표시할 클립이 없습니다
+                    </div>
+                  </div>
+                )}
+                {selected && (
+                  <>
+                    {isLoading && (
+                      <div className="videoLoadingMessage">Loading...</div>
+                    )}
+                    {hasError && (
+                      <div className="videoErrorMessage">
+                        <div>비디오를 로드할 수 없습니다</div>
+                        <div className="videoErrorUrl">ID: {selected?.id}</div>
+                      </div>
+                    )}
+                    <video
+                      key={`${selected?.id}_${selected?.clipUrl}`}
+                      ref={videoRef}
+                      className={`videoElement ${
+                        isLoading || hasError ? 'hidden' : ''
+                      }`}
+                      src={selected?.clipUrl || ''}
+                      preload="metadata"
+                      controls={false}
+                      crossOrigin="anonymous"
+                      muted
+                      playsInline
+                      autoPlay={false}
+                      onContextMenu={handleVideoContextMenu}
+                    />
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="floatingToolButtons">
+            <button
+              className="floatingToolBtn memoBtn"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowMemo(true);
+              }}
+              title="메모 작성"
+            >
+              <FaStickyNote size={24} />
+              {currentMemoCount > 0 && (
+                <span className="memo-badge">{currentMemoCount}</span>
               )}
             </button>
-            <div className="videoFrameNavigation">
-              <button
-                className="skipSquare skipSquare--back"
-                onClick={(e) => handleStepTime(e, -settings.skipTime)}
-                disabled={hasError || !selected}
-                title={`Previous ${settings.skipTime}s (A)`}
-              >
-                <TbArrowForwardUpDouble className="skipSquare__icon" />{' '}
-                <span className="skipSquare__sec">{settings.skipTime}</span>
-              </button>
-              <button
-                className="skipSquare"
-                onClick={(e) => handleStepTime(e, settings.skipTime)}
-                disabled={hasError || !selected}
-                title={`Next ${settings.skipTime}s (D)`}
-              >
-                <TbArrowForwardUpDouble className="skipSquare__icon" />{' '}
-                <span className="skipSquare__sec">{settings.skipTime}</span>
-              </button>
-              <button
-                className="videoFrameStepButton"
-                onClick={handleGoPrevClip}
-                disabled={!selected || !clipPosition || clipPosition.isFirst}
-                title="Previous Clip (M)"
-              >
-                <TbPlayerTrackNext
-                  className="prevClipIcon"
-                  style={{
-                    transform: 'scaleX(-1)',
-                    transformOrigin: '50% 50%',
-                  }}
-                />
-              </button>
-              <button
-                className="videoFrameStepButton"
-                onClick={handleGoNextClip}
-                disabled={!selected || !clipPosition || clipPosition.isLast}
-                title="Next Clip (N)"
-              >
-                <TbPlayerTrackNext className="nextClipIcon" />
-              </button>
-            </div>
-          </div>
-          <div className="videoTimelineContainer">
-            <div className="timeLabel">{formatTime(currentTime)}</div>
-            <div
-              ref={timelineRef}
-              className="ctrl timeline"
-              onMouseDown={handleMouseDown}
-              role="slider"
-              aria-valuemin={0}
-              aria-valuemax={duration || 0}
-              aria-valuenow={currentTime || 0}
+            <button
+              className="floatingToolBtn magicPencilBtn"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowMagicPencil((v) => !v);
+              }}
+              disabled={hasError || !selected || hasNoVideo}
+              title="매직펜슬"
             >
-              <div className="timelineTrack" />
-              <div
-                className="timelineProgress"
-                style={{
-                  width:
-                    duration > 0 ? `${(currentTime / duration) * 100}%` : '0%',
-                }}
-              />
-              <div
-                className="timelineHandle"
-                style={{
-                  left:
-                    duration > 0 ? `${(currentTime / duration) * 100}%` : '0%',
-                }}
-              />
-            </div>
-            <div className="timeLabel dim">{formatTime(duration)}</div>
-            <div className="volume">
+              <FaPencilAlt size={24} />
+            </button>
+          </div>
+          <div className="videoEditorControls">
+            <div className="videoControlsTop">
               <button
-                className="ctrl volBtn"
-                onClick={() => setVolume((v) => (v > 0 ? 0 : 0.6))}
-                title="Mute/Unmute"
+                className="videoPlayButton"
+                onClick={handleTogglePlay}
+                disabled={hasError || !selected || hasNoVideo}
               >
-                {volume > 0 ? (
-                  <IoVolumeMedium size={18} />
+                {isPlaying ? (
+                  <IoPauseCircleOutline size={32} />
                 ) : (
-                  <IoVolumeMute size={18} />
+                  <IoPlayCircleOutline size={32} />
                 )}
               </button>
-              <input
-                className="volSlider"
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                onChange={(e) => setVolume(parseFloat(e.target.value))}
-              />
+              <div className="videoFrameNavigation">
+                <button
+                  className="skipSquare skipSquare--back"
+                  onClick={(e) => handleStepTime(e, -settings.skipTime)}
+                  disabled={hasError || !selected}
+                  title={`Previous ${settings.skipTime}s (A)`}
+                >
+                  <TbArrowForwardUpDouble className="skipSquare__icon" />{' '}
+                  <span className="skipSquare__sec">{settings.skipTime}</span>
+                </button>
+                <button
+                  className="skipSquare"
+                  onClick={(e) => handleStepTime(e, settings.skipTime)}
+                  disabled={hasError || !selected}
+                  title={`Next ${settings.skipTime}s (D)`}
+                >
+                  <TbArrowForwardUpDouble className="skipSquare__icon" />{' '}
+                  <span className="skipSquare__sec">{settings.skipTime}</span>
+                </button>
+                <button
+                  className="videoFrameStepButton"
+                  onClick={handleGoPrevClip}
+                  disabled={!selected || !clipPosition || clipPosition.isFirst}
+                  title="Previous Clip (M)"
+                >
+                  <TbPlayerTrackNext
+                    className="prevClipIcon"
+                    style={{
+                      transform: 'scaleX(-1)',
+                      transformOrigin: '50% 50%',
+                    }}
+                  />
+                </button>
+                <button
+                  className="videoFrameStepButton"
+                  onClick={handleGoNextClip}
+                  disabled={!selected || !clipPosition || clipPosition.isLast}
+                  title="Next Clip (N)"
+                >
+                  <TbPlayerTrackNext className="nextClipIcon" />
+                </button>
+              </div>
             </div>
-            <button
-              className="ctrl fsBtn"
-              onClick={toggleFullscreen}
-              title="Fullscreen"
-            >
-              {isFullscreen ? (
-                <GoScreenNormal size={18} />
-              ) : (
-                <GoScreenFull size={18} />
-              )}
-            </button>
+            <div className="videoTimelineContainer">
+              <div className="timeLabel">{formatTime(currentTime)}</div>
+              <div
+                ref={timelineRef}
+                className="ctrl timeline"
+                onMouseDown={handleMouseDown}
+                role="slider"
+                aria-valuemin={0}
+                aria-valuemax={duration || 0}
+                aria-valuenow={currentTime || 0}
+              >
+                <div className="timelineTrack" />
+                <div
+                  className="timelineProgress"
+                  style={{
+                    width:
+                      duration > 0
+                        ? `${(currentTime / duration) * 100}%`
+                        : '0%',
+                  }}
+                />
+                <div
+                  className="timelineHandle"
+                  style={{
+                    left:
+                      duration > 0
+                        ? `${(currentTime / duration) * 100}%`
+                        : '0%',
+                  }}
+                />
+              </div>
+              <div className="timeLabel dim">{formatTime(duration)}</div>
+              <div className="volume">
+                <button
+                  className="ctrl volBtn"
+                  onClick={() => setVolume((v) => (v > 0 ? 0 : 0.6))}
+                  title="Mute/Unmute"
+                >
+                  {volume > 0 ? (
+                    <IoVolumeMedium size={18} />
+                  ) : (
+                    <IoVolumeMute size={18} />
+                  )}
+                </button>
+                <input
+                  className="volSlider"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={(e) => setVolume(parseFloat(e.target.value))}
+                />
+              </div>
+              <button
+                className="ctrl fsBtn"
+                onClick={toggleFullscreen}
+                title="Fullscreen"
+              >
+                {isFullscreen ? (
+                  <GoScreenNormal size={18} />
+                ) : (
+                  <GoScreenFull size={18} />
+                )}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-      <div className={`videoSideModal ${isModalOpen ? 'open' : ''}`}>
-        <div className="videoModalClose">
-          <button
-            className="videoCloseButton"
+        <div className={`videoSideModal ${isModalOpen ? 'open' : ''}`}>
+          <div className="videoModalClose">
+            <button
+              className="videoCloseButton"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsModalOpen(false);
+              }}
+            >
+              <IoClose size={20} />
+            </button>
+          </div>
+          <div className="videoModalContent">
+            <div className="videoMatchInfo">
+              <div className="videoMatchTeams">
+                <div className="videoMatchHome">
+                  {homeLogo ? (
+                    <img
+                      src={homeLogo}
+                      alt={homeName}
+                      className="videoTeamLogos"
+                    />
+                  ) : (
+                    <div className="videoTeamLogos placeholder">
+                      {homeName[0]}
+                    </div>
+                  )}
+                  <span>{homeName}</span>
+                </div>
+                <div>VS</div>
+                <div className="videoMatchAway">
+                  {awayLogo ? (
+                    <img
+                      src={awayLogo}
+                      alt={awayName}
+                      className="videoTeamLogos"
+                    />
+                  ) : (
+                    <div className="videoTeamLogos placeholder">
+                      {awayName[0]}
+                    </div>
+                  )}
+                  <span>{awayName}</span>
+                </div>
+              </div>
+            </div>
+            <div
+              className="videoFilterControls"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="filterRow">
+                <Dropdown
+                  label="쿼터"
+                  summary={quarterSummary}
+                  isOpen={openMenu === 'quarter'}
+                  onToggle={() => handleMenuToggle('quarter')}
+                  onClose={closeAllMenus}
+                >
+                  <button
+                    className={`ff-dd-item ${
+                      !filters.quarter ? 'selected' : ''
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleFilterChange('quarter', null);
+                      closeAllMenus();
+                    }}
+                  >
+                    {' '}
+                    전체{' '}
+                  </button>
+                  {[1, 2, 3, 4].map((q) => (
+                    <button
+                      key={q}
+                      className={`ff-dd-item ${
+                        filters.quarter === q ? 'selected' : ''
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleFilterChange('quarter', q);
+                        closeAllMenus();
+                      }}
+                    >
+                      {' '}
+                      Q{q}{' '}
+                    </button>
+                  ))}
+                </Dropdown>
+                <Dropdown
+                  label="공격팀"
+                  summary={teamSummary}
+                  isOpen={openMenu === 'team'}
+                  onToggle={() => handleMenuToggle('team')}
+                  onClose={closeAllMenus}
+                >
+                  <button
+                    className={`ff-dd-item ${!filters.team ? 'selected' : ''}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleFilterChange('team', null);
+                      closeAllMenus();
+                    }}
+                  >
+                    {' '}
+                    전체{' '}
+                  </button>
+                  {teamOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      className={`ff-dd-item ${
+                        filters.team === opt.value ? 'selected' : ''
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleFilterChange('team', opt.value);
+                        closeAllMenus();
+                      }}
+                    >
+                      {' '}
+                      {opt.logo && (
+                        <img className="ff-dd-avatar" src={opt.logo} alt="" />
+                      )}{' '}
+                      {opt.label || opt.value}{' '}
+                    </button>
+                  ))}
+                </Dropdown>
+              </div>
+              <div className="filterRow">
+                <Dropdown
+                  label="유형"
+                  summary={playTypeSummary}
+                  isOpen={openMenu === 'playType'}
+                  onToggle={() => handleMenuToggle('playType')}
+                  onClose={closeAllMenus}
+                >
+                  <button
+                    className={`ff-dd-item ${
+                      !filters.playType ? 'selected' : ''
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleFilterChange('playType', null);
+                      closeAllMenus();
+                    }}
+                  >
+                    {' '}
+                    전체{' '}
+                  </button>
+                  {Object.entries(PT_LABEL).map(([code]) => (
+                    <button
+                      key={code}
+                      className={`ff-dd-item ${
+                        filters.playType === code ? 'selected' : ''
+                      }`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleFilterChange('playType', code);
+                        closeAllMenus();
+                      }}
+                    >
+                      {' '}
+                      {PT_LABEL[code] || code}{' '}
+                    </button>
+                  ))}
+                </Dropdown>
+                <Dropdown
+                  label="중요플레이"
+                  summary={significantSummary}
+                  isOpen={openMenu === 'significant'}
+                  onToggle={() => handleMenuToggle('significant')}
+                  onClose={closeAllMenus}
+                >
+                  <div className="ff-dd-section">
+                    {Object.entries(SIGNIFICANT_PLAYS).map(([code, label]) => (
+                      <button
+                        key={code}
+                        className={`ff-dd-item ${
+                          filters.significantPlay?.includes(label)
+                            ? 'selected'
+                            : ''
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleFilterChange('significantPlay', label);
+                        }}
+                      >
+                        {' '}
+                        {label}{' '}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="ff-dd-actions">
+                    <button
+                      className="ff-dd-clear"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setFilters((p) => ({ ...p, significantPlay: [] }));
+                      }}
+                    >
+                      {' '}
+                      모두 해제{' '}
+                    </button>
+                    <button
+                      className="ff-dd-close"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        closeAllMenus();
+                      }}
+                    >
+                      {' '}
+                      닫기{' '}
+                    </button>
+                  </div>
+                </Dropdown>
+              </div>
+              <div className="filterRow">
+                <button
+                  type="button"
+                  className="videoFilterResetButton"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    clearAllFilters();
+                  }}
+                >
+                  {' '}
+                  초기화{' '}
+                </button>
+              </div>
+            </div>
+            <div className="videoPlaysList">
+              {clips.length > 0 ? (
+                clips.map((p) => (
+                  <div
+                    key={p.id}
+                    className={`clip-row ${
+                      isPlaySelected(p.id) ? 'selected' : ''
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      selectPlay(p.id, { autoplay: true });
+                    }}
+                  >
+                    <div className="quarter-name">
+                      {' '}
+                      <div>{p.quarter}Q</div>{' '}
+                    </div>
+                    <div className="clip-rows">
+                      <div className="vid-clip-row1">
+                        <div className="clip-down">{getDownDisplay(p)}</div>
+                        {PT_LABEL[p.playType] ? (
+                          <div className="clip-type">
+                            #{PT_LABEL[p.playType]}
+                          </div>
+                        ) : (
+                          <div className="clip-type"></div>
+                        )}
+                      </div>
+                      <div className="vid-clip-row2">
+                        <div className="clip-oT">
+                          {p.offensiveTeam === 'Home'
+                            ? homeName
+                            : p.offensiveTeam === 'Away'
+                            ? awayName
+                            : p.offensiveTeam}
+                        </div>
+                        {Array.isArray(p.displaySignificantPlays) &&
+                        p.displaySignificantPlays.length > 0 ? (
+                          <div className="clip-sig vid">
+                            {p.displaySignificantPlays.map((t, idx) => (
+                              <span key={`${p.id}-sig-${idx}`}>#{t}</span>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="clip-sig" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="videoNoPlaysMessage">
+                  {' '}
+                  일치하는 클립이 없습니다.{' '}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        {isModalOpen && (
+          <div
+            className="videoModalOverlay"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               setIsModalOpen(false);
             }}
-          >
-            <IoClose size={20} />
-          </button>
-        </div>
-        <div className="videoModalContent">
-          <div className="videoMatchInfo">
-            <div className="videoMatchTeams">
-              <div className="videoMatchHome">
-                {homeLogo ? (
-                  <img
-                    src={homeLogo}
-                    alt={homeName}
-                    className="videoTeamLogos"
-                  />
-                ) : (
-                  <div className="videoTeamLogos placeholder">
-                    {homeName[0]}
-                  </div>
-                )}
-                <span>{homeName}</span>
-              </div>
-              <div>VS</div>
-              <div className="videoMatchAway">
-                {awayLogo ? (
-                  <img
-                    src={awayLogo}
-                    alt={awayName}
-                    className="videoTeamLogos"
-                  />
-                ) : (
-                  <div className="videoTeamLogos placeholder">
-                    {awayName[0]}
-                  </div>
-                )}
-                <span>{awayName}</span>
-              </div>
-            </div>
-          </div>
+          />
+        )}
+        {contextMenu.visible && (
           <div
-            className="videoFilterControls"
-            onClick={(e) => e.stopPropagation()}
+            ref={menuRef}
+            className="customContextMenu"
+            style={{
+              position: 'fixed',
+              left: `${contextMenu.x}px`,
+              top: `${contextMenu.y}px`,
+              zIndex: 9999,
+            }}
           >
-            <div className="filterRow">
-              <Dropdown
-                label="쿼터"
-                summary={quarterSummary}
-                isOpen={openMenu === 'quarter'}
-                onToggle={() => handleMenuToggle('quarter')}
-                onClose={closeAllMenus}
-              >
-                <button
-                  className={`ff-dd-item ${!filters.quarter ? 'selected' : ''}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleFilterChange('quarter', null);
-                    closeAllMenus();
-                  }}
-                >
-                  {' '}
-                  전체{' '}
-                </button>
-                {[1, 2, 3, 4].map((q) => (
-                  <button
-                    key={q}
-                    className={`ff-dd-item ${
-                      filters.quarter === q ? 'selected' : ''
-                    }`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleFilterChange('quarter', q);
-                      closeAllMenus();
-                    }}
-                  >
-                    {' '}
-                    Q{q}{' '}
-                  </button>
-                ))}
-              </Dropdown>
-              <Dropdown
-                label="공격팀"
-                summary={teamSummary}
-                isOpen={openMenu === 'team'}
-                onToggle={() => handleMenuToggle('team')}
-                onClose={closeAllMenus}
-              >
-                <button
-                  className={`ff-dd-item ${!filters.team ? 'selected' : ''}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleFilterChange('team', null);
-                    closeAllMenus();
-                  }}
-                >
-                  {' '}
-                  전체{' '}
-                </button>
-                {teamOptions.map((opt) => (
-                  <button
-                    key={opt.value}
-                    className={`ff-dd-item ${
-                      filters.team === opt.value ? 'selected' : ''
-                    }`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleFilterChange('team', opt.value);
-                      closeAllMenus();
-                    }}
-                  >
-                    {' '}
-                    {opt.logo && (
-                      <img className="ff-dd-avatar" src={opt.logo} alt="" />
-                    )}{' '}
-                    {opt.label || opt.value}{' '}
-                  </button>
-                ))}
-              </Dropdown>
+            <div className="contextMenuItem" onClick={handleSystemSettings}>
+              {' '}
+              ⚙️ 시스템 설정{' '}
             </div>
-            <div className="filterRow">
-              <Dropdown
-                label="유형"
-                summary={playTypeSummary}
-                isOpen={openMenu === 'playType'}
-                onToggle={() => handleMenuToggle('playType')}
-                onClose={closeAllMenus}
-              >
-                <button
-                  className={`ff-dd-item ${
-                    !filters.playType ? 'selected' : ''
-                  }`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleFilterChange('playType', null);
-                    closeAllMenus();
-                  }}
-                >
-                  {' '}
-                  전체{' '}
-                </button>
-                {Object.entries(PT_LABEL).map(([code]) => (
-                  <button
-                    key={code}
-                    className={`ff-dd-item ${
-                      filters.playType === code ? 'selected' : ''
-                    }`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleFilterChange('playType', code);
-                      closeAllMenus();
-                    }}
-                  >
-                    {' '}
-                    {PT_LABEL[code] || code}{' '}
-                  </button>
-                ))}
-              </Dropdown>
-              <Dropdown
-                label="중요플레이"
-                summary={significantSummary}
-                isOpen={openMenu === 'significant'}
-                onToggle={() => handleMenuToggle('significant')}
-                onClose={closeAllMenus}
-              >
-                <div className="ff-dd-section">
-                  {Object.entries(SIGNIFICANT_PLAYS).map(([code, label]) => (
-                    <button
-                      key={code}
-                      className={`ff-dd-item ${
-                        filters.significantPlay?.includes(label)
-                          ? 'selected'
-                          : ''
-                      }`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleFilterChange('significantPlay', label);
-                      }}
-                    >
-                      {' '}
-                      {label}{' '}
-                    </button>
-                  ))}
-                </div>
-                <div className="ff-dd-actions">
-                  <button
-                    className="ff-dd-clear"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setFilters((p) => ({ ...p, significantPlay: [] }));
-                    }}
-                  >
-                    {' '}
-                    모두 해제{' '}
-                  </button>
-                  <button
-                    className="ff-dd-close"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      closeAllMenus();
-                    }}
-                  >
-                    {' '}
-                    닫기{' '}
-                  </button>
-                </div>
-              </Dropdown>
-            </div>
-            <div className="filterRow">
-              <button
-                type="button"
-                className="videoFilterResetButton"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  clearAllFilters();
-                }}
-              >
-                {' '}
-                초기화{' '}
-              </button>
+            <div className="contextMenuItem" onClick={handleEditGameData}>
+              {' '}
+              📝 경기데이터 수정{' '}
             </div>
           </div>
-          <div className="videoPlaysList">
-            {clips.length > 0 ? (
-              clips.map((p) => (
-                <div
-                  key={p.id}
-                  className={`clip-row ${
-                    isPlaySelected(p.id) ? 'selected' : ''
-                  }`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    selectPlay(p.id, { autoplay: true });
-                  }}
-                >
-                  <div className="quarter-name">
-                    {' '}
-                    <div>{p.quarter}Q</div>{' '}
-                  </div>
-                  <div className="clip-rows">
-                    <div className="vid-clip-row1">
-                      <div className="clip-down">{getDownDisplay(p)}</div>
-                      {PT_LABEL[p.playType] ? (
-                        <div className="clip-type">#{PT_LABEL[p.playType]}</div>
-                      ):(<div className="clip-type"></div>)}
-                    </div>
-                    <div className="vid-clip-row2">
-                      <div className="clip-oT">
-                        {p.offensiveTeam === 'Home'
-                          ? homeName
-                          : p.offensiveTeam === 'Away'
-                          ? awayName
-                          : p.offensiveTeam}
-                      </div>
-                      {Array.isArray(p.displaySignificantPlays) &&
-                      p.displaySignificantPlays.length > 0 ? (
-                        <div className="clip-sig vid">
-                          {p.displaySignificantPlays.map((t, idx) => (
-                            <span key={`${p.id}-sig-${idx}`}>#{t}</span>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="clip-sig" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="videoNoPlaysMessage">
-                {' '}
-                일치하는 클립이 없습니다.{' '}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {isModalOpen && (
-        <div
-          className="videoModalOverlay"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsModalOpen(false);
+        )}
+        <GameDataEditModal
+          isVisible={showGameDataModal}
+          onClose={() => setShowGameDataModal(false)}
+          clipKey={selected?.clipKey || selectedId}
+          gameKey={gameKey}
+          playType={selected?.playType}
+        />
+        <VideoMemo
+          isVisible={showMemo}
+          onClose={() => setShowMemo(false)}
+          gameKey={gameKey}
+          clipKey={selected?.clipKey || selectedId}
+          teamId={teamMeta?.teamId}
+          playType={selected?.playType}
+          memos={memos}
+          onSaveMemo={handleSaveMemo}
+          onMemoCountChange={handleMemoCountChange}
+          clipInfo={{
+            quarter,
+            down: selected?.down,
+            yardsToGo: selected?.yardsToGo,
+            playType: selected?.playType,
+            time: formatTime(currentTime),
           }}
         />
-      )}
-      {contextMenu.visible && (
-        <div
-          ref={menuRef}
-          className="customContextMenu"
-          style={{
-            position: 'fixed',
-            left: `${contextMenu.x}px`,
-            top: `${contextMenu.y}px`,
-            zIndex: 9999,
-          }}
-        >
-          <div className="contextMenuItem" onClick={handleSystemSettings}>
-            {' '}
-            ⚙️ 시스템 설정{' '}
-          </div>
-          <div className="contextMenuItem" onClick={handleEditGameData}>
-            {' '}
-            📝 경기데이터 수정{' '}
-          </div>
-        </div>
-      )}
-      <GameDataEditModal
-        isVisible={showGameDataModal}
-        onClose={() => setShowGameDataModal(false)}
-        clipKey={selected?.clipKey || selectedId}
-        gameKey={gameKey}
-        playType={selected?.playType}
-      />
+        <VideoSettingModal
+          isVisible={showVideoSettingModal}
+          onClose={() => setShowVideoSettingModal(false)}
+        />
+      </div>
+
       <MagicPencil
         videoElement={videoRef.current}
-        isVisible={showMagicPencil && !isPlaying}
+        isVisible={showMagicPencil}
         onClose={() => setShowMagicPencil(false)}
-      />
-      <VideoMemo
-        isVisible={showMemo}
-        onClose={() => setShowMemo(false)}
-        gameKey={gameKey}
-        clipKey={selected?.clipKey || selectedId}
-        teamId={teamMeta?.teamId}
-        playType={selected?.playType}
-        memos={memos}
-        onSaveMemo={handleSaveMemo}
-        onMemoCountChange={handleMemoCountChange}
-        clipInfo={{
-          quarter,
-          down: selected?.down,
-          yardsToGo: selected?.yardsToGo,
-          playType: selected?.playType,
-          time: formatTime(currentTime),
-        }}
-      />
-      <VideoSettingModal
-        isVisible={showVideoSettingModal}
-        onClose={() => setShowVideoSettingModal(false)}
       />
     </div>
   );

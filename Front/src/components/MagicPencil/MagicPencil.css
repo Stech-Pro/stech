@@ -155,3 +155,30 @@
   color: white !important;
   border-color: #00c851 !important;
 }
+
+.magicPencilCanvasContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.magicPencilToolsContainer {
+  position: fixed;  
+  
+  left: 0;          
+   z-index: 1000;   
+  align-self:center;
+
+  width: 130px;     
+  background-color: rgba(26, 29, 33, 0.95);
+  backdrop-filter: blur(10px);
+  border-left: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -5px 0 15px rgba(0, 0,0, 0.3);
+  
+  /* 부드럽게 나타나고 사라지는 애니메이션 효과 (선택 사항) */
+  transition: transform 0.3s ease-in-out;
+}
