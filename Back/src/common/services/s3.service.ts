@@ -184,7 +184,7 @@ export class S3Service {
   }
 
   /**
-   * 업로드용 Presigned URL 생성 (PUT 방식) - 다양한 비디오 형식 지원
+   * 업로드용 Presigned URL 생성 (PUT 방식) - Content-Type 제약 없음
    */
   async generatePresignedUploadUrl(
     fileKey: string,
@@ -192,7 +192,7 @@ export class S3Service {
     expiresIn: number = 3600,
   ): Promise<string> {
     try {
-      // Content-Type을 제한하지 않고 유연하게 처리
+      // Content-Type 제약 없이 유연하게 처리
       const params = {
         Bucket: this.bucketName,
         Key: fileKey,
@@ -260,6 +260,31 @@ export class S3Service {
     } catch (error) {
       console.error(`❌ S3 파일 조회 실패 (${gameKey}):`, error.message);
       return [];
+    }
+  }
+
+  /**
+   * 백엔드 프록시를 통한 파일 업로드 (Safari 호환)
+   */
+  async uploadFileToS3(
+    fileKey: string,
+    fileBuffer: Buffer,
+    contentType: string = 'video/mp4',
+  ): Promise<any> {
+    try {
+      const params = {
+        Bucket: this.bucketName,
+        Key: fileKey,
+        Body: fileBuffer,
+        ContentType: contentType,
+      };
+
+      const result = await this.s3.upload(params).promise();
+      console.log(`🔗 백엔드 프록시 업로드 성공: ${fileKey}`);
+      return result;
+    } catch (error) {
+      console.error(`❌ 백엔드 프록시 업로드 실패 (${fileKey}):`, error.message);
+      throw new Error(`S3 프록시 업로드 실패: ${error.message}`);
     }
   }
 

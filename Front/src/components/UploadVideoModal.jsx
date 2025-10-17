@@ -542,7 +542,19 @@ const UploadVideoModal = ({
       Object.keys(uploadUrls).forEach((quarter) => {
         (uploadUrls[quarter] || []).forEach((u, idx) => {
           const f = fileMap[quarter]?.[idx];
-          if (f) pairs.push({ quarter, idx, url: u.uploadUrl, file: f });
+          if (f) {
+            pairs.push({ 
+              quarter, 
+              idx, 
+              url: u.uploadUrl, 
+              file: f,
+              uploadData: {
+                gameKey: gameKey,
+                fileName: u.fileName,
+                s3Path: u.s3Path
+              }
+            });
+          }
         });
       });
       if (pairs.length === 0) throw new Error('업로드할 파일/URL이 없습니다.');
@@ -551,11 +563,11 @@ const UploadVideoModal = ({
       for (let i = 0; i < pairs.length; i += batchSize) {
         const batch = pairs.slice(i, i + batchSize);
 
-        // 1차: Content-Type 헤더 omit
+        // 1차: 백엔드 프록시 업로드
         const first = await Promise.allSettled(
           batch.map((p) =>
-            putToS3(p.url, p.file, {
-              contentTypeStrategy: 'file',
+            putToS3(p.uploadData, p.file, {
+              contentTypeStrategy: 'omit',
               timeoutMs: 300000,
             }),
           ),
@@ -566,8 +578,8 @@ const UploadVideoModal = ({
         if (retryTargets.length) {
           const second = await Promise.allSettled(
             retryTargets.map((p) =>
-              putToS3(p.url, p.file, {
-                contentTypeStrategy: 'file',
+              putToS3(p.uploadData, p.file, {
+                contentTypeStrategy: 'omit',
                 timeoutMs: 300000,
               }),
             ),
