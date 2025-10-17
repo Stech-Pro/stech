@@ -1845,7 +1845,7 @@ export class GameController {
   @Post('upload-video')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file', {
-    limits: { fileSize: 100 * 1024 * 1024 }, // 100MB 제한
+    limits: { fileSize: 200 * 1024 * 1024 }, // 200MB 제한
     fileFilter: (req, file, cb) => {
       // 비디오 파일만 허용
       if (file.mimetype.startsWith('video/')) {
