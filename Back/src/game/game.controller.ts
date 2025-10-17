@@ -1200,17 +1200,39 @@ export class GameController {
           };
         });
 
-        // ClipKey 기준으로 중복 제거 - 첫 번째 클립만 유지
-        const seenClipKeys = new Set();
-        const filteredClips = clipsWithUrls.filter((clip) => {
+        // ClipKey 기준으로 중복 제거 - significantPlay 병합 처리
+        const clipMap = new Map();
+        
+        clipsWithUrls.forEach((clip) => {
           const clipKey = clip.clipKey;
-          if (seenClipKeys.has(clipKey)) {
-            console.log(`🔄 중복 클립 제거: ${clipKey}`);
-            return false; // 중복된 클립은 제외
+          
+          if (!clipMap.has(clipKey)) {
+            // 첫 번째 클립: 그대로 저장
+            clipMap.set(clipKey, { ...clip });
+            console.log(`📌 첫 번째 클립 저장: ${clipKey}`);
+          } else {
+            // 두 번째 클립: significantPlay 병합 로직
+            const firstClip = clipMap.get(clipKey);
+            const secondClip = clip;
+            
+            console.log(`🔄 중복 클립 발견: ${clipKey}, significantPlay 병합 시작`);
+            console.log(`  - 1번째: ${JSON.stringify(firstClip.significantPlays)}`);
+            console.log(`  - 2번째: ${JSON.stringify(secondClip.significantPlays)}`);
+            
+            // significantPlay 병합
+            const mergedSignificantPlays = this.mergeSignificantPlays(
+              firstClip, 
+              secondClip
+            );
+            
+            // 첫 번째 클립의 significantPlay 업데이트
+            firstClip.significantPlays = mergedSignificantPlays;
+            
+            console.log(`  - 병합 결과: ${JSON.stringify(mergedSignificantPlays)}`);
           }
-          seenClipKeys.add(clipKey);
-          return true; // 첫 번째 클립은 포함
         });
+        
+        const filteredClips = Array.from(clipMap.values());
 
         console.log(`📊 ${gameKey}: 중복 필터링 전 ${clipsWithUrls.length}개 → 후 ${filteredClips.length}개 클립`);
 
@@ -1447,6 +1469,64 @@ export class GameController {
         warning: 'S3 비디오 URL 생성에 실패했습니다',
       };
     }
+  }
+
+  /**
+   * 중복 클립의 significantPlay 병합 로직
+   */
+  private mergeSignificantPlays(firstClip: any, secondClip: any): any[] {
+    const firstSigPlays = Array.isArray(firstClip.significantPlays) ? firstClip.significantPlays.filter(play => play !== null) : [];
+    const secondSigPlays = Array.isArray(secondClip.significantPlays) ? secondClip.significantPlays.filter(play => play !== null) : [];
+    
+    // 1. 킥오프: 2번째 클립의 significantPlay 추가
+    if (firstClip.playType === 'KICKOFF') {
+      const merged = [...firstSigPlays, ...secondSigPlays];
+      console.log(`  🏈 킥오프: 2번째 클립 significantPlay 추가`);
+      return this.removeDuplicates(merged);
+    }
+    
+    // 2. 펌블: FUMBLERECOFF/FUMBLERECDEF 처리
+    if (secondSigPlays.includes('FUMBLERECOFF')) {
+      const filtered = firstSigPlays.filter(play => play !== 'FUMBLE');
+      const merged = [...filtered, 'FUMBLERECOFF', ...secondSigPlays.filter(play => play !== 'FUMBLERECOFF')];
+      console.log(`  🏈 펌블: FUMBLE 제거 후 FUMBLERECOFF 추가`);
+      return this.removeDuplicates(merged);
+    }
+    
+    if (secondSigPlays.includes('FUMBLERECDEF')) {
+      const filtered = firstSigPlays.filter(play => play !== 'FUMBLE');
+      const merged = [...filtered, 'FUMBLERECDEF', ...secondSigPlays.filter(play => play !== 'FUMBLERECDEF')];
+      console.log(`  🏈 펌블: FUMBLE 제거 후 FUMBLERECDEF 추가`);
+      return this.removeDuplicates(merged);
+    }
+    
+    // 3. 인터셉션: 1번째에 INTERCEPT 있고 2번째에 TURNOVER 있으면 병합
+    if (firstSigPlays.includes('INTERCEPT') && secondSigPlays.includes('TURNOVER')) {
+      const merged = [...firstSigPlays, ...secondSigPlays];
+      console.log(`  🏈 인터셉션: INTERCEPT + TURNOVER + 기타 병합`);
+      return this.removeDuplicates(merged);
+    }
+    
+    // 4. 펀트: 2번째에 punt 외 다른 significantPlay 있으면 추가
+    if (firstClip.playType === 'PUNT') {
+      const nonPuntPlays = secondSigPlays.filter(play => !play.toLowerCase().includes('punt'));
+      if (nonPuntPlays.length > 0) {
+        const merged = [...firstSigPlays, ...nonPuntPlays];
+        console.log(`  🏈 펀트: punt 외 significantPlay 추가`);
+        return this.removeDuplicates(merged);
+      }
+    }
+    
+    // 기본: 첫 번째 클립의 significantPlay 유지
+    console.log(`  🏈 기본: 첫 번째 클립 significantPlay 유지`);
+    return firstSigPlays;
+  }
+  
+  /**
+   * 배열에서 중복 제거
+   */
+  private removeDuplicates(array: any[]): any[] {
+    return [...new Set(array)];
   }
 
   @Delete(':gameKey')
@@ -1759,6 +1839,59 @@ export class GameController {
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    }
+  }
+
+  @Post('upload-video')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file', {
+    limits: { fileSize: 100 * 1024 * 1024 }, // 100MB 제한
+    fileFilter: (req, file, cb) => {
+      // 비디오 파일만 허용
+      if (file.mimetype.startsWith('video/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('비디오 파일만 업로드 가능합니다'), false);
+      }
+    },
+  }))
+  async uploadVideo(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: { gameKey: string; fileName: string; s3Path: string },
+    @Req() req: Request,
+  ) {
+    try {
+      if (!file) {
+        throw new Error('파일이 업로드되지 않았습니다');
+      }
+
+      console.log(`🎬 비디오 업로드 시작: ${dto.fileName} (${file.size} bytes)`);
+
+      // S3에 파일 업로드
+      const uploadResult = await this.s3Service.uploadFileToS3(
+        dto.s3Path,
+        file.buffer,
+        file.mimetype,
+      );
+
+      console.log(`✅ 비디오 업로드 완료: ${dto.fileName}`);
+
+      return {
+        success: true,
+        message: '비디오 업로드 성공',
+        data: {
+          fileName: dto.fileName,
+          s3Path: dto.s3Path,
+          size: file.size,
+        },
+      };
+    } catch (error) {
+      console.error(`❌ 비디오 업로드 실패 (${dto.fileName}):`, error.message);
+      return {
+        success: false,
+        message: '비디오 업로드 실패',
+        error: error.message,
+      };
     }
   }
 

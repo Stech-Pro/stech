@@ -56,33 +56,48 @@ export async function completeMatchUpload(payload) {
 
 
 export async function putToS3(
-  url,
+  uploadData,
   file,
   {
     contentType,                 // contentTypeStrategy === 'force' 일 때 사용
-    contentTypeStrategy = 'file' // 'file' | 'force' | 'omit'
+    contentTypeStrategy = 'omit' // 'file' | 'force' | 'omit'
   } = {}
 ) {
+  // 백엔드 프록시 업로드 사용 (Safari 호환)
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('gameKey', uploadData.gameKey);
+  formData.append('fileName', uploadData.fileName);
+  formData.append('s3Path', uploadData.s3Path);
+
+  const token = getToken?.();
   const headers = {};
-  if (contentTypeStrategy === 'file') {
-    if (file?.type) headers['Content-Type'] = file.type;
-  } else if (contentTypeStrategy === 'force' && contentType) {
-    headers['Content-Type'] = contentType;
-  } // 'omit'이면 Content-Type 보내지 않음
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   let res;
   try {
-    res = await fetch(url, { method: 'PUT', headers, body: file });
+    res = await fetch(`${API_CONFIG.BASE_URL}/game/upload-video`, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
   } catch (e) {
-    // 네트워크/CORS 차단 시 여기로 들어옴 (브라우저에선 TypeError: Failed to fetch)
-    // AbortError가 더이상 나오지 않게 AbortController를 사용하지 않습니다.
+    // 네트워크/CORS 차단 시 여기로 들어옴
     throw e;
   }
 
   if (!res.ok) {
     const text = await res.text().catch(() => '');
-    throw new Error(`S3 업로드 실패 (HTTP ${res.status}) ${text || ''}`);
+    throw new Error(`백엔드 업로드 실패 (HTTP ${res.status}) ${text || ''}`);
   }
+  
+  const result = await res.json().catch(() => ({}));
+  if (!result.success) {
+    throw new Error(result.message || '업로드 실패');
+  }
+  
   return true;
 }
 
