@@ -1500,10 +1500,10 @@ export class GameController {
       return this.removeDuplicates(merged);
     }
     
-    // 3. 인터셉션: 1번째에 INTERCEPT 있고 2번째에 TURNOVER 있으면 병합
-    if (firstSigPlays.includes('INTERCEPT') && secondSigPlays.includes('TURNOVER')) {
+    // 3. 인터셉션: 1번째에 INTERCEPT 있으면 2번째 클립의 모든 significantPlay 병합
+    if (firstSigPlays.includes('INTERCEPT')) {
       const merged = [...firstSigPlays, ...secondSigPlays];
-      console.log(`  🏈 인터셉션: INTERCEPT + TURNOVER + 기타 병합`);
+      console.log(`  🏈 인터셉션: INTERCEPT + 2번째 클립 significantPlay 병합`);
       return this.removeDuplicates(merged);
     }
     
