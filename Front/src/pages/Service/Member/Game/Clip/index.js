@@ -104,6 +104,8 @@ const OPPOSITES = {
   'FG 실패': 'FG 성공',
   '공격팀 페널티': '수비팀 페널티',
   '수비팀 페널티': '공격팀 페널티',
+  '홈팀 페널티': '원정팀 페널티',
+  '원정팀 페널티': '홈팀 페널티',
   '공격팀 리커버리': '수비팀 리커버리',
   '수비팀 리커버리': '공격팀 리커버리',
 };
@@ -419,6 +421,10 @@ export default function ClipPage() {
 
     if (key.endsWith('.OFF')) return '공격팀 페널티';
     if (key.endsWith('.DEF')) return '수비팀 페널티';
+    
+    // PENALTY.HOME/AWAY 형식 처리 - 실제 팀 이름 사용
+    if (key === 'PENALTY.HOME') return `${homeName} 페널티`;
+    if (key === 'PENALTY.AWAY') return `${awayName} 페널티`;
 
     // penalizedIsHome과 offenseIsHome이 같으면 공격팀 페널티
     return penalizedIsHome === offenseIsHome
