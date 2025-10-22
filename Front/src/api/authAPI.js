@@ -127,7 +127,7 @@ export async function login(username, password) {
   const msg =
     typeof data === 'object'
       ? data.message ||
-        (res.status === 401 ? '비밀번호가 틀렸습니다.' : '로그인 실패')
+        (res.status === 401 ? '비밀번호를 잘못 입력하셨습니다.' : '로그인 실패')
       : '로그인 실패';
   throw new APIError(msg, res.status, data);
 }
