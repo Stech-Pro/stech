@@ -658,11 +658,12 @@ function PlayerCore({ stateData }) {
   return (
     <div
       className={`videoPlayerPage ${showMagicPencil ? 'pencil-active' : ''}`}
+                ref={containerRef}
+
     >
       <div className="player-main-content">
         <div
           className="videoContainer"
-          ref={containerRef}
           onClick={handleContainerClick}
         >
           <button
