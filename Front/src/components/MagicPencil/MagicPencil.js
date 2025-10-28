@@ -61,8 +61,6 @@ const MagicPencil = ({ videoElement, isVisible, onClose }) => {
     '#0066FF',
     '#FFD700',
     '#00FF00',
-    '#FF8C00',
-    '#9400D3',
     '#000000',
     '#FFFFFF',
   ];
