@@ -426,4 +426,80 @@ export class AuthController {
   async getHighlights(@Request() req) {
     return this.authService.getHighlights(req.user.id);
   }
+
+  @Get('my-profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: '📋 마이페이지 프로필 조회',
+    description: `
+    ## 👤 개인 프로필 정보 조회 API
+
+    로그인한 사용자의 상세 프로필 정보를 조회합니다.
+    
+    ### 📋 포함된 정보
+    - **필수 정보**: 유저ID, 유저네임(playerID), 풀네임
+    - **연락처**: 이메일, 연락처, 주소, 우편번호
+    - **신체 정보**: 키, 몸무게, 나이, 국적
+    - **선수 정보**: 경력, 포지션(배열)
+    - **소속 정보**: 지역, 팀명
+    
+    ### 🎯 사용 목적
+    - 마이페이지에서 개인 정보 표시
+    - 프로필 수정 페이지 초기값 제공
+    - 선수 정보 확인 및 검증
+    `,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 프로필 조회 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '프로필 정보를 조회했습니다.',
+        data: {
+          유저ID: 'player123',
+          유저네임: '건국이',
+          풀네임: '김철수',
+          이메일: 'kim.chulsu@example.com',
+          국적: '대한민국',
+          우편번호: '05029',
+          연락처: '010-1234-5678',
+          주소: '서울시 광진구 능동로 120',
+          키: 180,
+          몸무게: 75,
+          나이: 22,
+          경력: '고등학교 3년, 대학교 2년',
+          포지션: ['QB', 'RB'],
+          지역: '서울권',
+          팀명: '건국대 레이징불스',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: '❌ 인증 필요',
+    schema: {
+      example: {
+        success: false,
+        message: '로그인이 필요합니다.',
+        code: 'UNAUTHORIZED',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: '❌ 사용자를 찾을 수 없음',
+    schema: {
+      example: {
+        success: false,
+        message: '사용자를 찾을 수 없습니다.',
+        code: 'USER_NOT_FOUND',
+      },
+    },
+  })
+  async getMyProfile(@Request() req) {
+    return this.authService.getMyProfile(req.user.id);
+  }
 }

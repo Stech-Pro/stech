@@ -674,4 +674,69 @@ export class AuthService {
       await user.save();
     }
   }
+
+  // 마이페이지 프로필 정보 조회
+  async getMyProfile(userId: string) {
+    console.log('=== 마이페이지 프로필 조회 ===');
+    console.log('userId:', userId);
+
+    const user = await this.userModel.findById(userId).lean();
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    console.log('조회된 사용자:', {
+      username: user.username,
+      teamName: user.teamName,
+      hasProfile: !!user.profile?.realName,
+    });
+
+    // 프로필이 완성되지 않은 경우 체크
+    const isProfileComplete = !!(
+      user.profile?.realName &&
+      user.profile?.contactInfo?.email &&
+      user.profile?.physicalInfo?.height
+    );
+
+    const profileData = {
+      유저ID: user.username,
+      유저네임: user.profile?.playerID || '미설정',  // playerID를 유저네임으로 사용
+      풀네임: user.profile?.realName || '미설정',
+      이메일: user.profile?.contactInfo?.email || '미설정',
+      국적: user.profile?.physicalInfo?.nationality || '미설정',
+      우편번호: user.profile?.contactInfo?.postalCode || '미설정',
+      연락처: user.profile?.contactInfo?.phone || '미설정',
+      주소: user.profile?.contactInfo?.address || '미설정',
+      키: user.profile?.physicalInfo?.height || 0,
+      몸무게: user.profile?.physicalInfo?.weight || 0,
+      나이: user.profile?.physicalInfo?.age || 0,
+      경력: user.profile?.career || '미설정',
+      포지션: this.formatPositions(user.profile?.positions),
+      지역: user.region,
+      팀명: user.teamName,
+    };
+
+    console.log('✅ 프로필 조회 완료');
+
+    return {
+      success: true,
+      message: '프로필 정보를 조회했습니다.',
+      data: profileData,
+    };
+  }
+
+  // 포지션 정보 포맷팅 헬퍼 함수
+  private formatPositions(positions: any): string[] {
+    if (!positions) return ['미설정'];
+    
+    const positionArray = [];
+    for (let i = 1; i <= 10; i++) {
+      const posKey = `PS${i}`;
+      if (positions[posKey]) {
+        positionArray.push(positions[posKey]);
+      }
+    }
+    
+    return positionArray.length > 0 ? positionArray : ['미설정'];
+  }
 }
