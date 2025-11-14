@@ -2,6 +2,7 @@ Back/node_modules/
 node_modules/
 .env
 .claude/
+CLAUDE.md
 
 # TypeScript 빌드 파일
 *.tsbuildinfo
