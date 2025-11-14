@@ -6,11 +6,15 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { User, UserSchema } from '../schemas/user.schema';
+import { Team, TeamSchema } from '../schemas/team.schema';
 import { EmailService } from '../utils/email.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Team.name, schema: TeamSchema },
+    ]),
     PassportModule,
     JwtModule.register({
       secret: 'stech-super-secret-key-2025',

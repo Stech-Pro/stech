@@ -8,6 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserDocument } from '../schemas/user.schema';
+import { Team, TeamDocument } from '../schemas/team.schema';
 import {
   SignupDto,
   LoginDto,
@@ -22,6 +23,7 @@ import { EmailService } from '../utils/email.service';
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Team.name) private teamModel: Model<TeamDocument>,
     private jwtService: JwtService,
     private emailService: EmailService,
   ) {}
@@ -691,6 +693,10 @@ export class AuthService {
       hasProfile: !!user.profile?.realName,
     });
 
+    // 팀 정보 조회하여 league 정보 가져오기
+    const team = await this.teamModel.findOne({ teamName: user.teamName }).lean();
+    const league = team?.league || '1부'; // 기본값 1부
+
     // 프로필이 완성되지 않은 경우 체크
     const isProfileComplete = !!(
       user.profile?.realName &&
@@ -712,7 +718,7 @@ export class AuthService {
       나이: user.profile?.physicalInfo?.age || 0,
       경력: user.profile?.career || '미설정',
       포지션: this.formatPositions(user.profile?.positions),
-      지역: user.region,
+      지역: this.formatRegionWithLeague(user.region, league),
       팀명: user.teamName,
     };
 
@@ -723,6 +729,26 @@ export class AuthService {
       message: '프로필 정보를 조회했습니다.',
       data: profileData,
     };
+  }
+
+  // 지역 + 리그 정보 포맷팅 헬퍼 함수
+  private formatRegionWithLeague(region: string, league: string): string {
+    const regionMap = {
+      'Seoul': '서울',
+      'Gyeonggi-Gangwon': '경기강원',
+      'Daegu-Gyeongbuk': '대구경북',
+      'Busan-Gyeongnam': '부산경남',
+      'Amateur': '사회인',
+    };
+
+    const koreanRegion = regionMap[region] || region;
+    
+    // 사회인의 경우 리그 구분 없이 표시
+    if (region === 'Amateur') {
+      return '사회인';
+    }
+    
+    return `${koreanRegion} ${league} 리그`;
   }
 
   // 포지션 정보 포맷팅 헬퍼 함수
