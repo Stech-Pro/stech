@@ -25,8 +25,7 @@ export default function AppRouter() {
           <Route path=":gameKey/clip" element={<ServicePages.ClipPage />} />
         </Route>
         <Route path="stat" element={<ServicePages.StatLayout />}>
-          <Route index element={<ServicePages.LeaguePage />} />
-          <Route path="league" element={<ServicePages.LeaguePage />} />
+          <Route index element={<ServicePages.LeagueTeamPage />} />
           <Route path="team" element={<ServicePages.LeagueTeamPage />} />
           <Route
             path="position"
@@ -50,7 +49,10 @@ export default function AppRouter() {
           
           <Route path="manage" element={<ServicePages.ProfileManage />} />
         </Route>
-        <Route path="settings" element={<ServicePages.SettingsPage />} />
+        <Route path='settings' element={<ServicePages.SettingsLayout />}>
+          <Route index element={<ServicePages.VideoSettingsPage />} />
+          <Route path='testvideo' element={<ServicePages.TestVideo />} />
+        </Route>
         <Route path="video" element={<ServicePages.VideoPlayer />} />
 
         {/* Guest Pages */}

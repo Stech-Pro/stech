@@ -1,6 +1,7 @@
 // src/pages/Service/Member/Profile/ProfilePage/index.js
 import React, { useState, useEffect } from 'react';
 import './ProfileMain.css';
+import { myProfile } from '../../../../../api/authAPI';
 // NOTE: 경로는 프로젝트 구조에 맞게 수정
 import { mockData } from '../../../../../data/teamplayermock';
 import { teamData } from '../../../../../data/teamData';

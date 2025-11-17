@@ -1,30 +1,19 @@
 import React from 'react';
 import './index.css';
-import {useNavigate } from 'react-router-dom';
-import  logo from '../../../../assets/images/logos/stech.png';
+import StatLeague from "../../../../components/Stat/StatLeague";
+import {FALL_2024_DATA} from "../../../../data/fall2024";
+import {FALL_2025_DATA} from "../../../../data/fall2025";
+import {TEAMS } from "../../../../data/TEAMS";
+import { useMemo } from "react";
 
 
 const MemberHomePage = () => {
-  const navigate = useNavigate();
+  const MERGED_FALL_DATA = useMemo(
+    () => ({ ...FALL_2024_DATA, ...FALL_2025_DATA }),
+    []
+  );
 
-  return(
-    <div className='serviceHomeContainer'>
-      <div className='serviceHomeHeader'>
-        <img src={logo} alt="STECH Logo" className='serviceHomeLogo' />
-        <h1 className='serviceHomeTitle'>사용방법</h1>
-      </div>
-      <div className='tutorialContainer'>
-        <iframe 
-        src={`https://player.vimeo.com/video/1108074372?badge=0&autopause=0&player_id=0&app_id=58479`}
-        frameBorder="0" 
-        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
-        referrerPolicy="strict-origin-when-cross-origin" 
-        className='tutorialVideo'
-        title="미식축구 영상 분석 서비스 사용법" 
-      />
-        </div>
-    </div>
-  )
+  return <StatLeague data={MERGED_FALL_DATA} teams={TEAMS} /> ;
 }
 
 export default MemberHomePage;
