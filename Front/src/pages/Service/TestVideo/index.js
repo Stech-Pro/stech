@@ -12,7 +12,7 @@ import { TbArrowForwardUpDouble, TbPlayerTrackNext } from 'react-icons/tb';
 import { useVideoSettings } from '../../../hooks/useVideoSettings';
 
 // 💡 기존 스타일 그대로 재사용
-import '../../Service/Video/index.css';
+import '../../../Service/Video/index.css';
 
 export default function TestVideo() {
   const navigate = useNavigate();

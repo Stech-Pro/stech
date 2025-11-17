@@ -81,7 +81,7 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                   <button
   type="button"
   className="secondary-button"
-  onClick={() => navigate('/service/settings/testvideo')}
+  onClick={() => navigate('/service/testvideo')}
 >
   전체화면 테스트 열기
 </button>
