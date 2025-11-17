@@ -3,6 +3,7 @@ export {default as MemberHomePage} from './Home';
 export {default as HighlightPage} from './Highlight';
 export {default as FAQPage} from './FAQ';
 export {default as SuggestionPage} from './Suggestion';
+export {default as TestVideo} from './TestVideo';
 
 export * from './Settings';
 export * from './Stat';

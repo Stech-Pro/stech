@@ -51,9 +51,9 @@ export default function AppRouter() {
         </Route>
         <Route path='settings' element={<ServicePages.SettingsLayout />}>
           <Route index element={<ServicePages.VideoSettingsPage />} />
-          <Route path='testvideo' element={<ServicePages.TestVideo />} />
         </Route>
         <Route path="video" element={<ServicePages.VideoPlayer />} />
+        <Route path='testvideo' element={<ServicePages.TestVideo />} />
 
         {/* Guest Pages */}
         <Route path="guest" element={<ServicePages.GuestLayout />}>

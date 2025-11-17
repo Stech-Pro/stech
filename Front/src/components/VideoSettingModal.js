@@ -4,8 +4,10 @@ import { IoPlayCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
 import { MdOutlineHandyman } from 'react-icons/md';
 import { useVideoSettings } from '../hooks/useVideoSettings';
 import './VideoSettingModal.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function VideoSettingModal({ isVisible, onClose }) {
+  const navigate = useNavigate();
   console.log('VideoSettingModal 렌더링됨');
   const { settings, updateSetting, updateHotkey, resetSettings } = useVideoSettings();
   const [currentHotkey, setCurrentHotkey] = useState(null);
@@ -76,6 +78,13 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                       <IoPlayCircleOutline size={48} />
                     </button>
                   </div>
+                  <button
+  type="button"
+  className="secondary-button"
+  onClick={() => navigate('/service/settings/testvideo')}
+>
+  전체화면 테스트 열기
+</button>
                 </div>
 
                 <div className="settings-row">
