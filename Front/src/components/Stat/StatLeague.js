@@ -683,7 +683,7 @@ export default function StatLeague({ data, teams = [] }) {
     [data],
   );
 
-  const [selectedYear, setSelectedYear] = useState('2024');
+  const [selectedYear, setSelectedYear] = useState('2025');
   const [selectedLeague, setSelectedLeague] = useState('서울');
   const [selectedDivision, setSelectedDivision] = useState('1부');
 

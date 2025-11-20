@@ -9,10 +9,10 @@ import {
 } from 'react-icons/io5';
 import { GoScreenFull, GoScreenNormal } from 'react-icons/go';
 import { TbArrowForwardUpDouble, TbPlayerTrackNext } from 'react-icons/tb';
-import { useVideoSettings } from '../../../hooks/useVideoSettings';
+import { useVideoSettings } from '../../../../../hooks/useVideoSettings';
 
 // 💡 기존 스타일 그대로 재사용
-import '../../../Service/Video/index.css';
+import '../../../../Service/Video/index.css';
 
 export default function TestVideo() {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export default function TestVideo() {
   // 안전한 샘플 mp4 (state?.src 있으면 그걸 사용)
   const src =
     state?.src ||
-    'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+    'https://www.pexels.com/ko-kr/download/video/9441427/';
 
   // 재생속도/볼륨 반영
   useEffect(() => {
@@ -222,7 +222,7 @@ export default function TestVideo() {
                 </button>
 
                 {/* 이전/다음은 TestVideo에서는 고정 비활성화 */}
-                <button className="videoFrameStepButton" disabled title="Previous Clip (비활성화)">
+                {/* <button className="videoFrameStepButton" disabled title="Previous Clip (비활성화)">
                   <TbPlayerTrackNext
                     className="prevClipIcon"
                     style={{ transform: 'scaleX(-1)', transformOrigin: '50% 50%' }}
@@ -230,7 +230,7 @@ export default function TestVideo() {
                 </button>
                 <button className="videoFrameStepButton" disabled title="Next Clip (비활성화)">
                   <TbPlayerTrackNext className="nextClipIcon" />
-                </button>
+                </button> */}
               </div>
             </div>
 

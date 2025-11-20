@@ -131,6 +131,37 @@ export default function ProfilePage() {
   const [seasonPosition, setSeasonPosition] = useState('');
 
   useEffect(() => {
+  const loadProfile = async () => {
+    try {
+      setIsLoading(true);
+
+      // 1) 토큰 가져오기
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        setIsLoading(false);
+        return;
+      }
+
+      // 2) 백엔드에서 프로필 요청
+      const data = await myProfile(token);
+      console.log("백엔드에서 받은 프로필:", data);
+
+      // 3) 상태 저장
+      setProfileData(data);
+      setCareerPosition(data.position);
+      setSeasonPosition(data.position);
+
+    } catch (error) {
+      console.error("프로필 불러오기 오류:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  loadProfile();
+}, []);
+  useEffect(() => {
     const loadProfile = async () => {
       setIsLoading(true);
       const data = await fetchProfileDataFromBackend();

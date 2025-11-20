@@ -9,7 +9,7 @@ import { useMemo } from "react";
 
 const MemberHomePage = () => {
   const MERGED_FALL_DATA = useMemo(
-    () => ({ ...FALL_2024_DATA, ...FALL_2025_DATA }),
+    () => ({ ...FALL_2025_DATA, ...FALL_2024_DATA }),
     []
   );
 

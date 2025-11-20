@@ -1,15 +1,16 @@
 import { createPortal } from 'react-dom';
 import { useEffect, useRef, useState } from 'react';
 import { IoPlayCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
-import { MdOutlineHandyman } from 'react-icons/md';
 import { useVideoSettings } from '../hooks/useVideoSettings';
 import './VideoSettingModal.css';
 import { useNavigate } from 'react-router-dom';
+import { GoScreenFull } from 'react-icons/go';
 
 export default function VideoSettingModal({ isVisible, onClose }) {
   const navigate = useNavigate();
   console.log('VideoSettingModal 렌더링됨');
-  const { settings, updateSetting, updateHotkey, resetSettings } = useVideoSettings();
+  const { settings, updateSetting, updateHotkey, resetSettings } =
+    useVideoSettings();
   const [currentHotkey, setCurrentHotkey] = useState(null);
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -77,14 +78,14 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     <button className="play-button" onClick={togglePlay}>
                       <IoPlayCircleOutline size={48} />
                     </button>
+                    <button
+                      className="fullscreen-button"
+                      onClick={() => navigate('/service/testvideo')}
+                      aria-label="전체화면"
+                    >
+                      <GoScreenFull size={20} />
+                    </button>
                   </div>
-                  <button
-  type="button"
-  className="secondary-button"
-  onClick={() => navigate('/service/testvideo')}
->
-  전체화면 테스트 열기
-</button>
                 </div>
 
                 <div className="settings-row">
@@ -97,7 +98,9 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                       className="sr-only"
                       aria-live="polite"
                       aria-atomic="true"
-                    >                    </div>
+                    >
+                      {' '}
+                    </div>
 
                     <div className="slider-control">
                       <span>0.1X</span>
@@ -109,7 +112,10 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                         step="0.1"
                         value={settings.playbackRate}
                         onChange={(e) =>
-                          updateSetting('playbackRate', parseFloat(e.target.value))
+                          updateSetting(
+                            'playbackRate',
+                            parseFloat(e.target.value),
+                          )
                         }
                         aria-valuemin={0.1}
                         aria-valuemax={2.0}
@@ -134,8 +140,7 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                       className="sr-only"
                       aria-live="polite"
                       aria-atomic="true"
-                    >
-                    </div>
+                    ></div>
 
                     <div className="slider-control">
                       <span>0.1초</span>
@@ -162,7 +167,6 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                       </span>
                     </div>
                   </div>
-
                 </div>
               </div>
             </div>
@@ -176,7 +180,10 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                 </div>
               </div>
               <div className="settings-row">
-                <div className="setting-item" style={{ display: 'flex', gap: '25px' }}>
+                <div
+                  className="setting-item"
+                  style={{ display: 'flex', gap: '25px' }}
+                >
                   <label>언어 설정</label>
                   <select
                     value={settings.language}
@@ -188,11 +195,16 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                   </select>
                 </div>
 
-                <div className="setting-item" style={{ display: 'flex', gap: '25px' }}>
+                <div
+                  className="setting-item"
+                  style={{ display: 'flex', gap: '25px' }}
+                >
                   <label>화면 비율 설정</label>
                   <select
                     value={settings.screenRatio}
-                    onChange={(e) => updateSetting('screenRatio', e.target.value)}
+                    onChange={(e) =>
+                      updateSetting('screenRatio', e.target.value)
+                    }
                     style={{ padding: '20px 30px', textSize: '24px' }}
                   >
                     <option value="1920:1080">1920:1080</option>
@@ -206,7 +218,12 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     <span>리그 팀 순위:</span>
                     <select
                       value={settings.leaguePosition}
-                      onChange={(e) => updateSetting('leaguePosition', parseInt(e.target.value))}
+                      onChange={(e) =>
+                        updateSetting(
+                          'leaguePosition',
+                          parseInt(e.target.value),
+                        )
+                      }
                     >
                       <option value={1}>1부</option>
                       <option value={2}>2부</option>
@@ -215,7 +232,9 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     <span>리그 포지션 순위:</span>
                     <select
                       value={settings.teamRank}
-                      onChange={(e) => updateSetting('teamRank', parseInt(e.target.value))}
+                      onChange={(e) =>
+                        updateSetting('teamRank', parseInt(e.target.value))
+                      }
                     >
                       <option value={1}>1부</option>
                       <option value={2}>2부</option>
@@ -238,7 +257,11 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                   <label>앞으로 넘기기:</label>
                   <input
                     type="text"
-                    value={currentHotkey === 'forward' ? 'Press a key...' : settings.hotkeys.forward}
+                    value={
+                      currentHotkey === 'forward'
+                        ? 'Press a key...'
+                        : settings.hotkeys.forward
+                    }
                     readOnly
                     onFocus={() => setCurrentHotkey('forward')}
                     onBlur={() => setCurrentHotkey(null)}
@@ -250,7 +273,11 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                   <label>뒤로 넘기기:</label>
                   <input
                     type="text"
-                    value={currentHotkey === 'backward' ? 'Press a key...' : settings.hotkeys.backward}
+                    value={
+                      currentHotkey === 'backward'
+                        ? 'Press a key...'
+                        : settings.hotkeys.backward
+                    }
                     readOnly
                     onFocus={() => setCurrentHotkey('backward')}
                     onBlur={() => setCurrentHotkey(null)}
@@ -262,7 +289,11 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                   <label>다음 영상 재생:</label>
                   <input
                     type="text"
-                    value={currentHotkey === 'nextVideo' ? 'Press a key...' : settings.hotkeys.nextVideo}
+                    value={
+                      currentHotkey === 'nextVideo'
+                        ? 'Press a key...'
+                        : settings.hotkeys.nextVideo
+                    }
                     readOnly
                     onFocus={() => setCurrentHotkey('nextVideo')}
                     onBlur={() => setCurrentHotkey(null)}
@@ -274,7 +305,11 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                   <label>이전 영상 재생:</label>
                   <input
                     type="text"
-                    value={currentHotkey === 'prevVideo' ? 'Press a key...' : settings.hotkeys.prevVideo}
+                    value={
+                      currentHotkey === 'prevVideo'
+                        ? 'Press a key...'
+                        : settings.hotkeys.prevVideo
+                    }
                     readOnly
                     onFocus={() => setCurrentHotkey('prevVideo')}
                     onBlur={() => setCurrentHotkey(null)}

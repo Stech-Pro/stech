@@ -340,6 +340,7 @@ export const myProfile = async (token) => {
   });
 
   const data = await jsonOrText(response);
+  console.log('myProfile response data:', data);
   if (response.ok) return data;
   
   throw new APIError(
