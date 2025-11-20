@@ -237,20 +237,17 @@ export default function ClipPage() {
   const homeMeta = TEAM_BY_ID[game.homeId];
   const awayMeta = TEAM_BY_ID[game.awayId];
 
-  // 홈/원정 → 팀 드롭다운 옵션
+
   const teamOptions = useMemo(() => {
-    const home = homeMeta;
-    const away = awayMeta;
-    const arr = [];
-    if (home?.name)
-      arr.push({ value: home.name, label: home.name, logo: home.logo });
-    if (away?.name)
-      arr.push({ value: away.name, label: away.name, logo: away.logo });
-    // 중복 제거
-    return arr.filter(
-      (v, i, a) => a.findIndex((x) => x.value === v.value) === i,
-    );
-  }, [homeMeta, awayMeta]);
+  const arr = [];
+  if (homeMeta?.name) {
+    arr.push({ value: 'Home', label: homeMeta.name, logo: homeMeta.logo });
+  }
+  if (awayMeta?.name) {
+    arr.push({ value: 'Away', label: awayMeta.name, logo: awayMeta.logo });
+  }
+  return arr;
+}, [homeMeta, awayMeta]);
 
   const SPECIAL_DOWN_MAP = {
     TPT: '2PT',
@@ -459,6 +456,19 @@ export default function ClipPage() {
     return label ? `#${label}` : null;
   };
 
+  const selectedTeamOpt = useMemo(
+  () => teamOptions.find(o => o.value === filters.team) || null,
+  [teamOptions, filters.team]
+);
+
+// 2) 버튼에 뿌릴 요약 노드(팀 이름 + 로고)
+const teamSummaryNode = selectedTeamOpt ? (
+  <span className="ff-summary-with-icon">
+   
+    {selectedTeamOpt.label}
+  </span>
+) : '공격팀'; 
+
   return (
     <div className="clip-root">
       {/* ===== 헤더 ===== */}
@@ -485,7 +495,7 @@ export default function ClipPage() {
                 {/* TEAM */}
                 <Dropdown
                   label="공격팀"
-                  summary={teamSummary}
+                  summary={teamSummaryNode}
                   isOpen={openMenu === 'team'}
                   onToggle={() => handleMenuToggle('team')}
                   onClose={closeAll}
