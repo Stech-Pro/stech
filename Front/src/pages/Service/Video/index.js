@@ -359,6 +359,7 @@ function PlayerCore({ stateData }) {
       videoRef.current.load();
   }, [selected?.clipUrl]);
 
+
   const selectPlay = useCallback(
     (id, options = {}) => {
       const newId = String(id);
@@ -654,6 +655,19 @@ function PlayerCore({ stateData }) {
   const handleContainerClick = useCallback((e) => {
     e.stopPropagation();
   }, []);
+
+
+  const selectedTeamOpt = useMemo(
+  () => teamOptions.find(o => o.value === filters.team) || null,
+  [teamOptions, filters.team]
+);
+
+// 버튼에 표시할 요약(팀 이름 + 로고). 선택 없으면 기존 teamSummary/기본 라벨 사용
+const teamSummaryNode = selectedTeamOpt ? (
+  <span className="ff-summary-with-icon">
+    {selectedTeamOpt.label}
+  </span>
+) : (teamSummary || '공격팀');
 
   return (
     <div
@@ -1007,7 +1021,7 @@ function PlayerCore({ stateData }) {
                 </Dropdown>
                 <Dropdown
                   label="공격팀"
-                  summary={teamSummary}
+                  summary={teamSummaryNode}
                   isOpen={openMenu === 'team'}
                   onToggle={() => handleMenuToggle('team')}
                   onClose={closeAllMenus}
