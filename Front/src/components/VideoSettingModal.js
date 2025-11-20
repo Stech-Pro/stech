@@ -2,15 +2,28 @@ import { createPortal } from 'react-dom';
 import { useEffect, useRef, useState } from 'react';
 import { IoPlayCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
 import { useVideoSettings } from '../hooks/useVideoSettings';
+import { useStatInitial } from '../hooks/useStatInitial';
 import './VideoSettingModal.css';
 import { useNavigate } from 'react-router-dom';
 import { GoScreenFull } from 'react-icons/go';
 
 export default function VideoSettingModal({ isVisible, onClose }) {
   const navigate = useNavigate();
-  console.log('VideoSettingModal 렌더링됨');
-  const { settings, updateSetting, updateHotkey, resetSettings } =
-    useVideoSettings();
+  const {
+    settings,
+    updateSetting,
+    updateHotkey,
+    resetSettings,
+    getKeyFromEvent,
+  } = useVideoSettings();
+  const {
+    initialValues,
+    updateLeague,
+    updateDivision,
+    leagueHasDivisions,
+    getLeagueOptions,
+    getDivisionOptions,
+  } = useStatInitial();
   const [currentHotkey, setCurrentHotkey] = useState(null);
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -36,8 +49,11 @@ export default function VideoSettingModal({ isVisible, onClose }) {
 
   const handleHotkeyInput = (action, e) => {
     e.preventDefault();
-    const key = e.key.toUpperCase();
-    if (key.length === 1 && /[A-Z0-9]/.test(key)) {
+
+    // getKeyFromEvent를 사용하여 언어 설정과 관계없이 키 인식
+    const key = getKeyFromEvent(e);
+
+    if (key) {
       updateHotkey(action, key);
       setCurrentHotkey(null);
     }
@@ -211,34 +227,39 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     <option value="1280:720">1280:720</option>
                   </select>
                 </div>
-
                 <div className="setting-item initial-screen-item">
                   <label>초기화면 설정</label>
                   <div className="initial-screen-settings">
-                    <span>리그 팀 순위:</span>
+                    <span>리그 / 부 </span>
                     <select
-                      value={settings.leaguePosition}
-                      onChange={(e) =>
-                        updateSetting(
-                          'leaguePosition',
-                          parseInt(e.target.value),
-                        )
-                      }
+                      value={initialValues.league}
+                      onChange={(e) => updateLeague(e.target.value)}
                     >
-                      <option value={1}>1부</option>
-                      <option value={2}>2부</option>
+                      {getLeagueOptions().map((league) => (
+                        <option key={league.value} value={league.value}>
+                          {league.label}
+                        </option>
+                      ))}
                     </select>
 
-                    <span>리그 포지션 순위:</span>
-                    <select
-                      value={settings.teamRank}
-                      onChange={(e) =>
-                        updateSetting('teamRank', parseInt(e.target.value))
-                      }
-                    >
-                      <option value={1}>1부</option>
-                      <option value={2}>2부</option>
-                    </select>
+                    {/* 선택된 리그가 디비전이 있는 경우에만 표시 */}
+                    {leagueHasDivisions(initialValues.league) ? (
+                      <select
+                        value={initialValues.division}
+                        onChange={(e) => updateDivision(e.target.value)}
+                      >
+                        {getDivisionOptions().map((division) => (
+                          <option key={division} value={division}>
+                            {division}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      // 부 구분이 없는 리그는 비활성화된 select 표시
+                      <select value="" disabled>
+                        <option value=""></option>
+                      </select>
+                    )}
                   </div>
                 </div>
               </div>
@@ -259,7 +280,7 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     type="text"
                     value={
                       currentHotkey === 'forward'
-                        ? 'Press a key...'
+                        ? ''
                         : settings.hotkeys.forward
                     }
                     readOnly
@@ -275,7 +296,7 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     type="text"
                     value={
                       currentHotkey === 'backward'
-                        ? 'Press a key...'
+                        ? ''
                         : settings.hotkeys.backward
                     }
                     readOnly
@@ -291,7 +312,7 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     type="text"
                     value={
                       currentHotkey === 'nextVideo'
-                        ? 'Press a key...'
+                        ? ''
                         : settings.hotkeys.nextVideo
                     }
                     readOnly
@@ -307,7 +328,7 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     type="text"
                     value={
                       currentHotkey === 'prevVideo'
-                        ? 'Press a key...'
+                        ? ''
                         : settings.hotkeys.prevVideo
                     }
                     readOnly
@@ -329,7 +350,6 @@ export default function VideoSettingModal({ isVisible, onClose }) {
             </div>
           </div>
         </div>
-        {/* === 기존 설정 UI 내용 끝 === */}
       </div>
     </div>,
     document.body,

@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { RxTriangleDown } from 'react-icons/rx';
 import { FaChevronDown } from 'react-icons/fa';
 import './StatPosition.css';
+import { useStatInitial } from '../../hooks/useStatInitial';
 
 /* ─────────────────────────  공통 드롭다운 (수정 없음)  ───────────────────────── */
 function Dropdown({
@@ -389,12 +390,17 @@ const statColumns = {
 
 /* ─────────────────────────  컴포넌트  ───────────────────────── */
 export default function StatPosition({ data = [], teams = [] }) {
-  const [league, setLeague] = useState('서울');
-  const [division, setDivision] = useState('1부');
+
   const [position, setPosition] = useState('QB');
   const [category, setCategory] = useState('패스');
   const [currentSort, setCurrentSort] = useState(null);
-
+  const { initialValues, leagueHasDivisions } = useStatInitial();
+   const [league, setLeague] = useState(initialValues.league);
+  const [division, setDivision] = useState(
+    leagueHasDivisions(initialValues.league)
+      ? initialValues.division || '1부'
+      : ''
+  );
   const leagueOptions = useMemo(() => {
     const set = new Set();
     (Array.isArray(data) ? data : []).forEach((row) => {
