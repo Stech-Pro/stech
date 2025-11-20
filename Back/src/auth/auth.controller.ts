@@ -3,6 +3,7 @@ import {
   Post,
   Put,
   Get,
+  Patch,
   Delete,
   Body,
   HttpCode,
@@ -11,6 +12,7 @@ import {
   Request,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -19,6 +21,7 @@ import {
   ApiResponse,
   ApiBody,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import {
@@ -34,6 +37,7 @@ import {
   VerifyPasswordDto,
   CheckUserExistsDto,
   CreateProfileDto,
+  UpdateProfileDto,
 } from '../common/dto/auth.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
@@ -458,21 +462,21 @@ export class AuthController {
         success: true,
         message: '프로필 정보를 조회했습니다.',
         data: {
-          유저ID: 'player123',
-          유저네임: '건국이',
-          풀네임: '김철수',
-          이메일: 'kim.chulsu@example.com',
-          국적: '대한민국',
-          우편번호: '05029',
-          연락처: '010-1234-5678',
-          주소: '서울시 광진구 능동로 120',
-          키: 180,
-          몸무게: 75,
-          나이: 22,
-          경력: '고등학교 3년, 대학교 2년',
-          포지션: ['QB', 'RB'],
-          지역: '서울권',
-          팀명: '건국대 레이징불스',
+          username: 'player123',
+          playerID: '건국이',
+          realName: '김철수',
+          email: 'kim.chulsu@example.com',
+          nationality: '대한민국',
+          postalCode: '05029',
+          phone: '010-1234-5678',
+          address: '서울시 광진구 능동로 120',
+          height: 180,
+          weight: 75,
+          age: 22,
+          career: '고등학교 3년, 대학교 2년',
+          position: ['QB', 'RB'],
+          region: '서울권',
+          teamName: '건국대 레이징불스',
         },
       },
     },
@@ -501,5 +505,213 @@ export class AuthController {
   })
   async getMyProfile(@Request() req) {
     return this.authService.getMyProfile(req.user.id);
+  }
+
+  @Patch('my-profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: '✏️ 마이페이지 프로필 수정',
+    description: `
+    ## ✏️ 개인 프로필 정보 수정 API
+
+    로그인한 사용자가 자신의 프로필 정보를 수정할 수 있습니다.
+    
+    ### 📋 수정 가능한 필드들
+    - **기본 정보**: 실명, 플레이어ID/유저네임
+    - **연락처**: 이메일, 연락처, 주소, 우편번호  
+    - **신체 정보**: 키, 몸무게, 나이, 국적
+    - **선수 정보**: 경력, 주포지션
+    
+    ### 🎯 특징
+    - **부분 수정 지원**: 필요한 필드만 전송하면 됩니다
+    - **실시간 반영**: 수정된 정보를 즉시 반환합니다
+    - **유효성 검증**: 각 필드별 데이터 타입 및 형식을 검증합니다
+    
+    ### 📝 사용 예시
+    \`\`\`json
+    // 이름과 이메일만 수정하고 싶은 경우
+    {
+      "realName": "김철수",
+      "email": "new.email@example.com"
+    }
+    
+    // 신체 정보만 수정하고 싶은 경우  
+    {
+      "height": 185,
+      "weight": 80,
+      "age": 23
+    }
+    \`\`\`
+    `,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 프로필 수정 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '프로필이 성공적으로 수정되었습니다.',
+        data: {
+          username: 'player123',
+          playerID: '건국이',
+          realName: '김철수',
+          email: 'new.email@example.com',
+          nationality: '대한민국',
+          postalCode: '05029',
+          phone: '010-1234-5678',
+          address: '서울시 광진구 능동로 120',
+          height: 185,
+          weight: 80,
+          age: 23,
+          career: '고등학교 3년, 대학교 2년',
+          position: ['QB'],
+          region: '서울 1부 리그',
+          teamName: '한양대 라이온즈',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: '❌ 잘못된 요청 (수정할 정보 없음, 유효하지 않은 데이터)',
+    schema: {
+      example: {
+        success: false,
+        message: '수정할 정보가 없습니다.',
+        code: 'NO_UPDATE_DATA',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: '❌ 인증 필요',
+    schema: {
+      example: {
+        success: false,
+        message: '로그인이 필요합니다.',
+        code: 'UNAUTHORIZED',
+      },
+    },
+  })
+  async updateMyProfile(
+    @Request() req,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.authService.updateMyProfile(req.user.id, updateProfileDto);
+  }
+
+  @Get('my-team-stats')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: '🏆 팀 선수들 스탯 조회',
+    description: `
+    ## 👥 팀 선수들 스탯 조회 API
+
+    로그인한 사용자와 같은 팀의 모든 선수들의 스탯을 포지션별로 그룹화하여 조회합니다.
+    
+    ### 📋 스탯 유형
+    - **total**: 통산 커리어 스탯 (기본값)
+    - **season**: 올해 시즌 스탯
+    - **game**: 경기별 스탯 목록
+    
+    ### 📋 포함된 정보
+    - **팀 정보**: 팀명, 지역 (예: "서울 1부 리그")
+    - **선수별 정보**: 선수명, 등번호, 포지션
+    - **포지션별 스탯**: QB, WR, RB, TE 등 포지션에 맞는 모든 스탯
+    
+    ### 🎯 사용 목적
+    - 마이페이지에서 팀 선수들 스탯 표시
+    - 포지션별 팀 성과 분석
+    - 선수별 상세 스탯 비교
+    `,
+  })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    description: '스탯 유형 (total: 통산, season: 시즌, game: 경기별)',
+    enum: ['total', 'season', 'game'],
+    example: 'total',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 팀 스탯 조회 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '팀 선수 스탯을 조회했습니다.',
+        data: {
+          teamName: 'HYlions',
+          teamRegion: '서울 1부 리그',
+          stats: {
+            QB: [
+              {
+                playerId: 'HYlions_10',
+                playerName: '김철수',
+                teamName: 'HYlions',
+                jerseyNumber: 10,
+                position: 'QB',
+                totalGamesPlayed: 5,
+                gamesPlayed: 5,
+                passingAttempts: 50,
+                passingCompletions: 30,
+                completionPercentage: 60,
+                passingYards: 450,
+                passingTouchdowns: 3,
+                passingInterceptions: 1,
+                longestPass: 35,
+                rushingAttempts: 8,
+                rushingYards: 45,
+                yardsPerCarry: 5.6,
+                rushingTouchdowns: 1,
+                longestRush: 15,
+                sacks: 2,
+                fumbles: 0,
+              },
+            ],
+            WR: [
+              {
+                playerId: 'HYlions_80',
+                playerName: '박민수',
+                teamName: 'HYlions',
+                jerseyNumber: 80,
+                position: 'WR',
+                totalGamesPlayed: 5,
+                // WR 관련 스탯들...
+              },
+            ],
+            RB: [],
+            TE: [],
+            // 다른 포지션들...
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: '❌ 인증 필요',
+    schema: {
+      example: {
+        success: false,
+        message: '로그인이 필요합니다.',
+        code: 'UNAUTHORIZED',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: '❌ 사용자를 찾을 수 없음',
+    schema: {
+      example: {
+        success: false,
+        message: '사용자를 찾을 수 없습니다.',
+        code: 'USER_NOT_FOUND',
+      },
+    },
+  })
+  async getMyTeamStats(@Request() req, @Query('type') type?: string) {
+    return this.authService.getMyTeamStats(req.user.id, type || 'total');
   }
 }
