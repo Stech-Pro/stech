@@ -3,6 +3,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { RxTriangleDown } from 'react-icons/rx';
 import { FaChevronDown } from 'react-icons/fa';
 import './StatTeam.css';
+import { useStatInitial } from '../../hooks/useStatInitial';
 
 /* ─────────────────────────  공통 드롭다운  ───────────────────────── */
 function Dropdown({
@@ -257,11 +258,39 @@ export default function StatTeam({
 }) {
   const isGuestFixed = Boolean(fixedLeague && fixedDivision);
 
-  const [league, setLeague] = useState(fixedLeague || '서울');
-  const [division, setDivision] = useState(fixedDivision || '1부');
+  // 🔹 유저/로컬스토리지 기반 초기 리그/부
+  const { initialValues, loaded, leagueHasDivisions } = useStatInitial();
+
+  // 🔹 리그/부 state를 초기값으로 세팅 (게스트면 props 우선)
+  const [league, setLeague] = useState(() =>
+    isGuestFixed ? fixedLeague : initialValues.league || '서울',
+  );
+  const [division, setDivision] = useState(() => {
+    if (isGuestFixed) return fixedDivision;
+    const hasDiv = leagueHasDivisions(initialValues.league);
+    return hasDiv ? initialValues.division || '1부' : '';
+  });
+
   const [playType, setPlayType] = useState('득점/경기');
   const [leagueSelected, setLeagueSelected] = useState(false);
 
+  // 🔹 initialValues가 바뀌었을 때(처음 로딩 등) 유저가 아직 직접 선택 안 했으면 동기화
+  useEffect(() => {
+    if (isGuestFixed) return;
+    if (leagueSelected) return; // 이미 사용자가 직접 선택한 후면 건드리지 않음
+
+    setLeague(initialValues.league || '서울');
+    const hasDiv = leagueHasDivisions(initialValues.league);
+    setDivision(hasDiv ? initialValues.division || '1부' : '');
+  }, [
+    initialValues.league,
+    initialValues.division,
+    isGuestFixed,
+    leagueSelected,
+    leagueHasDivisions,
+  ]);
+
+  // 게스트용: 부모에서 props 바뀌면 따라감 (기존 로직 유지)
   useEffect(() => {
     if (fixedLeague) setLeague(fixedLeague);
   }, [fixedLeague]);
@@ -269,10 +298,10 @@ export default function StatTeam({
     if (fixedDivision) setDivision(fixedDivision);
   }, [fixedDivision]);
 
-  // 게스트 고정이면 디비전 드롭다운을 항상 노출(단일 옵션)
+  // 🔹 디비전 드롭다운 노출 조건
   const showDivision = isGuestFixed
-    ? true
-    : league !== '사회인' && leagueSelected;
+    ? leagueHasDivisions(fixedLeague)         // 게스트면 해당 리그가 부를 가지면 항상 표시
+    : leagueHasDivisions(league) && leagueSelected;
   const currentColumns = TEAM_COLUMNS[playType] || [];
 
   const [currentSort, setCurrentSort] = useState(null);

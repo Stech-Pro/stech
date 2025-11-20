@@ -14,7 +14,8 @@ const ServiceLayout = () => {
   const [showUpload, setShowUpload] = useState(false);
   const isServiceVideo = !!useMatch('/service/video/*');
   const isGuestVideo = !!useMatch('/service/guest/video/*');
-  const isVideo = isServiceVideo || isGuestVideo;
+  const isTestVideo = !!useMatch('/service/testvideo/*');
+  const isVideo = isServiceVideo || isGuestVideo|| isTestVideo;
   const windowWidth = useDeviceWidth();
 
   if (windowWidth <= 1200) {

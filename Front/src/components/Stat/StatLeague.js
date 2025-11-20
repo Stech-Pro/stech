@@ -1,8 +1,10 @@
+// StatLeague.jsx
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import './StatLeague.css';
 import NoGroupImg from '../../assets/images/png/NoGroup.png';
 import Trophy from '../../assets/images/png/trophy.png';
+import { useStatInitial } from '../../hooks/useStatInitial';
 
 const Dropdown = ({
   options = [],
@@ -539,6 +541,7 @@ const KnockoutCard = ({
     </div>
   );
 };
+
 function KnockoutBracket({ currentDivision, teams = [] }) {
   const qf = currentDivision?.quarterFinals || [];
   const sf = currentDivision?.semiFinals || [];
@@ -635,6 +638,7 @@ function KnockoutBracket2({ currentDivision, teams = [] }) {
     </div>
   );
 }
+
 /* ----------------------------------
  * Empty(예외) 페이지
  * ---------------------------------- */
@@ -678,51 +682,26 @@ export default function StatLeague({ data, teams = [] }) {
   const exceptionLeague = ['타이거볼', '챌린지볼'];
   const [isExcepted, setIsExcepted] = useState(false);
 
+  // 🔹 유저 초기 리그/부 + 로딩 상태
+  const { initialValues, loaded } = useStatInitial();
+
+  // 🔹 연도는 2025 고정
+  const [selectedYear] = useState('2025');
+
+  // 🔹 리그/부는 처음 한 번만 유저 정보 기준으로 세팅
+  const [selectedLeague, setSelectedLeague] = useState('');
+  const [selectedDivision, setSelectedDivision] = useState('');
+  const [showDivisionFilter, setShowDivisionFilter] = useState(false);
+  const [initializedFromUser, setInitializedFromUser] = useState(false);
+
   const yearOptions = useMemo(
-    () => Object.keys(data ?? {}).map((y) => ({ value: y, label: y })),
+    () =>
+      Object.keys(data ?? {}).map((y) => ({
+        value: y,
+        label: y,
+      })),
     [data],
   );
-
-  const [selectedYear, setSelectedYear] = useState('2024');
-  const [selectedLeague, setSelectedLeague] = useState('서울');
-  const [selectedDivision, setSelectedDivision] = useState('1부');
-
-  const [showDivisionFilter, setShowDivisionFilter] = useState(false);
-
-  const handleLeagueChange = (opt) => {
-    const newLeague = opt.value;
-    setSelectedLeague(newLeague);
-
-    const node = data?.[selectedYear]?.[newLeague];
-    const divs = Array.isArray(node?.divisions) ? node.divisions : [];
-    const nextDiv =
-      divs.find((d) => d.name === '1부')?.name || divs[0]?.name || '';
-    setSelectedDivision(nextDiv);
-
-    setShowDivisionFilter(divs.length > 1);
-  };
-
-  const handleYearChange = (opt) => {
-    const y = opt.value;
-    setSelectedYear(y);
-
-    const leagues = Object.keys(data?.[y] ?? {});
-    if (!leagues.includes(selectedLeague)) {
-      const firstLeague = leagues[0] || '';
-      setSelectedLeague(firstLeague);
-      const node = data?.[y]?.[firstLeague];
-      const divs = Array.isArray(node?.divisions) ? node.divisions : [];
-      const nextDiv =
-        divs.find((d) => d.name === '1부')?.name || divs[0]?.name || '';
-      setSelectedDivision(nextDiv);
-    } else {
-      const node = data?.[y]?.[selectedLeague];
-      const divs = Array.isArray(node?.divisions) ? node.divisions : [];
-      const nextDiv =
-        divs.find((d) => d.name === '1부')?.name || divs[0]?.name || '';
-      setSelectedDivision(nextDiv);
-    }
-  };
 
   const leagueOptions = useMemo(() => {
     if (!selectedYear || !data?.[selectedYear]) return [];
@@ -737,14 +716,14 @@ export default function StatLeague({ data, teams = [] }) {
     return data?.[selectedYear]?.[selectedLeague] ?? null;
   }, [data, selectedYear, selectedLeague]);
 
-  const divisionList = useMemo(() => {
-    return Array.isArray(leagueNode?.divisions) ? leagueNode.divisions : [];
-  }, [leagueNode]);
-
-  const bracket = leagueNode?.bracket;
+  const divisionList = useMemo(
+    () =>
+      Array.isArray(leagueNode?.divisions) ? leagueNode.divisions : [],
+    [leagueNode],
+  );
 
   const hasDivisions = useMemo(
-    () => divisionList.length > 1, // 1부/2부 등 2개 이상이면 부 개념 있음
+    () => divisionList.length > 1,
     [divisionList],
   );
 
@@ -753,24 +732,50 @@ export default function StatLeague({ data, teams = [] }) {
     [divisionList],
   );
 
+  // 🔹 처음 마운트 + useStatInitial 로딩 끝난 후, 유저 기준 초기값 세팅
   useEffect(() => {
-    if (!divisionList.length) {
-      setSelectedDivision('');
-      return;
-    }
-    if (hasDivisions) {
-      const valid = divisionList.some((d) => d.name === selectedDivision);
-      if (!valid) {
-        const fallback =
-          divisionList.find((d) => d.name === '1부')?.name ||
-          divisionList[0].name;
-        setSelectedDivision(fallback);
-      }
-    } else {
-      setSelectedDivision('');
-    }
-  }, [selectedLeague, divisionList, hasDivisions, selectedDivision]);
+    if (!loaded || initializedFromUser || !data) return;
+    const year = '2025';
+    const leagues = Object.keys(data[year] ?? {});
 
+    // 1) 유저 초기 리그가 존재하면 그대로, 아니면 첫 번째 리그
+    let league = initialValues.league;
+    if (!leagues.includes(league)) {
+      league = leagues[0] || '';
+    }
+
+    const node = data?.[year]?.[league];
+    const divs = Array.isArray(node?.divisions) ? node.divisions : [];
+
+    // 2) 유저 초기 division이 있으면 그걸, 없으면 1부 → 없으면 첫 번째
+    let division = '';
+    if (divs.length > 0) {
+      division =
+        divs.find((d) => d.name === initialValues.division)?.name ||
+        divs.find((d) => d.name === '1부')?.name ||
+        divs[0].name;
+    }
+
+    setSelectedLeague(league);
+    setSelectedDivision(division);
+    setShowDivisionFilter(divs.length > 1);
+    setInitializedFromUser(true);
+  }, [loaded, initializedFromUser, data, initialValues.league, initialValues.division]);
+
+  // 🔹 리그 변경 시
+  const handleLeagueChange = (opt) => {
+    const newLeague = opt.value;
+    setSelectedLeague(newLeague);
+
+    const node = data?.[selectedYear]?.[newLeague];
+    const divs = Array.isArray(node?.divisions) ? node.divisions : [];
+    const nextDiv =
+      divs.find((d) => d.name === '1부')?.name || divs[0]?.name || '';
+    setSelectedDivision(nextDiv);
+    setShowDivisionFilter(divs.length > 1);
+  };
+
+  // 예외 리그(Tournament-only) 체크
   useEffect(() => {
     setIsExcepted(exceptionLeague.includes(selectedLeague));
   }, [selectedLeague]);
@@ -800,31 +805,34 @@ export default function StatLeague({ data, teams = [] }) {
     const promoOK = Array.isArray(div.promotion) && div.promotion.length > 0;
     return groupsOK || finalsOK || playoffsOK || promoOK;
   };
+
   const noDataForSelection =
     selectionReady && (!currentDivision || !hasAnyContent(currentDivision));
 
   if (!data) {
     return <div className="tournament-status">데이터가 없습니다</div>;
   }
+
+  // 🔹 필터 초기화 → 다시 유저 값 기준으로 세팅
   const resetFilters = () => {
-    setSelectedYear('2024');
-    setSelectedLeague('서울');
-    setSelectedDivision('1부');
-    setShowDivisionFilter(false);
+    setInitializedFromUser(false);
   };
 
   return (
     <div className="statTeamContainer">
       <div className="tournament-header">
         <div className="dropdown-group">
+          {/* 연도: 2025 고정, 비활성화 */}
           <Dropdown
             options={yearOptions}
             value={selectedYear}
-            onChange={handleYearChange}
+            onChange={() => {}}
             className="year-dropdown"
             placeholder="연도"
-            hideValueUntilChange={true}
+            hideValueUntilChange={false}
+            disabled={true}
           />
+          {/* 리그 */}
           <Dropdown
             options={leagueOptions}
             value={selectedLeague}
@@ -834,12 +842,10 @@ export default function StatLeague({ data, teams = [] }) {
             hideValueUntilChange={true}
             disabled={!selectedYear}
           />
+          {/* 부 필터 */}
           {showDivisionFilter && hasDivisions && (
             <Dropdown
-              options={divisionList.map((d) => ({
-                value: d.name,
-                label: d.name,
-              }))}
+              options={divisionOptions}
               value={selectedDivision}
               onChange={(o) => setSelectedDivision(o.value)}
               className="division-dropdown"

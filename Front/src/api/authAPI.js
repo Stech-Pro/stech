@@ -328,3 +328,26 @@ export const createProfile = async (profileData, token) => {
     data
   );
 };
+
+export const myProfile = async (token) => {
+  if (!token) throw new APIError('인증이 필요합니다.', 401);
+
+  const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.MY_PROFILE}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  const data = await jsonOrText(response);
+  console.log('myProfile response data:', data);
+  if (response.ok) return data;
+  
+  throw new APIError(
+    typeof data === 'object' 
+      ? data.message || '프로필 조회 실패' 
+      : '프로필 조회 실패',
+    response.status,
+    data
+  );
+};

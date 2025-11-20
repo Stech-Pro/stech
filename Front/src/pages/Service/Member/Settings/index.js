@@ -1,7 +1,3 @@
-import { useNavigate } from 'react-router-dom';
-import VideoSettingModal from '../../../../components/VideoSettingModal';
-
-export default function VideoSettingsPage() {
-  const navigate = useNavigate();
-  return <VideoSettingModal isVisible={true} onClose={() => navigate(-1)} />;
-}
+export {default as VideoSettingsPage} from './VideoSettings';
+export {default as SettingsLayout} from './SettingsLayout';
+export {default as TestVideo} from './TestVideo';

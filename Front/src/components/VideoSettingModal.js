@@ -1,14 +1,29 @@
 import { createPortal } from 'react-dom';
 import { useEffect, useRef, useState } from 'react';
 import { IoPlayCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
-import { MdOutlineHandyman } from 'react-icons/md';
 import { useVideoSettings } from '../hooks/useVideoSettings';
+import { useStatInitial } from '../hooks/useStatInitial';
 import './VideoSettingModal.css';
+import { useNavigate } from 'react-router-dom';
+import { GoScreenFull } from 'react-icons/go';
 
 export default function VideoSettingModal({ isVisible, onClose }) {
-  console.log('VideoSettingModal 렌더링됨');
-  const { settings, updateSetting, updateHotkey, resetSettings } =
-    useVideoSettings();
+  const navigate = useNavigate();
+  const {
+    settings,
+    updateSetting,
+    updateHotkey,
+    resetSettings,
+    getKeyFromEvent,
+  } = useVideoSettings();
+  const {
+    initialValues,
+    updateLeague,
+    updateDivision,
+    leagueHasDivisions,
+    getLeagueOptions,
+    getDivisionOptions,
+  } = useStatInitial();
   const [currentHotkey, setCurrentHotkey] = useState(null);
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -34,14 +49,17 @@ export default function VideoSettingModal({ isVisible, onClose }) {
 
   const handleHotkeyInput = (action, e) => {
     e.preventDefault();
-    const key = e.key.toUpperCase();
-    if (key.length === 1 && /[A-Z0-9]/.test(key)) {
+
+    // getKeyFromEvent를 사용하여 언어 설정과 관계없이 키 인식
+    const key = getKeyFromEvent(e);
+
+    if (key) {
       updateHotkey(action, key);
       setCurrentHotkey(null);
     }
   };
-    if (!isVisible) return null;
 
+  if (!isVisible) return null;
 
   return createPortal(
     <div className="vs-overlay" onClick={onClose}>
@@ -76,14 +94,34 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     <button className="play-button" onClick={togglePlay}>
                       <IoPlayCircleOutline size={48} />
                     </button>
+                    <button
+                      className="fullscreen-button"
+                      onClick={() => navigate('/service/testvideo')}
+                      aria-label="전체화면"
+                    >
+                      <GoScreenFull size={20} />
+                    </button>
                   </div>
                 </div>
+
                 <div className="settings-row">
+                  {/* 재생 속도 */}
                   <div className="setting-item">
-                    <label>영상 재생 속도 제어</label>
+                    <label htmlFor="vs-playback">영상 재생 속도 제어</label>
+
+                    {/* 현재 값 표시 (실시간) */}
+                    <div
+                      className="sr-only"
+                      aria-live="polite"
+                      aria-atomic="true"
+                    >
+                      {' '}
+                    </div>
+
                     <div className="slider-control">
                       <span>0.1X</span>
                       <input
+                        id="vs-playback"
                         type="range"
                         min="0.1"
                         max="2.0"
@@ -95,16 +133,35 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                             parseFloat(e.target.value),
                           )
                         }
+                        aria-valuemin={0.1}
+                        aria-valuemax={2.0}
+                        aria-valuenow={settings.playbackRate}
+                        aria-label="재생 속도"
                       />
                       <span>2X</span>
+
+                      {/* 우측 숫자 배지 */}
+                      <span className="slider-value-badge">
+                        {settings.playbackRate.toFixed(1)}X
+                      </span>
                     </div>
                   </div>
 
+                  {/* 건너뛰기 시간 */}
                   <div className="setting-item">
-                    <label>영상 건너뛰기 시간 조절</label>
+                    <label htmlFor="vs-skip">영상 건너뛰기 시간 조절</label>
+
+                    {/* 현재 값 표시 (실시간) */}
+                    <div
+                      className="sr-only"
+                      aria-live="polite"
+                      aria-atomic="true"
+                    ></div>
+
                     <div className="slider-control">
                       <span>0.1초</span>
                       <input
+                        id="vs-skip"
                         type="range"
                         min="0.1"
                         max="2.0"
@@ -113,18 +170,23 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                         onChange={(e) =>
                           updateSetting('skipTime', parseFloat(e.target.value))
                         }
+                        aria-valuemin={0.1}
+                        aria-valuemax={2.0}
+                        aria-valuenow={settings.skipTime}
+                        aria-label="건너뛰기 시간"
                       />
                       <span>2초</span>
+
+                      {/* 우측 숫자 배지 */}
+                      <span className="slider-value-badge">
+                        {settings.skipTime.toFixed(1)}초
+                      </span>
                     </div>
                   </div>
-
-                  {/* 저장 버튼은 UX상 모달 하단 버튼으로 옮겨도 됨 */}
-                  <button className="save-button" onClick={onClose}>
-                    저장
-                  </button>
                 </div>
               </div>
             </div>
+
             {/* 2. 인터페이스 */}
             <div className="settings-section interface-settings-section">
               <div className="vs-top">
@@ -165,34 +227,39 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     <option value="1280:720">1280:720</option>
                   </select>
                 </div>
-
                 <div className="setting-item initial-screen-item">
                   <label>초기화면 설정</label>
                   <div className="initial-screen-settings">
-                    <span>리그 팀 순위:</span>
+                    <span>리그 / 부 </span>
                     <select
-                      value={settings.leaguePosition}
-                      onChange={(e) =>
-                        updateSetting(
-                          'leaguePosition',
-                          parseInt(e.target.value),
-                        )
-                      }
+                      value={initialValues.league}
+                      onChange={(e) => updateLeague(e.target.value)}
                     >
-                      <option value={1}>1부</option>
-                      <option value={2}>2부</option>
+                      {getLeagueOptions().map((league) => (
+                        <option key={league.value} value={league.value}>
+                          {league.label}
+                        </option>
+                      ))}
                     </select>
 
-                    <span>리그 포지션 순위:</span>
-                    <select
-                      value={settings.teamRank}
-                      onChange={(e) =>
-                        updateSetting('teamRank', parseInt(e.target.value))
-                      }
-                    >
-                      <option value={1}>1부</option>
-                      <option value={2}>2부</option>
-                    </select>
+                    {/* 선택된 리그가 디비전이 있는 경우에만 표시 */}
+                    {leagueHasDivisions(initialValues.league) ? (
+                      <select
+                        value={initialValues.division}
+                        onChange={(e) => updateDivision(e.target.value)}
+                      >
+                        {getDivisionOptions().map((division) => (
+                          <option key={division} value={division}>
+                            {division}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      // 부 구분이 없는 리그는 비활성화된 select 표시
+                      <select value="" disabled>
+                        <option value=""></option>
+                      </select>
+                    )}
                   </div>
                 </div>
               </div>
@@ -213,7 +280,7 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     type="text"
                     value={
                       currentHotkey === 'forward'
-                        ? 'Press a key...'
+                        ? ''
                         : settings.hotkeys.forward
                     }
                     readOnly
@@ -229,7 +296,7 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     type="text"
                     value={
                       currentHotkey === 'backward'
-                        ? 'Press a key...'
+                        ? ''
                         : settings.hotkeys.backward
                     }
                     readOnly
@@ -245,7 +312,7 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     type="text"
                     value={
                       currentHotkey === 'nextVideo'
-                        ? 'Press a key...'
+                        ? ''
                         : settings.hotkeys.nextVideo
                     }
                     readOnly
@@ -261,7 +328,7 @@ export default function VideoSettingModal({ isVisible, onClose }) {
                     type="text"
                     value={
                       currentHotkey === 'prevVideo'
-                        ? 'Press a key...'
+                        ? ''
                         : settings.hotkeys.prevVideo
                     }
                     readOnly
@@ -283,7 +350,6 @@ export default function VideoSettingModal({ isVisible, onClose }) {
             </div>
           </div>
         </div>
-        {/* === 기존 설정 UI 내용 끝 === */}
       </div>
     </div>,
     document.body,

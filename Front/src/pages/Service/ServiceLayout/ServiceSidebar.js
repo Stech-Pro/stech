@@ -41,18 +41,18 @@ const ServiceSidebar = () => {
       description: 'Performance analytics',
     },
     {
-      path: '/service/guest/stat/league',
+      path: '/service/guest/stat/team',
       label: '스탯',
       icon: <BiSolidBarChartAlt2 />,
       description: 'AI recommendations',
       hasSubmenu: true,
       submenu: [
-        {
-          path: '/service/guest/stat/league',
-          label: '리그 순위',
-          icon: <BiSolidBarChartAlt2 />,
-          description: 'League rankings',
-        },
+        // {
+        //   path: '/service/guest/stat/league',
+        //   label: '리그 순위',
+        //   icon: <BiSolidBarChartAlt2 />,
+        //   description: 'League rankings',
+        // },
         {
           path: '/service/guest/stat/team',
           label: '리그 팀 순위',
@@ -84,18 +84,18 @@ const ServiceSidebar = () => {
       description: 'Video analysis',
     },
     {
-      path: '/service/stat/league',
+      path: '/service/stat/team',
       label: '스탯',
       icon: <BiSolidBarChartAlt2 />,
       description: 'Performance analytics',
       hasSubmenu: true,
       submenu: [
-        {
-          path: '/service/stat/league',
-          label: '리그 순위',
-          icon: <BiSolidBarChartAlt2 />,
-          description: 'League rankings',
-        },
+        // {
+        //   path: '/service/stat/league',
+        //   label: '리그 순위',
+        //   icon: <BiSolidBarChartAlt2 />,
+        //   description: 'League rankings',
+        // },
         {
           path: '/service/stat/team',
           label: '리그 팀 순위',
@@ -139,18 +139,18 @@ const ServiceSidebar = () => {
       description: 'Video analysis',
     },
     {
-      path: '/service/stat/league',
+      path: '/service/stat/team',
       label: '스탯',
       icon: <BiSolidBarChartAlt2 />,
       description: 'Performance analytics',
       hasSubmenu: true,
       submenu: [
-        {
-          path: '/service/stat/league',
-          label: '리그 순위',
-          icon: <BiSolidBarChartAlt2 />,
-          description: 'League rankings',
-        },
+        // {
+        //   path: '/service/stat/league',
+        //   label: '리그 순위',
+        //   icon: <BiSolidBarChartAlt2 />,
+        //   description: 'League rankings',
+        // },
         {
           path: '/service/stat/team',
           label: '리그 팀 순위',
