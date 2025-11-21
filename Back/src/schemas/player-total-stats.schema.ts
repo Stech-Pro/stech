@@ -12,6 +12,9 @@ export class PlayerTotalStats {
   playerId: string; // 예: "KKRagingBulls_15"
 
   @Prop({ required: true })
+  playerName: string; // 선수 실명
+
+  @Prop({ required: true })
   teamName: string;
 
   @Prop({ required: true })

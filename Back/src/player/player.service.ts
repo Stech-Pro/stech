@@ -72,7 +72,7 @@ export class PlayerService {
       '서강대 알바트로스': 'SG',
       KHcommanders: 'KH',
       '경희대 커맨더스': 'KH',
-      
+
       // 경기강원권 - TEAMS.js와 일치하는 형식 사용
       KWcapra: 'KW',
       '강원대 카프라스': 'KW',
@@ -90,7 +90,7 @@ export class PlayerService {
       '한신대 킬러웨일스': 'HS',
       KAmavericks: 'KA',
       '카이스트 매버릭스': 'KA',
-      
+
       // 대구경북권 - TEAMS.js와 일치하는 형식 사용
       KPorangefighters: 'KP',
       '경북대 오렌지파이터스': 'KP',
@@ -112,7 +112,7 @@ export class PlayerService {
       '영남대 페가수스': 'YN',
       HDholyrams: 'HD',
       '한동대 홀리램스': 'HD',
-      
+
       // 부산경남권 - TEAMS.js와 일치하는 형식 사용
       GSdragons: 'GS',
       '경성대 드래곤스': 'GS',
@@ -134,7 +134,7 @@ export class PlayerService {
       '한국해양대 바이킹스': 'HH',
       BKmadmobydicks: 'BK',
       '부경대 매드모비딕스': 'BK',
-      
+
       // 사회인 - TEAMS.js와 일치하는 형식 사용
       GunwiPhoenix: 'GP',
       '군위 피닉스': 'GP',
@@ -173,7 +173,7 @@ export class PlayerService {
       CAbluedragons: 'CABlueDragons',
       KHcommanders: 'KHCommanders',
       SGalbatross: 'SGAlbatross',
-      
+
       // 경기강원권
       SKroyals: 'SKRoyals',
       KWcapra: 'KWCapras',
@@ -183,7 +183,7 @@ export class PlayerService {
       HLphoenix: 'HLPhoenix',
       HSkillerwhales: 'HSKillerWhales',
       KAmavericks: 'KAMavericks',
-      
+
       // 대구경북권
       KPorangefighters: 'KBOrangeFighters',
       KIblackbears: 'KIBlackBears',
@@ -195,7 +195,7 @@ export class PlayerService {
       DongkukWhiteelephants: 'DGWhiteElephants',
       YNpegasus: 'YNPegasus',
       HDholyrams: 'HDHolyRams',
-      
+
       // 부산경남권
       GSdrangons: 'GSDragons',
       BSeagles: 'PNUEagles',
@@ -207,7 +207,7 @@ export class PlayerService {
       DSbluedolphins: 'DSBlueDolphins',
       BFtornado: 'BUFSTornados',
       UUunicorns: 'UOUUnicorns',
-      
+
       // 사회인
       GunwiPheonix: 'GunwiPhoenix',
       BusanGryphons: 'BusanGryphons',

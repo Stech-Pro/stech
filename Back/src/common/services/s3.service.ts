@@ -21,7 +21,9 @@ export class S3Service {
    */
   async getVideoFilesByGameKey(gameKey: string): Promise<string[]> {
     try {
-      console.log(`🔍 S3에서 videos/${gameKey} 폴더의 파일들 조회 시작 (하위 폴더 포함)`);
+      console.log(
+        `🔍 S3에서 videos/${gameKey} 폴더의 파일들 조회 시작 (하위 폴더 포함)`,
+      );
 
       const params = {
         Bucket: this.bucketName,
@@ -120,7 +122,7 @@ export class S3Service {
         }
       }
 
-      const validUrls = signedUrls.filter(url => url !== null).length;
+      const validUrls = signedUrls.filter((url) => url !== null).length;
       console.log(
         `✅ ${gameKey}에서 ${validUrls}/${signedUrls.length}개 클립에 비디오 URL 생성 완료`,
       );
@@ -141,29 +143,36 @@ export class S3Service {
   /**
    * 특정 gameKey의 모든 비디오 파일 삭제
    */
-  async deleteVideosByGameKey(gameKey: string): Promise<{ deletedCount: number; deletedFiles: string[] }> {
+  async deleteVideosByGameKey(
+    gameKey: string,
+  ): Promise<{ deletedCount: number; deletedFiles: string[] }> {
     try {
       console.log(`🗑️ ${gameKey} 비디오 파일 삭제 시작`);
-      
+
       // 해당 게임의 모든 비디오 파일 목록 조회
       const fileKeys = await this.getVideoFilesByGameKey(gameKey);
-      
+
       if (fileKeys.length === 0) {
         console.log(`⚠️ ${gameKey}에 삭제할 비디오 파일이 없습니다`);
         return { deletedCount: 0, deletedFiles: [] };
       }
 
-      console.log(`📁 삭제할 파일들:`, fileKeys.map(key => key.split('/').pop()));
+      console.log(
+        `📁 삭제할 파일들:`,
+        fileKeys.map((key) => key.split('/').pop()),
+      );
 
       // 각 파일 삭제
       const deletedFiles: string[] = [];
       for (const fileKey of fileKeys) {
         try {
-          await this.s3.deleteObject({
-            Bucket: this.bucketName,
-            Key: fileKey,
-          }).promise();
-          
+          await this.s3
+            .deleteObject({
+              Bucket: this.bucketName,
+              Key: fileKey,
+            })
+            .promise();
+
           deletedFiles.push(fileKey);
           console.log(`✅ 파일 삭제 성공: ${fileKey.split('/').pop()}`);
         } catch (error) {
@@ -171,11 +180,15 @@ export class S3Service {
         }
       }
 
-      console.log(`🎉 ${gameKey} 비디오 삭제 완료: ${deletedFiles.length}/${fileKeys.length}개 성공`);
+      console.log(
+        `🎉 ${gameKey} 비디오 삭제 완료: ${deletedFiles.length}/${fileKeys.length}개 성공`,
+      );
 
       return {
         deletedCount: deletedFiles.length,
-        deletedFiles: deletedFiles.map(key => key.split('/').pop()).filter(Boolean),
+        deletedFiles: deletedFiles
+          .map((key) => key.split('/').pop())
+          .filter(Boolean),
       };
     } catch (error) {
       console.error(`❌ ${gameKey} 비디오 삭제 실패:`, error.message);
@@ -214,7 +227,9 @@ export class S3Service {
    */
   async listVideosByGameKey(gameKey: string): Promise<string[]> {
     try {
-      console.log(`🔍 S3에서 videos/${gameKey} 폴더의 파일들 조회 시작 (하위 폴더 포함)`);
+      console.log(
+        `🔍 S3에서 videos/${gameKey} 폴더의 파일들 조회 시작 (하위 폴더 포함)`,
+      );
 
       const params = {
         Bucket: this.bucketName,
@@ -239,13 +254,15 @@ export class S3Service {
       const sortedFiles = videoFiles.sort((a, b) => {
         const keyA = a.Key || '';
         const keyB = b.Key || '';
-        
+
         // clip_숫자_ 패턴에서 숫자 추출
         const indexA = parseInt(keyA.match(/clip_(\d+)_/)?.[1] || '999');
         const indexB = parseInt(keyB.match(/clip_(\d+)_/)?.[1] || '999');
-        
-        console.log(`🔍 파일 정렬: ${keyA.split('/').pop()} (index: ${indexA}) vs ${keyB.split('/').pop()} (index: ${indexB})`);
-        
+
+        console.log(
+          `🔍 파일 정렬: ${keyA.split('/').pop()} (index: ${indexA}) vs ${keyB.split('/').pop()} (index: ${indexB})`,
+        );
+
         return indexA - indexB;
       });
 
@@ -253,7 +270,7 @@ export class S3Service {
 
       console.log(
         `✅ videos/${gameKey}에서 ${fileKeys.length}개 비디오 파일 발견 (정렬 후):`,
-        fileKeys.map(key => key.split('/').pop()), // 파일명만 표시
+        fileKeys.map((key) => key.split('/').pop()), // 파일명만 표시
       );
 
       return fileKeys;
@@ -283,7 +300,10 @@ export class S3Service {
       console.log(`🔗 백엔드 프록시 업로드 성공: ${fileKey}`);
       return result;
     } catch (error) {
-      console.error(`❌ 백엔드 프록시 업로드 실패 (${fileKey}):`, error.message);
+      console.error(
+        `❌ 백엔드 프록시 업로드 실패 (${fileKey}):`,
+        error.message,
+      );
       throw new Error(`S3 프록시 업로드 실패: ${error.message}`);
     }
   }
@@ -291,7 +311,10 @@ export class S3Service {
   /**
    * 파일들의 총 크기 계산
    */
-  async getFilesSize(fileKeys: string[]): Promise<{ totalSize: number; fileSizes: Array<{ key: string; size: number }> }> {
+  async getFilesSize(fileKeys: string[]): Promise<{
+    totalSize: number;
+    fileSizes: Array<{ key: string; size: number }>;
+  }> {
     try {
       const fileSizes = [];
       let totalSize = 0;
@@ -304,7 +327,7 @@ export class S3Service {
 
         const headData = await this.s3.headObject(params).promise();
         const size = headData.ContentLength || 0;
-        
+
         fileSizes.push({ key, size });
         totalSize += size;
       }

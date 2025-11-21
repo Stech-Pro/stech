@@ -10,10 +10,12 @@ export class EmailService {
     console.log('📧 EmailService 초기화 중...');
     console.log('EMAIL_USER:', process.env.EMAIL_USER ? '설정됨' : '❌ 미설정');
     console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '설정됨' : '❌ 미설정');
-    
+
     // 환경변수 누락 시 에러 대신 경고 메시지
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.warn('⚠️  이메일 환경변수가 설정되지 않았습니다. 이메일 기능이 비활성화됩니다.');
+      console.warn(
+        '⚠️  이메일 환경변수가 설정되지 않았습니다. 이메일 기능이 비활성화됩니다.',
+      );
       this.transporter = null;
       return;
     }
@@ -21,7 +23,7 @@ export class EmailService {
     // 이메일 전송 설정 (다음 메일 - 디버그 모드)
     console.log('🔐 다음 메일 SMTP 연결 시도:', process.env.EMAIL_USER);
     console.log('📧 앱 비밀번호 길이:', process.env.EMAIL_PASS?.length || 0);
-    
+
     this.transporter = nodemailer.createTransport({
       host: 'smtp.daum.net',
       port: 465,
@@ -31,9 +33,9 @@ export class EmailService {
         pass: process.env.EMAIL_PASS, // 앱 비밀번호
       },
       debug: true,
-      logger: true
+      logger: true,
     });
-    
+
     console.log('✅ 이메일 transporter 설정 완료');
   }
 
@@ -108,10 +110,12 @@ export class EmailService {
     username?: string,
   ): Promise<boolean> {
     console.log(`📧 패스워드 리셋 이메일 발송 시도: ${email}`);
-    
+
     // transporter가 없으면 이메일 발송 불가
     if (!this.transporter) {
-      console.error('❌ 이메일 transporter가 설정되지 않았습니다. 환경변수를 확인해주세요.');
+      console.error(
+        '❌ 이메일 transporter가 설정되지 않았습니다. 환경변수를 확인해주세요.',
+      );
       return false;
     }
 
@@ -156,14 +160,17 @@ export class EmailService {
 
     try {
       const result = await this.transporter.sendMail(mailOptions);
-      console.log(`✅ 패스워드 리셋 이메일 발송 성공: ${email}`, result.messageId);
+      console.log(
+        `✅ 패스워드 리셋 이메일 발송 성공: ${email}`,
+        result.messageId,
+      );
       return true;
     } catch (error) {
       console.error('❌ 패스워드 리셋 이메일 발송 실패:', error);
       console.error('에러 세부사항:', {
         code: error.code,
         response: error.response,
-        message: error.message
+        message: error.message,
       });
       return false;
     }

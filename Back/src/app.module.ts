@@ -15,6 +15,8 @@ import { ContactModule } from './contact/contact.module';
 import { VideoUploadModule } from './videoupload/videoupload.module';
 import { NotificationModule } from './notification/notification.module';
 import { MemoModule } from './memo/memo.module';
+import { InsertDataModule } from './insert-data/insert-data.module';
+import { KafaStatsModule } from './kafa-stats/kafa-stats.module';
 
 @Module({
   imports: [
@@ -47,6 +49,8 @@ import { MemoModule } from './memo/memo.module';
     VideoUploadModule,
     NotificationModule,
     MemoModule,
+    InsertDataModule,
+    KafaStatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

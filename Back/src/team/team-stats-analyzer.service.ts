@@ -112,31 +112,38 @@ export class TeamStatsAnalyzerService {
     // 각 클립 분석
     for (let i = 0; i < (gameData.Clips || []).length; i++) {
       const clip = gameData.Clips[i];
-      
+
       // 기존 클립 분석
       this.analyzeClip(clip, homeTeamStats, awayTeamStats);
 
       // 3rd down 추적 (down이 문자열 또는 숫자일 수 있음)
-      const currentDown = typeof clip.down === 'string' ? parseInt(clip.down, 10) : clip.down;
-      console.log(`🔍 클립 ${i}: down=${clip.down} (타입: ${typeof clip.down}), 변환된 값: ${currentDown}`);
+      const currentDown =
+        typeof clip.down === 'string' ? parseInt(clip.down, 10) : clip.down;
+      console.log(
+        `🔍 클립 ${i}: down=${clip.down} (타입: ${typeof clip.down}), 변환된 값: ${currentDown}`,
+      );
       if (currentDown === 3) {
         const isHomeOffense = clip.offensiveTeam === 'Home';
         const thirdDownTeam = isHomeOffense
           ? thirdDownData.home
           : thirdDownData.away;
         thirdDownTeam.attempts++;
-        console.log(`📊 3rd down 발견! 클립 ${i}: ${isHomeOffense ? '홈팀' : '어웨이팀'} 시도`);
+        console.log(
+          `📊 3rd down 발견! 클립 ${i}: ${isHomeOffense ? '홈팀' : '어웨이팀'} 시도`,
+        );
 
         // 다음 클립 확인하여 1st down 획득 여부 확인
         if (i + 1 < gameData.Clips.length) {
           const nextClip = gameData.Clips[i + 1];
-          const nextDown = typeof nextClip.down === 'string' ? parseInt(nextClip.down, 10) : nextClip.down;
-          console.log(`  다음 클립 정보: 팀=${nextClip.offensiveTeam}, down=${nextDown}`);
+          const nextDown =
+            typeof nextClip.down === 'string'
+              ? parseInt(nextClip.down, 10)
+              : nextClip.down;
+          console.log(
+            `  다음 클립 정보: 팀=${nextClip.offensiveTeam}, down=${nextDown}`,
+          );
           // 같은 팀이 공격권을 유지하고 down이 1이면 성공
-          if (
-            nextClip.offensiveTeam === clip.offensiveTeam &&
-            nextDown === 1
-          ) {
+          if (nextClip.offensiveTeam === clip.offensiveTeam && nextDown === 1) {
             thirdDownTeam.conversions++;
             console.log(`  ✅ 3rd down 성공!`);
           } else {
@@ -154,13 +161,25 @@ export class TeamStatsAnalyzerService {
 
     // 3rd down 데이터를 팀 스탯에 추가
     console.log(`📈 3rd Down 최종 데이터 (analyzeTeamStats):`);
-    console.log(`  홈팀 (${homeTeamStats.teamName}): ${thirdDownData.home.conversions}/${thirdDownData.home.attempts}`);
-    console.log(`  어웨이팀 (${awayTeamStats.teamName}): ${thirdDownData.away.conversions}/${thirdDownData.away.attempts}`);
-    
-    homeTeamStats.thirdDownAttempts = this.safeNumber(thirdDownData.home.attempts);
-    homeTeamStats.thirdDownMade = this.safeNumber(thirdDownData.home.conversions);
-    awayTeamStats.thirdDownAttempts = this.safeNumber(thirdDownData.away.attempts);
-    awayTeamStats.thirdDownMade = this.safeNumber(thirdDownData.away.conversions);
+    console.log(
+      `  홈팀 (${homeTeamStats.teamName}): ${thirdDownData.home.conversions}/${thirdDownData.home.attempts}`,
+    );
+    console.log(
+      `  어웨이팀 (${awayTeamStats.teamName}): ${thirdDownData.away.conversions}/${thirdDownData.away.attempts}`,
+    );
+
+    homeTeamStats.thirdDownAttempts = this.safeNumber(
+      thirdDownData.home.attempts,
+    );
+    homeTeamStats.thirdDownMade = this.safeNumber(
+      thirdDownData.home.conversions,
+    );
+    awayTeamStats.thirdDownAttempts = this.safeNumber(
+      thirdDownData.away.attempts,
+    );
+    awayTeamStats.thirdDownMade = this.safeNumber(
+      thirdDownData.away.conversions,
+    );
 
     // 총 리턴 야드 계산
     homeTeamStats.totalReturnYards =
@@ -246,9 +265,14 @@ export class TeamStatsAnalyzerService {
       }
 
       // OL 런 펌블 처리 (스냅 미스)
-      if (significantPlays.includes('FUMBLE') && (clip.car?.pos === 'OL' || clip.car2?.pos === 'OL')) {
+      if (
+        significantPlays.includes('FUMBLE') &&
+        (clip.car?.pos === 'OL' || clip.car2?.pos === 'OL')
+      ) {
         offenseStats.fumbles += 1;
-        console.log(`   🏈 팀 런 펌블 (OL 스냅 미스) 기록! 팀: ${isHomeOffense ? '홈' : '어웨이'}`);
+        console.log(
+          `   🏈 팀 런 펌블 (OL 스냅 미스) 기록! 팀: ${isHomeOffense ? '홈' : '어웨이'}`,
+        );
       }
     }
 
@@ -403,8 +427,12 @@ export class TeamStatsAnalyzerService {
       );
 
       // 페널티 야드 계산: gainYard가 0이면 start.yard 값 사용
-      const penaltyYards = gainYard !== 0 ? Math.abs(gainYard) : 
-        (clip.start?.yard ? Math.abs(clip.start.yard) : 5); // 기본값 5야드
+      const penaltyYards =
+        gainYard !== 0
+          ? Math.abs(gainYard)
+          : clip.start?.yard
+            ? Math.abs(clip.start.yard)
+            : 5; // 기본값 5야드
 
       if (
         (isHomeOffense && isHomePenalty) ||
@@ -452,7 +480,8 @@ export class TeamStatsAnalyzerService {
             passingYards: teamStatsResult.homeTeamStats.passingYards,
             rushingYards: teamStatsResult.homeTeamStats.rushingYards,
             passingAttempts: teamStatsResult.homeTeamStats.passingAttempts,
-            passingCompletions: teamStatsResult.homeTeamStats.passingCompletions,
+            passingCompletions:
+              teamStatsResult.homeTeamStats.passingCompletions,
             passingTouchdowns: teamStatsResult.homeTeamStats.passingTouchdowns,
             rushingAttempts: teamStatsResult.homeTeamStats.rushingAttempts,
             touchdowns: teamStatsResult.homeTeamStats.touchdowns,
@@ -473,7 +502,7 @@ export class TeamStatsAnalyzerService {
             opponent: teamStatsResult.awayTeamStats.totalPoints,
           },
         },
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
 
       // 2. 어웨이팀 게임별 스탯 저장 (upsert 방식으로 중복 방지)
@@ -496,7 +525,8 @@ export class TeamStatsAnalyzerService {
             passingYards: teamStatsResult.awayTeamStats.passingYards,
             rushingYards: teamStatsResult.awayTeamStats.rushingYards,
             passingAttempts: teamStatsResult.awayTeamStats.passingAttempts,
-            passingCompletions: teamStatsResult.awayTeamStats.passingCompletions,
+            passingCompletions:
+              teamStatsResult.awayTeamStats.passingCompletions,
             passingTouchdowns: teamStatsResult.awayTeamStats.passingTouchdowns,
             rushingAttempts: teamStatsResult.awayTeamStats.rushingAttempts,
             touchdowns: teamStatsResult.awayTeamStats.touchdowns,
@@ -517,7 +547,7 @@ export class TeamStatsAnalyzerService {
             opponent: teamStatsResult.homeTeamStats.totalPoints,
           },
         },
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
       console.log('✅ 게임별 팀 스탯 저장 완료');
 
@@ -592,13 +622,19 @@ export class TeamStatsAnalyzerService {
       existingStats.penaltyYards =
         (existingStats.penaltyYards || 0) + teamStats.penaltyYards;
       console.log(`🔄 3rd down 누적 계산 - ${teamStats.teamName}:`);
-      console.log(`  기존 Attempts: ${existingStats.thirdDownAttempts || 0}, 추가: ${teamStats.thirdDownAttempts || 0}, 총합: ${(existingStats.thirdDownAttempts || 0) + (teamStats.thirdDownAttempts || 0)}`);
-      console.log(`  기존 Made: ${existingStats.thirdDownMade || 0}, 추가: ${teamStats.thirdDownMade || 0}, 총합: ${(existingStats.thirdDownMade || 0) + (teamStats.thirdDownMade || 0)}`);
-      
+      console.log(
+        `  기존 Attempts: ${existingStats.thirdDownAttempts || 0}, 추가: ${teamStats.thirdDownAttempts || 0}, 총합: ${(existingStats.thirdDownAttempts || 0) + (teamStats.thirdDownAttempts || 0)}`,
+      );
+      console.log(
+        `  기존 Made: ${existingStats.thirdDownMade || 0}, 추가: ${teamStats.thirdDownMade || 0}, 총합: ${(existingStats.thirdDownMade || 0) + (teamStats.thirdDownMade || 0)}`,
+      );
+
       existingStats.thirdDownAttempts =
-        this.safeNumber(existingStats.thirdDownAttempts) + this.safeNumber(teamStats.thirdDownAttempts);
+        this.safeNumber(existingStats.thirdDownAttempts) +
+        this.safeNumber(teamStats.thirdDownAttempts);
       existingStats.thirdDownMade =
-        this.safeNumber(existingStats.thirdDownMade) + this.safeNumber(teamStats.thirdDownMade);
+        this.safeNumber(existingStats.thirdDownMade) +
+        this.safeNumber(teamStats.thirdDownMade);
 
       existingStats.gamesPlayed += 1;
       existingStats.processedGames.push(gameKey);
@@ -645,7 +681,7 @@ export class TeamStatsAnalyzerService {
       console.log(`💾 새 팀 스탯 저장 - ${teamStats.teamName}:`);
       console.log(`  3rd Down Attempts: ${teamStats.thirdDownAttempts || 0}`);
       console.log(`  3rd Down Made: ${teamStats.thirdDownMade || 0}`);
-      
+
       await newTeamStats.save();
     }
   }
@@ -676,21 +712,33 @@ export class TeamStatsAnalyzerService {
 
   private convertToTeamStatsData(stats: any): TeamStatsData {
     // 플레이콜 비율 계산
-    const totalPlays = (stats.stats?.passingAttempts || 0) + (stats.stats?.rushingAttempts || 0);
+    const totalPlays =
+      (stats.stats?.passingAttempts || 0) + (stats.stats?.rushingAttempts || 0);
     const playCallRatio = {
       runPlays: stats.stats?.rushingAttempts || 0,
       passPlays: stats.stats?.passingAttempts || 0,
-      runPercentage: totalPlays > 0 ? Math.round(((stats.stats?.rushingAttempts || 0) / totalPlays) * 100) : 0,
-      passPercentage: totalPlays > 0 ? Math.round(((stats.stats?.passingAttempts || 0) / totalPlays) * 100) : 0,
+      runPercentage:
+        totalPlays > 0
+          ? Math.round(((stats.stats?.rushingAttempts || 0) / totalPlays) * 100)
+          : 0,
+      passPercentage:
+        totalPlays > 0
+          ? Math.round(((stats.stats?.passingAttempts || 0) / totalPlays) * 100)
+          : 0,
     };
 
     // 3rd down 스탯 계산
     const thirdDownStats = {
       attempts: stats.stats?.thirdDownAttempts || 0,
       conversions: stats.stats?.thirdDownMade || 0,
-      percentage: (stats.stats?.thirdDownAttempts || 0) > 0 
-        ? Math.round(((stats.stats?.thirdDownMade || 0) / (stats.stats?.thirdDownAttempts || 0)) * 100) 
-        : 0,
+      percentage:
+        (stats.stats?.thirdDownAttempts || 0) > 0
+          ? Math.round(
+              ((stats.stats?.thirdDownMade || 0) /
+                (stats.stats?.thirdDownAttempts || 0)) *
+                100,
+            )
+          : 0,
     };
 
     return {
@@ -758,26 +806,33 @@ export class TeamStatsAnalyzerService {
       const clip = gameData.Clips[i];
 
       // 3rd down 추적 (down이 문자열 또는 숫자일 수 있음)
-      const currentDown = typeof clip.down === 'string' ? parseInt(clip.down, 10) : clip.down;
-      console.log(`🔍 클립 ${i}: down=${clip.down} (타입: ${typeof clip.down}), 변환된 값: ${currentDown}`);
+      const currentDown =
+        typeof clip.down === 'string' ? parseInt(clip.down, 10) : clip.down;
+      console.log(
+        `🔍 클립 ${i}: down=${clip.down} (타입: ${typeof clip.down}), 변환된 값: ${currentDown}`,
+      );
       if (currentDown === 3) {
         const isHomeOffense = clip.offensiveTeam === 'Home';
         const thirdDownTeam = isHomeOffense
           ? thirdDownData.home
           : thirdDownData.away;
         thirdDownTeam.attempts++;
-        console.log(`📊 3rd down 발견! 클립 ${i}: ${isHomeOffense ? '홈팀' : '어웨이팀'} 시도`);
+        console.log(
+          `📊 3rd down 발견! 클립 ${i}: ${isHomeOffense ? '홈팀' : '어웨이팀'} 시도`,
+        );
 
         // 다음 클립 확인하여 1st down 획득 여부 확인
         if (i + 1 < gameData.Clips.length) {
           const nextClip = gameData.Clips[i + 1];
-          const nextDown = typeof nextClip.down === 'string' ? parseInt(nextClip.down, 10) : nextClip.down;
-          console.log(`  다음 클립 정보: 팀=${nextClip.offensiveTeam}, down=${nextDown}`);
+          const nextDown =
+            typeof nextClip.down === 'string'
+              ? parseInt(nextClip.down, 10)
+              : nextClip.down;
+          console.log(
+            `  다음 클립 정보: 팀=${nextClip.offensiveTeam}, down=${nextDown}`,
+          );
           // 같은 팀이 공격권을 유지하고 down이 1이면 성공
-          if (
-            nextClip.offensiveTeam === clip.offensiveTeam &&
-            nextDown === 1
-          ) {
+          if (nextClip.offensiveTeam === clip.offensiveTeam && nextDown === 1) {
             thirdDownTeam.conversions++;
             console.log(`  ✅ 3rd down 성공!`);
           } else {
@@ -797,13 +852,25 @@ export class TeamStatsAnalyzerService {
 
     // 3rd down 데이터를 팀 스탯에 추가
     console.log(`📈 3rd Down 최종 데이터:`);
-    console.log(`  홈팀 (${homeTeamStats.teamName}): ${thirdDownData.home.conversions}/${thirdDownData.home.attempts}`);
-    console.log(`  어웨이팀 (${awayTeamStats.teamName}): ${thirdDownData.away.conversions}/${thirdDownData.away.attempts}`);
-    
-    homeTeamStats.thirdDownAttempts = this.safeNumber(thirdDownData.home.attempts);
-    homeTeamStats.thirdDownMade = this.safeNumber(thirdDownData.home.conversions);
-    awayTeamStats.thirdDownAttempts = this.safeNumber(thirdDownData.away.attempts);
-    awayTeamStats.thirdDownMade = this.safeNumber(thirdDownData.away.conversions);
+    console.log(
+      `  홈팀 (${homeTeamStats.teamName}): ${thirdDownData.home.conversions}/${thirdDownData.home.attempts}`,
+    );
+    console.log(
+      `  어웨이팀 (${awayTeamStats.teamName}): ${thirdDownData.away.conversions}/${thirdDownData.away.attempts}`,
+    );
+
+    homeTeamStats.thirdDownAttempts = this.safeNumber(
+      thirdDownData.home.attempts,
+    );
+    homeTeamStats.thirdDownMade = this.safeNumber(
+      thirdDownData.home.conversions,
+    );
+    awayTeamStats.thirdDownAttempts = this.safeNumber(
+      thirdDownData.away.attempts,
+    );
+    awayTeamStats.thirdDownMade = this.safeNumber(
+      thirdDownData.away.conversions,
+    );
 
     console.log('홈팀 스탯:', {
       팀명: homeTeamStats.teamName,
@@ -889,10 +956,12 @@ export class TeamStatsAnalyzerService {
         console.log(
           `✅ ${teamTotalStats.length}개 팀의 team_total_stats 데이터 조회`,
         );
-        
+
         // 3rd down 데이터 디버깅
-        teamTotalStats.forEach(team => {
-          console.log(`🔍 ${team.teamName}: 3rd Down ${team.thirdDownMade || 0}/${team.thirdDownAttempts || 0}`);
+        teamTotalStats.forEach((team) => {
+          console.log(
+            `🔍 ${team.teamName}: 3rd Down ${team.thirdDownMade || 0}/${team.thirdDownAttempts || 0}`,
+          );
         });
         const formattedStats = teamTotalStats
           .map((team) => ({
@@ -990,9 +1059,12 @@ export class TeamStatsAnalyzerService {
             // 3rd down 스탯 추가
             thirdDownAttempts: team.thirdDownAttempts || 0,
             thirdDownMade: team.thirdDownMade || 0,
-            thirdDownPercentage: 
+            thirdDownPercentage:
               (team.thirdDownAttempts || 0) > 0
-                ? ((team.thirdDownMade || 0) / team.thirdDownAttempts * 100).toFixed(1)
+                ? (
+                    ((team.thirdDownMade || 0) / team.thirdDownAttempts) *
+                    100
+                  ).toFixed(1)
                 : '0.0',
 
             lastUpdated: team.updatedAt || new Date(),

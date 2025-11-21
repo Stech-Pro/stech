@@ -36,7 +36,8 @@ export class VideoUploadController {
     schema: {
       example: {
         success: true,
-        uploadUrl: 'https://s3.amazonaws.com/bucket/stechpro-frontend/HFHY20240907/clip_0_20241216_143022.mp4?...',
+        uploadUrl:
+          'https://s3.amazonaws.com/bucket/stechpro-frontend/HFHY20240907/clip_0_20241216_143022.mp4?...',
         fileKey: 'stechpro-frontend/HFHY20240907/clip_0_20241216_143022.mp4',
         expiresIn: 3600,
       },
@@ -46,9 +47,7 @@ export class VideoUploadController {
     status: 400,
     description: '❌ 잘못된 요청 데이터',
   })
-  async getPresignedUrl(
-    @Body() body: { gameKey: string; fileName: string },
-  ) {
+  async getPresignedUrl(@Body() body: { gameKey: string; fileName: string }) {
     try {
       if (!body.gameKey || !body.fileName) {
         throw new HttpException(
@@ -218,9 +217,10 @@ export class VideoUploadController {
         success: true,
         gameKey,
         ...result,
-        message: result.deletedCount > 0 
-          ? `${result.deletedCount}개의 비디오 파일이 삭제되었습니다`
-          : '삭제할 비디오 파일이 없습니다',
+        message:
+          result.deletedCount > 0
+            ? `${result.deletedCount}개의 비디오 파일이 삭제되었습니다`
+            : '삭제할 비디오 파일이 없습니다',
       };
     } catch (error) {
       console.error(`❌ 비디오 삭제 실패 (${gameKey}):`, error);
