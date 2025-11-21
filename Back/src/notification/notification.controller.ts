@@ -69,12 +69,12 @@ export class NotificationController {
   })
   async getMyNotifications(@Req() req: any, @Query('limit') limit?: number) {
     const userId = req.user.username || req.user.id;
-    
+
     const notifications = await this.notificationService.getUserNotifications(
       userId,
       limit || 20,
     );
-    
+
     const unreadCount = await this.notificationService.getUnreadCount(userId);
 
     return {

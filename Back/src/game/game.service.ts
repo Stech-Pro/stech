@@ -14,7 +14,6 @@ import {
 
 @Injectable()
 export class GameService {
-
   constructor(
     @InjectModel(GameInfo.name)
     private gameInfoModel: Model<GameInfoDocument>,
@@ -25,7 +24,6 @@ export class GameService {
     @InjectModel(TeamTotalStats.name)
     private teamTotalStatsModel: Model<TeamTotalStatsDocument>,
   ) {}
-
 
   async createGameInfo(gameData: any): Promise<GameInfo> {
     console.log('🔍 createGameInfo 호출됨, gameData 필드들:');
@@ -45,12 +43,16 @@ export class GameService {
     const fixedAwayTeam = gameData.awayTeam;
 
     // 중복 체크: 같은 gameKey가 이미 존재하는지 확인
-    const existingGame = await this.gameInfoModel.findOne({ gameKey: gameData.gameKey });
+    const existingGame = await this.gameInfoModel.findOne({
+      gameKey: gameData.gameKey,
+    });
     if (existingGame) {
-      console.log(`📝 기존 게임 업데이트: ${gameData.gameKey} (${existingGame.uploadStatus} → ${gameData.uploadStatus || existingGame.uploadStatus})`);
+      console.log(
+        `📝 기존 게임 업데이트: ${gameData.gameKey} (${existingGame.uploadStatus} → ${gameData.uploadStatus || existingGame.uploadStatus})`,
+      );
       console.log(`🔍 기존 게임의 uploader: ${existingGame.uploader}`);
       console.log(`🔍 전달된 gameData.uploader: ${gameData.uploader}`);
-      
+
       // 기존 데이터 업데이트 - uploader는 절대 삭제하지 않음
       const updateData: any = {
         date: gameData.date,
@@ -61,7 +63,7 @@ export class GameService {
         homeTeam: fixedHomeTeam,
         awayTeam: fixedAwayTeam,
       };
-      
+
       // uploader 처리: 새 값이 있으면 사용, 없으면 기존 값 유지
       if (gameData.uploader) {
         updateData.uploader = gameData.uploader;
@@ -72,25 +74,29 @@ export class GameService {
       } else {
         console.log(`❌ 경고: uploader가 없습니다!`);
       }
-      
+
       console.log(`📝 최종 updateData.uploader: ${updateData.uploader}`);
-      
+
       // uploadStatus가 있으면 포함
       if (gameData.uploadStatus) {
         updateData.uploadStatus = gameData.uploadStatus;
-        console.log(`📝 uploadStatus 업데이트: ${existingGame.uploadStatus} → ${gameData.uploadStatus}`);
+        console.log(
+          `📝 uploadStatus 업데이트: ${existingGame.uploadStatus} → ${gameData.uploadStatus}`,
+        );
       }
-      
+
       // report가 있으면 포함
       if (gameData.report !== undefined) {
         updateData.report = gameData.report;
-        console.log(`📝 report 업데이트: ${(existingGame as any).report} → ${gameData.report}`);
+        console.log(
+          `📝 report 업데이트: ${(existingGame as any).report} → ${gameData.report}`,
+        );
       }
-      
+
       const updatedGame = await this.gameInfoModel.findOneAndUpdate(
         { gameKey: gameData.gameKey },
-        { $set: updateData },  // $set을 명시적으로 사용하여 특정 필드만 업데이트
-        { new: true }
+        { $set: updateData }, // $set을 명시적으로 사용하여 특정 필드만 업데이트
+        { new: true },
       );
       console.log('✅ GameInfo 업데이트 성공:', updatedGame._id);
       return updatedGame;
@@ -108,7 +114,7 @@ export class GameService {
       uploader: gameData.uploader, // JWT 토큰에서 가져온 팀명
       uploadStatus: gameData.uploadStatus || 'pending', // 기본값 pending
     };
-    
+
     console.log(`📝 새 게임 생성 - uploadStatus: ${gameInfo.uploadStatus}`);
 
     console.log('📝 새로운 gameInfo 저장:', JSON.stringify(gameInfo, null, 2));
@@ -127,7 +133,7 @@ export class GameService {
 
   async findGamesByTeam(teamName: string): Promise<GameInfo[]> {
     console.log(`🔍 팀별 경기 조회: ${teamName} (pending + completed 상태)`);
-    
+
     const games = await this.gameInfoModel
       .find({
         $or: [{ homeTeam: teamName }, { awayTeam: teamName }],
@@ -135,11 +141,13 @@ export class GameService {
       })
       .sort({ date: -1 }) // 최신순 정렬
       .exec();
-    
-    console.log(`📊 ${teamName} 전체 경기 수: ${games.length}개 (pending + completed)`);
-    
+
+    console.log(
+      `📊 ${teamName} 전체 경기 수: ${games.length}개 (pending + completed)`,
+    );
+
     // 팀명 수정 적용
-    return games.map(game => {
+    return games.map((game) => {
       const gameObj = game.toObject();
       return gameObj;
     });
@@ -147,14 +155,14 @@ export class GameService {
 
   async findGamesByUploader(uploaderTeam: string): Promise<GameInfo[]> {
     console.log(`🔍 업로더별 경기 조회: ${uploaderTeam}`);
-    
+
     const games = await this.gameInfoModel
       .find({ uploader: uploaderTeam })
       .sort({ date: -1 }) // 최신순 정렬
       .exec();
-    
+
     console.log(`📊 ${uploaderTeam} 업로드 경기 수: ${games.length}개`);
-    
+
     if (games.length > 0) {
       console.log(`📋 첫 번째 경기 예시:`, {
         gameKey: games[0].gameKey,
@@ -162,11 +170,11 @@ export class GameService {
         homeTeam: games[0].homeTeam,
         awayTeam: games[0].awayTeam,
         uploadStatus: games[0].uploadStatus,
-        report: (games[0] as any).report
+        report: (games[0] as any).report,
       });
     }
-    
-    return games.map(game => {
+
+    return games.map((game) => {
       const gameObj = game.toObject();
       return gameObj;
     });
@@ -174,16 +182,16 @@ export class GameService {
 
   async findAllGames(): Promise<GameInfo[]> {
     console.log(`🔍 모든 경기 조회 (pending + completed 상태)`);
-    
+
     const games = await this.gameInfoModel
       .find({ uploadStatus: { $in: ['pending', 'completed'] } }) // 👈 Admin도 모든 상태 조회
       .sort({ date: -1 }) // 최신순 정렬
       .exec();
-    
+
     console.log(`📊 전체 경기 수: ${games.length}개 (pending + completed)`);
-    
+
     // 팀명 수정 적용
-    return games.map(game => {
+    return games.map((game) => {
       const gameObj = game.toObject();
       return gameObj;
     });
@@ -191,14 +199,14 @@ export class GameService {
 
   async findPendingGames(): Promise<GameInfo[]> {
     console.log('🔍 pending 상태 경기 조회 시작');
-    
+
     const games = await this.gameInfoModel
       .find({ uploadStatus: 'pending' })
       .sort({ date: -1 }) // 최신순 정렬
       .exec();
-    
+
     console.log(`📊 pending 상태 경기 발견: ${games.length}개`);
-    
+
     if (games.length > 0) {
       console.log(`📋 첫 번째 pending 경기:`, {
         gameKey: games[0].gameKey,
@@ -207,11 +215,11 @@ export class GameService {
         awayTeam: games[0].awayTeam,
         uploader: games[0].uploader,
         uploadStatus: games[0].uploadStatus,
-        videoUrls: games[0].videoUrls
+        videoUrls: games[0].videoUrls,
       });
     }
-    
-    return games.map(game => {
+
+    return games.map((game) => {
       const gameObj = game.toObject();
       return gameObj;
     });
@@ -222,7 +230,7 @@ export class GameService {
     if (!game) {
       return null;
     }
-    
+
     // 팀명은 그대로 사용
     const gameObj = game.toObject();
     return gameObj as any;
@@ -231,7 +239,7 @@ export class GameService {
   async updateGameInfo(gameKey: string, gameData: any): Promise<GameInfo> {
     // 기존 게임 정보 가져오기 (uploader 보존을 위해)
     const existingGame = await this.gameInfoModel.findOne({ gameKey });
-    
+
     const updateData: any = {
       gameKey: gameData.gameKey,
       date: gameData.date,
@@ -246,16 +254,22 @@ export class GameService {
     // uploadStatus가 있으면 추가
     if (gameData.uploadStatus) {
       updateData.uploadStatus = gameData.uploadStatus;
-      console.log(`📝 updateGameInfo에서 uploadStatus 업데이트: ${gameData.uploadStatus}`);
+      console.log(
+        `📝 updateGameInfo에서 uploadStatus 업데이트: ${gameData.uploadStatus}`,
+      );
     }
 
     // uploader는 명시적으로 전달된 경우에만 업데이트, 아니면 기존 값 유지
     if (gameData.uploader) {
       updateData.uploader = gameData.uploader;
-      console.log(`📝 updateGameInfo에서 uploader 업데이트: ${gameData.uploader}`);
+      console.log(
+        `📝 updateGameInfo에서 uploader 업데이트: ${gameData.uploader}`,
+      );
     } else if (existingGame?.uploader) {
       updateData.uploader = existingGame.uploader;
-      console.log(`📝 updateGameInfo에서 기존 uploader 유지: ${existingGame.uploader}`);
+      console.log(
+        `📝 updateGameInfo에서 기존 uploader 유지: ${existingGame.uploader}`,
+      );
     }
 
     // report가 있으면 추가
@@ -363,7 +377,7 @@ export class GameService {
     // 팀명은 그대로 사용
     // clipsObject.homeTeam = clipsObject.homeTeam;
     // clipsObject.awayTeam = clipsObject.awayTeam;
-    
+
     return clipsObject as any;
   }
 

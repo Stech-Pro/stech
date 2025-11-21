@@ -32,7 +32,8 @@ export class MemoController {
   @Post()
   @ApiOperation({
     summary: '메모 작성',
-    description: '클립에 대한 메모를 작성합니다. 팀 공개 메모는 같은 팀원에게 알림이 발송됩니다.',
+    description:
+      '클립에 대한 메모를 작성합니다. 팀 공개 메모는 같은 팀원에게 알림이 발송됩니다.',
   })
   @ApiBody({
     schema: {
@@ -53,7 +54,10 @@ export class MemoController {
       type: 'object',
       properties: {
         success: { type: 'boolean', example: true },
-        message: { type: 'string', example: '메모가 성공적으로 작성되었습니다.' },
+        message: {
+          type: 'string',
+          example: '메모가 성공적으로 작성되었습니다.',
+        },
         memo: {
           type: 'object',
           properties: {
@@ -75,7 +79,8 @@ export class MemoController {
   })
   async createMemo(
     @Request() req,
-    @Body() body: {
+    @Body()
+    body: {
       gameKey: string;
       clipKey: string;
       content: string;
@@ -94,7 +99,8 @@ export class MemoController {
   @Get()
   @ApiOperation({
     summary: '메모 목록 조회',
-    description: '내가 속한 팀의 공개 메모와 내가 작성한 개인 메모를 조회합니다.',
+    description:
+      '내가 속한 팀의 공개 메모와 내가 작성한 개인 메모를 조회합니다.',
   })
   @ApiQuery({
     name: 'gameKey',
@@ -219,7 +225,10 @@ export class MemoController {
       type: 'object',
       properties: {
         success: { type: 'boolean', example: true },
-        message: { type: 'string', example: '메모가 성공적으로 수정되었습니다.' },
+        message: {
+          type: 'string',
+          example: '메모가 성공적으로 수정되었습니다.',
+        },
         memo: {
           type: 'object',
           properties: {
@@ -272,7 +281,10 @@ export class MemoController {
       type: 'object',
       properties: {
         success: { type: 'boolean', example: true },
-        message: { type: 'string', example: '메모가 성공적으로 삭제되었습니다.' },
+        message: {
+          type: 'string',
+          example: '메모가 성공적으로 삭제되었습니다.',
+        },
       },
     },
   })

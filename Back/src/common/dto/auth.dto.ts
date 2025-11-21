@@ -171,3 +171,85 @@ export class CreateProfileDto {
   @IsString()
   playerID?: string;
 }
+
+export class UpdateProfileDto {
+  @ApiProperty({ example: '김건국', description: '성함', required: false })
+  @IsOptional()
+  @IsString()
+  realName?: string;
+
+  @ApiProperty({
+    example: '건국이',
+    description: '플레이어ID/유저네임',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  playerID?: string;
+
+  @ApiProperty({
+    example: 'user@example.com',
+    description: '이메일',
+    required: false,
+  })
+  @IsOptional()
+  @IsEmail({}, { message: '올바른 이메일 형식을 입력해주세요.' })
+  email?: string;
+
+  @ApiProperty({ example: '대한민국', description: '국적', required: false })
+  @IsOptional()
+  @IsString()
+  nationality?: string;
+
+  @ApiProperty({
+    example: '010-1234-5678',
+    description: '연락처',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiProperty({
+    example: '서울특별시 광진구 능동로 120',
+    description: '주소',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  address?: string;
+
+  @ApiProperty({ example: '05029', description: '우편번호', required: false })
+  @IsOptional()
+  @IsString()
+  postalCode?: string;
+
+  @ApiProperty({ example: 180, description: '키 (cm)', required: false })
+  @IsOptional()
+  @IsNumber()
+  height?: number;
+
+  @ApiProperty({ example: 75, description: '몸무게 (kg)', required: false })
+  @IsOptional()
+  @IsNumber()
+  weight?: number;
+
+  @ApiProperty({ example: 22, description: '나이', required: false })
+  @IsOptional()
+  @IsNumber()
+  age?: number;
+
+  @ApiProperty({
+    example: '고등학교 3년, 대학교 2년',
+    description: '경력',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  career?: string;
+
+  @ApiProperty({ example: 'QB', description: '주포지션', required: false })
+  @IsOptional()
+  @IsString()
+  position?: string;
+}

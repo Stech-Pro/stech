@@ -12,7 +12,7 @@ export class VideoUploadService {
     try {
       // S3 키 생성: videos/GAMEKEY/FILENAME
       const s3Key = `videos/${gameKey}/${fileName}`;
-      
+
       console.log(`🔗 Presigned URL 생성 시작: ${s3Key}`);
 
       // S3Service를 통해 Presigned URL 생성
@@ -32,7 +32,10 @@ export class VideoUploadService {
         fileName,
       };
     } catch (error) {
-      console.error(`❌ Presigned URL 생성 실패 (${gameKey}/${fileName}):`, error);
+      console.error(
+        `❌ Presigned URL 생성 실패 (${gameKey}/${fileName}):`,
+        error,
+      );
       throw new Error(`Presigned URL 생성 실패: ${error.message}`);
     }
   }
@@ -48,7 +51,7 @@ export class VideoUploadService {
       const files = await this.s3Service.listVideosByGameKey(gameKey);
 
       const hasVideos = files.length > 0;
-      const fileList = files.map(file => {
+      const fileList = files.map((file) => {
         // 전체 경로에서 파일명만 추출
         // videos/HFHY20240907/clip_0_xxx.mp4 → clip_0_xxx.mp4
         const parts = file.split('/');
@@ -64,7 +67,9 @@ export class VideoUploadService {
         console.log('⚠️ 파일 크기 조회 실패:', sizeError.message);
       }
 
-      console.log(`✅ 기존 비디오 확인 완료: ${gameKey} - ${files.length}개 파일`);
+      console.log(
+        `✅ 기존 비디오 확인 완료: ${gameKey} - ${files.length}개 파일`,
+      );
 
       return {
         hasVideos,
@@ -97,10 +102,7 @@ export class VideoUploadService {
    */
   generateClipFileName(clipIndex: number): string {
     const now = new Date();
-    const timestamp = now
-      .toISOString()
-      .replace(/[-:T]/g, '')
-      .substring(0, 14); // YYYYMMDDHHMMSS
+    const timestamp = now.toISOString().replace(/[-:T]/g, '').substring(0, 14); // YYYYMMDDHHMMSS
 
     return `clip_${clipIndex}_${timestamp}.mp4`;
   }
@@ -115,7 +117,9 @@ export class VideoUploadService {
       // S3Service를 통해 비디오 파일들 삭제
       const result = await this.s3Service.deleteVideosByGameKey(gameKey);
 
-      console.log(`✅ ${gameKey} 비디오 삭제 완료: ${result.deletedCount}개 파일`);
+      console.log(
+        `✅ ${gameKey} 비디오 삭제 완료: ${result.deletedCount}개 파일`,
+      );
 
       return {
         deletedCount: result.deletedCount,
@@ -130,10 +134,7 @@ export class VideoUploadService {
   /**
    * 여러 파일에 대한 Presigned URL 일괄 생성
    */
-  async generateMultiplePresignedUrls(
-    gameKey: string,
-    fileCount: number,
-  ) {
+  async generateMultiplePresignedUrls(gameKey: string, fileCount: number) {
     try {
       console.log(`🔗 ${gameKey}에 대한 ${fileCount}개 파일 URL 생성 시작`);
 
@@ -149,7 +150,7 @@ export class VideoUploadService {
 
         // API 호출 간격 (S3 Rate Limiting 방지)
         if (i < fileCount - 1) {
-          await new Promise(resolve => setTimeout(resolve, 100));
+          await new Promise((resolve) => setTimeout(resolve, 100));
         }
       }
 

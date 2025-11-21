@@ -477,6 +477,30 @@ export class AuthController {
           position: ['QB', 'RB'],
           region: '서울권',
           teamName: '건국대 레이징불스',
+          kafaStats: {
+            totalPlayers: 3,
+            season: '2025',
+            league: '대학',
+            players: [
+              {
+                playerName: '김민겸',
+                jerseyNumber: 26,
+                position: 'Unknown',
+                rushing: {
+                  rank: 5,
+                  totalYards: 258,
+                  forwardYards: 295,
+                  backwardYards: -37,
+                  yardsPerAttempt: 4.8,
+                  attempts: 54,
+                  touchdowns: 3,
+                  longest: 25,
+                },
+                rawYardString: '258 (전진 : 295 / 후퇴 : -37)',
+                lastUpdated: '2025-01-15T10:30:00.000Z',
+              }
+            ]
+          }
         },
       },
     },

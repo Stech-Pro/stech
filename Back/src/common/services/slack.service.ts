@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 export class SlackService {
   private readonly slackToken = process.env.SLACK_BOT_TOKEN || '';
   private readonly channelId = process.env.SLACK_CHANNEL_ID || 'C09CRFMURD5';
-  
+
   async sendGameDataEditRequest(requestData: {
     gameKey: string;
     clipKey: string;
@@ -18,7 +18,7 @@ export class SlackService {
       const response = await fetch('https://slack.com/api/chat.postMessage', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.slackToken}`,
+          Authorization: `Bearer ${this.slackToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -61,13 +61,17 @@ export class SlackService {
                 },
               ],
             },
-            ...(requestData.reason ? [{
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: `*수정 사유:*\n${requestData.reason}`,
-              },
-            }] : []),
+            ...(requestData.reason
+              ? [
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: `*수정 사유:*\n${requestData.reason}`,
+                    },
+                  },
+                ]
+              : []),
             {
               type: 'divider',
             },
@@ -85,7 +89,7 @@ export class SlackService {
       });
 
       const result = await response.json();
-      
+
       if (!result.ok) {
         throw new Error(`Slack API 오류: ${result.error}`);
       }

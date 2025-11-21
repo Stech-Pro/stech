@@ -84,13 +84,15 @@ export class GameController {
       homeTeam: gameData.homeTeam,
       awayTeam: gameData.awayTeam,
     });
-    
+
     // 기존 게임 상태 확인
-    const existingGameBefore = await this.gameService.findGameByKey(gameData.gameKey);
+    const existingGameBefore = await this.gameService.findGameByKey(
+      gameData.gameKey,
+    );
     console.log('🔍 업로드 전 게임 상태:', {
       gameKey: gameData.gameKey,
       uploadStatus: existingGameBefore?.uploadStatus,
-      존재여부: !!existingGameBefore
+      존재여부: !!existingGameBefore,
     });
 
     try {
@@ -121,43 +123,59 @@ export class GameController {
 
       // 3. 선수 데이터 처리
       const playerResults = await this.processGameData(processedGameData);
-      console.log('🎯🎯🎯 선수 데이터 처리 완료, 이제 GameInfo 저장 시작 🎯🎯🎯');
+      console.log(
+        '🎯🎯🎯 선수 데이터 처리 완료, 이제 GameInfo 저장 시작 🎯🎯🎯',
+      );
 
       // 4. 경기 정보 저장 또는 업데이트
       console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
       try {
         // 이미 pending 상태로 존재하는 경기인지 확인
-        const existingGame = await this.gameService.findGameByKey(processedGameData.gameKey);
-        console.log('🔍 기존 게임 존재 여부:', !!existingGame, '- gameKey:', processedGameData.gameKey);
-        
+        const existingGame = await this.gameService.findGameByKey(
+          processedGameData.gameKey,
+        );
+        console.log(
+          '🔍 기존 게임 존재 여부:',
+          !!existingGame,
+          '- gameKey:',
+          processedGameData.gameKey,
+        );
+
         if (existingGame) {
           // 기존 경기가 있으면 uploadStatus를 completed로 업데이트
           console.log('📝 기존 경기 발견, uploadStatus를 completed로 업데이트');
           console.log('📝 업데이트 전 상태:', existingGame.uploadStatus);
-          
-          const updatedGame = await this.gameService.updateGameInfo(processedGameData.gameKey, {
-            ...processedGameData,
-            uploadStatus: 'completed',
-            uploader: existingGame.uploader, // 기존 uploader 유지
-          });
-          
+
+          const updatedGame = await this.gameService.updateGameInfo(
+            processedGameData.gameKey,
+            {
+              ...processedGameData,
+              uploadStatus: 'completed',
+              uploader: existingGame.uploader, // 기존 uploader 유지
+            },
+          );
+
           console.log('📝 업데이트 후 상태:', updatedGame?.uploadStatus);
-          
+
           // 🔔 알림 생성: pending → completed로 변경된 경우
           if (updatedGame && existingGame.uploadStatus === 'pending') {
             console.log('🔔 경기 분석 완료 알림 생성 시작');
-            
+
             try {
               // 해당 팀의 모든 사용자 조회
-              const teamUsers = await this.userModel.find({
-                team: existingGame.uploader, // 업로더 팀의 사용자들에게 알림
-                role: { $in: ['player', 'coach'] }
-              }).select('username team');
-              
-              console.log(`📋 ${existingGame.uploader} 팀 사용자 ${teamUsers.length}명 발견`);
-              
+              const teamUsers = await this.userModel
+                .find({
+                  team: existingGame.uploader, // 업로더 팀의 사용자들에게 알림
+                  role: { $in: ['player', 'coach'] },
+                })
+                .select('username team');
+
+              console.log(
+                `📋 ${existingGame.uploader} 팀 사용자 ${teamUsers.length}명 발견`,
+              );
+
               // 팀의 모든 사용자들에게 알림 생성
-              const userIds = teamUsers.map(user => user.username);
+              const userIds = teamUsers.map((user) => user.username);
               await this.notificationService.createTeamNotifications(
                 existingGame.uploader,
                 processedGameData.gameKey,
@@ -168,7 +186,7 @@ export class GameController {
                 },
                 userIds,
               );
-              
+
               console.log('✅ 알림 생성 완료');
             } catch (notificationError) {
               console.error('❌ 알림 생성 실패:', notificationError.message);
@@ -183,18 +201,27 @@ export class GameController {
             uploader: uploaderTeam,
             uploadStatus: 'completed', // 👈 완료 상태로 설정
           };
-          console.log('📝 새 경기 생성 - uploadStatus:', gameInfoWithUploader.uploadStatus);
+          console.log(
+            '📝 새 경기 생성 - uploadStatus:',
+            gameInfoWithUploader.uploadStatus,
+          );
           console.log('📝 gameInfoWithUploader 객체:', {
             gameKey: gameInfoWithUploader.gameKey,
             uploader: gameInfoWithUploader.uploader,
-            uploadStatus: gameInfoWithUploader.uploadStatus
+            uploadStatus: gameInfoWithUploader.uploadStatus,
           });
           await this.gameService.createGameInfo(gameInfoWithUploader);
         }
-        
+
         // 최종 상태 확인
-        const finalGame = await this.gameService.findGameByKey(processedGameData.gameKey);
-        console.log('✅✅✅ 경기 정보 저장 완료 - 최종 상태:', finalGame?.uploadStatus, '✅✅✅');
+        const finalGame = await this.gameService.findGameByKey(
+          processedGameData.gameKey,
+        );
+        console.log(
+          '✅✅✅ 경기 정보 저장 완료 - 최종 상태:',
+          finalGame?.uploadStatus,
+          '✅✅✅',
+        );
       } catch (gameInfoError) {
         console.error('❌❌❌ 경기 정보 저장 실패:', gameInfoError.message);
       }
@@ -202,9 +229,10 @@ export class GameController {
       // 5. 전체 경기 클립 데이터 저장 (하이라이트용)
       console.log('💾 경기 클립 데이터 저장 시작...');
       // existingGame 변수가 스코프 밖에서 선언되어야 함
-      const uploaderTeam = await this.gameService.findGameByKey(processedGameData.gameKey)
-        .then(game => game?.uploader || req.user.team);
-      
+      const uploaderTeam = await this.gameService
+        .findGameByKey(processedGameData.gameKey)
+        .then((game) => game?.uploader || req.user.team);
+
       const gameClipsData = {
         ...processedGameData,
         uploader: uploaderTeam,
@@ -336,7 +364,10 @@ export class GameController {
       },
     },
   })
-  async uploadGameJson(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
+  async uploadGameJson(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: any,
+  ) {
     try {
       console.log('🎮 게임 JSON 파일 업로드 시작');
 
@@ -412,13 +443,17 @@ export class GameController {
 
       // 4. 선수 데이터 처리
       const playerResults = await this.processGameData(gameData);
-      console.log('🎯🎯🎯 선수 데이터 처리 완료, 이제 GameInfo 저장 시작 🎯🎯🎯');
+      console.log(
+        '🎯🎯🎯 선수 데이터 처리 완료, 이제 GameInfo 저장 시작 🎯🎯🎯',
+      );
 
       // 5. 경기 정보 저장
       console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
       try {
         // 기존 게임 정보 확인
-        const existingGame = await this.gameService.findGameByKey(gameData.gameKey);
+        const existingGame = await this.gameService.findGameByKey(
+          gameData.gameKey,
+        );
         if (existingGame) {
           // 기존 경기가 있으면 uploader 유지하면서 업데이트
           await this.gameService.updateGameInfo(gameData.gameKey, {
@@ -427,7 +462,9 @@ export class GameController {
             uploader: existingGame.uploader, // 기존 uploader 유지
             report: true,
           });
-          console.log('✅✅✅ 경기 정보 업데이트 완료 (기존 uploader 유지) ✅✅✅');
+          console.log(
+            '✅✅✅ 경기 정보 업데이트 완료 (기존 uploader 유지) ✅✅✅',
+          );
         } else {
           // 새 경기면 현재 사용자로 생성
           const { team: uploaderTeam } = req.user;
@@ -447,10 +484,14 @@ export class GameController {
       console.log('🎬🎬🎬 경기 클립 데이터 저장 시작... 🎬🎬🎬');
       try {
         // 기존 uploader 유지 (영상을 업로드한 팀 정보)
-        const existingGame = await this.gameService.findGameByKey(gameData.gameKey);
+        const existingGame = await this.gameService.findGameByKey(
+          gameData.gameKey,
+        );
         const uploaderTeam = existingGame?.uploader || req.user.team;
-        console.log(`📋 uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${req.user.team}, 최종=${uploaderTeam}`);
-        
+        console.log(
+          `📋 uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${req.user.team}, 최종=${uploaderTeam}`,
+        );
+
         const gameClipsData = {
           ...gameData,
           uploader: uploaderTeam, // 영상을 업로드한 팀으로 유지
@@ -459,7 +500,7 @@ export class GameController {
           gameKey: gameClipsData.gameKey,
           uploader: gameClipsData.uploader,
           homeTeam: gameClipsData.homeTeam,
-          awayTeam: gameClipsData.awayTeam
+          awayTeam: gameClipsData.awayTeam,
         });
         await this.gameService.saveGameClips(gameClipsData);
         console.log('✅ 경기 클립 데이터 저장 완료');
@@ -779,7 +820,7 @@ export class GameController {
     let message: string;
 
     const { role, team: userTeam } = req.user;
-    
+
     console.log(`🔍 경기 조회 요청 - 사용자: ${userTeam}, 역할: ${role}`);
 
     // Admin인 경우 모든 경기 반환
@@ -857,7 +898,8 @@ export class GameController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: '⏳ 분석 대기중 경기 조회 (관리자 전용)',
-    description: '영상 업로드는 완료되었지만 분석 JSON이 아직 업로드되지 않은 경기들을 조회합니다.',
+    description:
+      '영상 업로드는 완료되었지만 분석 JSON이 아직 업로드되지 않은 경기들을 조회합니다.',
   })
   @ApiResponse({
     status: 200,
@@ -877,13 +919,13 @@ export class GameController {
             uploadStatus: 'pending',
             videoUrls: {
               Q1: ['YSKM20250920_clip1.mp4'],
-              Q2: ['YSKM20250920_clip4.mp4']
-            }
-          }
+              Q2: ['YSKM20250920_clip4.mp4'],
+            },
+          },
         ],
-        totalGames: 1
-      }
-    }
+        totalGames: 1,
+      },
+    },
   })
   @ApiResponse({
     status: 403,
@@ -891,18 +933,18 @@ export class GameController {
   })
   async getPendingGames(@Req() req: any) {
     console.log('⏳ 분석 대기중 경기 조회 시작');
-    
+
     const pendingGames = await this.gameService.findPendingGames();
-    
+
     console.log(`📊 분석 대기중 경기 수: ${pendingGames.length}개`);
-    
+
     // 각 게임의 클립 개수 및 실제 비디오 파일 개수 조회
     const gamesWithClipCount = await Promise.all(
       pendingGames.map(async (game) => {
         try {
           const clips = await this.gameService.getGameClipsByKey(game.gameKey);
           const clipCount = clips?.Clips?.length || 0;
-          
+
           // S3에서 실제 존재하는 비디오 파일 개수 확인
           let videoCount = 0;
           if (clipCount > 0) {
@@ -912,16 +954,23 @@ export class GameController {
                 clipCount,
               );
               // null이 아닌 URL들만 카운트 (실제 존재하는 비디오 파일)
-              videoCount = videoUrls.filter(url => url !== null).length;
-              console.log(`🎬 ${game.gameKey}: S3에서 ${videoCount}/${clipCount} 비디오 URL 생성 성공`);
+              videoCount = videoUrls.filter((url) => url !== null).length;
+              console.log(
+                `🎬 ${game.gameKey}: S3에서 ${videoCount}/${clipCount} 비디오 URL 생성 성공`,
+              );
             } catch (s3Error) {
-              console.error(`❌ ${game.gameKey} S3 비디오 URL 생성 실패:`, s3Error.message);
+              console.error(
+                `❌ ${game.gameKey} S3 비디오 URL 생성 실패:`,
+                s3Error.message,
+              );
               videoCount = 0;
             }
           }
-          
-          console.log(`📊 ${game.gameKey}: 클립 ${clipCount}개, 실제 비디오 ${videoCount}개`);
-          
+
+          console.log(
+            `📊 ${game.gameKey}: 클립 ${clipCount}개, 실제 비디오 ${videoCount}개`,
+          );
+
           return {
             ...game,
             totalClips: clipCount,
@@ -935,9 +984,9 @@ export class GameController {
             totalVideos: 0,
           };
         }
-      })
+      }),
     );
-    
+
     return {
       success: true,
       message: '분석 대기중 경기 조회 성공',
@@ -1177,13 +1226,15 @@ export class GameController {
   })
   async getGameClips(@Param('gameKey') gameKey: string) {
     console.log(`📹 ${gameKey}: 클립 데이터 조회 시작`);
-    
+
     // 먼저 저장된 GameClips 데이터 조회
     const savedClips = await this.gameService.getGameClipsByKey(gameKey);
-    
+
     if (savedClips && savedClips.Clips && savedClips.Clips.length > 0) {
-      console.log(`✅ ${gameKey}: 저장된 클립 데이터 발견 - ${savedClips.Clips.length}개 클립`);
-      
+      console.log(
+        `✅ ${gameKey}: 저장된 클립 데이터 발견 - ${savedClips.Clips.length}개 클립`,
+      );
+
       try {
         // S3에서 비디오 URL들 가져오기
         const videoUrls = await this.s3Service.generateClipUrls(
@@ -1202,10 +1253,10 @@ export class GameController {
 
         // ClipKey 기준으로 중복 제거 - significantPlay 병합 처리
         const clipMap = new Map();
-        
+
         clipsWithUrls.forEach((clip) => {
           const clipKey = clip.clipKey;
-          
+
           if (!clipMap.has(clipKey)) {
             // 첫 번째 클립: 그대로 저장
             clipMap.set(clipKey, { ...clip });
@@ -1214,27 +1265,37 @@ export class GameController {
             // 두 번째 클립: significantPlay 병합 로직
             const firstClip = clipMap.get(clipKey);
             const secondClip = clip;
-            
-            console.log(`🔄 중복 클립 발견: ${clipKey}, significantPlay 병합 시작`);
-            console.log(`  - 1번째: ${JSON.stringify(firstClip.significantPlays)}`);
-            console.log(`  - 2번째: ${JSON.stringify(secondClip.significantPlays)}`);
-            
+
+            console.log(
+              `🔄 중복 클립 발견: ${clipKey}, significantPlay 병합 시작`,
+            );
+            console.log(
+              `  - 1번째: ${JSON.stringify(firstClip.significantPlays)}`,
+            );
+            console.log(
+              `  - 2번째: ${JSON.stringify(secondClip.significantPlays)}`,
+            );
+
             // significantPlay 병합
             const mergedSignificantPlays = this.mergeSignificantPlays(
-              firstClip, 
-              secondClip
+              firstClip,
+              secondClip,
             );
-            
+
             // 첫 번째 클립의 significantPlay 업데이트
             firstClip.significantPlays = mergedSignificantPlays;
-            
-            console.log(`  - 병합 결과: ${JSON.stringify(mergedSignificantPlays)}`);
+
+            console.log(
+              `  - 병합 결과: ${JSON.stringify(mergedSignificantPlays)}`,
+            );
           }
         });
-        
+
         const filteredClips = Array.from(clipMap.values());
 
-        console.log(`📊 ${gameKey}: 중복 필터링 전 ${clipsWithUrls.length}개 → 후 ${filteredClips.length}개 클립`);
+        console.log(
+          `📊 ${gameKey}: 중복 필터링 전 ${clipsWithUrls.length}개 → 후 ${filteredClips.length}개 클립`,
+        );
 
         return {
           success: true,
@@ -1247,7 +1308,7 @@ export class GameController {
         };
       } catch (error) {
         console.error(`❌ ${gameKey} 비디오 URL 생성 실패:`, error);
-        
+
         // S3 오류가 있어도 클립 데이터는 반환
         return {
           success: true,
@@ -1257,11 +1318,11 @@ export class GameController {
         };
       }
     }
-    
+
     // 저장된 클립이 없으면 분석 대시보드용 임시 클립 생성
     console.log(`⚠️ ${gameKey}: 저장된 클립 없음, 임시 클립 생성`);
     const gameInfo = await this.gameService.findGameByKey(gameKey);
-    
+
     if (!gameInfo) {
       throw new HttpException(
         {
@@ -1294,13 +1355,13 @@ export class GameController {
     // 실제 videoUrls를 기반으로 올바른 쿼터 배정
     const tempClips = [];
     let clipIndex = 1;
-    
+
     if (gameInfo.videoUrls) {
       // videoUrls가 있는 경우: 쿼터별로 올바르게 배정
       for (const quarter of ['Q1', 'Q2', 'Q3', 'Q4']) {
         const quarterVideos = gameInfo.videoUrls[quarter] || [];
         const quarterNumber = parseInt(quarter.substring(1)); // Q1 -> 1, Q2 -> 2 등
-        
+
         for (let i = 0; i < quarterVideos.length; i++) {
           tempClips.push({
             clipKey: `${gameKey}_clip${clipIndex}`,
@@ -1327,10 +1388,10 @@ export class GameController {
       try {
         console.log(`📂 ${gameKey}: S3 파일 구조 분석하여 쿼터별 클립 생성`);
         const s3Files = await this.s3Service.listVideosByGameKey(gameKey);
-        
+
         // S3 파일들을 쿼터별로 그룹화
         const filesByQuarter = { Q1: [], Q2: [], Q3: [], Q4: [] };
-        
+
         s3Files.forEach((file: any) => {
           // 파일 경로에서 쿼터 정보 추출: videos/GAMEKEY/Q1/filename.mp4
           const filePath = file.Key || file;
@@ -1346,7 +1407,10 @@ export class GameController {
             if (clipMatch) {
               const clipNum = parseInt(clipMatch[1]);
               // 클립 번호 기반으로 쿼터 추정 (4등분)
-              const estimatedQuarter = Math.min(4, Math.ceil(clipNum / Math.max(1, s3Files.length / 4)));
+              const estimatedQuarter = Math.min(
+                4,
+                Math.ceil(clipNum / Math.max(1, s3Files.length / 4)),
+              );
               const quarter = `Q${estimatedQuarter}`;
               filesByQuarter[quarter].push(file);
             }
@@ -1358,7 +1422,7 @@ export class GameController {
         for (const quarter of ['Q1', 'Q2', 'Q3', 'Q4']) {
           const quarterFiles = filesByQuarter[quarter] || [];
           const quarterNumber = parseInt(quarter.substring(1));
-          
+
           for (let i = 0; i < quarterFiles.length; i++) {
             tempClips.push({
               clipKey: `${gameKey}_clip${clipIndex}`,
@@ -1380,11 +1444,15 @@ export class GameController {
             clipIndex++;
           }
         }
-        
-        console.log(`📊 ${gameKey}: S3 파일 분석 완료 - Q1: ${filesByQuarter.Q1.length}, Q2: ${filesByQuarter.Q2.length}, Q3: ${filesByQuarter.Q3.length}, Q4: ${filesByQuarter.Q4.length}`);
-        
+
+        console.log(
+          `📊 ${gameKey}: S3 파일 분석 완료 - Q1: ${filesByQuarter.Q1.length}, Q2: ${filesByQuarter.Q2.length}, Q3: ${filesByQuarter.Q3.length}, Q4: ${filesByQuarter.Q4.length}`,
+        );
       } catch (s3Error) {
-        console.error(`❌ ${gameKey}: S3 파일 분석 실패, 기본 방식 사용:`, s3Error.message);
+        console.error(
+          `❌ ${gameKey}: S3 파일 분석 실패, 기본 방식 사용:`,
+          s3Error.message,
+        );
         // S3 분석 실패 시 기본 방식으로 폴백
         for (let index = 0; index < videoCount; index++) {
           tempClips.push({
@@ -1421,7 +1489,9 @@ export class GameController {
       Clips: tempClips,
     };
 
-    console.log(`📹 ${gameKey}: 분석용 임시 클립 ${tempClips.length}개 생성 (영상 ${videoCount}개 기반)`);
+    console.log(
+      `📹 ${gameKey}: 분석용 임시 클립 ${tempClips.length}개 생성 (영상 ${videoCount}개 기반)`,
+    );
 
     try {
       // S3에서 비디오 URL들 가져오기
@@ -1442,7 +1512,7 @@ export class GameController {
 
       // 원본 데이터 구조 유지하면서 Clips만 수정
       const responseData = {
-        ...(clips as any).toObject ? (clips as any).toObject() : clips,
+        ...((clips as any).toObject ? (clips as any).toObject() : clips),
         Clips: clipsWithUrls,
       };
 
@@ -1475,53 +1545,67 @@ export class GameController {
    * 중복 클립의 significantPlay 병합 로직
    */
   private mergeSignificantPlays(firstClip: any, secondClip: any): any[] {
-    const firstSigPlays = Array.isArray(firstClip.significantPlays) ? firstClip.significantPlays.filter(play => play !== null) : [];
-    const secondSigPlays = Array.isArray(secondClip.significantPlays) ? secondClip.significantPlays.filter(play => play !== null) : [];
-    
+    const firstSigPlays = Array.isArray(firstClip.significantPlays)
+      ? firstClip.significantPlays.filter((play) => play !== null)
+      : [];
+    const secondSigPlays = Array.isArray(secondClip.significantPlays)
+      ? secondClip.significantPlays.filter((play) => play !== null)
+      : [];
+
     // 1. 킥오프: 2번째 클립의 significantPlay 추가
     if (firstClip.playType === 'KICKOFF') {
       const merged = [...firstSigPlays, ...secondSigPlays];
       console.log(`  🏈 킥오프: 2번째 클립 significantPlay 추가`);
       return this.removeDuplicates(merged);
     }
-    
+
     // 2. 펌블: FUMBLERECOFF/FUMBLERECDEF 처리
     if (secondSigPlays.includes('FUMBLERECOFF')) {
-      const filtered = firstSigPlays.filter(play => play !== 'FUMBLE');
-      const merged = [...filtered, 'FUMBLERECOFF', ...secondSigPlays.filter(play => play !== 'FUMBLERECOFF')];
+      const filtered = firstSigPlays.filter((play) => play !== 'FUMBLE');
+      const merged = [
+        ...filtered,
+        'FUMBLERECOFF',
+        ...secondSigPlays.filter((play) => play !== 'FUMBLERECOFF'),
+      ];
       console.log(`  🏈 펌블: FUMBLE 제거 후 FUMBLERECOFF 추가`);
       return this.removeDuplicates(merged);
     }
-    
+
     if (secondSigPlays.includes('FUMBLERECDEF')) {
-      const filtered = firstSigPlays.filter(play => play !== 'FUMBLE');
-      const merged = [...filtered, 'FUMBLERECDEF', ...secondSigPlays.filter(play => play !== 'FUMBLERECDEF')];
+      const filtered = firstSigPlays.filter((play) => play !== 'FUMBLE');
+      const merged = [
+        ...filtered,
+        'FUMBLERECDEF',
+        ...secondSigPlays.filter((play) => play !== 'FUMBLERECDEF'),
+      ];
       console.log(`  🏈 펌블: FUMBLE 제거 후 FUMBLERECDEF 추가`);
       return this.removeDuplicates(merged);
     }
-    
+
     // 3. 인터셉션: 1번째에 INTERCEPT 있으면 2번째 클립의 모든 significantPlay 병합
     if (firstSigPlays.includes('INTERCEPT')) {
       const merged = [...firstSigPlays, ...secondSigPlays];
       console.log(`  🏈 인터셉션: INTERCEPT + 2번째 클립 significantPlay 병합`);
       return this.removeDuplicates(merged);
     }
-    
+
     // 4. 펀트: 2번째에 punt 외 다른 significantPlay 있으면 추가
     if (firstClip.playType === 'PUNT') {
-      const nonPuntPlays = secondSigPlays.filter(play => !play.toLowerCase().includes('punt'));
+      const nonPuntPlays = secondSigPlays.filter(
+        (play) => !play.toLowerCase().includes('punt'),
+      );
       if (nonPuntPlays.length > 0) {
         const merged = [...firstSigPlays, ...nonPuntPlays];
         console.log(`  🏈 펀트: punt 외 significantPlay 추가`);
         return this.removeDuplicates(merged);
       }
     }
-    
+
     // 기본: 첫 번째 클립의 significantPlay 유지
     console.log(`  🏈 기본: 첫 번째 클립 significantPlay 유지`);
     return firstSigPlays;
   }
-  
+
   /**
    * 배열에서 중복 제거
    */
@@ -1663,21 +1747,21 @@ export class GameController {
                 clipNumber: 1,
                 fileName: 'YSKM20250920_clip1.mp4',
                 uploadUrl: 'https://s3.amazonaws.com/...',
-                s3Path: 'videos/YSKM20250920/Q1/YSKM20250920_clip1.mp4'
-              }
+                s3Path: 'videos/YSKM20250920/Q1/YSKM20250920_clip1.mp4',
+              },
             ],
             Q2: [
               {
                 clipNumber: 4,
                 fileName: 'YSKM20250920_clip4.mp4',
                 uploadUrl: 'https://s3.amazonaws.com/...',
-                s3Path: 'videos/YSKM20250920/Q2/YSKM20250920_clip4.mp4'
-              }
-            ]
-          }
-        }
-      }
-    }
+                s3Path: 'videos/YSKM20250920/Q2/YSKM20250920_clip4.mp4',
+              },
+            ],
+          },
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 400,
@@ -1695,16 +1779,16 @@ export class GameController {
           type: 'League',
           score: { home: 21, away: 14 },
           region: 'Seoul', // 친선전인 경우 생략 가능
-          location: '테스트 경기장'
+          location: '테스트 경기장',
         },
         quarterVideoCounts: {
           Q1: 3,
           Q2: 3,
           Q3: 2,
-          Q4: 2
-        }
-      }
-    }
+          Q4: 2,
+        },
+      },
+    },
   })
   async prepareMatchUpload(@Body() body: any, @Req() req: any) {
     try {
@@ -1735,11 +1819,14 @@ export class GameController {
 
       console.log(`🎬 경기 업로드 준비 시작: ${gameKey}`);
       console.log(`📊 쿼터별 영상 개수:`, quarterVideoCounts);
-      
+
       // 쿼터별 개수 검증 및 경고
-      const totalRequestedVideos = Object.values(quarterVideoCounts).reduce((sum: number, count: any) => sum + (Number(count) || 0), 0);
+      const totalRequestedVideos = Object.values(quarterVideoCounts).reduce(
+        (sum: number, count: any) => sum + (Number(count) || 0),
+        0,
+      );
       console.log(`📊 총 요청된 영상 개수: ${totalRequestedVideos}개`);
-      
+
       for (const [quarter, count] of Object.entries(quarterVideoCounts)) {
         const videoCount = Number(count) || 0;
         if (videoCount > 0) {
@@ -1755,20 +1842,22 @@ export class GameController {
       for (const quarter of ['Q1', 'Q2', 'Q3', 'Q4']) {
         const videoCount = quarterVideoCounts[quarter] || 0;
         console.log(`🎯 ${quarter}: ${videoCount}개 영상 처리 시작`);
-        
+
         if (videoCount > 0) {
           uploadUrls[quarter] = [];
-          
+
           for (let i = 0; i < videoCount; i++) {
             const fileName = `${gameKey}_clip${clipCounter}.mp4`;
             const s3Path = `videos/${gameKey}/${quarter}/${fileName}`;
-            console.log(`📁 ${quarter} 폴더에 ${fileName} 생성 (clip번호: ${clipCounter})`);
-            
+            console.log(
+              `📁 ${quarter} 폴더에 ${fileName} 생성 (clip번호: ${clipCounter})`,
+            );
+
             // S3 업로드 URL 생성
             const uploadUrl = await this.s3Service.generatePresignedUploadUrl(
               s3Path,
               'video/mp4',
-              3600 // 1시간 유효
+              3600, // 1시간 유효
             );
 
             uploadUrls[quarter].push({
@@ -1787,7 +1876,7 @@ export class GameController {
 
       // 업로더 정보 추가
       const { team: uploaderTeam } = req.user;
-      
+
       console.log(`🔍 JWT에서 추출된 업로더 팀: ${uploaderTeam}`);
       console.log(`📋 전체 사용자 정보:`, req.user);
 
@@ -1796,7 +1885,9 @@ export class GameController {
       for (const quarter of ['Q1', 'Q2', 'Q3', 'Q4']) {
         const videoCount = quarterVideoCounts[quarter] || 0;
         if (videoCount > 0) {
-          expectedVideoUrls[quarter] = uploadUrls[quarter].map(url => url.fileName);
+          expectedVideoUrls[quarter] = uploadUrls[quarter].map(
+            (url) => url.fileName,
+          );
         }
       }
 
@@ -1808,7 +1899,7 @@ export class GameController {
         uploadStatus: 'pending',
         videoUrls: expectedVideoUrls, // 👈 예상 videoUrls 추가
       });
-      
+
       console.log(`✅ ${gameKey} 경기 저장 완료 - 업로더: ${uploaderTeam}`);
 
       console.log(`✅ ${gameKey} 업로드 URL 생성 완료: 총 ${totalVideos}개`);
@@ -1844,17 +1935,19 @@ export class GameController {
 
   @Post('upload-video')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file', {
-    limits: { fileSize: 200 * 1024 * 1024 }, // 200MB 제한
-    fileFilter: (req, file, cb) => {
-      // 비디오 파일만 허용
-      if (file.mimetype.startsWith('video/')) {
-        cb(null, true);
-      } else {
-        cb(new Error('비디오 파일만 업로드 가능합니다'), false);
-      }
-    },
-  }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 200 * 1024 * 1024 }, // 200MB 제한
+      fileFilter: (req, file, cb) => {
+        // 비디오 파일만 허용
+        if (file.mimetype.startsWith('video/')) {
+          cb(null, true);
+        } else {
+          cb(new Error('비디오 파일만 업로드 가능합니다'), false);
+        }
+      },
+    }),
+  )
   async uploadVideo(
     @UploadedFile() file: Express.Multer.File,
     @Body() dto: { gameKey: string; fileName: string; s3Path: string },
@@ -1865,7 +1958,9 @@ export class GameController {
         throw new Error('파일이 업로드되지 않았습니다');
       }
 
-      console.log(`🎬 비디오 업로드 시작: ${dto.fileName} (${file.size} bytes)`);
+      console.log(
+        `🎬 비디오 업로드 시작: ${dto.fileName} (${file.size} bytes)`,
+      );
 
       // S3에 파일 업로드
       const uploadResult = await this.s3Service.uploadFileToS3(
@@ -1933,12 +2028,12 @@ export class GameController {
             Q1: ['YSKM20250920_clip1.mp4', 'YSKM20250920_clip2.mp4'],
             Q2: ['YSKM20250920_clip4.mp4', 'YSKM20250920_clip5.mp4'],
             Q3: ['YSKM20250920_clip7.mp4'],
-            Q4: ['YSKM20250920_clip9.mp4', 'YSKM20250920_clip10.mp4']
+            Q4: ['YSKM20250920_clip9.mp4', 'YSKM20250920_clip10.mp4'],
           },
-          uploadCompletedAt: '2025-01-24T10:30:00.000Z'
-        }
-      }
-    }
+          uploadCompletedAt: '2025-01-24T10:30:00.000Z',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 404,
@@ -1953,7 +2048,7 @@ export class GameController {
           Q1: ['YSKM20250920_clip1.mp4', 'YSKM20250920_clip2.mp4'],
           Q2: ['YSKM20250920_clip4.mp4', 'YSKM20250920_clip5.mp4'],
           Q3: ['YSKM20250920_clip7.mp4'],
-          Q4: ['YSKM20250920_clip9.mp4', 'YSKM20250920_clip10.mp4']
+          Q4: ['YSKM20250920_clip9.mp4', 'YSKM20250920_clip10.mp4'],
         },
         gameInfo: {
           date: '2025-02-01(토) 15:00',
@@ -1962,10 +2057,10 @@ export class GameController {
           awayTeam: 'SNgreenterrors',
           location: '서울대 운동장',
           region: 'Seoul',
-          score: { home: 0, away: 0 }
-        }
-      }
-    }
+          score: { home: 0, away: 0 },
+        },
+      },
+    },
   })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
@@ -1993,10 +2088,10 @@ export class GameController {
 
       // 기존 게임이 있는지 확인
       const existingGame = await this.gameService.findGameByKey(gameKey);
-      
+
       if (existingGame) {
         console.log(`📝 기존 게임 발견, 비디오 정보 업데이트: ${gameKey}`);
-        
+
         // 기존 게임에 비디오 정보 추가
         const updatedGame = await this.gameService.updateGameInfo(gameKey, {
           uploadStatus: 'pending',
@@ -2016,7 +2111,7 @@ export class GameController {
         }
       } else {
         console.log(`🆕 새 게임 생성: ${gameKey}`);
-        
+
         // 게임 정보가 없으면 기본값 사용
         const defaultGameInfo = {
           date: new Date().toISOString(),
@@ -2038,7 +2133,7 @@ export class GameController {
         };
 
         const createdGame = await this.gameService.createGameInfo(gameData);
-        
+
         if (!createdGame) {
           throw new HttpException(
             {
@@ -2145,12 +2240,13 @@ export class GameController {
       };
 
       // Slack 서비스 호출
-      const result = await this.slackService.sendGameDataEditRequest(requestData);
+      const result =
+        await this.slackService.sendGameDataEditRequest(requestData);
 
       return result;
     } catch (error) {
       console.error('❌ 게임 데이터 수정 요청 실패:', error);
-      
+
       throw new HttpException(
         {
           success: false,
@@ -2165,7 +2261,8 @@ export class GameController {
   @Get('tools/test-slack')
   @ApiOperation({
     summary: '🧪 Slack API 테스트 페이지',
-    description: 'Slack 게임 데이터 수정 요청 기능을 테스트할 수 있는 HTML 페이지를 제공합니다.',
+    description:
+      'Slack 게임 데이터 수정 요청 기능을 테스트할 수 있는 HTML 페이지를 제공합니다.',
   })
   @ApiResponse({
     status: 200,

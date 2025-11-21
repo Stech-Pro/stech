@@ -50,7 +50,10 @@ export class PlayerController {
 
   @Post('reset-all')
   @ApiOperation({ summary: '모든 선수 데이터 및 게임 데이터 초기화' })
-  @ApiResponse({ status: 200, description: '선수 데이터와 게임 데이터 초기화 성공' })
+  @ApiResponse({
+    status: 200,
+    description: '선수 데이터와 게임 데이터 초기화 성공',
+  })
   @HttpCode(HttpStatus.OK)
   async resetAllPlayers() {
     console.log('🔄 모든 선수 데이터 및 게임 데이터 초기화 요청');
@@ -58,11 +61,11 @@ export class PlayerController {
     try {
       // 1. 선수 데이터 삭제
       const playerResult = await this.playerService.resetAllPlayerData();
-      
+
       // 2. 모든 게임 데이터 삭제
       const allGames = await this.gameService.findAllGames();
       let totalGamesDeleted = 0;
-      
+
       for (const game of allGames) {
         try {
           await this.gameService.deleteGameInfo(game.gameKey);
@@ -71,15 +74,17 @@ export class PlayerController {
           console.error(`❌ 게임 ${game.gameKey} 삭제 실패:`, error);
         }
       }
-      
-      console.log(`✅ 총 ${totalGamesDeleted}개의 게임 데이터가 삭제되었습니다.`);
-      
+
+      console.log(
+        `✅ 총 ${totalGamesDeleted}개의 게임 데이터가 삭제되었습니다.`,
+      );
+
       return {
         success: true,
         message: `${playerResult.deletedCount}명의 선수 데이터와 ${totalGamesDeleted}개의 게임 데이터가 삭제되었습니다.`,
         deletedCount: {
           players: playerResult.deletedCount,
-          games: totalGamesDeleted
+          games: totalGamesDeleted,
         },
       };
     } catch (error) {
@@ -282,7 +287,7 @@ export class PlayerController {
       teamStatsUpdated: false,
       errors: [] as string[],
     };
-    
+
     // 알림 관련 변수들을 메서드 스코프에 선언
     let existingGameForNotification = null;
     let shouldSendNotification = false;
@@ -293,7 +298,7 @@ export class PlayerController {
       console.log('🔍 ClipAnalyzer 결과:', {
         success: clipResult.success,
         qbCount: clipResult.qbCount,
-        totalAnalyzed: clipResult.results?.length || 0
+        totalAnalyzed: clipResult.results?.length || 0,
       });
       if (clipResult.success) {
         results.playerStatsUpdated = clipResult.results?.length || 0;
@@ -416,26 +421,35 @@ export class PlayerController {
       console.log('✅ 팀 스탯 업데이트 완료');
 
       // GameInfo 생성 전에 상태 업데이트 (변수는 이미 외부에 선언됨)
-      
+
       // GameInfo 생성
       console.log('💾💾💾 경기 정보 저장 시작... 💾💾💾');
       try {
         // 기존 게임이 있는지 확인하고 uploader 유지
-        const existingGame = await this.gameService.findGameByKey(gameData.gameKey);
+        const existingGame = await this.gameService.findGameByKey(
+          gameData.gameKey,
+        );
         existingGameForNotification = existingGame; // 나중에 알림 생성용으로 저장
         const wasAlreadyCompleted = existingGame?.uploadStatus === 'completed';
         const uploaderTeam = existingGame?.uploader || user.team;
-        console.log(`🔍 GameInfo uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${user.team}, 최종=${uploaderTeam}`);
+        console.log(
+          `🔍 GameInfo uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${user.team}, 최종=${uploaderTeam}`,
+        );
         console.log(`📝 기존 uploadStatus: ${existingGame?.uploadStatus}`);
-        
+
         // 알림 조건 확인: pending → completed 변경인 경우
-        shouldSendNotification = existingGame && existingGame.uploadStatus === 'pending' && !wasAlreadyCompleted;
+        shouldSendNotification =
+          existingGame &&
+          existingGame.uploadStatus === 'pending' &&
+          !wasAlreadyCompleted;
         console.log(`🔍 알림 조건 디버깅:`);
         console.log(`  - existingGame: ${!!existingGame}`);
-        console.log(`  - uploadStatus === 'pending': ${existingGame?.uploadStatus === 'pending'}`);
+        console.log(
+          `  - uploadStatus === 'pending': ${existingGame?.uploadStatus === 'pending'}`,
+        );
         console.log(`  - !wasAlreadyCompleted: ${!wasAlreadyCompleted}`);
         console.log(`  - shouldSendNotification: ${shouldSendNotification}`);
-        
+
         const gameDataWithUploader = {
           ...gameData,
           uploader: uploaderTeam, // 기존 uploader 유지 또는 새 사용자
@@ -454,10 +468,14 @@ export class PlayerController {
       console.log('🎬🎬🎬 경기 클립 데이터 저장 시작... 🎬🎬🎬');
       try {
         // 기존 게임 정보에서 uploader 가져오기
-        const existingGame = await this.gameService.findGameByKey(gameData.gameKey);
+        const existingGame = await this.gameService.findGameByKey(
+          gameData.gameKey,
+        );
         const uploaderTeam = existingGame?.uploader || user.team;
-        console.log(`🔍 GameClips uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${user.team}, 최종=${uploaderTeam}`);
-        
+        console.log(
+          `🔍 GameClips uploader 정보: 기존=${existingGame?.uploader}, 현재 사용자=${user.team}, 최종=${uploaderTeam}`,
+        );
+
         const gameClipsData = {
           ...gameData,
           uploader: uploaderTeam,
@@ -465,10 +483,12 @@ export class PlayerController {
         await this.gameService.saveGameClips(gameClipsData);
         console.log('✅✅✅ 경기 클립 데이터 저장 완료 ✅✅✅');
       } catch (gameClipsError) {
-        console.error('❌❌❌ 경기 클립 데이터 저장 실패:', gameClipsError.message);
+        console.error(
+          '❌❌❌ 경기 클립 데이터 저장 실패:',
+          gameClipsError.message,
+        );
         results.errors.push(`GameClips 생성: ${gameClipsError.message}`);
       }
-
     } catch (error) {
       console.error('게임 데이터 분석 중 전체 오류:', error);
       require('fs').appendFileSync(
@@ -482,27 +502,37 @@ export class PlayerController {
     // 🔔 모든 처리가 성공적으로 완료되고 알림 조건이 충족된 경우에만 알림 생성
     console.log(`🔍 최종 알림 조건 확인:`);
     console.log(`  - shouldSendNotification: ${shouldSendNotification}`);
-    console.log(`  - results.errors.length === 0: ${results.errors.length === 0}`);
-    console.log(`  - existingGameForNotification: ${!!existingGameForNotification}`);
+    console.log(
+      `  - results.errors.length === 0: ${results.errors.length === 0}`,
+    );
+    console.log(
+      `  - existingGameForNotification: ${!!existingGameForNotification}`,
+    );
     console.log(`  - errors: ${JSON.stringify(results.errors)}`);
-    
-    if (shouldSendNotification && results.errors.length === 0 && existingGameForNotification) {
+
+    if (
+      shouldSendNotification &&
+      results.errors.length === 0 &&
+      existingGameForNotification
+    ) {
       console.log('🔔 경기 분석 완료 알림 생성 시작');
-      
+
       try {
         const uploaderTeam = existingGameForNotification.uploader || user.team;
-        
+
         // 해당 팀의 모든 사용자 조회
-        const teamUsers = await this.userModel.find({
-          teamName: uploaderTeam,
-          role: { $in: ['player', 'coach'] }
-        }).select('username teamName');
-        
+        const teamUsers = await this.userModel
+          .find({
+            teamName: uploaderTeam,
+            role: { $in: ['player', 'coach'] },
+          })
+          .select('username teamName');
+
         console.log(`📋 ${uploaderTeam} 팀 사용자 ${teamUsers.length}명 발견`);
-        
+
         // 팀의 모든 사용자들에게 알림 생성
         if (teamUsers.length > 0) {
-          const userIds = teamUsers.map(user => user.username);
+          const userIds = teamUsers.map((user) => user.username);
           await this.notificationService.createTeamNotifications(
             uploaderTeam,
             gameData.gameKey,
@@ -513,7 +543,7 @@ export class PlayerController {
             },
             userIds,
           );
-          
+
           console.log('✅ 알림 생성 완료');
         } else {
           console.log('⚠️ 해당 팀에 사용자가 없어 알림을 생성하지 않음');
@@ -523,7 +553,9 @@ export class PlayerController {
         // 알림 실패는 전체 프로세스에 영향을 주지 않음
       }
     } else if (!shouldSendNotification) {
-      console.log('ℹ️ 알림 생성 조건 미충족 (이미 completed 상태이거나 에러 발생)');
+      console.log(
+        'ℹ️ 알림 생성 조건 미충족 (이미 completed 상태이거나 에러 발생)',
+      );
     }
 
     return {
@@ -565,13 +597,13 @@ export class PlayerController {
   async updateGameStats(@Body() gameData: any, @User() user: any) {
     console.log('받은 데이터 구조:', JSON.stringify(gameData, null, 2));
     console.log('업로더 정보:', user);
-    
+
     // 업로더 정보를 게임 데이터에 추가
     const gameDataWithUploader = {
       ...gameData,
       uploader: user.team,
     };
-    
+
     return this.playerService.analyzeGameData(gameDataWithUploader);
   }
 

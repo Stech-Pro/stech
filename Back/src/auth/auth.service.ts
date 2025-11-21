@@ -31,6 +31,7 @@ import {
 } from '../common/dto/auth.dto';
 import { TEAM_CODES } from '../common/constants/team-codes';
 import { EmailService } from '../utils/email.service';
+import { KafaStatsService } from '../kafa-stats/kafa-stats.service';
 
 @Injectable()
 export class AuthService {
@@ -45,6 +46,7 @@ export class AuthService {
     private playerGameStatsModel: Model<PlayerGameStatsDocument>,
     private jwtService: JwtService,
     private emailService: EmailService,
+    private kafaStatsService: KafaStatsService,
   ) {}
 
   async signup(signupDto: SignupDto) {
@@ -723,6 +725,48 @@ export class AuthService {
       user.profile?.physicalInfo?.height
     );
 
+    // KAFA 스탯 조회 (현재 시즌, 대학 리그)
+    let kafaStats = null;
+    try {
+      const currentSeason = '2025';
+      const teamKeyword = user.teamName.includes('한양') ? '한양대' : 
+                          user.teamName.replace('대학교', '').replace(' ', '');
+      
+      const kafaData = await this.kafaStatsService.getKafaPlayerStatsFromDB(
+        'uni', // 대학 리그
+        currentSeason,
+        teamKeyword
+      );
+
+      if (kafaData && kafaData.length > 0) {
+        kafaStats = {
+          totalPlayers: kafaData.length,
+          season: currentSeason,
+          league: '대학',
+          players: kafaData.map(player => ({
+            playerName: player.playerName,
+            jerseyNumber: player.jerseyNumber,
+            position: player.position,
+            rushing: {
+              rank: player.rank,
+              totalYards: player.rushing.totalYards,
+              forwardYards: player.rushing.forwardYards,
+              backwardYards: player.rushing.backwardYards,
+              yardsPerAttempt: player.rushing.yardsPerAttempt,
+              attempts: player.rushing.attempts,
+              touchdowns: player.rushing.touchdowns,
+              longest: player.rushing.longest,
+            },
+            rawYardString: player.rawYardString,
+            lastUpdated: player.lastUpdated,
+          }))
+        };
+      }
+    } catch (error) {
+      console.log('KAFA 스탯 조회 실패:', error.message);
+      // KAFA 스탯 조회 실패해도 프로필 조회는 계속 진행
+    }
+
     const profileData = {
       username: user.username,
       playerID: user.profile?.playerID || '미설정', // playerID를 유저네임으로 사용
@@ -739,6 +783,7 @@ export class AuthService {
       position: this.formatPositions(user.profile?.positions),
       region: this.formatRegionWithLeague(user.region, league),
       teamName: user.teamName,
+      kafaStats: kafaStats, // KAFA 협회 공식 스탯 추가
     };
 
     console.log('✅ 프로필 조회 완료');

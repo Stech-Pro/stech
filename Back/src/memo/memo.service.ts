@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Memo, MemoDocument } from '../schemas/memo.schema';
@@ -59,7 +64,7 @@ export class MemoService {
     }
 
     const teamId = user.teamName;
-    
+
     const query: any = {
       isDeleted: false,
       $or: [
@@ -151,7 +156,7 @@ export class MemoService {
       currentUserIdString: userIdString,
       memoUserIdType: typeof memo.userId,
       currentUserIdType: typeof userId,
-      isEqual: memo.userId.toString() === userIdString
+      isEqual: memo.userId.toString() === userIdString,
     });
 
     if (memo.userId.toString() !== userIdString) {
@@ -168,9 +173,13 @@ export class MemoService {
   }
 
   // 팀 알림 발송
-  private async sendTeamNotification(user: UserDocument, gameKey: string, memoId: string) {
+  private async sendTeamNotification(
+    user: UserDocument,
+    gameKey: string,
+    memoId: string,
+  ) {
     const teamId = user.teamName;
-    
+
     // 같은 팀의 모든 사용자 조회
     const teamMembers = await this.userModel.find({
       teamName: teamId,
@@ -178,9 +187,10 @@ export class MemoService {
     });
 
     const userName = user.profile?.realName || user.username;
-    const userRole = user.role === 'player' ? '선수' : user.role === 'coach' ? '코치' : '';
-    
-    const notificationPromises = teamMembers.map(member =>
+    const userRole =
+      user.role === 'player' ? '선수' : user.role === 'coach' ? '코치' : '';
+
+    const notificationPromises = teamMembers.map((member) =>
       this.notificationService.createNotification({
         userId: member._id.toString(),
         team: teamId,
