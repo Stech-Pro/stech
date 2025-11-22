@@ -98,7 +98,7 @@
 }
 
 .input-with-icon {
-  position: relative;                 /* 기준 */
+  position: relative; /* 기준 */
 }
 
 .profile-input-password {
@@ -110,7 +110,7 @@
 .profilepasswordToggleButton {
   position: absolute;
   top: 50%;
-  right: 10px;                        /* 필요 시 조정 */
+  right: 10px; /* 필요 시 조정 */
   transform: translateY(-50%);
   width: 28px;
   height: 28px;
@@ -122,5 +122,259 @@
   cursor: pointer;
 }
 
-.profilepasswordToggleButton:focus { outline: none; }
-.profilepasswordToggleButton img { width: 18px; height: 18px; }
+.profilepasswordToggleButton:focus {
+  outline: none;
+}
+.profilepasswordToggleButton img {
+  width: 18px;
+  height: 18px;
+}
+
+/*
+ * ProfileModify.css
+ * 프로필 수정 페이지에 특화된 스타일
+ */
+
+/* ProfileMain.css와 충돌하지 않도록 react-select 클래스에 '-mod' 접미사 사용 */
+
+/* 1. Control 컴포넌트 (전체 입력 필드) 높이 고정 및 커스텀 화살표 */
+.profile-form-group .nationality-mod__control,
+.profile-form-group .position-select-mod__control {
+  /* Control 컴포넌트에 select 태그의 스타일을 적용 */
+  background-color: transparent !important;
+  border: 1px solid white !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  font-size: 16px !important;
+  /* 높이 통일 및 내부 정렬을 위해 */
+  min-height: 40px !important;
+  height: 40px !important; /* 높이 명시적 고정 */
+  cursor: pointer !important;
+
+  /* 커스텀 화살표 */
+  background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3cpolyline points="6 9 12 15 18 9"%3e%3c/polyline%3e%3c/svg%3e');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 2. ValueContainer (선택된 값 및 검색/플레이스홀더를 담는 컨테이너) */
+.profile-form-group .nationality-mod__value-container,
+.profile-form-group .position-select-mod__value-container {
+  padding: 0 0 0 10px !important; /* 왼쪽 패딩만 유지 */
+  height: 100%; /* Control 높이에 맞춤 */
+  align-items: center; /* 세로 중앙 정렬 */
+}
+
+/* 3. Indicators Container (화살표 영역) */
+.profile-form-group .nationality-mod__indicators,
+.profile-form-group .position-select-mod__indicators {
+  height: 100%;
+  align-items: center;
+}
+
+/* 4. 주소 인풋 간격 */
+.profile-input.mt-2 {
+  margin-top: 8px;
+}
+
+/* 비밀번호 변경 섹션 */
+.password-change-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* 비밀번호 표시/숨기기 아이콘 버튼 컨테이너 */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.profile-input-password {
+  width: 100%;
+  padding-right: 40px !important;
+}
+
+.profilepasswordToggleButton {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.profilepasswordToggleButton:focus {
+  outline: none;
+}
+.profilepasswordToggleButton img {
+  width: 18px;
+  height: 18px;
+}
+
+/* 5. 수정 불가능한 (Static) 정보 필드 스타일 (profile-input과 동일하게 보이기 위함) */
+.profile-input.static-info {
+  /* 기본 input 스타일을 따라갑니다 */
+  background-color: transparent;
+  border: 1px solid white; /* 0.5px -> 1px 로 통일 (대부분의 브라우저에서 0.5px 지원 문제가 있음) */
+  border-radius: 10px;
+  padding: 10px;
+  color: #ffffff;
+  font-size: 16px;
+  /* **높이 통일 핵심:** 패딩(10px)을 고려한 최소 높이 설정 */
+  min-height: 40px;
+  height: auto; /* 내용에 따라 늘어나되 최소 높이 보장 */
+  display: flex;
+  align-items: center; /* 내부 텍스트 및 로고 세로 중앙 정렬 */
+}
+
+/* 6. 팀 표시 영역의 텍스트와 로고 정렬 */
+.profile-team-display.profile-input.static-info {
+  gap: 8px; /* 로고와 텍스트 사이 간격 */
+}
+
+/* 로고 크기 명시 */
+.profile-team-display.profile-input.static-info .profile-team-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+/*
+ * ProfileModify.css
+ * 프로필 수정 페이지에 특화된 스타일
+ */
+
+/* ProfileMain.css와 충돌하지 않도록 react-select 클래스에 '-mod' 접미사 사용 */
+
+/* 1. Control 컴포넌트 (전체 입력 필드) 높이 고정 및 커스텀 화살표 */
+.profile-form-group .nationality-mod__control,
+.profile-form-group .position-select-mod__control {
+  /* Control 컴포넌트에 select 태그의 스타일을 적용 */
+  background-color: transparent !important;
+  border: 1px solid white !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  font-size: 16px !important;
+  /* 높이 통일 및 내부 정렬을 위해 */
+  min-height: 40px !important;
+  height: 40px !important; /* 높이 명시적 고정 */
+  cursor: pointer !important;
+
+  /* 커스텀 화살표 */
+  background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3cpolyline points="6 9 12 15 18 9"%3e%3c/polyline%3e%3c/svg%3e');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 2. ValueContainer (선택된 값 및 검색/플레이스홀더를 담는 컨테이너) */
+.profile-form-group .nationality-mod__value-container,
+.profile-form-group .position-select-mod__value-container {
+  padding: 0 0 0 10px !important; /* 왼쪽 패딩만 유지 */
+  height: 100%; /* Control 높이에 맞춤 */
+  align-items: center; /* 세로 중앙 정렬 */
+}
+
+/* 3. Indicators Container (화살표 영역) */
+.profile-form-group .nationality-mod__indicators,
+.profile-form-group .position-select-mod__indicators {
+  height: 100%;
+  align-items: center;
+}
+
+/* 4. 주소 인풋 간격 */
+.profile-input.mt-2 {
+  margin-top: 8px;
+}
+
+/* 비밀번호 변경 섹션 */
+.password-change-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* 비밀번호 표시/숨기기 아이콘 버튼 컨테이너 */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.profile-input-password {
+  width: 100%;
+  padding-right: 40px !important;
+}
+
+.profilepasswordToggleButton {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.profilepasswordToggleButton:focus {
+  outline: none;
+}
+.profilepasswordToggleButton img {
+  width: 18px;
+  height: 18px;
+}
+
+/* 5. 수정 불가능한 (Static) 정보 필드 스타일 (profile-input과 동일하게 보이기 위함) */
+.profile-input.static-info {
+  /* 기본 input 스타일을 따라갑니다 */
+  background-color: transparent;
+  border: 1px solid white;
+  border-radius: 10px;
+  padding: 10px;
+  color: #ffffff;
+  font-size: 16px;
+  /* **높이 통일 핵심:** 패딩(10px)을 고려한 최소 높이 설정 */
+  min-height: 40px;
+  height: 40px; /* 명시적 높이 40px (패딩 포함 총 60px)로 강제 */
+  display: flex;
+  align-items: center; /* 내부 텍스트 및 로고 세로 중앙 정렬 */
+
+  /* 콘텐츠가 넘치면 숨김 처리 (팀 이름이 너무 길 경우 대비) */
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* 6. 팀 표시 영역의 텍스트와 로고 정렬 */
+.profile-team-display.profile-input.static-info {
+  gap: 8px;
+}
+
+/* 로고 크기 명시 (높이 통일의 핵심) */
+.profile-team-display.profile-input.static-info .profile-team-icon {
+  width: 20px; /* 로고 크기를 줄여서 높이에 맞춤 */
+  height: 20px;
+  object-fit: contain;
+}
