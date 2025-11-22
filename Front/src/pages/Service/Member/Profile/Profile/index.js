@@ -4,6 +4,32 @@ import './ProfileMain.css';
 import { myProfile } from '../../../../../api/authAPI';
 import { TEAM_BY_ID, TEAM_BY_NAME, TEAMS } from '../../../../../data/TEAMS';
 
+// ------------------------------------------------------------------
+// 🌎 국가 정보 헬퍼 및 라이브러리 추가
+// ------------------------------------------------------------------
+import CountryFlag from 'react-country-flag';
+import countries from 'i18n-iso-countries';
+import koLocale from 'i18n-iso-countries/langs/ko.json';
+
+countries.registerLocale(koLocale);
+
+// ISO3 -> ISO2 헬퍼 (국기 표시용)
+const toAlpha2 = (alpha3) => {
+  try {
+    return countries.alpha3ToAlpha2(alpha3) || '';
+  } catch {
+    return '';
+  }
+};
+// ISO3 -> 한국어 국가명 헬퍼
+const getCountryNameKo = (alpha3) => {
+    const alpha2 = toAlpha2(alpha3);
+    if (!alpha2) return alpha3 || 'N/A';
+    return countries.getName(alpha2, 'ko', { select: 'official' }) || alpha3;
+};
+// ------------------------------------------------------------------
+
+
 // 지역 한글 변환 매핑
 const REGION_KR = {
   Seoul: '서울',
@@ -128,6 +154,11 @@ export default function ProfilePage() {
 
   const availablePositions = Object.keys(POSITION_STATS_CONFIG);
 
+  // 🚩 국적 정보 변환
+  const nationalityAlpha3 = profileData.nationality || 'KOR'; // 기본값 KOR
+  const nationalityAlpha2 = toAlpha2(nationalityAlpha3);
+  const nationalityNameKo = getCountryNameKo(nationalityAlpha3);
+
   const renderStatsTable = (pos) => (
     <div className="no-data">스탯 연동 준비 중입니다.</div>
   );
@@ -136,7 +167,7 @@ export default function ProfilePage() {
     <div className="profile-main">
       <div className="profile-container">
         <div className="profile-title-container">
-          <h1 className="profile-title">선수 프로필</h1>
+          <h1 className="profile-title">내 프로필</h1>
         </div>
 
         <div className="profile-content">
@@ -153,7 +184,7 @@ export default function ProfilePage() {
           <div className="profile-info-section">
             <div className="profile-info-grid">
               <div className="profile-form-group">
-                <label>성명</label>
+                <label>이름</label>
                 <p className="profile-info-text">{displayName}</p>
               </div>
               <div className="profile-form-group">
@@ -164,10 +195,24 @@ export default function ProfilePage() {
                 <label>전화</label>
                 <p className="profile-info-text">{profileData.phone}</p>
               </div>
+              
+              {/* 🇰🇷 국적 표시 수정 부분 */}
               <div className="profile-form-group">
                 <label>국적</label>
-                <p className="profile-info-text">{profileData.nationality}</p>
+                <p className="profile-info-text">
+                  <span className="profile-nationality-display">
+                    {nationalityAlpha2 && (
+                      <CountryFlag
+                        svg
+                        countryCode={nationalityAlpha2}
+                        style={{ width: '20px', height: '15px' }}
+                      />
+                    )}
+                    <span>{nationalityNameKo}</span>
+                  </span>
+                </p>
               </div>
+              {/* --------------------------- */}
 
               <div className="profile-form-group full-width">
                 <label>주소</label>

@@ -1,33 +1,198 @@
-// src/pages/Service/Member/Profile/ProfileModify/index.js
 import React, { useState, useEffect } from 'react';
 import '../Profile/ProfileMain.css';
 import './ProfileModify.css';
-import { teamData } from '../../../../../data/teamData';
+import { myProfile, updateProfile, uploadAvatar } from '../../../../../api/authAPI'; // uploadAvatar 임포트
+import { TEAM_BY_ID, TEAM_BY_NAME, TEAMS } from '../../../../../data/TEAMS';
+import Select, { components as RSComponents } from 'react-select';
+import CountryFlag from 'react-country-flag';
+import countries from 'i18n-iso-countries';
+import koLocale from 'i18n-iso-countries/langs/ko.json';
+
 import Eye from '../../../../../assets/images/png/AuthPng/Eye.png';
 import EyeActive from '../../../../../assets/images/png/AuthPng/EyeActive.png';
 
-// 백엔드 연결 (mock)
-const fetchProfileDataFromBackend = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return {
-    profileImage: 'https://via.placeholder.com/250x300',
-    fullName: '홍길동',
-    email: 'test@example.com',
-    address1: '서울시 강남구 테헤란로 123',
-    address2: '멀티캠퍼스',
-    height: '180',
-    weight: '75',
-    position: 'QB',
-    age: '28',
-    career: '5',
-    region: 'seoul-first',
-    team: 'hanyang',
-  };
+countries.registerLocale(koLocale);
+const toAlpha2 = (alpha3) => {
+  try {
+    return countries.alpha3ToAlpha2(alpha3) || '';
+  } catch {
+    return '';
+  }
 };
+// ISO2 -> ISO3 헬퍼 (저장용)
+const toAlpha3 = (alpha2) => {
+  try {
+    return countries.alpha2ToAlpha3(alpha2) || '';
+  } catch {
+    return '';
+  }
+};
+
+// 한국어 국가 옵션 목록 생성 (value = ISO3)
+const buildCountryOptions = () => {
+  const namesKo = countries.getNames('ko', { select: 'official' });
+  return Object.entries(namesKo)
+    .map(([alpha2, label]) => ({
+      value: toAlpha3(alpha2), // 저장: ISO3
+      label, // 표시: 한국어 국가명
+      alpha2, // 플래그용
+    }))
+    .filter((o) => !!o.value)
+    .sort((a, b) => a.label.localeCompare(b.label, 'ko'));
+};
+const COUNTRY_OPTIONS = buildCountryOptions();
+
+const POSITION_OPTIONS = [
+  { value: 'QB', label: 'QB' }, { value: 'RB', label: 'RB' },
+  { value: 'WR', label: 'WR' }, { value: 'TE', label: 'TE' },
+  { value: 'OL', label: 'OL' }, { value: 'DL', label: 'DL' },
+  { value: 'LB', label: 'LB' }, { value: 'DB', label: 'DB' },
+  { value: 'K', label: 'K' }, { value: 'P', label: 'P' },
+];
+
+// 1. react-select 기본 화살표를 숨기는 컴포넌트 (CSS background-image를 사용하기 위함)
+const NullIndicator = () => null;
+
+// 2. 국적 필드 렌더(옵션/싱글밸류): 국기 + 한글명
+const Option = (props) => {
+  const { alpha2, label } = props.data;
+  return (
+    <RSComponents.Option {...props}>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <CountryFlag
+          svg
+          countryCode={alpha2}
+          style={{ width: 16, height: 12 }}
+        />
+        <span>{label}</span>
+      </span>
+    </RSComponents.Option>
+  );
+};
+const SingleValue = (props) => {
+  const { alpha2, label } = props.data;
+  return (
+    <RSComponents.SingleValue {...props}>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <CountryFlag
+          svg
+          countryCode={alpha2}
+          style={{ width: 16, height: 12 }}
+        />
+        <span>{label}</span>
+      </span>
+    </RSComponents.SingleValue>
+  );
+};
+
+// 3. 포지션 필드 렌더(옵션/싱글밸류): 단순 텍스트 (국기 없음)
+const PositionOption = (props) => (<RSComponents.Option {...props}><span>{props.data.label}</span></RSComponents.Option>);
+const PositionSingleValue = (props) => (<RSComponents.SingleValue {...props}><span>{props.data.label}</span></RSComponents.SingleValue>);
+
+
+// 4. react-select 스타일 오버라이드 객체 (회원가입/프로필 페이지와 동일)
+const selectStyles = {
+  control: (provided, state) => ({
+    ...provided,
+    backgroundColor: 'transparent',
+    border: '1px solid white', 
+    borderRadius: '10px',
+    padding: '0', 
+    color: '#ffffff',
+    fontSize: '16px',
+    minHeight: '40px', 
+    boxShadow: 'none',
+    cursor: 'pointer',
+    '&:hover': {
+      borderColor: 'white',
+    },
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: '#ffffff',
+    margin: '0',
+    padding: '0 0 0 10px', 
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  }),
+  menu: (provided) => ({
+    ...provided,
+    backgroundColor: '#444444', 
+    borderRadius: '10px',
+    zIndex: 2,
+    border: '1px solid white',
+    marginTop: '5px',
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isSelected
+      ? '#f77705' 
+      : state.isFocused
+      ? '#616161' 
+      : 'transparent',
+    color: '#ffffff',
+    '&:active': {
+      backgroundColor: '#f77705',
+    },
+    cursor: 'pointer',
+    padding: '10px',
+  }),
+  indicatorSeparator: () => ({ display: 'none' }),
+  placeholder: (provided) => ({
+    ...provided,
+    color: '#b8b8b8', 
+    padding: '0 0 0 10px', 
+  }),
+  input: (provided) => ({
+    ...provided,
+    color: '#ffffff',
+    padding: '0',
+    margin: '0',
+  }),
+};
+// ------------------------------------------------------------------
+
+
+// ⚙️ teamName(약어/ID/텍스트)을 한글 팀명/로고/리그명으로 변환
+function resolveTeamDisplay(teamName) {
+  if (!teamName) return { id: null, name: 'N/A', logo: null, region: null, division: null };
+  const byId = TEAM_BY_ID[teamName];
+  if (byId) return byId;
+  const byName = TEAM_BY_NAME[teamName];
+  if (byName) return byName;
+  const key = String(teamName).toLowerCase().replace(/\s+/g, '');
+  const loose = TEAMS.find(
+    (t) =>
+      t.id?.toLowerCase().replace(/\s+/g, '') === key ||
+      t.name?.toLowerCase().replace(/\s+/g, '') === key
+  );
+  if (loose) return loose;
+  return { id: null, name: teamName, logo: null, region: null, division: null };
+}
+
+// 🔹 region + division을 조합해 "서울 / 1부" 형식으로 변환 (ProfilePage와 동일 로직)
+const REGION_KR = {
+  Seoul: '서울', 'Gyeonggi-Gangwon': '경기강원', 'Daegu-Gyeongbuk': '대구경북', 
+  'Busan-Gyeongnam': '부산경남', Amateur: '사회인', Admin: '관리자',
+};
+function getRegionDisplay(team) {
+  if (!team || !team.region) return 'N/A';
+  const regionKR = REGION_KR[team.region] ?? team.region;
+  return team.division ? `${regionKR} / ${team.division}` : regionKR;
+}
+
+// ------------------------------------------------------------------
+// 📮 Daum Postcode API URL
+// ------------------------------------------------------------------
+const DAUM_POSTCODE_URL =
+  'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+// ------------------------------------------------------------------
 
 export default function ProfileModify() {
   const [profileData, setProfileData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [scriptLoaded, setScriptLoaded] = useState(false); // Daum Script 로드 상태
 
   const [passwords, setPasswords] = useState({
     currentPassword: '',
@@ -39,55 +204,218 @@ export default function ProfileModify() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
+  // Address: address 필드를 address1과 address2로 분리
+  const splitAddress = (fullAddress) => {
+    if (!fullAddress) return { address1: '', address2: '' };
+    // 주소는 API에서 통째로 가져오고, 수정 화면에서는 주소1에 전체 주소를 표시하고 주소2는 비워둡니다.
+    return { address1: fullAddress, address2: '' }; 
+  };
+
   useEffect(() => {
     const loadProfile = async () => {
-      const data = await fetchProfileDataFromBackend();
-      setProfileData(data);
-      setIsLoading(false);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No token found');
+
+        const res = await myProfile(token);
+        const payload = res.data;
+        
+        // address 필드를 UI에 맞게 분리
+        const { address1, address2 } = splitAddress(payload.address);
+
+        setProfileData({
+            ...payload,
+            // position이 배열로 올 경우를 대비하여 첫 번째 요소를 사용하거나 문자열 그대로 사용
+            position: Array.isArray(payload.position) ? payload.position[0] : payload.position, 
+            height: String(payload.height || ''),
+            weight: String(payload.weight || ''),
+            age: String(payload.age || ''),
+            career: String(payload.career || ''),
+            address1: payload.address || '', // 주소 1에 전체 주소 표시
+            address2: '', // 상세 주소는 비워둠
+        });
+        
+      } catch (e) {
+        console.error('프로필 불러오기 오류:', e);
+        setProfileData(null);
+        alert('프로필 정보를 불러오는 데 실패했습니다.');
+      } finally {
+        setIsLoading(false);
+      }
     };
     loadProfile();
   }, []);
 
+  // ------------------------------------------------------------------
+  // 📮 Daum Postcode 스크립트 로딩 로직
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    if (window.daum?.Postcode) {
+      setScriptLoaded(true);
+      return;
+    }
+    let s = document.querySelector('script[data-daum-postcode]');
+    if (!s) {
+      s = document.createElement('script');
+      s.src = DAUM_POSTCODE_URL;
+      s.async = true;
+      s.defer = true;
+      s.dataset.daumPostcode = 'true';
+      document.head.appendChild(s);
+    }
+    const onLoad = () => setScriptLoaded(true);
+    const onError = () => setScriptLoaded(false);
+    s.addEventListener('load', onLoad);
+    s.addEventListener('error', onError);
+    return () => {
+      s.removeEventListener('load', onLoad);
+      s.removeEventListener('error', onError);
+    };
+  }, []);
+
+  // ------------------------------------------------------------------
+  // 🔍 주소 검색 핸들러
+  // ------------------------------------------------------------------
+  const handleAddressSearch = () => {
+    if (!scriptLoaded) {
+      alert(
+        '주소 검색 스크립트가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.',
+      );
+      return;
+    }
+    // window.daum.Postcode는 스크립트 로드 후 전역적으로 사용 가능하다고 가정합니다.
+    new window.daum.Postcode({
+      oncomplete: function (data) {
+        let fullAddress = data.roadAddress;
+        let extraAddress = '';
+        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname))
+          extraAddress += data.bname;
+        if (data.buildingName !== '' && data.apartment === 'Y') {
+          extraAddress +=
+            extraAddress !== '' ? ', ' + data.buildingName : data.buildingName;
+        }
+        if (extraAddress !== '') fullAddress += ' (' + extraAddress + ')';
+        setProfileData((prev) => ({
+          ...prev,
+          address1: fullAddress,
+          address2: '', // 상세 주소는 초기화
+        }));
+      },
+    }).open();
+  };
+  // ------------------------------------------------------------------
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // **숫자 필드에 대한 입력 유효성 검사**
+    if (['height', 'weight', 'age', 'career'].includes(name)) {
+      // 숫자가 아니거나 소수점(.)이 두 개 이상인 경우 입력을 무시
+      if (value !== '' && !/^\d*\.?\d*$/.test(value)) {
+        return; 
+      }
+    }
+    
     setProfileData((prev) => ({ ...prev, [name]: value }));
   };
+  
+  // react-select용 핸들러
+  const handleSelectChange = (name, opt) => {
+      setProfileData((prev) => ({ 
+          ...prev, 
+          [name]: opt ? opt.value : '', 
+      }));
+  }
 
-  const handleImageUpload = (e) => {
+  // ------------------------------------------------------------------
+  // 📸 이미지 업로드 핸들러 (API 연동)
+  // ------------------------------------------------------------------
+  const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // 프로필 이미지 미리보기 (즉시 반영)
     const reader = new FileReader();
     reader.onloadend = () => {
-      setProfileData((prev) => ({ ...prev, profileImage: reader.result }));
+        // 임시 URL로 미리보기만 업데이트 (업로드 중임을 표시)
+        setProfileData((prev) => ({ ...prev, profileImage: reader.result }));
     };
     reader.readAsDataURL(file);
+
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('인증 토큰이 없습니다.');
+
+        // 💡 API를 호출하여 파일을 업로드하고 URL을 받아옴
+        // authAPI.js 파일에 uploadAvatar 함수가 정의되어 있어야 합니다.
+        const { avatarUrl } = await uploadAvatar(file, token);
+
+        // API 응답으로 받은 실제 URL로 상태 업데이트
+        setProfileData((prev) => ({ ...prev, profileImage: avatarUrl }));
+        alert('프로필 이미지가 성공적으로 업로드되었습니다.');
+
+    } catch (error) {
+        console.error('이미지 업로드 오류:', error);
+        alert('이미지 업로드에 실패했습니다: ' + (error.message || '알 수 없는 오류'));
+        
+        // 업로드 실패 시 이미지를 초기 상태로 되돌림 (여기서는 null로 가정)
+        setProfileData((prev) => ({ ...prev, profileImage: null })); 
+    }
   };
+
 
   const handleImageDelete = () => {
+    // ⚠️ TODO: 서버에 이미지 삭제 요청 로직 추가
     setProfileData((prev) => ({ ...prev, profileImage: null }));
+    alert('프로필 이미지가 삭제되었습니다.');
   };
+  // ------------------------------------------------------------------
 
-  const handleSave = () => {
+
+  const handleSave = async () => {
     if (!profileData) return;
 
-    // 이메일 유효성
+    // 1. 유효성 검사
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(profileData.email)) {
+    if (!profileData.email || !emailRegex.test(profileData.email)) {
       alert('유효한 이메일 주소를 입력해주세요.');
       return;
     }
-
-    // 숫자 유효성
     const numericFields = ['height', 'weight', 'age', 'career'];
     for (const f of numericFields) {
       if (profileData[f] === '' || Number.isNaN(Number(profileData[f]))) {
-        alert('키, 몸무게, 나이, 경력은 숫자만 입력 가능합니다.');
+        alert('키, 몸무게, 나이, 경력은 숫자만 입력 가능하며, 빈 칸일 수 없습니다.');
         return;
       }
     }
+    
+    // 2. 전송 데이터 구성
+    const payload = {
+        realName: profileData.realName,
+        playerID: profileData.playerID,
+        email: profileData.email,
+        phone: profileData.phone,
+        nationality: profileData.nationality,
+        address: `${profileData.address1.trim()} ${profileData.address2.trim()}`.trim(),
+        height: parseInt(profileData.height),
+        weight: parseInt(profileData.weight),
+        age: parseInt(profileData.age),
+        career: profileData.career, // API 요구사항에 따라 문자열로 전송
+        position: profileData.position,
+        // profileImage URL은 updateProfile API 명세에 포함되지 않으므로 제외
+    };
 
-    console.log('Saving changes...', profileData);
-    alert('변경사항이 저장되었습니다!');
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('인증 토큰이 없습니다.');
+        
+        await updateProfile(payload, token);
+        alert('변경사항이 성공적으로 저장되었습니다!');
+    } catch (error) {
+        console.error('프로필 업데이트 오류:', error);
+        alert('프로필 업데이트에 실패했습니다: ' + (error.message || '알 수 없는 오류'));
+    }
   };
 
   const handlePasswordChange = (e) => {
@@ -96,8 +424,13 @@ export default function ProfileModify() {
   };
 
   const handlePasswordSave = () => {
-    const { newPassword, confirmNewPassword } = passwords;
-
+    const { currentPassword, newPassword, confirmNewPassword } = passwords;
+    
+    // ⚠️ 비밀번호 변경은 별도의 API를 호출해야 하지만, 여기서는 프론트엔드 유효성 검사만 수행합니다.
+    if (!currentPassword) {
+        alert('현재 비밀번호를 입력해주세요.');
+        return;
+    }
     if (newPassword !== confirmNewPassword) {
       alert('새로운 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
       return;
@@ -107,19 +440,10 @@ export default function ProfileModify() {
       return;
     }
 
+    // ⚠️ TODO: 여기에 비밀번호 변경 API 호출 로직 추가
+
     console.log('Password change successful!');
     alert('비밀번호가 성공적으로 변경되었습니다!');
-  };
-
-  const getSelectedTeam = () => {
-    if (!profileData?.team) return { label: 'N/A', logo: null };
-    const selectedRegionTeams = teamData[profileData.region] || [];
-    return (
-      selectedRegionTeams.find((t) => t.value === profileData.team) || {
-        label: 'N/A',
-        logo: null,
-      }
-    );
   };
 
   if (isLoading)
@@ -129,15 +453,23 @@ export default function ProfileModify() {
   if (!profileData)
     return <div className="error-message">프로필 정보를 찾을 수 없습니다.</div>;
 
-  const selectedTeam = getSelectedTeam();
+  const selectedTeam = resolveTeamDisplay(profileData.teamName);
+  const regionDisplay = getRegionDisplay(selectedTeam);
+
+  const selectedNationalityOption = COUNTRY_OPTIONS.find(
+    (opt) => opt.value === profileData.nationality
+  );
+  
+  const selectedPositionOption = POSITION_OPTIONS.find(
+    (opt) => opt.value === profileData.position
+  );
+
 
   return (
     <div className="profile-main">
-      {/* ⛔️ 상단 메뉴는 헤더에 있으므로 제거함 */}
-
       <div className="profile-container">
         <div className="profile-title-container">
-          <h1 className="profile-title">선수 프로필</h1>
+          <h1 className="profile-title">내 프로필 수정</h1>
         </div>
 
         <div className="profile-content">
@@ -175,15 +507,17 @@ export default function ProfileModify() {
 
           <div className="profile-info-section">
             <div className="profile-info-grid">
+              {/* R1: 이름, 이메일 */}
               <div className="profile-form-group">
-                <label>성명</label>
+                <label>이름</label>
                 <input
-                  id="fullName"
-                  name="fullName"
+                  id="realName"
+                  name="realName"
                   type="text"
-                  value={profileData.fullName}
+                  value={profileData.realName}
                   onChange={handleChange}
                   className="profile-input"
+                  placeholder="실명"
                 />
               </div>
               <div className="profile-form-group">
@@ -195,18 +529,69 @@ export default function ProfileModify() {
                   value={profileData.email}
                   onChange={handleChange}
                   className="profile-input"
+                  placeholder="example@email.com"
                 />
               </div>
+              
+              {/* R2: 전화, 국적 */}
+              <div className="profile-form-group">
+                <label>전화</label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={profileData.phone}
+                  onChange={handleChange}
+                  className="profile-input"
+                  placeholder="010-xxxx-xxxx"
+                />
+              </div>
+              <div className="profile-form-group">
+                <label>국적</label>
+                <Select
+                    inputId="nationality"
+                    classNamePrefix="nationality-mod"
+                    placeholder="국가 선택"
+                    options={COUNTRY_OPTIONS}
+                    components={{ Option, SingleValue, DropdownIndicator: NullIndicator }}
+                    styles={selectStyles}
+                    value={selectedNationalityOption}
+                    onChange={(opt) => handleSelectChange('nationality', opt)}
+                />
+              </div>
+
+              {/* R3: 별명(ID) (Full Width) */}
+              <div className="profile-form-group full-width">
+                <label>별명(ID)</label>
+                <input
+                  id="playerID"
+                  name="playerID"
+                  type="text"
+                  value={profileData.playerID}
+                  onChange={handleChange}
+                  className="profile-input"
+                  placeholder="선수 별명/ID"
+                />
+              </div>
+
+              {/* R4: 주소 (Full Width) - 주소 찾기 버튼 제거 및 클릭 이벤트 추가 */}
               <div className="profile-form-group full-width">
                 <label>주소</label>
+                {/* 주소 입력 필드만 남기고 클릭 시 검색 실행 */}
                 <input
                   id="address1"
                   name="address1"
                   type="text"
                   value={profileData.address1}
                   onChange={handleChange}
+                  onClick={handleAddressSearch} // 클릭 시 검색 함수 호출
                   className="profile-input"
+                  placeholder="주소 검색 (클릭)"
+                  readOnly // 주소 검색을 통해서만 입력되도록 읽기 전용 설정
+                  style={{ cursor: 'pointer' }} // 클릭 가능함을 시각적으로 표시
                 />
+                
+                {/* 상세 주소 입력 필드 (readOnly 해제) */}
                 <input
                   id="address2"
                   name="address2"
@@ -214,6 +599,7 @@ export default function ProfileModify() {
                   value={profileData.address2}
                   onChange={handleChange}
                   className="profile-input mt-2"
+                  placeholder="상세 주소"
                 />
               </div>
             </div>
@@ -228,6 +614,7 @@ export default function ProfileModify() {
                   value={profileData.height}
                   onChange={handleChange}
                   className="profile-input"
+                  pattern="[0-9]*"
                 />
               </div>
               <div className="profile-form-group">
@@ -239,6 +626,7 @@ export default function ProfileModify() {
                   value={profileData.weight}
                   onChange={handleChange}
                   className="profile-input"
+                  pattern="[0-9]*"
                 />
               </div>
               <div className="profile-form-group">
@@ -250,6 +638,7 @@ export default function ProfileModify() {
                   value={profileData.age}
                   onChange={handleChange}
                   className="profile-input"
+                  pattern="[0-9]*"
                 />
               </div>
               <div className="profile-form-group">
@@ -261,45 +650,53 @@ export default function ProfileModify() {
                   value={profileData.career}
                   onChange={handleChange}
                   className="profile-input"
+                  pattern="[0-9]*"
                 />
               </div>
             </div>
 
+            {/* 포지션, 지역 / 리그, 팀 */}
             <div className="profile-info-three-column">
               <div className="profile-form-group">
                 <label>포지션</label>
-                <input
-                  id="position"
-                  name="position"
-                  type="text"
-                  value={profileData.position}
-                  onChange={handleChange}
-                  className="profile-input"
+                <Select
+                    inputId="position"
+                    name="position"
+                    classNamePrefix="position-select-mod"
+                    placeholder="포지션 선택"
+                    options={POSITION_OPTIONS}
+                    components={{ 
+                        Option: PositionOption, 
+                        SingleValue: PositionSingleValue, 
+                        DropdownIndicator: NullIndicator 
+                    }} 
+                    isSearchable={false}
+                    styles={selectStyles}
+                    value={selectedPositionOption}
+                    onChange={(opt) => handleSelectChange('position', opt)}
                 />
               </div>
+              
               <div className="profile-form-group">
-                <label>지역</label>
-                <p className="profile-input">
-                  {profileData.region === 'seoul-first'
-                    ? '서울 1부 리그'
-                    : profileData.region === 'seoul-second'
-                    ? '서울 2부 리그'
-                    : profileData.region === 'adult'
-                    ? '사회인 리그'
-                    : 'N/A'}
+                <label>지역 / 리그</label>
+                {/* 지역/리그는 수정 항목이 아닙니다. */}
+                <p className="profile-input static-info">
+                  {regionDisplay}
                 </p>
               </div>
+              
               <div className="profile-form-group">
                 <label>팀</label>
-                <div className="profile-team-display">
+                {/* 팀 정보도 수정 항목이 아닙니다. */}
+                <div className="profile-team-display profile-input static-info">
                   {selectedTeam.logo && (
                     <img
                       src={selectedTeam.logo}
-                      alt={selectedTeam.label}
+                      alt={selectedTeam.name}
                       className="profile-team-icon"
                     />
                   )}
-                  <p>{selectedTeam.label}</p>
+                  <p>{selectedTeam.name}</p>
                 </div>
               </div>
             </div>
@@ -334,9 +731,9 @@ export default function ProfileModify() {
               <button
                 type="button"
                 className="profilepasswordToggleButton"
-                tabIndex={-1} // ← 탭으로 선택 안 되게
+                tabIndex={-1} 
                 aria-hidden="true"
-                onMouseDown={(e) => e.preventDefault()} // ← 클릭해도 인풋 포커스 유지
+                onMouseDown={(e) => e.preventDefault()} 
                 onClick={() => setShowCurrentPassword((s) => !s)}
               >
                 <img src={showCurrentPassword ? EyeActive : Eye} alt="" />
@@ -392,7 +789,6 @@ export default function ProfileModify() {
               </button>
             </div>
           </div>
-
           <div className="profile-save-container">
             <button
               onClick={handlePasswordSave}
