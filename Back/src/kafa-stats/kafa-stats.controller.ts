@@ -645,4 +645,174 @@ export class KafaStatsController {
       };
     }
   }
+
+  // 저장된 플레이 데이터 조회 API
+  @Get('play-data/:matchId')
+  @ApiOperation({
+    summary: '🏈 경기 플레이별 상세 데이터 조회',
+    description: `
+    ## 🏈 저장된 플레이별 상세 데이터 조회
+    
+    크롤링하여 저장된 경기의 플레이별 상세 데이터를 조회합니다.
+    
+    ### 📋 포함 데이터
+    - 쿼터별 모든 플레이 데이터
+    - 선수별 플레이 정보 (QB, 태클, 게인 야드 등)
+    - 다운, 볼 위치, 득점 정보
+    
+    ### 🔍 선택 사항
+    - quarter 파라미터로 특정 쿼터만 조회 가능
+    `,
+  })
+  @ApiParam({
+    name: 'matchId',
+    description: '경기 ID',
+    example: 295,
+  })
+  @ApiQuery({
+    name: 'quarter',
+    description: '특정 쿼터 (1qtr, 2qtr, 3qtr, 4qtr, SD)',
+    required: false,
+    example: '1qtr',
+  })
+  async getPlayData(
+    @Param('matchId') matchId: string,
+    @Query('quarter') quarter?: string
+  ) {
+    try {
+      const playData = await this.kafaStatsService.getPlayDataFromDB(parseInt(matchId), quarter);
+      
+      // 쿼터별로 그룹핑
+      const groupedData = playData.reduce((acc, play) => {
+        if (!acc[play.quarter]) {
+          acc[play.quarter] = [];
+        }
+        acc[play.quarter].push(play);
+        return acc;
+      }, {});
+
+      return {
+        success: true,
+        message: `플레이 데이터 조회 성공`,
+        data: {
+          matchId: parseInt(matchId),
+          totalPlays: playData.length,
+          quarters: groupedData,
+          playsByQuarter: Object.keys(groupedData).map(q => ({
+            quarter: q,
+            playCount: groupedData[q].length
+          }))
+        },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `플레이 데이터 조회 실패: ${error.message}`,
+      };
+    }
+  }
+
+  // 경기 기록지 통계 계산 API
+  @Get('game-record/:matchId')
+  @ApiOperation({
+    summary: '📊 경기 기록지 통계 분석',
+    description: `
+    ## 📊 경기 기록지 통계 분석 및 계산
+    
+    저장된 플레이 데이터를 바탕으로 경기 기록지에 필요한 모든 통계를 계산합니다.
+    
+    ### 📋 분석되는 통계
+    
+    **경기 일반 정보**
+    - 경기 ID, 홈팀, 어웨이팀
+    - 총 플레이 수
+    
+    **팀별 상세 통계**
+    - 총 플레이 수 (러싱/패싱 구분)
+    - 총 획득 야드 (러싱/패싱 구분)
+    - 턴오버 (펌블 리커버리, 인터셉션)
+    - 반칙 횟수 및 야드
+    - 득점 횟수
+    - 3rd Down 성공률
+    
+    **쿼터별 통계**
+    - 쿼터별 플레이 수
+    - 쿼터별 득점 수
+    
+    ### 🎯 활용 방안
+    - 클립바 시스템 연동 (3rd Down% 등)
+    - 경기 기록지 자동 생성
+    - 팀 분석 자료 제공
+    `,
+  })
+  @ApiParam({
+    name: 'matchId',
+    description: '분석할 경기 ID',
+    example: 295,
+  })
+  @ApiQuery({
+    name: 'quarter',
+    description: '특정 쿼터만 분석 (선택사항)',
+    required: false,
+    enum: ['1qtr', '2qtr', '3qtr', '4qtr', 'SD'],
+    example: '1qtr',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 경기 기록지 통계 분석 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '경기 295 기록지 통계 계산 완료',
+        data: {
+          matchId: 295,
+          homeTeam: 'KI',
+          awayTeam: 'YS', 
+          totalPlays: 127,
+          teamStats: {
+            'KI': {
+              teamName: 'KI',
+              totalPlays: 65,
+              rushingPlays: 45,
+              passingPlays: 20,
+              totalYards: 284,
+              rushingYards: 180,
+              passingYards: 104,
+              turnovers: 2,
+              penalties: 8,
+              penaltyYards: 75,
+              scores: 3,
+              thirdDownAttempts: 12,
+              thirdDownConversions: 7,
+              thirdDownPercentage: 58
+            }
+          },
+          quarterStats: {
+            '1qtr': { plays: 35, scores: 1 },
+            '2qtr': { plays: 36, scores: 2 },
+            '3qtr': { plays: 25, scores: 0 },
+            '4qtr': { plays: 31, scores: 1 }
+          }
+        }
+      }
+    }
+  })
+  async calculateGameRecordStats(
+    @Param('matchId') matchId: string,
+    @Query('quarter') quarter?: string
+  ) {
+    try {
+      const stats = await this.kafaStatsService.calculateGameRecordStats(
+        parseInt(matchId),
+        quarter
+      );
+
+      return stats;
+    } catch (error) {
+      return {
+        success: false,
+        message: `경기 기록지 통계 계산 실패: ${error.message}`,
+      };
+    }
+  }
 }
