@@ -8,12 +8,17 @@ import { CookieJar } from 'tough-cookie';
 import { 
   TeamOffenseStats, 
   PlayerStats, 
-  KafaStatsOptions 
+  KafaStatsOptions,
+  GameRecordStats
 } from './interfaces/kafa-stats.interface';
 import { 
   KafaPlayerStats, 
   KafaPlayerStatsDocument 
 } from '../schemas/kafa-player-stats.schema';
+import {
+  GamePlayData,
+  GamePlayDataDocument
+} from '../schemas/game-play-data.schema';
 import { parseRushingYards } from './utils/parse-rushing-yards.util';
 
 @Injectable()
@@ -27,6 +32,8 @@ export class KafaStatsService {
   constructor(
     @InjectModel(KafaPlayerStats.name)
     private kafaPlayerStatsModel: Model<KafaPlayerStatsDocument>,
+    @InjectModel(GamePlayData.name)
+    private gamePlayDataModel: Model<GamePlayDataDocument>,
   ) {
     // 쿠키를 유지하는 axios 인스턴스 생성
     this.cookieJar = new CookieJar();
@@ -924,11 +931,344 @@ export class KafaStatsService {
         }
       };
       
+      // 쿼터별 플레이 데이터 수집 추가
+      const quarterPlayData = await this.crawlQuarterPlayData(matchId);
+      
+      // circular reference를 피하기 위해 안전하게 변환
+      try {
+        const safeQuarterPlayData = JSON.parse(JSON.stringify(quarterPlayData));
+        (matchData as any).quarterPlayData = safeQuarterPlayData;
+      } catch (jsonError) {
+        this.logger.warn(`⚠️ quarterPlayData JSON 변환 실패, 요약 정보만 포함: ${jsonError.message}`);
+        (matchData as any).quarterPlayData = {
+          summary: `${Object.keys(quarterPlayData).length}개 쿼터 데이터 수집됨`,
+          quarters: Object.keys(quarterPlayData),
+          error: 'circular_reference_prevented'
+        };
+      }
+
+      // 플레이 데이터를 DB에 저장
+      await this.savePlayDataToDB(matchId, quarterPlayData);
+
       this.logger.log(`✅ 전체 경기 데이터 크롤링 완료: ${matchData.meta.totalInputs}개 input, ${matchData.meta.totalSelects}개 select, ${matchData.meta.totalTables}개 테이블`);
       return matchData;
     } catch (error) {
       this.logger.error(`❌ 경기 데이터 크롤링 실패: ${error.message}`);
       throw new Error(`Failed to crawl match data: ${error.message}`);
+    }
+  }
+
+  // 쿼터별 플레이 데이터 크롤링
+  async crawlQuarterPlayData(matchId: number): Promise<any> {
+    this.logger.log(`🏈 쿼터별 플레이 데이터 크롤링 시작: Match ID ${matchId}`);
+    
+    const quarters = ['1qtr', '2qtr', '3qtr', '4qtr', 'SD'];
+    const quarterData = {};
+
+    try {
+      for (const qtr of quarters) {
+        this.logger.log(`⚡ ${qtr.toUpperCase()} 플레이 데이터 수집 중...`);
+        
+        const playData = await this.getQuarterData(matchId, qtr);
+        quarterData[qtr] = playData;
+        
+        this.logger.log(`✅ ${qtr.toUpperCase()} 데이터 수집 완료: ${playData?.plays?.length || 0}개 플레이`);
+      }
+
+      this.logger.log(`🏆 전체 쿼터별 플레이 데이터 크롤링 완료`);
+      return quarterData;
+    } catch (error) {
+      this.logger.error(`❌ 쿼터별 플레이 데이터 크롤링 실패: ${error.message}`);
+      return {};
+    }
+  }
+
+  // 특정 쿼터의 플레이 데이터 수집
+  async getQuarterData(matchId: number, quarter: string): Promise<any> {
+    try {
+      // subadmin 경로를 사용해야 할 수도 있음
+      const ajaxUrl = `${this.kafaBaseUrl}/subadmin/ajax_result.php`;
+      
+      // FormData 생성
+      const formData = new URLSearchParams();
+      formData.append('result_idx', matchId.toString());
+      formData.append('qtr', quarter);
+      formData.append('mode', 'read_result');
+
+      this.logger.log(`🔍 ${quarter.toUpperCase()} AJAX 요청: ${ajaxUrl}`);
+      this.logger.log(`📤 전송 데이터: ${formData.toString()}`);
+
+      // KAFA 사이트의 정확한 헤더 재현
+      const response = await this.axiosInstance.post(ajaxUrl, formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Requested-With': 'XMLHttpRequest',
+          'Referer': `${this.kafaBaseUrl}/subadmin/league_matchedit.html?L_index=${matchId}`,
+          'Origin': this.kafaBaseUrl
+        },
+      });
+
+      this.logger.log(`📥 ${quarter.toUpperCase()} 응답 타입: ${typeof response.data}`);
+      this.logger.log(`📥 ${quarter.toUpperCase()} 응답 길이: ${response.data?.length || 0}자`);
+      this.logger.log(`📥 ${quarter.toUpperCase()} 응답 내용: ${JSON.stringify(response.data)?.substring(0, 300)}...`);
+
+      if (response.data) {
+        // 이미 객체인 경우 (axios가 자동으로 JSON 파싱함)
+        if (typeof response.data === 'object' && response.data.text && response.data.count !== undefined) {
+          this.logger.log(`✅ ${quarter.toUpperCase()} JSON 객체 확인됨 - ${response.data.count}개 플레이`);
+          return this.parsePlayData(response.data, quarter);
+        }
+        // 문자열인 경우 JSON 파싱 시도
+        else if (typeof response.data === 'string') {
+          try {
+            const jsonData = JSON.parse(response.data);
+            this.logger.log(`✅ ${quarter.toUpperCase()} JSON 파싱 성공`);
+            return this.parsePlayData(jsonData, quarter);
+          } catch (jsonError) {
+            // HTML 응답인 경우 파싱
+            this.logger.log(`🔄 ${quarter.toUpperCase()} HTML로 파싱 시도`);
+            return this.parseHtmlPlayData(response.data, quarter);
+          }
+        }
+      }
+
+      return { quarter, plays: [], count: 0 };
+    } catch (error) {
+      this.logger.warn(`⚠️ ${quarter.toUpperCase()} 데이터 수집 실패: ${error.message}`);
+      return { quarter, plays: [], count: 0, error: error.message };
+    }
+  }
+
+  // JSON 형태 플레이 데이터 파싱
+  private parsePlayData(data: any, quarter: string): any {
+    try {
+      if (data.text && data.count !== undefined) {
+        // HTML 테이블 파싱 (table 태그로 감싸기)
+        const wrappedHtml = `<table>${data.text}</table>`;
+        const $ = cheerio.load(wrappedHtml);
+        const plays = [];
+
+        $('tr').each((index, row) => {
+          const $row = $(row);
+          const cells = [];
+          
+          $row.find('td, th').each((cellIdx, cell) => {
+            const $cell = $(cell);
+            cells.push({
+              text: $cell.text().trim(),
+              html: $cell.html()?.toString() || '',
+              className: $cell.attr('class') || ''
+            });
+          });
+
+          if (cells.length > 0) {
+            // 플레이 데이터 구조화
+            const playData = this.structurePlayData(cells, index);
+            if (playData && Object.keys(playData).length > 0) {
+              plays.push(playData);
+            }
+          }
+        });
+
+        return {
+          quarter,
+          plays,
+          count: data.count || plays.length,
+          rawHtml: typeof data.text === 'string' ? data.text : ''
+        };
+      }
+      
+      return { quarter, plays: [], count: 0 };
+    } catch (error) {
+      this.logger.error(`❌ ${quarter} JSON 플레이 데이터 파싱 실패: ${error.message}`);
+      return { quarter, plays: [], count: 0, error: error.message };
+    }
+  }
+
+  // HTML 형태 플레이 데이터 파싱
+  private parseHtmlPlayData(html: string, quarter: string): any {
+    try {
+      const wrappedHtml = `<table>${html}</table>`;
+      const $ = cheerio.load(wrappedHtml);
+      const plays = [];
+
+      $('tr').each((index, row) => {
+        const $row = $(row);
+        const cells = [];
+        
+        $row.find('td, th').each((cellIdx, cell) => {
+          const $cell = $(cell);
+          cells.push({
+            text: $cell.text().trim(),
+            html: $cell.html()?.toString() || '',
+            className: $cell.attr('class') || ''
+          });
+        });
+
+        if (cells.length > 0) {
+          const playData = this.structurePlayData(cells, index);
+          if (playData && Object.keys(playData).length > 0) {
+            plays.push(playData);
+          }
+        }
+      });
+
+      return {
+        quarter,
+        plays,
+        count: plays.length,
+        rawHtml: typeof html === 'string' ? html : ''
+      };
+    } catch (error) {
+      this.logger.error(`❌ ${quarter} HTML 플레이 데이터 파싱 실패: ${error.message}`);
+      return { quarter, plays: [], count: 0, error: error.message };
+    }
+  }
+
+  // 플레이 데이터 구조화 (스크린샷 기준)
+  private structurePlayData(cells: any[], index: number): any {
+    if (cells.length < 10) return null; // 최소한의 셀 개수 체크 (20 → 10으로 완화)
+
+    try {
+      // 디버깅을 위한 로그 (첫 번째 플레이만)
+      if (index === 1) {
+        this.logger.log(`🔍 첫 번째 플레이 셀 분석 (총 ${cells.length}개 셀):`);
+        cells.slice(0, 15).forEach((cell, idx) => {
+          this.logger.log(`  셀 ${idx}: "${cell.text}" (class: ${cell.className})`);
+        });
+      }
+
+      return {
+        playNumber: index,
+        gameTime: cells[2]?.text?.replace(/\s+/g, ' ') || '',
+        offenseTeam: cells[3]?.text || '',
+        ballOn: cells[4]?.text || '',
+        down: cells[5]?.text || '',
+        qbPasser: cells[6]?.text || '',
+        playDetail: cells[7]?.text || '',
+        yards: cells[8]?.text || '',
+        result: cells[9]?.text || '',
+        sack: cells[10]?.text || '',
+        gainYards: {
+          offense: cells[11]?.text || '',
+          penalty: cells[12]?.text || '',
+          total: cells[13]?.text || ''
+        },
+        kickReturn: {
+          playerNumber: cells[14]?.text || '',
+          yards: cells[15]?.text || ''
+        },
+        fumble: {
+          playerNumber: cells[16]?.text || '',
+        },
+        fumbleRecovery: {
+          playerNumber: cells[17]?.text || '',
+          yards: cells[18]?.text || ''
+        },
+        interception: {
+          playerNumber: cells[19]?.text || '',
+          yards: cells[20]?.text || ''
+        },
+        penalty: cells[21]?.text || '',
+        penaltyName: cells[22]?.text || '',
+        firstDown: cells[23]?.text || '',
+        remark: cells[24]?.text || '',
+        score: {
+          type: cells[25]?.text || '',
+          points: cells[26]?.text || ''
+        },
+        rawCells: cells.map(cell => ({
+          text: cell.text,
+          html: cell.html,
+          className: cell.className
+        }))
+      };
+    } catch (error) {
+      this.logger.warn(`⚠️ 플레이 데이터 구조화 실패 (Row ${index}): ${error.message}`);
+      return null;
+    }
+  }
+
+  // 플레이 데이터를 DB에 저장
+  async savePlayDataToDB(matchId: number, quarterData: any): Promise<void> {
+    this.logger.log(`💾 플레이 데이터 DB 저장 시작: Match ID ${matchId}`);
+    
+    let totalSaved = 0;
+    let totalErrors = 0;
+
+    try {
+      // 기존 데이터 삭제 (재크롤링 시 중복 방지)
+      const deleteResult = await this.gamePlayDataModel.deleteMany({ matchId });
+      this.logger.log(`🗑️ 기존 데이터 삭제: ${deleteResult.deletedCount}개`);
+
+      for (const [quarter, data] of Object.entries(quarterData as any)) {
+        const quarterPlayData = data as any;
+        if (quarterPlayData?.plays && Array.isArray(quarterPlayData.plays)) {
+          for (const play of quarterPlayData.plays) {
+            try {
+              const playDocument = new this.gamePlayDataModel({
+                matchId,
+                quarter,
+                playNumber: play.playNumber,
+                gameTime: play.gameTime,
+                offenseTeam: play.offenseTeam,
+                ballOn: play.ballOn,
+                down: play.down,
+                qbPasser: play.qbPasser,
+                playToNumber: play.playToNumber,
+                kickPuntYards: play.kickPuntYards,
+                tackleBy: play.tackleBy,
+                sack: play.sack,
+                gainYards: play.gainYards,
+                kickReturn: play.kickReturn,
+                fumble: play.fumble,
+                fumbleRecovery: play.fumbleRecovery,
+                interception: play.interception,
+                penalty: play.penalty,
+                penaltyName: play.penaltyName,
+                firstDown: play.firstDown,
+                remark: play.remark,
+                score: play.score,
+                rawCells: JSON.parse(JSON.stringify(play.rawCells || [])),
+                rawHtml: quarterPlayData.rawHtml,
+                crawledAt: new Date()
+              });
+
+              await playDocument.save();
+              totalSaved++;
+            } catch (saveError) {
+              totalErrors++;
+              this.logger.warn(`⚠️ 플레이 데이터 저장 실패 (${quarter} Play ${play.playNumber}): ${saveError.message}`);
+            }
+          }
+        }
+      }
+
+      this.logger.log(`✅ 플레이 데이터 DB 저장 완료: ${totalSaved}개 저장, ${totalErrors}개 실패`);
+    } catch (error) {
+      this.logger.error(`❌ 플레이 데이터 DB 저장 실패: ${error.message}`);
+      throw error;
+    }
+  }
+
+  // 저장된 플레이 데이터 조회
+  async getPlayDataFromDB(matchId: number, quarter?: string): Promise<GamePlayData[]> {
+    try {
+      const filter: any = { matchId };
+      if (quarter) {
+        filter.quarter = quarter;
+      }
+
+      const playData = await this.gamePlayDataModel
+        .find(filter)
+        .sort({ quarter: 1, playNumber: 1 })
+        .lean();
+
+      this.logger.log(`📊 플레이 데이터 조회 완료: ${playData.length}개 플레이`);
+      return playData;
+    } catch (error) {
+      this.logger.error(`❌ 플레이 데이터 조회 실패: ${error.message}`);
+      throw error;
     }
   }
 
@@ -1013,5 +1353,259 @@ export class KafaStatsService {
         summary: null
       };
     }
+  }
+
+  /**
+   * 경기 기록지 통계 계산
+   * @param matchId 경기 ID
+   * @param quarter 특정 쿼터 (선택사항)
+   * @returns 경기 통계 데이터
+   */
+  async calculateGameRecordStats(matchId: number, quarter?: string): Promise<any> {
+    try {
+      this.logger.log(`📊 경기 ${matchId} 기록지 통계 계산 시작${quarter ? ` (${quarter})` : ''}`);
+
+      // MongoDB에서 플레이 데이터 조회
+      const query: any = { matchId };
+      if (quarter) {
+        query.quarter = quarter;
+      }
+
+      const plays = await this.gamePlayDataModel.find(query).exec();
+      
+      if (plays.length === 0) {
+        throw new Error(`경기 ${matchId}의 플레이 데이터를 찾을 수 없습니다.`);
+      }
+
+      // 팀 목록 추출
+      const teams = [...new Set(plays.map(play => play.offenseTeam).filter(team => team))];
+      this.logger.log(`🏈 참가 팀: ${teams.join(' vs ')}`);
+
+      // 통계 초기화
+      const stats = {
+        matchId,
+        homeTeam: teams[0] || '',
+        awayTeam: teams[1] || '',
+        totalPlays: plays.length,
+        teamStats: {} as any,
+        quarterStats: {} as any
+      };
+
+      // 팀별 통계 초기화
+      teams.forEach(team => {
+        stats.teamStats[team] = {
+          teamName: team,
+          totalPlays: 0,
+          rushingPlays: 0,
+          passingPlays: 0,
+          totalYards: 0,
+          rushingYards: 0,
+          passingYards: 0,
+          turnovers: 0,
+          penalties: 0,
+          penaltyYards: 0,
+          scores: 0,
+          thirdDownAttempts: 0,
+          thirdDownConversions: 0,
+          thirdDownPercentage: 0
+        };
+      });
+
+      // 쿼터별 통계 초기화
+      const quarters = [...new Set(plays.map(play => play.quarter).filter(q => q))];
+      quarters.forEach(q => {
+        stats.quarterStats[q] = {
+          plays: 0,
+          scores: 0
+        };
+      });
+
+      // 플레이별 분석
+      plays.forEach(play => {
+        const team = play.offenseTeam;
+        if (!team) return;
+
+        const teamStat = stats.teamStats[team];
+        const quarterStat = stats.quarterStats[play.quarter];
+
+        // 기본 카운트
+        teamStat.totalPlays++;
+        quarterStat.plays++;
+
+        // 패싱 vs 러싱 구분
+        const playType = this.determinePlayType(play);
+        
+        // 디버깅: 첫 10개 플레이만 로그 출력
+        if (play.playNumber <= 10) {
+          this.logger.log(`🔍 플레이 ${play.playNumber}: ${play.offenseTeam} - playType: ${playType}`);
+          this.logger.log(`  rawCells[7]: ${play.rawCells?.[7]?.text || 'undefined'}`);
+          this.logger.log(`  rawCells length: ${play.rawCells?.length || 0}`);
+          this.logger.log(`  gainYards.offense: ${play.gainYards?.offense || 'empty'}`);
+        }
+        
+        if (playType === 'PASS') {
+          teamStat.passingPlays++;
+          // 패싱 야드 계산 (gainYards.offense 또는 rawCells[8] 사용)
+          const passingYards = this.extractYards(play.gainYards?.offense || 
+                                                 (play.rawCells?.[8]?.text || '0'));
+          teamStat.passingYards += passingYards;
+        } else if (playType === 'RUSH') {
+          teamStat.rushingPlays++;
+          // 러싱 야드 계산 (gainYards.offense 사용)
+          const rushingYards = this.extractYards(play.gainYards?.offense || '0');
+          teamStat.rushingYards += rushingYards;
+        }
+
+        // 총 야드 계산
+        const totalYards = this.extractYards(play.gainYards?.total || '0');
+        teamStat.totalYards += totalYards;
+
+        // 턴오버 체크
+        if (play.fumbleRecovery?.playerNumber || play.interception?.playerNumber) {
+          teamStat.turnovers++;
+        }
+
+        // 반칙 체크 (penalty 필드에서 팀 구분)
+        if (play.penalty && play.penalty.trim()) {
+          const penaltyTeam = this.extractPenaltyTeam(play.penalty);
+          if (penaltyTeam === team) {
+            teamStat.penalties++;
+            const penaltyYards = this.extractPenaltyYards(play.penalty);
+            teamStat.penaltyYards += Math.abs(penaltyYards);
+          }
+        }
+
+        // 득점 체크 (remark 필드에서 터치다운, 추가점 등 확인)
+        const remark = play.remark || '';
+        let points = 0;
+        
+        // 터치다운: 6점
+        if (remark.includes('터치다운') || remark.includes('TD') || remark.includes('타격대용')) {
+          points = 6;
+        }
+        // 필드골 성공: 3점
+        else if (remark.includes('필드골') && remark.includes('성공')) {
+          points = 3;
+        }
+        // Try kick (추가점) 성공: 1점
+        else if (remark.includes('Try kick') && remark.includes('성공')) {
+          points = 1;
+        }
+        // 세이프티 성공: 2점 (상대팀에게)
+        else if (remark.includes('세이프티') && remark.includes('성공')) {
+          // 세이프티는 수비팀이 득점하므로 상대팀에 점수 추가
+          const otherTeam = teams.find(t => t !== team);
+          if (otherTeam && stats.teamStats[otherTeam]) {
+            stats.teamStats[otherTeam].scores += 2;
+            quarterStat.scores += 2;
+          }
+          points = 0; // 공격팀은 점수 없음
+        }
+        
+        if (points > 0) {
+          teamStat.scores += points;
+          quarterStat.scores += points;
+        }
+
+        // 3rd Down 분석
+        if (play.down && play.down.startsWith('3-')) {
+          teamStat.thirdDownAttempts++;
+          // FD 필드 또는 remark에서 1st down 확인
+          if ((play.firstDown && play.firstDown.trim() === 'FD') ||
+              (remark && (remark.includes('1st down') || remark.includes('FD')))) {
+            teamStat.thirdDownConversions++;
+          }
+        }
+      });
+
+      // 3rd Down 성공률 계산
+      Object.values(stats.teamStats).forEach((teamStat: any) => {
+        if (teamStat.thirdDownAttempts > 0) {
+          teamStat.thirdDownPercentage = Math.round(
+            (teamStat.thirdDownConversions / teamStat.thirdDownAttempts) * 100
+          );
+        }
+      });
+
+      this.logger.log(`✅ 경기 ${matchId} 통계 계산 완료: ${plays.length}개 플레이 분석`);
+      return {
+        success: true,
+        message: `경기 ${matchId} 기록지 통계 계산 완료`,
+        data: stats
+      };
+
+    } catch (error) {
+      this.logger.error(`❌ 경기 기록지 통계 계산 실패: ${error.message}`);
+      throw new Error(`경기 기록지 통계 계산 실패: ${error.message}`);
+    }
+  }
+
+  /**
+   * 야드 문자열에서 숫자 추출
+   * @param yardString "73YD", "10YD", "-5YD" 등
+   * @returns 숫자 값
+   */
+  private extractYards(yardString: string): number {
+    if (!yardString) return 0;
+    const match = yardString.match(/(-?\d+)/);
+    return match ? parseInt(match[1]) : 0;
+  }
+
+  /**
+   * 반칙 야드 추출
+   * @param penaltyString "YS-10YD", "KI+5YD" 등
+   * @returns 야드 값 (음수/양수 구분)
+   */
+  private extractPenaltyYards(penaltyString: string): number {
+    if (!penaltyString) return 0;
+    const match = penaltyString.match(/([+-]?\d+)YD/);
+    return match ? parseInt(match[1]) : 0;
+  }
+
+  /**
+   * 반칙 팀 추출
+   * @param penaltyString "YS-10YD", "HY+5YD" 등
+   * @returns 팀 코드 (YS, HY, KN 등)
+   */
+  private extractPenaltyTeam(penaltyString: string): string {
+    if (!penaltyString) return '';
+    const match = penaltyString.match(/^([A-Z]+)[+-]/);
+    return match ? match[1] : '';
+  }
+
+  /**
+   * 플레이 타입 판단 (러싱/패싱/기타)
+   * @param play 플레이 데이터
+   * @returns PASS, RUSH, KICK, PUNT, OTHER
+   */
+  private determinePlayType(play: any): string {
+    // rawCells[7]에 실제 플레이 타입이 있음 ("R → HY11", "P → KN12" 등)
+    let playTypeSource = '';
+    
+    if (play.rawCells && play.rawCells[7] && play.rawCells[7].text) {
+      playTypeSource = play.rawCells[7].text;
+    }
+    
+    // 패싱: "P → KN12" 패턴
+    if (playTypeSource.includes('P →')) {
+      return 'PASS';
+    }
+    
+    // 러싱: "R → HY30" 패턴  
+    if (playTypeSource.includes('R →')) {
+      return 'RUSH';
+    }
+    
+    // 킥: "K → KN08" 패턴
+    if (playTypeSource.includes('K →')) {
+      return 'KICK';
+    }
+    
+    // 펀트: "PT → HY71" 패턴
+    if (playTypeSource.includes('PT →')) {
+      return 'PUNT';
+    }
+    
+    return 'OTHER';
   }
 }

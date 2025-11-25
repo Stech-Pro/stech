@@ -42,3 +42,40 @@ export interface KafaStatsResponse<T> {
     stats: T[];
   };
 }
+
+// 경기 기록지 통계 인터페이스
+export interface GameRecordStats {
+  // 경기 일반 정보
+  matchId: number;
+  homeTeam: string;
+  awayTeam: string;
+  totalPlays: number;
+  
+  // 팀별 통계
+  teamStats: {
+    [teamCode: string]: {
+      teamName: string;
+      totalPlays: number;
+      rushingPlays: number;
+      passingPlays: number;
+      totalYards: number;
+      rushingYards: number;
+      passingYards: number;
+      turnovers: number;
+      penalties: number;
+      penaltyYards: number;
+      scores: number;
+      thirdDownAttempts: number;
+      thirdDownConversions: number;
+      thirdDownPercentage: number;
+    };
+  };
+  
+  // 쿼터별 통계
+  quarterStats: {
+    [quarter: string]: {
+      plays: number;
+      scores: number;
+    };
+  };
+}
