@@ -145,3 +145,6 @@ build/
 # Temporary files
 tmp/
 temp/
+
+# Documentation and progress files (private)
+docs/

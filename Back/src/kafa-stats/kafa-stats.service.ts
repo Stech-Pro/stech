@@ -15,10 +15,6 @@ import {
   KafaPlayerStats, 
   KafaPlayerStatsDocument 
 } from '../schemas/kafa-player-stats.schema';
-import {
-  GamePlayData,
-  GamePlayDataDocument
-} from '../schemas/game-play-data.schema';
 import { parseRushingYards } from './utils/parse-rushing-yards.util';
 
 @Injectable()
@@ -32,8 +28,6 @@ export class KafaStatsService {
   constructor(
     @InjectModel(KafaPlayerStats.name)
     private kafaPlayerStatsModel: Model<KafaPlayerStatsDocument>,
-    @InjectModel(GamePlayData.name)
-    private gamePlayDataModel: Model<GamePlayDataDocument>,
   ) {
     // 쿠키를 유지하는 axios 인스턴스 생성
     this.cookieJar = new CookieJar();
@@ -1125,6 +1119,31 @@ export class KafaStatsService {
     }
   }
 
+
+  // 셀들에서 패널티 정보를 유연하게 찾는 메서드
+  private findPenaltyInCells(cells: any[]): string {
+    // 패널티 패턴 (예: KN-5YD, HY-10YD, P-5YD 등)
+    const penaltyPattern = /^([A-Z]{1,3}[+-]?\d+YD|P[+-]\d+YD|DeclineYD|FD)$/;
+    
+    // cells 배열에서 패널티 패턴을 찾음 (19-23 인덱스 범위에서 우선 검색)
+    for (let i = 19; i <= 23; i++) {
+      const cellText = cells[i]?.text?.trim() || '';
+      if (cellText && penaltyPattern.test(cellText)) {
+        return cellText;
+      }
+    }
+    
+    // 못 찾으면 전체 셀에서 검색
+    for (let i = 0; i < cells.length; i++) {
+      const cellText = cells[i]?.text?.trim() || '';
+      if (cellText && penaltyPattern.test(cellText)) {
+        return cellText;
+      }
+    }
+    
+    return '';
+  }
+
   // 플레이 데이터 구조화 (스크린샷 기준)
   private structurePlayData(cells: any[], index: number): any {
     if (cells.length < 10) return null; // 최소한의 셀 개수 체크 (20 → 10으로 완화)
@@ -1138,8 +1157,11 @@ export class KafaStatsService {
         });
       }
 
+      // rawCells[0]에서 실제 플레이 번호 추출 (숫자만)
+      const actualPlayNumber = parseInt(cells[0]?.text?.replace(/\D/g, '') || index.toString());
+      
       return {
-        playNumber: index,
+        playNumber: actualPlayNumber,
         gameTime: cells[2]?.text?.replace(/\s+/g, ' ') || '',
         offenseTeam: cells[3]?.text || '',
         ballOn: cells[4]?.text || '',
@@ -1169,7 +1191,8 @@ export class KafaStatsService {
           playerNumber: cells[19]?.text || '',
           yards: cells[20]?.text || ''
         },
-        penalty: cells[21]?.text || '',
+        // 패널티는 여러 위치에 있을 수 있으므로 유연하게 검색
+        penalty: this.findPenaltyInCells(cells) || '',
         penaltyName: cells[22]?.text || '',
         firstDown: cells[23]?.text || '',
         remark: cells[24]?.text || '',
@@ -1198,7 +1221,9 @@ export class KafaStatsService {
 
     try {
       // 기존 데이터 삭제 (재크롤링 시 중복 방지)
-      const deleteResult = await this.gamePlayDataModel.deleteMany({ matchId });
+      // V2에서는 KafaMatch.plays 사용
+      // const deleteResult = await this.gamePlayDataModel.deleteMany({ matchId });
+      const deleteResult = { deletedCount: 0 };
       this.logger.log(`🗑️ 기존 데이터 삭제: ${deleteResult.deletedCount}개`);
 
       for (const [quarter, data] of Object.entries(quarterData as any)) {
@@ -1206,7 +1231,8 @@ export class KafaStatsService {
         if (quarterPlayData?.plays && Array.isArray(quarterPlayData.plays)) {
           for (const play of quarterPlayData.plays) {
             try {
-              const playDocument = new this.gamePlayDataModel({
+              // V2에서는 KafaMatch.plays 사용
+              const playDocument = {
                 matchId,
                 quarter,
                 playNumber: play.playNumber,
@@ -1232,9 +1258,9 @@ export class KafaStatsService {
                 rawCells: JSON.parse(JSON.stringify(play.rawCells || [])),
                 rawHtml: quarterPlayData.rawHtml,
                 crawledAt: new Date()
-              });
+              };
 
-              await playDocument.save();
+              // await playDocument.save(); // V2에서는 다른 방식으로 저장
               totalSaved++;
             } catch (saveError) {
               totalErrors++;
@@ -1252,17 +1278,19 @@ export class KafaStatsService {
   }
 
   // 저장된 플레이 데이터 조회
-  async getPlayDataFromDB(matchId: number, quarter?: string): Promise<GamePlayData[]> {
+  async getPlayDataFromDB(matchId: number, quarter?: string): Promise<any[]> {
     try {
       const filter: any = { matchId };
       if (quarter) {
         filter.quarter = quarter;
       }
 
-      const playData = await this.gamePlayDataModel
+      // V2에서는 KafaMatch에서 직접 조회
+      const playData = [] as any[];
+      /* await this.gamePlayDataModel
         .find(filter)
         .sort({ quarter: 1, playNumber: 1 })
-        .lean();
+        .lean(); */
 
       this.logger.log(`📊 플레이 데이터 조회 완료: ${playData.length}개 플레이`);
       return playData;
@@ -1371,7 +1399,8 @@ export class KafaStatsService {
         query.quarter = quarter;
       }
 
-      const plays = await this.gamePlayDataModel.find(query).exec();
+      // V2에서는 KafaMatch에서 직접 조회
+      const plays = [] as any[]; // await this.gamePlayDataModel.find(query).exec();
       
       if (plays.length === 0) {
         throw new Error(`경기 ${matchId}의 플레이 데이터를 찾을 수 없습니다.`);
@@ -1465,58 +1494,74 @@ export class KafaStatsService {
           teamStat.turnovers++;
         }
 
-        // 반칙 체크 (penalty 필드에서 팀 구분)
-        if (play.penalty && play.penalty.trim()) {
-          const penaltyTeam = this.extractPenaltyTeam(play.penalty);
-          if (penaltyTeam === team) {
-            teamStat.penalties++;
-            const penaltyYards = this.extractPenaltyYards(play.penalty);
-            teamStat.penaltyYards += Math.abs(penaltyYards);
-          }
-        }
+        // 반칙은 별도 처리로 이동 (공격/수비 구분 없이 처리하기 위해)
 
-        // 득점 체크 (remark 필드에서 터치다운, 추가점 등 확인)
-        const remark = play.remark || '';
-        let points = 0;
+        // 득점 체크 (score 컬럼 직접 사용)
+        const scoreTeam = play.score?.type?.trim() || '';
+        const scorePoints = parseInt(play.score?.points?.trim() || '0') || 0;
         
-        // 터치다운: 6점
-        if (remark.includes('터치다운') || remark.includes('TD') || remark.includes('타격대용')) {
-          points = 6;
-        }
-        // 필드골 성공: 3점
-        else if (remark.includes('필드골') && remark.includes('성공')) {
-          points = 3;
-        }
-        // Try kick (추가점) 성공: 1점
-        else if (remark.includes('Try kick') && remark.includes('성공')) {
-          points = 1;
-        }
-        // 세이프티 성공: 2점 (상대팀에게)
-        else if (remark.includes('세이프티') && remark.includes('성공')) {
-          // 세이프티는 수비팀이 득점하므로 상대팀에 점수 추가
-          const otherTeam = teams.find(t => t !== team);
-          if (otherTeam && stats.teamStats[otherTeam]) {
-            stats.teamStats[otherTeam].scores += 2;
-            quarterStat.scores += 2;
+        if (scorePoints > 0 && scoreTeam) {
+          // 득점한 팀의 통계에 점수 추가
+          if (stats.teamStats[scoreTeam]) {
+            stats.teamStats[scoreTeam].scores += scorePoints;
+            quarterStat.scores += scorePoints;
           }
-          points = 0; // 공격팀은 점수 없음
-        }
-        
-        if (points > 0) {
-          teamStat.scores += points;
-          quarterStat.scores += points;
         }
 
         // 3rd Down 분석
         if (play.down && play.down.startsWith('3-')) {
           teamStat.thirdDownAttempts++;
           // FD 필드 또는 remark에서 1st down 확인
+          const remark = play.remark || '';
           if ((play.firstDown && play.firstDown.trim() === 'FD') ||
               (remark && (remark.includes('1st down') || remark.includes('FD')))) {
             teamStat.thirdDownConversions++;
           }
         }
       });
+
+      // 패널티 별도 처리 (공격/수비 상관없이 전체 플레이에서 체크)
+      // 먼저 패널티 초기화
+      Object.values(stats.teamStats).forEach((teamStat: any) => {
+        teamStat.penalties = 0;
+        teamStat.penaltyYards = 0;
+      });
+      
+      this.logger.log(`🔍 패널티 처리 시작: ${plays.length}개 플레이 분석`);
+      let penaltyCount = 0;
+      
+      plays.forEach(play => {
+        const penaltyValue = play.penalty?.trim();
+        
+        // 패널티 필드가 있는 플레이 로그
+        if (penaltyValue) {
+          this.logger.log(`패널티 필드 발견: "${penaltyValue}" (${play.quarter} Play ${play.playNumber})`);
+          penaltyCount++;
+        }
+        
+        // 패널티가 있고, DeclineYD나 FD가 아닌 경우
+        if (penaltyValue && penaltyValue !== 'DeclineYD' && penaltyValue !== 'FD') {
+          let penaltyTeam = this.extractPenaltyTeam(penaltyValue);
+          
+          // P±YD 형식인 경우 현재 공격팀을 패널티 팀으로 간주
+          if (!penaltyTeam && penaltyValue.match(/^P[+-]\d+YD$/)) {
+            penaltyTeam = play.offenseTeam;
+          }
+          
+          if (penaltyTeam && stats.teamStats[penaltyTeam]) {
+            stats.teamStats[penaltyTeam].penalties++;
+            const penaltyYards = this.extractPenaltyYards(penaltyValue);
+            stats.teamStats[penaltyTeam].penaltyYards += Math.abs(penaltyYards);
+            
+            // 디버그 로그
+            this.logger.log(`✅ 패널티 카운트: ${penaltyValue} → 팀: ${penaltyTeam}, 야드: ${penaltyYards}, 플레이: ${play.quarter} ${play.playNumber}`);
+          } else {
+            this.logger.log(`❌ 패널티 팀 추출 실패: ${penaltyValue} → 팀: ${penaltyTeam}`);
+          }
+        }
+      });
+      
+      this.logger.log(`🔍 패널티 처리 완료: 총 ${penaltyCount}개 패널티 필드 발견`);
 
       // 3rd Down 성공률 계산
       Object.values(stats.teamStats).forEach((teamStat: any) => {
@@ -1607,5 +1652,259 @@ export class KafaStatsService {
     }
     
     return 'OTHER';
+  }
+
+  /**
+   * 스코어보드에서 Total(자동합산) 점수 추출
+   * @param matchData 크롤링된 경기 데이터
+   * @returns 홈팀/어웨이팀 총점 및 쿼터별 점수
+   */
+  private extractScoreboardTotals(matchData: any) {
+    const scores = {
+      home: { quarter1: 0, quarter2: 0, quarter3: 0, quarter4: 0, total: 0 },
+      away: { quarter1: 0, quarter2: 0, quarter3: 0, quarter4: 0, total: 0 }
+    };
+
+    // 완전한 크롤링 데이터에서 form input 찾기
+    if (matchData.data?.completePageData?.formData?.allInputs) {
+      const inputs = matchData.data.completePageData.formData.allInputs;
+      
+      inputs.forEach(input => {
+        if (input.id === 'L_score_total_home') {
+          scores.home.total = parseInt(input.value) || 0;
+        } else if (input.id === 'L_score_total_away') {
+          scores.away.total = parseInt(input.value) || 0;
+        } else if (input.id === 'L_score_1qr_home') {
+          scores.home.quarter1 = parseInt(input.value) || 0;
+        } else if (input.id === 'L_score_1qr_away') {
+          scores.away.quarter1 = parseInt(input.value) || 0;
+        } else if (input.id === 'L_score_2qr_home') {
+          scores.home.quarter2 = parseInt(input.value) || 0;
+        } else if (input.id === 'L_score_2qr_away') {
+          scores.away.quarter2 = parseInt(input.value) || 0;
+        } else if (input.id === 'L_score_3qr_home') {
+          scores.home.quarter3 = parseInt(input.value) || 0;
+        } else if (input.id === 'L_score_3qr_away') {
+          scores.away.quarter3 = parseInt(input.value) || 0;
+        } else if (input.id === 'L_score_4qr_home') {
+          scores.home.quarter4 = parseInt(input.value) || 0;
+        } else if (input.id === 'L_score_4qr_away') {
+          scores.away.quarter4 = parseInt(input.value) || 0;
+        }
+      });
+    }
+
+    return scores;
+  }
+
+  /**
+   * 경기 일반 정보 추출 (크롤링 데이터 기반)
+   * @param matchId 경기 ID
+   * @returns 경기 일반 정보
+   */
+  async getGameGeneralInfo(matchId: number): Promise<any> {
+    try {
+      this.logger.log(`📊 경기 ${matchId} 일반 정보 추출 시작`);
+
+      // 1. MongoDB에서 플레이 데이터 조회 (팀 정보 추출용)
+      // V2에서는 KafaMatch에서 직접 조회
+      const samplePlay = null; // await this.gamePlayDataModel.findOne({ matchId }).exec();
+      
+      // 2. 크롤링 파일에서 기본 정보 추출
+      const fs = require('fs');
+      const path = require('path');
+      
+      let matchInfo = null;
+      let quarterData = null;
+      
+      // crawling_result.json에서 기본 정보 추출
+      const crawlingResultPath = path.join(__dirname, '../../../crawling_result.json');
+      if (fs.existsSync(crawlingResultPath)) {
+        const crawlingResult = JSON.parse(fs.readFileSync(crawlingResultPath, 'utf8'));
+        if (crawlingResult.data.matchId === matchId) {
+          matchInfo = crawlingResult.data.matchInfo;
+        }
+      }
+      
+      // crawling_result_qtr1.json에서 팀 정보 추출
+      const quarterDataPath = path.join(__dirname, '../../../crawling_result_qtr1.json');
+      if (fs.existsSync(quarterDataPath)) {
+        const quarterResult = JSON.parse(fs.readFileSync(quarterDataPath, 'utf8'));
+        if (quarterResult.data.matchId === matchId) {
+          quarterData = quarterResult.data;
+        }
+      }
+      
+      if (!matchInfo) {
+        throw new Error(`경기 ${matchId}의 기본 정보를 찾을 수 없습니다.`);
+      }
+      
+      // 3. 팀 정보 추출 (쿼터 데이터에서)
+      const teams = new Set<string>();
+      let homeTeam = '';
+      let awayTeam = '';
+      
+      if (quarterData && quarterData.quarters) {
+        Object.keys(quarterData.quarters).forEach(quarter => {
+          quarterData.quarters[quarter].forEach((play: any) => {
+            if (play.offenseTeam) {
+              teams.add(play.offenseTeam);
+            }
+            
+            // 킥리턴에서 수비팀 추출
+            if (play.kickReturn?.playerNumber) {
+              const kickInfo = play.kickReturn.playerNumber;
+              if (kickInfo.includes('→')) {
+                const parts = kickInfo.split('→');
+                if (parts.length > 1 && parts[1].match(/^[A-Z]{2,3}/)) {
+                  const team = parts[1].substring(0, 2);
+                  teams.add(team);
+                }
+              }
+            }
+          });
+        });
+      }
+      
+      const teamList = Array.from(teams).sort();
+      homeTeam = teamList[0] || '';
+      awayTeam = teamList[1] || '';
+      
+      // 4. Total(자동합산) 스코어 추출
+      let finalScores = null;
+      
+      // crawling_result.json에서 Total(자동합산) 점수 추출 시도
+      if (fs.existsSync(crawlingResultPath)) {
+        const crawlingResult = JSON.parse(fs.readFileSync(crawlingResultPath, 'utf8'));
+        if (crawlingResult.data.matchId === matchId) {
+          finalScores = this.extractScoreboardTotals(crawlingResult);
+          this.logger.log(`✅ Total(자동합산) 점수 추출: 홈 ${finalScores.home.total} - 어웨이 ${finalScores.away.total}`);
+        }
+      }
+      
+      // Total(자동합산) 점수를 팀별로 매핑
+      const teamScores = { [homeTeam]: 0, [awayTeam]: 0 };
+      const quarterScores = {
+        q1: { [homeTeam]: 0, [awayTeam]: 0 },
+        q2: { [homeTeam]: 0, [awayTeam]: 0 },
+        q3: { [homeTeam]: 0, [awayTeam]: 0 },
+        q4: { [homeTeam]: 0, [awayTeam]: 0 }
+      };
+      
+      if (finalScores) {
+        // 홈팀은 첫 번째 팀, 어웨이팀은 두 번째 팀
+        teamScores[homeTeam] = finalScores.home.total;
+        teamScores[awayTeam] = finalScores.away.total;
+        
+        // 쿼터별 점수도 매핑
+        quarterScores.q1[homeTeam] = finalScores.home.quarter1;
+        quarterScores.q1[awayTeam] = finalScores.away.quarter1;
+        quarterScores.q2[homeTeam] = finalScores.home.quarter2;
+        quarterScores.q2[awayTeam] = finalScores.away.quarter2;
+        quarterScores.q3[homeTeam] = finalScores.home.quarter3;
+        quarterScores.q3[awayTeam] = finalScores.away.quarter3;
+        quarterScores.q4[homeTeam] = finalScores.home.quarter4;
+        quarterScores.q4[awayTeam] = finalScores.away.quarter4;
+      } else {
+        // 폴백: 기존 방식으로 계산 (플레이별 득점 합계)
+        this.logger.warn(`⚠️ Total(자동합산) 점수 없음, 플레이별 계산으로 폴백`);
+        
+        if (quarterData && quarterData.quarters) {
+          Object.keys(quarterData.quarters).forEach(quarter => {
+            quarterData.quarters[quarter].forEach((play: any) => {
+              if (play.score && play.score.type) {
+                const points = parseInt(play.score.type) || 0;
+                const scoreTeam = play.offenseTeam;
+                
+                if (points > 0 && scoreTeam && teamScores.hasOwnProperty(scoreTeam)) {
+                  teamScores[scoreTeam] += points;
+                  
+                  if (quarter === '1qtr') {
+                    quarterScores.q1[scoreTeam] += points;
+                  } else if (quarter === '2qtr') {
+                    quarterScores.q2[scoreTeam] += points;
+                  } else if (quarter === '3qtr') {
+                    quarterScores.q3[scoreTeam] += points;
+                  } else if (quarter === '4qtr') {
+                    quarterScores.q4[scoreTeam] += points;
+                  }
+                }
+              }
+            });
+          });
+        }
+      }
+      
+      // 5. 리그 타입 추출 (대회명에서)
+      let leagueType = '전체';
+      if (matchInfo.tournament.includes('1부')) {
+        leagueType = '1부';
+      } else if (matchInfo.tournament.includes('2부')) {
+        leagueType = '2부';
+      }
+      
+      // 6. 팀 풀네임 매핑 (일반적인 대학교 코드 매핑)
+      const teamNameMap = {
+        'HY': '한양대학교',
+        'KN': '고려대학교',
+        'YS': '연세대학교',
+        'KI': '경일대학교',
+        'SN': '성균관대학교',
+        'DK': '단국대학교',
+        'CU': '중앙대학교'
+      };
+      
+      const homeTeamFullName = teamNameMap[homeTeam as keyof typeof teamNameMap] || `${homeTeam} 대학교`;
+      const awayTeamFullName = teamNameMap[awayTeam as keyof typeof teamNameMap] || `${awayTeam} 대학교`;
+      
+      // 7. 결과 구성
+      const gameGeneralInfo = {
+        matchId,
+        leagueType,
+        gameDate: new Date(matchInfo.date),
+        venue: matchInfo.location,
+        
+        homeTeam: {
+          fullName: homeTeamFullName,
+          code: homeTeam,
+          isHome: true
+        },
+        
+        awayTeam: {
+          fullName: awayTeamFullName,
+          code: awayTeam,
+          isHome: false
+        },
+        
+        finalScore: {
+          home: teamScores[homeTeam],
+          away: teamScores[awayTeam]
+        },
+        
+        quarterScores: {
+          q1: { home: quarterScores.q1[homeTeam], away: quarterScores.q1[awayTeam] },
+          q2: { home: quarterScores.q2[homeTeam], away: quarterScores.q2[awayTeam] },
+          q3: { home: quarterScores.q3[homeTeam], away: quarterScores.q3[awayTeam] },
+          q4: { home: quarterScores.q4[homeTeam], away: quarterScores.q4[awayTeam] }
+        },
+        
+        processedAt: new Date(),
+        dataSource: 'crawled'
+      };
+      
+      this.logger.log(`✅ 경기 ${matchId} 일반 정보 추출 완료`);
+      this.logger.log(`🏈 ${homeTeamFullName} vs ${awayTeamFullName}`);
+      this.logger.log(`🏆 최종 스코어: ${teamScores[homeTeam]} - ${teamScores[awayTeam]}`);
+      
+      return {
+        success: true,
+        message: `경기 ${matchId} 일반 정보 추출 완료`,
+        data: gameGeneralInfo
+      };
+      
+    } catch (error) {
+      this.logger.error(`❌ 경기 일반 정보 추출 실패: ${error.message}`);
+      throw new Error(`경기 일반 정보 추출 실패: ${error.message}`);
+    }
   }
 }
