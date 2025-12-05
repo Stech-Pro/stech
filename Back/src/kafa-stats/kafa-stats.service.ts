@@ -130,7 +130,7 @@ export class KafaStatsService {
                           cell0.includes('대학교') ? cell0 : 
                           cell2.includes('대학교') ? cell2 : cell0;
           
-          const { playerName, team, jerseyNumber } = this.parsePlayerInfo(playerCell);
+          const { playerName, university, jerseyNumber } = this.parsePlayerInfo(playerCell);
           
           const rushYards = cell1.includes('대학교') ? cell2 : cell1;
           const yardsPerAttempt = parseFloat(cell1.includes('대학교') ? cell3 : cell2) || 0;
@@ -138,11 +138,11 @@ export class KafaStatsService {
           const touchdowns = parseInt(cell1.includes('대학교') ? cell5 : cell4) || 0;
           const longest = parseInt(cell1.includes('대학교') ? $(cells[6])?.text().trim() : cell5) || 0;
           
-          if (playerName && team) {
+          if (playerName && university) {
             stats.push({
               rank: index,
               playerName,
-              team,
+              university,
               jerseyNumber,
               rushYards,
               yardsPerAttempt,
@@ -198,6 +198,13 @@ export class KafaStatsService {
       university: '미상',
       jerseyNumber: 0
     };
+  }
+
+  // 러싱 야드 정보에서 숫자만 추출하는 헬퍼 함수
+  private cleanRushingYards(rushingYardStr: string): string {
+    // "383 (전진 : 434 / 후퇴 : -51)" 형식에서 383만 추출
+    const match = rushingYardStr.match(/^(-?\d+)/);
+    return match ? match[1] : rushingYardStr;
   }
 
   // 특정 팀의 팀 스탯 조회
@@ -276,7 +283,7 @@ export class KafaStatsService {
           { upsert: true, new: true }
         );
 
-        this.logger.log(`✅ 저장 완료: ${stat.team} ${stat.jerseyNumber}번 ${stat.playerName}`);
+        this.logger.log(`✅ 저장 완료: ${stat.university} ${stat.jerseyNumber}번 ${stat.playerName}`);
       }
 
       this.logger.log(`🎉 총 ${playerStats.length}명의 선수 스탯 저장 완료`);
@@ -511,7 +518,7 @@ export class KafaStatsService {
           const playerCell = $(cells[1]).text().trim();
           const playerInfo = this.parsePlayerInfo(playerCell);
           
-          if (playerInfo.playerName && playerInfo.team) {
+          if (playerInfo.playerName && playerInfo.university) {
             stats.push({
               ...playerInfo,
               pageNumber,
@@ -2135,11 +2142,11 @@ export class KafaStatsService {
           const playerCell = $(cells[1]).text().trim();
           const playerInfo = this.parsePlayerInfo(playerCell);
           
-          if (playerInfo.playerName && playerInfo.team) {
+          if (playerInfo.playerName && playerInfo.university) {
             const statData: any = {
               rank: index,
               playerName: playerInfo.playerName,
-              team: playerInfo.team,
+              university: playerInfo.university,
               jerseyNumber: playerInfo.jerseyNumber,
             };
 
