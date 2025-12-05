@@ -130,7 +130,7 @@ export class KafaStatsService {
                           cell0.includes('대학교') ? cell0 : 
                           cell2.includes('대학교') ? cell2 : cell0;
           
-          const { playerName, university, jerseyNumber } = this.parsePlayerInfo(playerCell);
+          const { playerName, team, jerseyNumber } = this.parsePlayerInfo(playerCell);
           
           const rushYards = cell1.includes('대학교') ? cell2 : cell1;
           const yardsPerAttempt = parseFloat(cell1.includes('대학교') ? cell3 : cell2) || 0;
@@ -138,11 +138,11 @@ export class KafaStatsService {
           const touchdowns = parseInt(cell1.includes('대학교') ? cell5 : cell4) || 0;
           const longest = parseInt(cell1.includes('대학교') ? $(cells[6])?.text().trim() : cell5) || 0;
           
-          if (playerName && university) {
+          if (playerName && team) {
             stats.push({
               rank: index,
               playerName,
-              university,
+              team,
               jerseyNumber,
               rushYards,
               yardsPerAttempt,
@@ -276,7 +276,7 @@ export class KafaStatsService {
           { upsert: true, new: true }
         );
 
-        this.logger.log(`✅ 저장 완료: ${stat.university} ${stat.jerseyNumber}번 ${stat.playerName}`);
+        this.logger.log(`✅ 저장 완료: ${stat.team} ${stat.jerseyNumber}번 ${stat.playerName}`);
       }
 
       this.logger.log(`🎉 총 ${playerStats.length}명의 선수 스탯 저장 완료`);
@@ -511,7 +511,7 @@ export class KafaStatsService {
           const playerCell = $(cells[1]).text().trim();
           const playerInfo = this.parsePlayerInfo(playerCell);
           
-          if (playerInfo.playerName && playerInfo.university) {
+          if (playerInfo.playerName && playerInfo.team) {
             stats.push({
               ...playerInfo,
               pageNumber,
@@ -2135,11 +2135,11 @@ export class KafaStatsService {
           const playerCell = $(cells[1]).text().trim();
           const playerInfo = this.parsePlayerInfo(playerCell);
           
-          if (playerInfo.playerName && playerInfo.university) {
+          if (playerInfo.playerName && playerInfo.team) {
             const statData: any = {
               rank: index,
               playerName: playerInfo.playerName,
-              university: playerInfo.university,
+              team: playerInfo.team,
               jerseyNumber: playerInfo.jerseyNumber,
             };
 
@@ -2150,11 +2150,17 @@ export class KafaStatsService {
               const cellValue = $(cell).text().trim();
               const fieldName = fieldMappings[cellIndex] || `unknown${cellIndex}`;
               
+              // 러싱야드인 경우 전진/후퇴 정보 제거
+              let processedValue = cellValue;
+              if (fieldName === 'rushingYards') {
+                processedValue = this.cleanRushingYards(cellValue);
+              }
+              
               // 숫자인지 확인하고 적절히 파싱
-              if (!isNaN(parseFloat(cellValue))) {
-                statData[fieldName] = parseFloat(cellValue);
+              if (!isNaN(parseFloat(processedValue))) {
+                statData[fieldName] = parseFloat(processedValue);
               } else {
-                statData[fieldName] = cellValue;
+                statData[fieldName] = processedValue;
               }
             });
             
