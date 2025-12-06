@@ -28,7 +28,7 @@ export default function AppRouter() {
           <Route index element={<ServicePages.LeagueTeamPage />} />
           <Route path="team" element={<ServicePages.LeagueTeamPage />} />
           <Route
-            path="position"
+            path="player"
             element={<ServicePages.LeaguePositionPage />}
           />
         </Route>
@@ -65,7 +65,7 @@ export default function AppRouter() {
             <Route path="league" element={<ServicePages.GuestLeaguePage />} />
             <Route path="team" element={<ServicePages.GuestLeagueTeamPage />} />
             <Route
-              path="position"
+              path="player"
               element={<ServicePages.GuestLeaguePositionPage />}
             />
           </Route>

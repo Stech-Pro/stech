@@ -1918,7 +1918,12 @@ export class KafaStatsService {
   // 특정 페이지의 팀 스탯 크롤링 (일반화)
   async getTeamStatsByPage(league: 'uni' | 'soc', pageType: string, year?: string): Promise<any[]> {
     try {
-      const url = `${this.baseUrl}/team_${league}_${pageType}.html`;
+      // KAFA 사이트의 오타를 위한 특별 처리: defense -> deffense
+      let actualPageType = pageType;
+      if (pageType === 'defense1' || pageType === 'defense2') {
+        actualPageType = pageType.replace('defense', 'deffense');
+      }
+      const url = `${this.baseUrl}/team_${league}_${actualPageType}.html`;
       this.logger.log(`📊 팀 스탯 페이지 크롤링: ${url}`);
       
       const { data } = await axios.get(url, {
@@ -2004,17 +2009,17 @@ export class KafaStatsService {
         5: 'touchdowns',
         6: 'longestReception'
       },
-      'defense1': { // 태클
-        1: 'totalTackles',
-        2: 'soloTackles',
-        3: 'assistTackles',
-        4: 'tacklesForLoss'
+      'defense1': { // 태클 (KAFA: ATT, SACK, SOLO, COMBO)
+        1: 'totalTackles',    // ATT
+        2: 'sacks',          // SACK
+        3: 'soloTackles',    // SOLO
+        4: 'assistTackles'   // COMBO
       },
-      'defense2': { // 인터셉션
-        1: 'interceptions',
-        2: 'interceptionYards',
-        3: 'touchdowns',
-        4: 'longestReturn'
+      'defense2': { // 인터셉션 (KAFA: INT, INT TD, INT YDS, LNG)
+        1: 'interceptions',          // INT
+        2: 'interceptionTd',         // INT TD
+        3: 'interceptionYards',      // INT YDS
+        4: 'longestInterception'     // LNG
       },
       'defense3': { // 색
         1: 'sacks',
@@ -2030,12 +2035,33 @@ export class KafaStatsService {
         5: 'longestMade',
         6: 'longestAttempted'
       },
-      'special2': { // 펀팅
-        1: 'averageDistance',
-        2: 'totalPunts',
-        3: 'totalYards',
-        4: 'inside20',
-        5: 'longestPunt'
+      'special2': { // 킥오프
+        1: 'avgKickoffYards',      // YDS AVG
+        2: 'kickoffCount',         // KO
+        3: 'kickoffYards',         // YDS
+        4: 'kickoffTouchdowns',    // TD
+        5: 'longestKickoff'        // LNG
+      },
+      'special3': { // 킥오프 리턴
+        1: 'avgReturnYards',       // YDS AVG
+        2: 'returns',              // KO RETURNS
+        3: 'returnYards',          // YDS
+        4: 'kickReturnTouchdowns', // TD
+        5: 'longestReturn'         // LNG
+      },
+      'special4': { // 펀팅
+        1: 'avgPuntYards',         // YDS AVG
+        2: 'puntCount',            // PUNTS
+        3: 'puntYards',            // YDS
+        4: 'puntTouchdowns',       // TD
+        5: 'longestPunt'           // LNG
+      },
+      'special5': { // 펀트 리턴
+        1: 'avgReturnYards',       // YDS AVG
+        2: 'returns',              // PUNT RETURNS
+        3: 'returnYards',          // YDS
+        4: 'puntReturnTouchdowns', // TD
+        5: 'longestReturn'         // LNG
       }
     };
     
@@ -2226,13 +2252,16 @@ export class KafaStatsService {
 
       result.university.team.defense = {
         tackles: await this.getTeamStatsByPage('uni', 'defense1', year),
-        interceptions: await this.getTeamStatsByPage('uni', 'defense2', year),
-        sacks: await this.getTeamStatsByPage('uni', 'defense3', year)
+        interceptions: await this.getTeamStatsByPage('uni', 'defense2', year)
+        // sacks는 defense1에 포함되어 있음
       };
 
       result.university.team.special = {
         kicking: await this.getTeamStatsByPage('uni', 'special1', year),
-        punting: await this.getTeamStatsByPage('uni', 'special2', year)
+        kickoff: await this.getTeamStatsByPage('uni', 'special2', year),
+        kickoffReturn: await this.getTeamStatsByPage('uni', 'special3', year),
+        punting: await this.getTeamStatsByPage('uni', 'special4', year),
+        puntReturn: await this.getTeamStatsByPage('uni', 'special5', year)
       };
 
       // 대학 개인 스탯 수집
@@ -2265,13 +2294,16 @@ export class KafaStatsService {
 
       result.social.team.defense = {
         tackles: await this.getTeamStatsByPage('soc', 'defense1', year),
-        interceptions: await this.getTeamStatsByPage('soc', 'defense2', year),
-        sacks: await this.getTeamStatsByPage('soc', 'defense3', year)
+        interceptions: await this.getTeamStatsByPage('soc', 'defense2', year)
+        // sacks는 defense1에 포함되어 있음
       };
 
       result.social.team.special = {
         kicking: await this.getTeamStatsByPage('soc', 'special1', year),
-        punting: await this.getTeamStatsByPage('soc', 'special2', year)
+        kickoff: await this.getTeamStatsByPage('soc', 'special2', year),
+        kickoffReturn: await this.getTeamStatsByPage('soc', 'special3', year),
+        punting: await this.getTeamStatsByPage('soc', 'special4', year),
+        puntReturn: await this.getTeamStatsByPage('soc', 'special5', year)
       };
 
       // 사회인 개인 스탯 수집
