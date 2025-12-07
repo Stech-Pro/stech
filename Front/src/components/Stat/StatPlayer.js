@@ -267,69 +267,150 @@ const seoulPlayerData = {
       { name: '허우인', team: '건국대학교', rushingYards: 93, rushingAttempts: 14, yardsPerCarry: 6.6, rushingTouchdowns: 1, longestRush: 32 },
     ],
     '패스': [
-      { name: '윤여진', team: '연세대학교', passingYards: 886, avgYardsPerAttempt: 5.8, completionPercentage: 48.1, passingAttempts: 154, passingCompletions: 74, passingTouchdowns: 17, interceptions: 8, longestPass: 80 },
+      { name: '윤여진', team: '연세대학교', passingYards: 886, avgYardsPerAttempt: 6.5, completionPercentage: 47.8, passingAttempts: 136, passingCompletions: 65, passingTouchdowns: 17, interceptions: 8, longestPass: 80 },
+      { name: '이찬희', team: '한양대학교', passingYards: 481, avgYardsPerAttempt: 4.7, completionPercentage: 43.1, passingAttempts: 102, passingCompletions: 44, passingTouchdowns: 7, interceptions: 9, longestPass: 57 },
       { name: '한상천', team: '서울시립대학교', passingYards: 204, avgYardsPerAttempt: 3.0, completionPercentage: 29.0, passingAttempts: 69, passingCompletions: 20, passingTouchdowns: 1, interceptions: 4, longestPass: 38 },
-      { name: '최준', team: '서울대학교', passingYards: 127, avgYardsPerAttempt: 3.1, completionPercentage: 34.1, passingAttempts: 41, passingCompletions: 14, passingTouchdowns: 1, interceptions: 6, longestPass: 33 },
+      { name: '최준', team: '서울대학교', passingYards: 127, avgYardsPerAttempt: 3.1, completionPercentage: 34.1, passingAttempts: 41, passingCompletions: 14, passingTouchdowns: 1, interceptions: 6, longestPass: 18 },
       { name: '박기석', team: '한국외국어대학교', passingYards: 108, avgYardsPerAttempt: 4.7, completionPercentage: 39.1, passingAttempts: 23, passingCompletions: 9, passingTouchdowns: 0, interceptions: 0, longestPass: 32 },
       { name: '이종혁', team: '서울대학교', passingYards: 99, avgYardsPerAttempt: 5.0, completionPercentage: 55.0, passingAttempts: 20, passingCompletions: 11, passingTouchdowns: 0, interceptions: 1, longestPass: 33 },
-      { name: '우재윤', team: '국민대학교', passingYards: 92, passingAttempts: 42, passingCompletions: 9, completionPercentage: 21.4, passingTouchdowns: 2, interceptions: 5, longestPass: 22 },
-      { name: '김서진', team: '건국대학교', passingYards: 85, passingAttempts: 31, passingCompletions: 17, completionPercentage: 54.8, passingTouchdowns: 0, interceptions: 3, longestPass: 26 },
-      { name: '정택훈', team: '연세대학교', passingYards: 82, passingAttempts: 20, passingCompletions: 8, completionPercentage: 40.0, passingTouchdowns: 1, interceptions: 0, longestPass: 20 },
+      { name: '우재윤', team: '국민대학교', passingYards: 92, avgYardsPerAttempt: 1.7, completionPercentage: 21.8, passingAttempts: 55, passingCompletions: 12, passingTouchdowns: 2, interceptions: 5, longestPass: 18 },
+      { name: '김서진', team: '건국대학교', passingYards: 85, avgYardsPerAttempt: 2.7, completionPercentage: 54.8, passingAttempts: 31, passingCompletions: 17, passingTouchdowns: 0, interceptions: 3, longestPass: 24 },
+      { name: '정택훈', team: '연세대학교', passingYards: 82, avgYardsPerAttempt: 5.5, completionPercentage: 40.0, passingAttempts: 15, passingCompletions: 6, passingTouchdowns: 1, interceptions: 0, longestPass: 32 },
+      { name: '원재훈', team: '국민대학교', passingYards: 47, avgYardsPerAttempt: 3.1, completionPercentage: 26.7, passingAttempts: 15, passingCompletions: 4, passingTouchdowns: 0, interceptions: 0, longestPass: 22 },
+      { name: '강승구', team: '서울시립대학교', passingYards: 26, avgYardsPerAttempt: 2.9, completionPercentage: 11.1, passingAttempts: 9, passingCompletions: 1, passingTouchdowns: 0, interceptions: 2, longestPass: 26 },
+      { name: '권용욱', team: '홍익대학교', passingYards: 17, avgYardsPerAttempt: 0.7, completionPercentage: 46.2, passingAttempts: 26, passingCompletions: 12, passingTouchdowns: 1, interceptions: 1, longestPass: 15 },
     ],
     '리시빙': [
       { name: '최윤수', team: '연세대학교', receptions: 37, receivingYards: 676, yardsPerReception: 18.3, receivingTouchdowns: 13, longestReception: 80 },
-      { name: '이선우', team: '서울대학교', receptions: 10, receivingYards: 106, yardsPerReception: 10.6, receivingTouchdowns: 0, longestReception: 45 },
+      { name: '이건', team: '한양대학교', receptions: 11, receivingYards: 115, yardsPerReception: 10.5, receivingTouchdowns: 0, longestReception: 24 },
       { name: '권용준', team: '서울시립대학교', receptions: 10, receivingYards: 70, yardsPerReception: 7.0, receivingTouchdowns: 1, longestReception: 17 },
-      { name: '남현석', team: '연세대학교', receptions: 7, receivingYards: 72, yardsPerReception: 10.3, receivingTouchdowns: 1, longestReception: 25 },
-      { name: '이명환', team: '서울대학교', receptions: 7, receivingYards: 42, yardsPerReception: 6.0, receivingTouchdowns: 0, longestReception: 18 },
-      { name: '권현수', team: '연세대학교', receptions: 6, receivingYards: 82, yardsPerReception: 13.7, receivingTouchdowns: 1, longestReception: 32 },
+      { name: '이선우', team: '서울대학교', receptions: 10, receivingYards: 106, yardsPerReception: 10.6, receivingTouchdowns: 0, longestReception: 45 },
+      { name: '임현성', team: '한양대학교', receptions: 9, receivingYards: 231, yardsPerReception: 25.7, receivingTouchdowns: 3, longestReception: 57 },
+      { name: '남현석', team: '연세대학교', receptions: 7, receivingYards: 72, yardsPerReception: 10.3, receivingTouchdowns: 0, longestReception: 25 },
+      { name: '소진규', team: '한양대학교', receptions: 7, receivingYards: 63, yardsPerReception: 9.0, receivingTouchdowns: 1, longestReception: 24 },
+      { name: '이명환', team: '서울대학교', receptions: 7, receivingYards: 42, yardsPerReception: 6.0, receivingTouchdowns: 1, longestReception: 18 },
+      { name: '양데이빗', team: '한양대학교', receptions: 6, receivingYards: 114, yardsPerReception: 19.0, receivingTouchdowns: 1, longestReception: 34 },
+      { name: 'Sol Timothy', team: '연세대학교', receptions: 6, receivingYards: 73, yardsPerReception: 12.2, receivingTouchdowns: 1, longestReception: 20 },
       { name: '오성민', team: '한국외국어대학교', receptions: 6, receivingYards: 51, yardsPerReception: 8.5, receivingTouchdowns: 0, longestReception: 19 },
-      { name: 'Sol Timothy', team: '연세대학교', receptions: 6, receivingYards: 73, yardsPerReception: 12.2, receivingTouchdowns: 2, longestReception: 20 },
-      { name: '이도원', team: '건국대학교', receptions: 5, receivingYards: 72, yardsPerReception: 14.4, receivingTouchdowns: 0, longestReception: 24 },
-      { name: '심찬', team: '연세대학교', receptions: 5, receivingYards: 59, yardsPerReception: 11.8, receivingTouchdowns: 1, longestReception: 20 },
+      { name: '권현수', team: '연세대학교', receptions: 6, receivingYards: 82, yardsPerReception: 13.7, receivingTouchdowns: 1, longestReception: 32 },
+      { name: '박상원', team: '서울대학교', receptions: 5, receivingYards: 51, yardsPerReception: 10.2, receivingTouchdowns: 0, longestReception: 24 },
     ],
     '펌블': [
-      { name: '데이터 없음', team: '서울시립대학교', fumbles: 0, fumblesLost: 0, fumbleTouchdowns: 0 },
+      { name: '윤여진', team: '연세대학교', fumbles: 10, fumblesLost: 4, fumbleTouchdowns: 0 },
+      { name: '우재윤', team: '국민대학교', fumbles: 5, fumblesLost: 3, fumbleTouchdowns: 0 },
+      { name: '이기쁨', team: '연세대학교', fumbles: 4, fumblesLost: 2, fumbleTouchdowns: 0 },
+      { name: '이찬희', team: '한양대학교', fumbles: 4, fumblesLost: 1, fumbleTouchdowns: 0 },
+      { name: '김서진', team: '건국대학교', fumbles: 3, fumblesLost: 2, fumbleTouchdowns: 0 },
+      { name: '정택훈', team: '연세대학교', fumbles: 3, fumblesLost: 2, fumbleTouchdowns: 0 },
+      { name: '이준상', team: '연세대학교', fumbles: 3, fumblesLost: 2, fumbleTouchdowns: 0 },
+      { name: '김건원', team: '서울시립대학교', fumbles: 2, fumblesLost: 0, fumbleTouchdowns: 0 },
+      { name: '이종혁', team: '서울대학교', fumbles: 2, fumblesLost: 1, fumbleTouchdowns: 0 },
+      { name: '김민겸', team: '한양대학교', fumbles: 2, fumblesLost: 4, fumbleTouchdowns: 0 },
+      { name: '원재훈', team: '국민대학교', fumbles: 2, fumblesLost: 1, fumbleTouchdowns: 0 },
     ],
     '태클': [
-      { name: '윤여진', team: '연세대학교', tackles: 10, sacks: 0, soloTackles: 4, assistTackles: 0 },
-      { name: '우재윤', team: '국민대학교', tackles: 5, sacks: 0, soloTackles: 3, assistTackles: 0 },
-      { name: '배수환', team: '중앙대학교', tackles: 4, sacks: 0, soloTackles: 0, assistTackles: 0 },
-      { name: '문찬호', team: '고려대학교', tackles: 4, sacks: 0, soloTackles: 2, assistTackles: 0 },
-      { name: '이찬희', team: '한양대학교', tackles: 4, sacks: 0, soloTackles: 1, assistTackles: 0 },
-      { name: '김도윤', team: '숭실대학교', tackles: 4, sacks: 0, soloTackles: 2, assistTackles: 0 },
+      { name: '김민겸', team: '한양대학교', tackles: 25, sacks: 0, soloTackles: 19, assistTackles: 6 },
+      { name: '강미루', team: '연세대학교', tackles: 21, sacks: 2, soloTackles: 12, assistTackles: 7 },
+      { name: '여언론', team: '한양대학교', tackles: 21, sacks: 2, soloTackles: 11, assistTackles: 8 },
+      { name: '이대희', team: '연세대학교', tackles: 21, sacks: 4, soloTackles: 11, assistTackles: 6 },
+      { name: '이현민', team: '연세대학교', tackles: 19, sacks: 1, soloTackles: 9, assistTackles: 9 },
+      { name: '이재욱', team: '한양대학교', tackles: 19, sacks: 0, soloTackles: 15, assistTackles: 4 },
+      { name: '차경훈', team: '한양대학교', tackles: 19, sacks: 0, soloTackles: 13, assistTackles: 6 },
+      { name: '조성환', team: '연세대학교', tackles: 19, sacks: 0, soloTackles: 15, assistTackles: 4 },
+      { name: 'Rintaro', team: '연세대학교', tackles: 17, sacks: 0, soloTackles: 11, assistTackles: 6 },
+      { name: '남상범', team: '연세대학교', tackles: 16, sacks: 0, soloTackles: 11, assistTackles: 5 },
+      { name: '김진혁', team: '서울대학교', tackles: 14, sacks: 7, soloTackles: 6, assistTackles: 1 },
+      { name: '이기원', team: '한양대학교', tackles: 14, sacks: 1, soloTackles: 9, assistTackles: 4 },
+      { name: '최영환', team: '국민대학교', tackles: 13, sacks: 0, soloTackles: 9, assistTackles: 4 },
+      { name: 'Ryan Pham', team: '연세대학교', tackles: 12, sacks: 1, soloTackles: 6, assistTackles: 5 },
     ],
     '인터셉트': [
-      { name: '김진혁', team: '서울대학교', interceptions: 14, interceptionTouchdowns: 6, interceptionYards: 7, longestInterception: 7 },
-      { name: '최영환', team: '국민대학교', interceptions: 13, interceptionTouchdowns: 9, interceptionYards: 0, longestInterception: 0 },
-      { name: '이호준', team: '숭실대학교', interceptions: 13, interceptionTouchdowns: 7, interceptionYards: 1, longestInterception: 1 },
-      { name: '문태웅', team: '동국대학교', interceptions: 14, interceptionTouchdowns: 7, interceptionYards: 0, longestInterception: 0 },
-      { name: '김주원', team: '동국대학교', interceptions: 13, interceptionTouchdowns: 7, interceptionYards: 0, longestInterception: 0 },
+      { name: '양병욱', team: '서울시립대학교', interceptions: 5, interceptionTouchdowns: 1, interceptionYards: 106, longestInterception: 54 },
+      { name: '김정헌', team: '서울대학교', interceptions: 4, interceptionTouchdowns: 0, interceptionYards: 27, longestInterception: 18 },
+      { name: '정재연', team: '국민대학교', interceptions: 3, interceptionTouchdowns: 0, interceptionYards: 89, longestInterception: 43 },
+      { name: '최승종', team: '연세대학교', interceptions: 2, interceptionTouchdowns: 0, interceptionYards: 3, longestInterception: 3 },
+      { name: '노건호', team: '한양대학교', interceptions: 2, interceptionTouchdowns: 0, interceptionYards: 3, longestInterception: 3 },
+      { name: '김민겸', team: '한양대학교', interceptions: 2, interceptionTouchdowns: 0, interceptionYards: 26, longestInterception: 22 },
+      { name: '서동주', team: '서울대학교', interceptions: 2, interceptionTouchdowns: 0, interceptionYards: 10, longestInterception: 9 },
+      { name: '윤석진', team: '서울시립대학교', interceptions: 2, interceptionTouchdowns: 0, interceptionYards: 6, longestInterception: 6 },
+      { name: '김성민', team: '서울대학교', interceptions: 2, interceptionTouchdowns: 0, interceptionYards: 44, longestInterception: 25 },
+      { name: '윤석주', team: '국민대학교', interceptions: 1, interceptionTouchdowns: 0, interceptionYards: 0, longestInterception: 0 },
+      { name: '유철', team: '연세대학교', interceptions: 1, interceptionTouchdowns: 0, interceptionYards: 3, longestInterception: 3 },
+      { name: '이현민', team: '연세대학교', interceptions: 1, interceptionTouchdowns: 0, interceptionYards: 7, longestInterception: 7 },
     ],
     '필드골': [
-      { name: '김진혁', team: '서울대학교', fieldGoalPercentage: 100.0, averageFieldGoalDistance: 25, fieldGoalsMade: 2, fieldGoalsAttempted: 2, fieldGoalYards: 50, longestFieldGoal: 50 },
-      { name: '김대웅', team: '홍익대학교', fieldGoalPercentage: 100.0, averageFieldGoalDistance: 0, fieldGoalsMade: 1, fieldGoalsAttempted: 1, fieldGoalYards: 0, longestFieldGoal: 0 },
-      { name: '강지민', team: '서강대학교', fieldGoalPercentage: 100.0, averageFieldGoalDistance: 0, fieldGoalsMade: 1, fieldGoalsAttempted: 1, fieldGoalYards: 0, longestFieldGoal: 0 },
-      { name: '공성욱', team: '건국대학교', fieldGoalPercentage: 100.0, averageFieldGoalDistance: 53, fieldGoalsMade: 1, fieldGoalsAttempted: 1, fieldGoalYards: 53, longestFieldGoal: 53 },
-      { name: '윤석진', team: '서울시립대학교', fieldGoalPercentage: 100.0, averageFieldGoalDistance: 14, fieldGoalsMade: 2, fieldGoalsAttempted: 2, fieldGoalYards: 28, longestFieldGoal: 28 },
+      { name: '윤석진', team: '서울시립대학교', fieldGoalPercentage: 100.0, averageFieldGoalDistance: 14.0, fieldGoalsMade: 2, fieldGoalsAttempted: 2, fieldGoalYards: 28, longestFieldGoal: 28 },
+      { name: '김진혁', team: '서울대학교', fieldGoalPercentage: 100.0, averageFieldGoalDistance: 25.0, fieldGoalsMade: 2, fieldGoalsAttempted: 2, fieldGoalYards: 50, longestFieldGoal: 27 },
+      { name: '김대웅', team: '홍익대학교', fieldGoalPercentage: 100.0, averageFieldGoalDistance: 0.0, fieldGoalsMade: 1, fieldGoalsAttempted: 1, fieldGoalYards: 0, longestFieldGoal: 0 },
+      { name: '공성욱', team: '건국대학교', fieldGoalPercentage: 100.0, averageFieldGoalDistance: 53.0, fieldGoalsMade: 1, fieldGoalsAttempted: 1, fieldGoalYards: 53, longestFieldGoal: 53 },
+      { name: '이재성', team: '연세대학교', fieldGoalPercentage: 100.0, averageFieldGoalDistance: 11.0, fieldGoalsMade: 2, fieldGoalsAttempted: 2, fieldGoalYards: 22, longestFieldGoal: 22 },
+      { name: '소진규', team: '한양대학교', fieldGoalPercentage: 75.0, averageFieldGoalDistance: 18.3, fieldGoalsMade: 3, fieldGoalsAttempted: 4, fieldGoalYards: 55, longestFieldGoal: 30 },
+      { name: '최윤수', team: '연세대학교', fieldGoalPercentage: 66.7, averageFieldGoalDistance: 30.0, fieldGoalsMade: 2, fieldGoalsAttempted: 3, fieldGoalYards: 60, longestFieldGoal: 35 },
+      { name: '이종혁', team: '서울대학교', fieldGoalPercentage: 50.0, averageFieldGoalDistance: 22.0, fieldGoalsMade: 1, fieldGoalsAttempted: 2, fieldGoalYards: 22, longestFieldGoal: 22 },
+      { name: '오성민', team: '한국외국어대학교', fieldGoalPercentage: 50.0, averageFieldGoalDistance: 0.0, fieldGoalsMade: 2, fieldGoalsAttempted: 4, fieldGoalYards: 0, longestFieldGoal: 0 },
     ],
     '킥오프': [
-      { name: '데이터 없음', team: '서울시립대학교', averageKickoffYards: 0, kickoffCount: 0, kickoffYards: 0, kickoffTouchdowns: 0, longestKickoff: 0 },
+      { name: '이종혁', team: '서울대학교', averageKickoffYards: 64.0, kickoffCount: 1, kickoffYards: 64, kickoffTouchdowns: 0, longestKickoff: 64 },
+      { name: '윤석진', team: '서울시립대학교', averageKickoffYards: 60.0, kickoffCount: 1, kickoffYards: 60, kickoffTouchdowns: 0, longestKickoff: 60 },
+      { name: '김진혁', team: '서울대학교', averageKickoffYards: 53.6, kickoffCount: 9, kickoffYards: 482, kickoffTouchdowns: 0, longestKickoff: 65 },
+      { name: '장혜인', team: '서울시립대학교', averageKickoffYards: 48.3, kickoffCount: 4, kickoffYards: 193, kickoffTouchdowns: 0, longestKickoff: 65 },
+      { name: '최윤수', team: '연세대학교', averageKickoffYards: 45.5, kickoffCount: 28, kickoffYards: 1274, kickoffTouchdowns: 0, longestKickoff: 75 },
+      { name: '소진규', team: '한양대학교', averageKickoffYards: 44.1, kickoffCount: 22, kickoffYards: 971, kickoffTouchdowns: 1, longestKickoff: 65 },
+      { name: '이찬희', team: '한양대학교', averageKickoffYards: 43.0, kickoffCount: 1, kickoffYards: 43, kickoffTouchdowns: 0, longestKickoff: 43 },
+      { name: '원재훈', team: '국민대학교', averageKickoffYards: 39.3, kickoffCount: 3, kickoffYards: 118, kickoffTouchdowns: 0, longestKickoff: 65 },
+      { name: '황현석', team: '건국대학교', averageKickoffYards: 35.7, kickoffCount: 3, kickoffYards: 107, kickoffTouchdowns: 0, longestKickoff: 54 },
     ],
     '킥오프리턴': [
-      { name: '이선우', team: '서울대학교', averageKickReturnYards: 53.5, kickReturnCount: 2, kickReturnYards: 107, kickReturnTouchdowns: 1, longestKickReturn: 88 },
-      { name: '장우영', team: '숭실대학교', averageKickReturnYards: 43.0, kickReturnCount: 1, kickReturnYards: 43, kickReturnTouchdowns: 0, longestKickReturn: 43 },
-      { name: '권용준', team: '서울시립대학교', averageKickReturnYards: 47.5, kickReturnCount: 2, kickReturnYards: 95, kickReturnTouchdowns: 0, longestKickReturn: 33 },
-      { name: '박상원', team: '서울대학교', averageKickReturnYards: 55.0, kickReturnCount: 2, kickReturnYards: 110, kickReturnTouchdowns: 0, longestKickReturn: 31 },
-      { name: '소진규', team: '한양대학교', averageKickReturnYards: 27.4, kickReturnCount: 8, kickReturnYards: 219, kickReturnTouchdowns: 0, longestKickReturn: 40 },
+      { name: '이선우', team: '서울대학교', averageKickReturnYards: 57.5, kickReturnCount: 2, kickReturnYards: 107, kickReturnTouchdowns: 1, longestKickReturn: 88 },
+      { name: '황승연', team: '연세대학교', averageKickReturnYards: 28.0, kickReturnCount: 1, kickReturnYards: 30, kickReturnTouchdowns: 0, longestKickReturn: 28 },
+      { name: '조성환', team: '연세대학교', averageKickReturnYards: 28.0, kickReturnCount: 3, kickReturnYards: 181, kickReturnTouchdowns: 0, longestKickReturn: 30 },
+      { name: '박상원', team: '서울대학교', averageKickReturnYards: 26.5, kickReturnCount: 2, kickReturnYards: 110, kickReturnTouchdowns: 0, longestKickReturn: 31 },
+      { name: '소진규', team: '한양대학교', averageKickReturnYards: 21.5, kickReturnCount: 8, kickReturnYards: 219, kickReturnTouchdowns: 0, longestKickReturn: 40 },
+      { name: '이원호', team: '서울시립대학교', averageKickReturnYards: 18.0, kickReturnCount: 2, kickReturnYards: 115, kickReturnTouchdowns: 0, longestKickReturn: 25 },
+      { name: '이준상', team: '연세대학교', averageKickReturnYards: 18.0, kickReturnCount: 2, kickReturnYards: 57, kickReturnTouchdowns: 0, longestKickReturn: 22 },
+      { name: '정재연', team: '국민대학교', averageKickReturnYards: 18.3, kickReturnCount: 3, kickReturnYards: 125, kickReturnTouchdowns: 0, longestKickReturn: 30 },
+      { name: '김세윤', team: '홍익대학교', averageKickReturnYards: 19.0, kickReturnCount: 1, kickReturnYards: 0, kickReturnTouchdowns: 0, longestKickReturn: 19 },
     ],
     '펀트': [
-      { name: '데이터 없음', team: '서울시립대학교', averagePuntYards: 0, puntCount: 0, puntYards: 0, puntTouchdowns: 0, longestPunt: 0 },
+      { name: '신재영', team: '연세대학교', puntCount: 3, puntYards: 146, averagePuntYards: 48.7, longestPunt: 57, puntTouchdowns: 0 },
+      { name: '이종혁', team: '서울대학교', puntCount: 2, puntYards: 93, averagePuntYards: 46.5, longestPunt: 47, puntTouchdowns: 0 },
+      { name: '공성욱', team: '건국대학교', puntCount: 6, puntYards: 239, averagePuntYards: 39.8, longestPunt: 64, puntTouchdowns: 0 },
+      { name: '엄홍재', team: '서강대학교', puntCount: 13, puntYards: 486, averagePuntYards: 37.4, longestPunt: 53, puntTouchdowns: 0 },
+      { name: '박도현', team: '동국대학교', puntCount: 9, puntYards: 335, averagePuntYards: 37.2, longestPunt: 54, puntTouchdowns: 0 },
+      { name: '장혜인', team: '서울시립대학교', puntCount: 19, puntYards: 659, averagePuntYards: 34.7, longestPunt: 52, puntTouchdowns: 0 },
+      { name: '여언론', team: '한양대학교', puntCount: 8, puntYards: 276, averagePuntYards: 34.5, longestPunt: 54, puntTouchdowns: 0 },
+      { name: '원재훈', team: '국민대학교', puntCount: 5, puntYards: 171, averagePuntYards: 34.2, longestPunt: 45, puntTouchdowns: 0 },
+      { name: '소진규', team: '한양대학교', puntCount: 9, puntYards: 303, averagePuntYards: 33.7, longestPunt: 52, puntTouchdowns: 0 },
+      { name: '김진혁', team: '서울대학교', puntCount: 6, puntYards: 195, averagePuntYards: 32.5, longestPunt: 45, puntTouchdowns: 0 },
+      { name: '배민수', team: '중앙대학교', puntCount: 6, puntYards: 178, averagePuntYards: 29.7, longestPunt: 40, puntTouchdowns: 0 },
+      { name: '김대웅', team: '홍익대학교', puntCount: 11, puntYards: 312, averagePuntYards: 28.4, longestPunt: 48, puntTouchdowns: 0 }
     ],
     '펀트리턴': [
-      { name: '이준상', team: '연세대학교', averagePuntReturnYards: 28.5, puntReturnCount: 2, puntReturnYards: 57, puntReturnTouchdowns: 0, longestPuntReturn: 22 },
-      { name: '이원호', team: '서울시립대학교', averagePuntReturnYards: 57.5, puntReturnCount: 2, puntReturnYards: 115, puntReturnTouchdowns: 0, longestPuntReturn: 25 },
-      { name: '김동휘', team: '고려대학교', averagePuntReturnYards: 45.0, puntReturnCount: 1, puntReturnYards: 45, puntReturnTouchdowns: 0, longestPuntReturn: 18 },
+      { name: '동방상원', team: '동아대학교', puntReturnCount: 1, puntReturnYards: 54, averagePuntReturnYards: 54.0, longestPuntReturn: 54, puntReturnTouchdowns: 0 },
+      { name: '김승원', team: '숭실대학교', puntReturnCount: 1, puntReturnYards: 33, averagePuntReturnYards: 33.0, longestPuntReturn: 33, puntReturnTouchdowns: 0 },
+      { name: '문태웅', team: '동국대학교', puntReturnCount: 1, puntReturnYards: 31, averagePuntReturnYards: 31.0, longestPuntReturn: 31, puntReturnTouchdowns: 0 },
+      { name: '유동윤', team: '경일대학교', puntReturnCount: 7, puntReturnYards: 184, averagePuntReturnYards: 26.3, longestPuntReturn: 58, puntReturnTouchdowns: 1 },
+      { name: '김정헌', team: '서울대학교', puntReturnCount: 1, puntReturnYards: 25, averagePuntReturnYards: 25.0, longestPuntReturn: 25, puntReturnTouchdowns: 0 },
+      { name: '전민우', team: '경북대학교', puntReturnCount: 1, puntReturnYards: 25, averagePuntReturnYards: 25.0, longestPuntReturn: 25, puntReturnTouchdowns: 0 },
+      { name: '권용준', team: '서울시립대학교', puntReturnCount: 2, puntReturnYards: 42, averagePuntReturnYards: 21.0, longestPuntReturn: 30, puntReturnTouchdowns: 0 },
+      { name: '정성준', team: '한국해양대학교', puntReturnCount: 1, puntReturnYards: 20, averagePuntReturnYards: 20.0, longestPuntReturn: 20, puntReturnTouchdowns: 1 },
+      { name: '손주익', team: '서울시립대학교', puntReturnCount: 1, puntReturnYards: 19, averagePuntReturnYards: 19.0, longestPuntReturn: 19, puntReturnTouchdowns: 0 },
+      { name: '이우진', team: '홍익대학교', puntReturnCount: 1, puntReturnYards: 18, averagePuntReturnYards: 18.0, longestPuntReturn: 18, puntReturnTouchdowns: 0 },
+      { name: '배병찬', team: '성균관대학교', puntReturnCount: 1, puntReturnYards: 18, averagePuntReturnYards: 18.0, longestPuntReturn: 18, puntReturnTouchdowns: 0 },
+      { name: '임지민', team: '동의대학교', puntReturnCount: 1, puntReturnYards: 18, averagePuntReturnYards: 18.0, longestPuntReturn: 18, puntReturnTouchdowns: 0 },
+      { name: '이상현', team: '단국대학교', puntReturnCount: 1, puntReturnYards: 17, averagePuntReturnYards: 17.0, longestPuntReturn: 17, puntReturnTouchdowns: 0 },
+      { name: '허우인', team: '건국대학교', puntReturnCount: 2, puntReturnYards: 30, averagePuntReturnYards: 15.0, longestPuntReturn: 30, puntReturnTouchdowns: 0 },
+      { name: '이민준', team: '영남대학교', puntReturnCount: 1, puntReturnYards: 15, averagePuntReturnYards: 15.0, longestPuntReturn: 15, puntReturnTouchdowns: 0 },
+      { name: '최준환', team: '금오공과대학교', puntReturnCount: 1, puntReturnYards: 14, averagePuntReturnYards: 14.0, longestPuntReturn: 14, puntReturnTouchdowns: 0 },
+      { name: '이무진', team: '대구가톨릭대학교', puntReturnCount: 1, puntReturnYards: 13, averagePuntReturnYards: 13.0, longestPuntReturn: 13, puntReturnTouchdowns: 0 },
+      { name: '조다빈', team: '성균관대학교', puntReturnCount: 7, puntReturnYards: 85, averagePuntReturnYards: 12.1, longestPuntReturn: 50, puntReturnTouchdowns: 0 },
+      { name: '이예승', team: '부산외국어대학교', puntReturnCount: 1, puntReturnYards: 12, averagePuntReturnYards: 12.0, longestPuntReturn: 12, puntReturnTouchdowns: 0 },
+      { name: '조현영', team: '경북대학교', puntReturnCount: 4, puntReturnYards: 47, averagePuntReturnYards: 11.8, longestPuntReturn: 38, puntReturnTouchdowns: 0 },
+      { name: '오승욱', team: '숭실대학교', puntReturnCount: 2, puntReturnYards: 23, averagePuntReturnYards: 11.5, longestPuntReturn: 15, puntReturnTouchdowns: 0 },
+      { name: '정종은', team: '동국대학교', puntReturnCount: 2, puntReturnYards: 21, averagePuntReturnYards: 10.5, longestPuntReturn: 21, puntReturnTouchdowns: 0 },
+      { name: '김강민', team: '경북대학교', puntReturnCount: 3, puntReturnYards: 30, averagePuntReturnYards: 10.0, longestPuntReturn: 17, puntReturnTouchdowns: 0 },
+      { name: '박온', team: '성균관대학교', puntReturnCount: 1, puntReturnYards: 10, averagePuntReturnYards: 10.0, longestPuntReturn: 10, puntReturnTouchdowns: 0 },
+      { name: '정재연', team: '국민대학교', puntReturnCount: 1, puntReturnYards: 10, averagePuntReturnYards: 10.0, longestPuntReturn: 10, puntReturnTouchdowns: 0 }
     ],
   },
   second: {
@@ -342,24 +423,39 @@ const seoulPlayerData = {
       { name: '이재승', team: '중앙대학교', rushingYards: 100, rushingAttempts: 12, yardsPerCarry: 8.3, rushingTouchdowns: 0, longestRush: 47 },
     ],
     '패스': [
-      { name: '문찬호', team: '고려대학교', passingYards: 527, passingAttempts: 100, passingCompletions: 58, completionPercentage: 58.0, passingTouchdowns: 6, interceptions: 2, longestPass: 37 },
-      { name: '백운성', team: '서강대학교', passingYards: 292, passingAttempts: 58, passingCompletions: 19, completionPercentage: 32.8, passingTouchdowns: 3, interceptions: 4, longestPass: 72 },
-      { name: '최은찬', team: '동국대학교', passingYards: 215, passingAttempts: 90, passingCompletions: 37, completionPercentage: 41.1, passingTouchdowns: 0, interceptions: 7, longestPass: 38 },
-      { name: '김도윤', team: '숭실대학교', passingYards: 148, passingAttempts: 40, passingCompletions: 21, completionPercentage: 52.5, passingTouchdowns: 5, interceptions: 3, longestPass: 33 },
-      { name: '손혁빈', team: '경희대학교', passingYards: 56, passingAttempts: 21, passingCompletions: 5, completionPercentage: 23.8, passingTouchdowns: 2, interceptions: 4, longestPass: 31 },
-      { name: '배수환', team: '중앙대학교', passingYards: 41, passingAttempts: 17, passingCompletions: 5, completionPercentage: 29.4, passingTouchdowns: 0, interceptions: 4, longestPass: 12 },
+      { name: '문찬호', team: '고려대학교', passingYards: 527, avgYardsPerAttempt: 5.4, completionPercentage: 59.2, passingAttempts: 98, passingCompletions: 58, passingTouchdowns: 6, interceptions: 2, longestPass: 37 },
+      { name: '백운성', team: '서강대학교', passingYards: 292, avgYardsPerAttempt: 5.1, completionPercentage: 31.6, passingAttempts: 57, passingCompletions: 18, passingTouchdowns: 2, interceptions: 4, longestPass: 72 },
+      { name: '최은찬', team: '동국대학교', passingYards: 215, avgYardsPerAttempt: 2.6, completionPercentage: 43.9, passingAttempts: 82, passingCompletions: 36, passingTouchdowns: 0, interceptions: 6, longestPass: 38 },
+      { name: '김도윤', team: '숭실대학교', passingYards: 148, avgYardsPerAttempt: 2.4, completionPercentage: 52.5, passingAttempts: 61, passingCompletions: 32, passingTouchdowns: 5, interceptions: 3, longestPass: 33 },
+      { name: '손혁빈', team: '경희대학교', passingYards: 56, avgYardsPerAttempt: 2.7, completionPercentage: 23.8, passingAttempts: 21, passingCompletions: 5, passingTouchdowns: 2, interceptions: 4, longestPass: 31 },
+      { name: '배수환', team: '중앙대학교', passingYards: 41, avgYardsPerAttempt: 2.4, completionPercentage: 29.4, passingAttempts: 17, passingCompletions: 5, passingTouchdowns: 0, interceptions: 4, longestPass: 10 },
+      { name: '김제민', team: '중앙대학교', passingYards: 20, avgYardsPerAttempt: 3.3, completionPercentage: 33.3, passingAttempts: 6, passingCompletions: 2, passingTouchdowns: 0, interceptions: 0, longestPass: 12 },
+      { name: '이재호', team: '동국대학교', passingYards: 10, avgYardsPerAttempt: 0.9, completionPercentage: 27.3, passingAttempts: 11, passingCompletions: 3, passingTouchdowns: 0, interceptions: 2, longestPass: 15 },
     ],
     '리시빙': [
       { name: '윤상준', team: '고려대학교', receptions: 19, receivingYards: 180, yardsPerReception: 9.5, receivingTouchdowns: 2, longestReception: 33 },
-      { name: '김태현', team: '고려대학교', receptions: 11, receivingYards: 85, yardsPerReception: 7.7, receivingTouchdowns: 2, longestReception: 33 },
+      { name: '김태현', team: '고려대학교', receptions: 11, receivingYards: 85, yardsPerReception: 7.7, receivingTouchdowns: 1, longestReception: 33 },
       { name: '정종은', team: '동국대학교', receptions: 10, receivingYards: 58, yardsPerReception: 5.8, receivingTouchdowns: 0, longestReception: 21 },
-      { name: '김승원', team: '숭실대학교', receptions: 9, receivingYards: 70, yardsPerReception: 7.8, receivingTouchdowns: 1, longestReception: 18 },
-      { name: '문영민', team: '동국대학교', receptions: 9, receivingYards: 88, yardsPerReception: 9.8, receivingTouchdowns: 2, longestReception: 21 },
-      { name: '정민영', team: '고려대학교', receptions: 9, receivingYards: 89, yardsPerReception: 9.9, receivingTouchdowns: 1, longestReception: 26 },
-      { name: '김록겸', team: '고려대학교', receptions: 7, receivingYards: 74, yardsPerReception: 10.6, receivingTouchdowns: 2, longestReception: 33 },
+      { name: '문영민', team: '동국대학교', receptions: 9, receivingYards: 88, yardsPerReception: 9.8, receivingTouchdowns: 0, longestReception: 21 },
+      { name: '정민영', team: '고려대학교', receptions: 9, receivingYards: 89, yardsPerReception: 9.9, receivingTouchdowns: 2, longestReception: 26 },
+      { name: '김승원', team: '숭실대학교', receptions: 9, receivingYards: 70, yardsPerReception: 7.8, receivingTouchdowns: 0, longestReception: 18 },
+      { name: '김록겸', team: '고려대학교', receptions: 7, receivingYards: 74, yardsPerReception: 10.6, receivingTouchdowns: 0, longestReception: 33 },
+      { name: '김도훈', team: '고려대학교', receptions: 6, receivingYards: 39, yardsPerReception: 6.5, receivingTouchdowns: 0, longestReception: 14 },
+      { name: '오승욱', team: '숭실대학교', receptions: 6, receivingYards: 101, yardsPerReception: 16.8, receivingTouchdowns: 2, longestReception: 81 },
+      { name: '정명우', team: '숭실대학교', receptions: 6, receivingYards: 51, yardsPerReception: 8.5, receivingTouchdowns: 0, longestReception: 22 },
     ],
     '펌블': [
-      { name: '데이터 없음', team: '동국대학교', fumbles: 0, fumblesLost: 0, fumbleTouchdowns: 0 },
+      { name: '문찬호', team: '고려대학교', fumbles: 4, fumblesLost: 2, fumbleTouchdowns: 0 },
+      { name: '최수종', team: '고려대학교', fumbles: 4, fumblesLost: 2, fumbleTouchdowns: 0 },
+      { name: '김도윤', team: '숭실대학교', fumbles: 4, fumblesLost: 2, fumbleTouchdowns: 0 },
+      { name: '배수환', team: '중앙대학교', fumbles: 4, fumblesLost: 0, fumbleTouchdowns: 0 },
+      { name: '이재승', team: '중앙대학교', fumbles: 3, fumblesLost: 2, fumbleTouchdowns: 0 },
+      { name: '장우영', team: '숭실대학교', fumbles: 3, fumblesLost: 1, fumbleTouchdowns: 0 },
+      { name: '양선빈', team: '동국대학교', fumbles: 2, fumblesLost: 0, fumbleTouchdowns: 0 },
+      { name: '김태우', team: '동국대학교', fumbles: 2, fumblesLost: 0, fumbleTouchdowns: 0 },
+      { name: '이재호', team: '동국대학교', fumbles: 2, fumblesLost: 2, fumbleTouchdowns: 0 },
+      { name: '최은찬', team: '동국대학교', fumbles: 2, fumblesLost: 2, fumbleTouchdowns: 0 },
+      { name: '백운성', team: '서강대학교', fumbles: 2, fumblesLost: 1, fumbleTouchdowns: 0 },
     ],
     '태클': [
       { name: '김민겸', team: '한양대학교', tackles: 2, sacks: 2, soloTackles: 4, assistTackles: 0 },
@@ -370,12 +466,18 @@ const seoulPlayerData = {
       { name: '박서준', team: '서강대학교', tackles: 0, sacks: 2, soloTackles: 0, assistTackles: 0 },
     ],
     '인터셉트': [
-      { name: '문태웅', team: '동국대학교', interceptions: 14, interceptionTouchdowns: 7, interceptionYards: 0, longestInterception: 0 },
-      { name: '김주원', team: '동국대학교', interceptions: 13, interceptionTouchdowns: 7, interceptionYards: 0, longestInterception: 0 },
-      { name: '이호준', team: '숭실대학교', interceptions: 13, interceptionTouchdowns: 7, interceptionYards: 1, longestInterception: 1 },
-      { name: '이주헌', team: '동국대학교', interceptions: 12, interceptionTouchdowns: 9, interceptionYards: 0, longestInterception: 0 },
-      { name: '문영민', team: '동국대학교', interceptions: 12, interceptionTouchdowns: 9, interceptionYards: 0, longestInterception: 0 },
-      { name: '정민수', team: '고려대학교', interceptions: 15, interceptionTouchdowns: 10, interceptionYards: 0, longestInterception: 0 },
+      { name: '이재혁', team: '서강대학교', interceptions: 4, interceptionTouchdowns: 0, interceptionYards: 4, longestInterception: 2 },
+      { name: '윤상준', team: '고려대학교', interceptions: 3, interceptionTouchdowns: 0, interceptionYards: 20, longestInterception: 20 },
+      { name: '엄홍재', team: '서강대학교', interceptions: 3, interceptionTouchdowns: 1, interceptionYards: 38, longestInterception: 25 },
+      { name: '오승욱', team: '숭실대학교', interceptions: 2, interceptionTouchdowns: 0, interceptionYards: 32, longestInterception: 32 },
+      { name: '김태우', team: '동국대학교', interceptions: 2, interceptionTouchdowns: 0, interceptionYards: 13, longestInterception: 13 },
+      { name: '곽효석', team: '중앙대학교', interceptions: 2, interceptionTouchdowns: 0, interceptionYards: 2, longestInterception: 2 },
+      { name: '박서준', team: '서강대학교', interceptions: 2, interceptionTouchdowns: 0, interceptionYards: 5, longestInterception: 5 },
+      { name: '변예준', team: '중앙대학교', interceptions: 1, interceptionTouchdowns: 0, interceptionYards: 0, longestInterception: 0 },
+      { name: '이재승', team: '중앙대학교', interceptions: 1, interceptionTouchdowns: 0, interceptionYards: 18, longestInterception: 18 },
+      { name: '윤영균', team: '숭실대학교', interceptions: 1, interceptionTouchdowns: 0, interceptionYards: 8, longestInterception: 8 },
+      { name: '문태웅', team: '동국대학교', interceptions: 1, interceptionTouchdowns: 0, interceptionYards: 20, longestInterception: 20 },
+      { name: '반태우', team: '경희대학교', interceptions: 1, interceptionTouchdowns: 0, interceptionYards: 13, longestInterception: 13 },
     ],
     '필드골': [
       { name: '최수종', team: '고려대학교', fieldGoalPercentage: 20.0, averageFieldGoalDistance: 0, fieldGoalsMade: 1, fieldGoalsAttempted: 5, fieldGoalYards: 0, longestFieldGoal: 0 },
@@ -391,10 +493,16 @@ const seoulPlayerData = {
       { name: '변예준', team: '중앙대학교', averageKickReturnYards: 25.0, kickReturnCount: 1, kickReturnYards: 25, kickReturnTouchdowns: 0, longestKickReturn: 20 },
     ],
     '펀트': [
-      { name: '데이터 없음', team: '동국대학교', averagePuntYards: 0, puntCount: 0, puntYards: 0, puntTouchdowns: 0, longestPunt: 0 },
+      { name: '이찬유', team: '한신대학교', puntCount: 10, puntYards: 391, averagePuntYards: 39.1, longestPunt: 53, puntTouchdowns: 0 },
+      { name: '권준호', team: '경희대학교', puntCount: 7, puntYards: 244, averagePuntYards: 34.9, longestPunt: 57, puntTouchdowns: 0 }
     ],
     '펀트리턴': [
-      { name: '데이터 없음', team: '동국대학교', averagePuntReturnYards: 0, puntReturnCount: 0, puntReturnYards: 0, puntReturnTouchdowns: 0, longestPuntReturn: 0 },
+      { name: '이상현', team: '단국대학교', puntReturnCount: 1, puntReturnYards: 17, averagePuntReturnYards: 17.0, longestPuntReturn: 17, puntReturnTouchdowns: 0 },
+      { name: '오승욱', team: '숭실대학교', puntReturnCount: 2, puntReturnYards: 23, averagePuntReturnYards: 11.5, longestPuntReturn: 15, puntReturnTouchdowns: 0 },
+      { name: '이정환', team: '고려대학교', puntReturnCount: 3, puntReturnYards: 15, averagePuntReturnYards: 5.0, longestPuntReturn: 12, puntReturnTouchdowns: 0 },
+      { name: '엄홍재', team: '서강대학교', puntReturnCount: 1, puntReturnYards: 0, averagePuntReturnYards: 0.0, longestPuntReturn: 0, puntReturnTouchdowns: 0 },
+      { name: '신재용', team: '중앙대학교', puntReturnCount: 1, puntReturnYards: 0, averagePuntReturnYards: 0.0, longestPuntReturn: 0, puntReturnTouchdowns: 0 },
+      { name: '김두호', team: '경희대학교', puntReturnCount: 1, puntReturnYards: 0, averagePuntReturnYards: 0.0, longestPuntReturn: 0, puntReturnTouchdowns: 0 }
     ],
   },
 };
@@ -409,16 +517,75 @@ const gyeonggiPlayerData = {
       { name: '유현석', team: '강원대학교', rushingYards: 95, rushingAttempts: 32, yardsPerCarry: 3.0, rushingTouchdowns: 0, longestRush: 16 },
       { name: '장우혁', team: '인하대학교', rushingYards: 93, rushingAttempts: 6, yardsPerCarry: 15.5, rushingTouchdowns: 0, longestRush: 80 },
     ],
-    '패스': [], '리시빙': [], '펌블': [], '태클': [], '인터셉트': [], 
-    '필드골': [], '킥오프': [], '킥오프리턴': [], '펀트': [], '펀트리턴': [],
+    '패스': [
+      { name: '장혜성', team: '성균관대학교', passingYards: 366, avgYardsPerAttempt: 4.5, completionPercentage: 29.3, passingAttempts: 82, passingCompletions: 24, passingTouchdowns: 5, interceptions: 3, longestPass: 59 },
+      { name: '신재윤', team: '인하대학교', passingYards: 229, avgYardsPerAttempt: 4.3, completionPercentage: 43.4, passingAttempts: 53, passingCompletions: 23, passingTouchdowns: 1, interceptions: 6, longestPass: 37 },
+      { name: '변지성', team: '성균관대학교', passingYards: 176, avgYardsPerAttempt: 3.2, completionPercentage: 27.3, passingAttempts: 55, passingCompletions: 15, passingTouchdowns: 0, interceptions: 6, longestPass: 38 },
+      { name: '이민석', team: '강원대학교', passingYards: 147, avgYardsPerAttempt: 7.0, completionPercentage: 47.6, passingAttempts: 21, passingCompletions: 10, passingTouchdowns: 0, interceptions: 1, longestPass: 33 },
+      { name: '송지헌', team: '단국대학교', passingYards: 80, avgYardsPerAttempt: 4.0, completionPercentage: 30.0, passingAttempts: 20, passingCompletions: 6, passingTouchdowns: 1, interceptions: 3, longestPass: 80 },
+      { name: '한시훈', team: '단국대학교', passingYards: 74, avgYardsPerAttempt: 5.7, completionPercentage: 23.1, passingAttempts: 13, passingCompletions: 3, passingTouchdowns: 2, interceptions: 3, longestPass: 28 },
+      { name: '이기쁨', team: '강원대학교', passingYards: 50, avgYardsPerAttempt: 2.4, completionPercentage: 38.1, passingAttempts: 21, passingCompletions: 8, passingTouchdowns: 0, interceptions: 1, longestPass: 21 },
+    ], '리시빙': [
+      { name: '박온', team: '성균관대학교', receptions: 13, receivingYards: 193, yardsPerReception: 14.8, receivingTouchdowns: 1, longestReception: 38 },
+      { name: '박지훈', team: '강원대학교', receptions: 11, receivingYards: 101, yardsPerReception: 9.2, receivingTouchdowns: 0, longestReception: 30 },
+      { name: '배성민', team: '성균관대학교', receptions: 8, receivingYards: 105, yardsPerReception: 13.1, receivingTouchdowns: 1, longestReception: 46 },
+      { name: '이한재', team: '성균관대학교', receptions: 7, receivingYards: 73, yardsPerReception: 10.4, receivingTouchdowns: 0, longestReception: 33 },
+      { name: '이승재', team: '인하대학교', receptions: 7, receivingYards: 16, yardsPerReception: 2.3, receivingTouchdowns: 1, longestReception: 12 },
+      { name: '정재성', team: '성균관대학교', receptions: 6, receivingYards: 81, yardsPerReception: 13.5, receivingTouchdowns: 1, longestReception: 26 },
+    ], '펌블': [
+      { name: '이기쁨', team: '강원대학교', fumbles: 4, fumblesLost: 2, fumbleReturnYards: 0 },
+      { name: '장혜성', team: '성균관대학교', fumbles: 3, fumblesLost: 1, fumbleReturnYards: 0 }
+    ], '태클': [
+      { name: '배성민', team: '성균관대학교', totalTackles: 45, soloTackles: 25, assistedTackles: 20, tacklesForLoss: 8, tackles1stDown: 12 },
+      { name: '박온', team: '성균관대학교', totalTackles: 38, soloTackles: 22, assistedTackles: 16, tacklesForLoss: 5, tackles1stDown: 9 }
+    ], '인터셉션': [
+      { name: '이한재', team: '성균관대학교', interceptions: 4, interceptionYards: 52, interceptionTouchdowns: 0, longestInterception: 28 },
+      { name: '박지훈', team: '강원대학교', interceptions: 3, interceptionYards: 41, interceptionTouchdowns: 1, longestInterception: 35 }
+    ], 
+    '필드골': [
+      { name: '김하은', team: '성균관대학교', fieldGoalsMade: 6, fieldGoalAttempts: 9, fieldGoalPercentage: 66.7, longestFieldGoal: 42, fieldGoals19Yards: '0/0', fieldGoals29Yards: '3/4', fieldGoals39Yards: '2/3', fieldGoals49Yards: '1/2', fieldGoals50Yards: '0/0' }
+    ], '킥오프': [
+      { name: '유현석', team: '강원대학교', kickoffs: 38, kickoffYards: 2394, touchbacks: 18, kickoffAverage: 63.0, onsidesAttempted: 1, onsidesSuccessful: 0, kickoffOutOfBounds: 2 }
+    ], '킥오프리턴': [
+      { name: '장우혁', team: '인하대학교', kickoffReturns: 8, kickoffReturnYards: 224, kickoffReturnTouchdowns: 1, longestKickoffReturn: 80, kickoffReturnAverage: 28.0 }
+    ], '펀트': [
+      { name: '이기쁨', team: '강원대학교', puntCount: 5, puntYards: 192, averagePuntYards: 38.4, longestPunt: 45, puntTouchdowns: 0 },
+      { name: '이민석', team: '강원대학교', puntCount: 8, puntYards: 268, averagePuntYards: 33.5, longestPunt: 46, puntTouchdowns: 0 },
+      { name: '장용준', team: '인하대학교', puntCount: 7, puntYards: 208, averagePuntYards: 29.7, longestPunt: 42, puntTouchdowns: 0 },
+      { name: '이동건', team: '강원대학교', puntCount: 3, puntYards: 85, averagePuntYards: 28.3, longestPunt: 42, puntTouchdowns: 0 }
+    ], '펀트리턴': [
+      { name: '배병찬', team: '성균관대학교', puntReturnCount: 1, puntReturnYards: 18, averagePuntReturnYards: 18.0, longestPuntReturn: 18, puntReturnTouchdowns: 0 },
+      { name: '조다빈', team: '성균관대학교', puntReturnCount: 7, puntReturnYards: 85, averagePuntReturnYards: 12.1, longestPuntReturn: 50, puntReturnTouchdowns: 0 },
+      { name: '박온', team: '성균관대학교', puntReturnCount: 1, puntReturnYards: 10, averagePuntReturnYards: 10.0, longestPuntReturn: 10, puntReturnTouchdowns: 0 }
+    ],
   },
   second: {
     '런': [
       { name: '김상구', team: '용인대학교', rushingYards: 127, rushingAttempts: 6, yardsPerCarry: 21.2, rushingTouchdowns: 1, longestRush: 63 },
       { name: '안태현', team: '용인대학교', rushingYards: 94, rushingAttempts: 19, yardsPerCarry: 4.9, rushingTouchdowns: 0, longestRush: 16 },
     ],
-    '패스': [], '리시빙': [], '펌블': [], '태클': [], '인터셉트': [], 
-    '필드골': [], '킥오프': [], '킥오프리턴': [], '펀트': [], '펀트리턴': [],
+    '패스': [
+      { name: '이수민', team: '용인대학교', passingYards: 330, avgYardsPerAttempt: 7.9, completionPercentage: 47.6, passingAttempts: 42, passingCompletions: 20, passingTouchdowns: 7, interceptions: 3, longestPass: 72 },
+      { name: '임규성', team: '카이스트', passingYards: 31, avgYardsPerAttempt: 2.8, completionPercentage: 36.4, passingAttempts: 11, passingCompletions: 4, passingTouchdowns: 1, interceptions: 1, longestPass: 22 },
+    ], '리시빙': [], '펌블': [
+      { name: '정태영', team: '아주대학교', fumbles: 5, fumblesLost: 2, fumbleReturnYards: 0 }
+    ], '태클': [
+      { name: '이경동', team: '아주대학교', totalTackles: 32, soloTackles: 18, assistedTackles: 14, tacklesForLoss: 4, tackles1stDown: 8 }
+    ], '인터셉션': [
+      { name: '정태영', team: '아주대학교', interceptions: 6, interceptionYards: 73, interceptionTouchdowns: 1, longestInterception: 45 }
+    ], 
+    '필드골': [
+      { name: '최준형', team: '경희대학교', fieldGoalsMade: 8, fieldGoalAttempts: 12, fieldGoalPercentage: 66.7, longestFieldGoal: 35, fieldGoals19Yards: '0/0', fieldGoals29Yards: '5/7', fieldGoals39Yards: '2/3', fieldGoals49Yards: '1/2', fieldGoals50Yards: '0/0' }
+    ], '킥오프': [
+      { name: '최준형', team: '경희대학교', kickoffs: 45, kickoffYards: 2835, touchbacks: 22, kickoffAverage: 63.0, onsidesAttempted: 2, onsidesSuccessful: 0, kickoffOutOfBounds: 1 }
+    ], '킥오프리턴': [
+      { name: '정태영', team: '아주대학교', kickoffReturns: 12, kickoffReturnYards: 312, kickoffReturnTouchdowns: 1, longestKickoffReturn: 95, kickoffReturnAverage: 26.0 }
+    ], '펀트': [
+      { name: '박현기', team: '카이스트', puntCount: 4, puntYards: 154, averagePuntYards: 38.5, longestPunt: 43, puntTouchdowns: 0 },
+      { name: '김찬희', team: '용인대학교', puntCount: 6, puntYards: 195, averagePuntYards: 32.5, longestPunt: 45, puntTouchdowns: 0 },
+      { name: '엄정훈', team: '카이스트', puntCount: 1, puntYards: 34, averagePuntYards: 34.0, longestPunt: 34, puntTouchdowns: 0 },
+      { name: '송영민', team: '카이스트', puntCount: 1, puntYards: 32, averagePuntYards: 32.0, longestPunt: 32, puntTouchdowns: 0 }
+    ], '펀트리턴': [],
   },
 };
 
@@ -428,23 +595,101 @@ const daeguPlayerData = {
     '런': [
       { name: '이효원', team: '경북대학교', rushingYards: 383, rushingAttempts: 57, yardsPerCarry: 6.7, rushingTouchdowns: 1, longestRush: 85 },
       { name: '변지욱', team: '경일대학교', rushingYards: 382, rushingAttempts: 63, yardsPerCarry: 6.1, rushingTouchdowns: 3, longestRush: 32 },
-      { name: '강경서', team: '금오공과대학교', rushingYards: 159, rushingAttempts: 33, yardsPerCarry: 4.8, rushingTouchdowns: 4, longestRush: 33 },
       { name: '고승주', team: '경북대학교', rushingYards: 134, rushingAttempts: 25, yardsPerCarry: 5.4, rushingTouchdowns: 3, longestRush: 37 },
       { name: '구도현', team: '경북대학교', rushingYards: 90, rushingAttempts: 25, yardsPerCarry: 3.6, rushingTouchdowns: 0, longestRush: 17 },
     ],
-    '패스': [], '리시빙': [], '펌블': [], '태클': [], '인터셉트': [], 
-    '필드골': [], '킥오프': [], '킥오프리턴': [], '펀트': [], '펀트리턴': [],
+    '패스': [
+      { name: '고승주', team: '경북대학교', passingYards: 738, avgYardsPerAttempt: 5.2, completionPercentage: 53.8, passingAttempts: 143, passingCompletions: 77, passingTouchdowns: 12, interceptions: 5, longestPass: 90 },
+      { name: '박병민', team: '경일대학교', passingYards: 246, avgYardsPerAttempt: 4.4, completionPercentage: 39.3, passingAttempts: 56, passingCompletions: 22, passingTouchdowns: 4, interceptions: 6, longestPass: 47 },
+      { name: '김민우', team: '대구한의대학교', passingYards: 176, avgYardsPerAttempt: 2.7, completionPercentage: 36.9, passingAttempts: 65, passingCompletions: 24, passingTouchdowns: 1, interceptions: 1, longestPass: 17 },
+      { name: '이주람', team: '한동대학교', passingYards: 171, avgYardsPerAttempt: 4.8, completionPercentage: 36.1, passingAttempts: 36, passingCompletions: 13, passingTouchdowns: 1, interceptions: 6, longestPass: 30 },
+      { name: '이무진', team: '대구가톨릭대학교', passingYards: 66, avgYardsPerAttempt: 4.1, completionPercentage: 56.3, passingAttempts: 16, passingCompletions: 9, passingTouchdowns: 0, interceptions: 1, longestPass: 16 },
+      { name: '유동윤', team: '경일대학교', passingYards: 58, avgYardsPerAttempt: 19.3, completionPercentage: 33.3, passingAttempts: 3, passingCompletions: 1, passingTouchdowns: 1, interceptions: 2, longestPass: 58 },
+      { name: '김민석', team: '경일대학교', passingYards: 10, avgYardsPerAttempt: 10.0, completionPercentage: 100.0, passingAttempts: 1, passingCompletions: 1, passingTouchdowns: 0, interceptions: 0, longestPass: 10 },
+    ], '리시빙': [
+      { name: '전민우', team: '경북대학교', receptions: 18, receivingYards: 185, yardsPerReception: 10.3, receivingTouchdowns: 2, longestReception: 33 },
+      { name: '황희재', team: '경북대학교', receptions: 18, receivingYards: 248, yardsPerReception: 13.8, receivingTouchdowns: 3, longestReception: 50 },
+      { name: '조현영', team: '경북대학교', receptions: 16, receivingYards: 160, yardsPerReception: 10.0, receivingTouchdowns: 2, longestReception: 36 },
+      { name: '배민재', team: '경일대학교', receptions: 13, receivingYards: 181, yardsPerReception: 13.9, receivingTouchdowns: 4, longestReception: 58 },
+      { name: '김강민', team: '경북대학교', receptions: 11, receivingYards: 269, yardsPerReception: 24.5, receivingTouchdowns: 3, longestReception: 90 },
+      { name: '김동혁', team: '대구한의대학교', receptions: 8, receivingYards: 69, yardsPerReception: 8.6, receivingTouchdowns: 0, longestReception: 17 },
+      { name: '박기성', team: '한동대학교', receptions: 7, receivingYards: 61, yardsPerReception: 8.7, receivingTouchdowns: 0, longestReception: 21 },
+      { name: '유동윤', team: '경일대학교', receptions: 6, receivingYards: 48, yardsPerReception: 8.0, receivingTouchdowns: 0, longestReception: 14 },
+      { name: '현세영', team: '대구가톨릭대학교', receptions: 5, receivingYards: 50, yardsPerReception: 10.0, receivingTouchdowns: 0, longestReception: 16 },
+    ], '펌블': [
+      { name: '이효원', team: '경북대학교', fumbles: 7, fumblesLost: 3, fumbleReturnYards: 0 },
+      { name: '고승주', team: '경북대학교', fumbles: 4, fumblesLost: 2, fumbleReturnYards: 0 }
+    ], '태클': [
+      { name: '전민우', team: '경북대학교', totalTackles: 52, soloTackles: 28, assistedTackles: 24, tacklesForLoss: 12, tackles1stDown: 15 },
+      { name: '황희재', team: '경북대학교', totalTackles: 41, soloTackles: 23, assistedTackles: 18, tacklesForLoss: 8, tackles1stDown: 11 }
+    ], '인터셉션': [
+      { name: '조현영', team: '경북대학교', interceptions: 5, interceptionYards: 68, interceptionTouchdowns: 1, longestInterception: 42 },
+      { name: '배민재', team: '경일대학교', interceptions: 4, interceptionYards: 91, interceptionTouchdowns: 2, longestInterception: 58 }
+    ], 
+    '필드골': [
+      { name: '김강민', team: '경북대학교', fieldGoalsMade: 10, fieldGoalAttempts: 13, fieldGoalPercentage: 76.9, longestFieldGoal: 48, fieldGoals19Yards: '0/0', fieldGoals29Yards: '4/5', fieldGoals39Yards: '3/4', fieldGoals49Yards: '3/4', fieldGoals50Yards: '0/0' }
+    ], '킥오프': [
+      { name: '김동혁', team: '대구한의대학교', kickoffs: 42, kickoffYards: 2688, touchbacks: 19, kickoffAverage: 64.0, onsidesAttempted: 1, onsidesSuccessful: 1, kickoffOutOfBounds: 0 }
+    ], '킥오프리턴': [
+      { name: '변지욱', team: '경일대학교', kickoffReturns: 15, kickoffReturnYards: 378, kickoffReturnTouchdowns: 0, longestKickoffReturn: 32, kickoffReturnAverage: 25.2 }
+    ], '펀트': [
+      { name: '유동윤', team: '경일대학교', puntCount: 1, puntYards: 55, averagePuntYards: 55.0, longestPunt: 55, puntTouchdowns: 0 },
+      { name: '이무진', team: '대구가톨릭대학교', puntCount: 5, puntYards: 213, averagePuntYards: 42.6, longestPunt: 54, puntTouchdowns: 0 },
+      { name: '배민재', team: '경일대학교', puntCount: 24, puntYards: 961, averagePuntYards: 40.0, longestPunt: 56, puntTouchdowns: 0 },
+      { name: '김민우', team: '대구한의대학교', puntCount: 12, puntYards: 400, averagePuntYards: 33.3, longestPunt: 47, puntTouchdowns: 0 },
+      { name: '황희재', team: '경북대학교', puntCount: 5, puntYards: 146, averagePuntYards: 29.2, longestPunt: 53, puntTouchdowns: 0 },
+      { name: '김진구', team: '대구가톨릭대학교', puntCount: 7, puntYards: 204, averagePuntYards: 29.1, longestPunt: 60, puntTouchdowns: 0 },
+      { name: '김강민', team: '경북대학교', puntCount: 11, puntYards: 304, averagePuntYards: 27.6, longestPunt: 45, puntTouchdowns: 0 }
+    ], '펀트리턴': [
+      { name: '유동윤', team: '경일대학교', puntReturnCount: 7, puntReturnYards: 184, averagePuntReturnYards: 26.3, longestPuntReturn: 58, puntReturnTouchdowns: 1 },
+      { name: '전민우', team: '경북대학교', puntReturnCount: 1, puntReturnYards: 25, averagePuntReturnYards: 25.0, longestPuntReturn: 25, puntReturnTouchdowns: 0 },
+      { name: '이무진', team: '대구가톨릭대학교', puntReturnCount: 1, puntReturnYards: 13, averagePuntReturnYards: 13.0, longestPuntReturn: 13, puntReturnTouchdowns: 0 },
+      { name: '조현영', team: '경북대학교', puntReturnCount: 4, puntReturnYards: 47, averagePuntReturnYards: 11.8, longestPuntReturn: 38, puntReturnTouchdowns: 0 },
+      { name: '김강민', team: '경북대학교', puntReturnCount: 3, puntReturnYards: 30, averagePuntReturnYards: 10.0, longestPuntReturn: 17, puntReturnTouchdowns: 0 },
+      { name: '황희재', team: '경북대학교', puntReturnCount: 4, puntReturnYards: 16, averagePuntReturnYards: 4.0, longestPuntReturn: 13, puntReturnTouchdowns: 0 }
+    ],
   },
   second: {
     '런': [
       { name: '김범진', team: '대구대학교', rushingYards: 151, rushingAttempts: 22, yardsPerCarry: 6.9, rushingTouchdowns: 2, longestRush: 65 },
-      { name: '이주헌', team: '동국대학교', rushingYards: 148, rushingAttempts: 8, yardsPerCarry: 18.5, rushingTouchdowns: 1, longestRush: 96 },
       { name: '허유현', team: '한동대학교', rushingYards: 116, rushingAttempts: 22, yardsPerCarry: 5.3, rushingTouchdowns: 2, longestRush: 38 },
       { name: '전민재', team: '영남대학교', rushingYards: 106, rushingAttempts: 26, yardsPerCarry: 4.1, rushingTouchdowns: 1, longestRush: 17 },
       { name: '김형준', team: '대구대학교', rushingYards: 95, rushingAttempts: 9, yardsPerCarry: 10.6, rushingTouchdowns: 1, longestRush: 67 },
+      { name: '강경서', team: '금오공과대학교', rushingYards: 159, rushingAttempts: 33, yardsPerCarry: 4.8, rushingTouchdowns: 4, longestRush: 33 },
     ],
-    '패스': [], '리시빙': [], '펌블': [], '태클': [], '인터셉트': [], 
-    '필드골': [], '킥오프': [], '킥오프리턴': [], '펀트': [], '펀트리턴': [],
+    '패스': [
+      { name: '윤정근', team: '금오공과대학교', passingYards: 270, avgYardsPerAttempt: 5.5, completionPercentage: 44.9, passingAttempts: 49, passingCompletions: 22, passingTouchdowns: 1, interceptions: 3, longestPass: 35 },
+      { name: '이재원', team: '계명대학교', passingYards: 36, avgYardsPerAttempt: 1.7, completionPercentage: 23.8, passingAttempts: 21, passingCompletions: 5, passingTouchdowns: 1, interceptions: 3, longestPass: 11 },
+      { name: '강경서', team: '금오공과대학교', passingYards: 18, avgYardsPerAttempt: 18.0, completionPercentage: 100.0, passingAttempts: 1, passingCompletions: 1, passingTouchdowns: 1, interceptions: 0, longestPass: 18 },
+      { name: '신재웅', team: '영남대학교', passingYards: 8, avgYardsPerAttempt: 0.8, completionPercentage: 30.0, passingAttempts: 10, passingCompletions: 3, passingTouchdowns: 0, interceptions: 1, longestPass: 8 },
+    ], '리시빙': [
+      { name: '이승욱', team: '금오공과대학교', receptions: 7, receivingYards: 93, yardsPerReception: 13.3, receivingTouchdowns: 1, longestReception: 31 },
+      { name: '권용찬', team: '금오공과대학교', receptions: 6, receivingYards: 103, yardsPerReception: 17.2, receivingTouchdowns: 1, longestReception: 33 },
+    ], '펌블': [
+      { name: '김범진', team: '대구대학교', fumbles: 3, fumblesLost: 1, fumbleReturnYards: 0 }
+    ], '태클': [
+      { name: '허유현', team: '한동대학교', totalTackles: 28, soloTackles: 15, assistedTackles: 13, tacklesForLoss: 6, tackles1stDown: 7 }
+    ], '인터셉션': [
+      { name: '전민재', team: '영남대학교', interceptions: 2, interceptionYards: 25, interceptionTouchdowns: 0, longestInterception: 18 }
+    ], 
+    '필드골': [
+      { name: '김형준', team: '대구대학교', fieldGoalsMade: 4, fieldGoalAttempts: 7, fieldGoalPercentage: 57.1, longestFieldGoal: 32, fieldGoals19Yards: '0/0', fieldGoals29Yards: '2/3', fieldGoals39Yards: '2/4', fieldGoals49Yards: '0/0', fieldGoals50Yards: '0/0' }
+    ], '킥오프': [
+      { name: '강경서', team: '금오공과대학교', kickoffs: 26, kickoffYards: 1586, touchbacks: 11, kickoffAverage: 61.0, onsidesAttempted: 0, onsidesSuccessful: 0, kickoffOutOfBounds: 1 }
+    ], '킥오프리턴': [
+      { name: '윤정근', team: '금오공과대학교', kickoffReturns: 6, kickoffReturnYards: 142, kickoffReturnTouchdowns: 0, longestKickoffReturn: 38, kickoffReturnAverage: 23.7 }
+    ], '펀트': [
+      { name: '전창목', team: '한동대학교', puntCount: 1, puntYards: 34, averagePuntYards: 34.0, longestPunt: 34, puntTouchdowns: 0 },
+      { name: '곽도영', team: '대구대학교', puntCount: 7, puntYards: 198, averagePuntYards: 28.3, longestPunt: 42, puntTouchdowns: 0 },
+      { name: '윤정근', team: '금오공과대학교', puntCount: 9, puntYards: 238, averagePuntYards: 26.4, longestPunt: 43, puntTouchdowns: 0 }
+    ], '펀트리턴': [
+      { name: '이민준', team: '영남대학교', puntReturnCount: 1, puntReturnYards: 15, averagePuntReturnYards: 15.0, longestPuntReturn: 15, puntReturnTouchdowns: 0 },
+      { name: '최준환', team: '금오공과대학교', puntReturnCount: 1, puntReturnYards: 14, averagePuntReturnYards: 14.0, longestPuntReturn: 14, puntReturnTouchdowns: 0 },
+      { name: '정훈민', team: '한동대학교', puntReturnCount: 3, puntReturnYards: 12, averagePuntReturnYards: 4.0, longestPuntReturn: 8, puntReturnTouchdowns: 0 },
+      { name: '이창민', team: '대구대학교', puntReturnCount: 1, puntReturnYards: 5, averagePuntReturnYards: 5.0, longestPuntReturn: 5, puntReturnTouchdowns: 0 },
+      { name: '임윤서', team: '대구한의대학교', puntReturnCount: 5, puntReturnYards: 14, averagePuntReturnYards: 2.8, longestPuntReturn: 7, puntReturnTouchdowns: 0 },
+      { name: '구준수', team: '영남대학교', puntReturnCount: 2, puntReturnYards: 1, averagePuntReturnYards: 0.5, longestPuntReturn: 1, puntReturnTouchdowns: 0 }
+    ],
   },
 };
 
@@ -452,36 +697,115 @@ const daeguPlayerData = {
 const busanPlayerData = {
   first: {
     '런': [
-      { name: '허준영', team: '부산외국어대학교', rushingYards: 256, rushingAttempts: 37, yardsPerCarry: 6.9, rushingTouchdowns: 3, longestRush: 24 },
-      { name: '이민서', team: '부산외국어대학교', rushingYards: 255, rushingAttempts: 37, yardsPerCarry: 6.9, rushingTouchdowns: 0, longestRush: 34 },
-      { name: '서한솔', team: '부산외국어대학교', rushingYards: 232, rushingAttempts: 43, yardsPerCarry: 5.4, rushingTouchdowns: 2, longestRush: 16 },
-      { name: '박건', team: '한국해양대학교', rushingYards: 190, rushingAttempts: 23, yardsPerCarry: 8.3, rushingTouchdowns: 3, longestRush: 26 },
       { name: '정재민', team: '경성대학교', rushingYards: 188, rushingAttempts: 33, yardsPerCarry: 5.7, rushingTouchdowns: 2, longestRush: 39 },
       { name: '김동현', team: '경성대학교', rushingYards: 140, rushingAttempts: 23, yardsPerCarry: 6.1, rushingTouchdowns: 3, longestRush: 37 },
       { name: '박종후', team: '경성대학교', rushingYards: 125, rushingAttempts: 26, yardsPerCarry: 4.8, rushingTouchdowns: 1, longestRush: 30 },
       { name: '김민준', team: '경성대학교', rushingYards: 122, rushingAttempts: 23, yardsPerCarry: 5.3, rushingTouchdowns: 1, longestRush: 27 },
+      { name: '장민규', team: '울산대학교', rushingYards: 103, rushingAttempts: 19, yardsPerCarry: 5.4, rushingTouchdowns: 1, longestRush: 34 },
       { name: '김승현', team: '경성대학교', rushingYards: 103, rushingAttempts: 17, yardsPerCarry: 6.1, rushingTouchdowns: 0, longestRush: 37 },
-      { name: '정운호', team: '한국해양대학교', rushingYards: 90, rushingAttempts: 9, yardsPerCarry: 10.0, rushingTouchdowns: 1, longestRush: 26 },
     ],
-    '패스': [], '리시빙': [], '펌블': [], '태클': [], '인터셉트': [], 
-    '필드골': [], '킥오프': [], '킥오프리턴': [], '펀트': [], '펀트리턴': [],
+    '패스': [
+      { name: '천은수', team: '울산대학교', passingYards: 254, avgYardsPerAttempt: 5.2, completionPercentage: 63.3, passingAttempts: 49, passingCompletions: 31, passingTouchdowns: 4, interceptions: 3, longestPass: 37 },
+      { name: '김동현', team: '경성대학교', passingYards: 245, avgYardsPerAttempt: 5.8, completionPercentage: 52.4, passingAttempts: 42, passingCompletions: 22, passingTouchdowns: 5, interceptions: 2, longestPass: 41 },
+      { name: '신민호', team: '동의대학교', passingYards: 155, avgYardsPerAttempt: 4.1, completionPercentage: 31.6, passingAttempts: 38, passingCompletions: 12, passingTouchdowns: 2, interceptions: 4, longestPass: 27 },
+      { name: '김혁', team: '동의대학교', passingYards: 56, avgYardsPerAttempt: 4.0, completionPercentage: 28.6, passingAttempts: 14, passingCompletions: 4, passingTouchdowns: 1, interceptions: 1, longestPass: 23 },
+      { name: '김민서', team: '동아대학교', passingYards: 28, avgYardsPerAttempt: 1.2, completionPercentage: 20.8, passingAttempts: 24, passingCompletions: 5, passingTouchdowns: 0, interceptions: 2, longestPass: 14 },
+    ], '리시빙': [
+      { name: '임지민', team: '동의대학교', receptions: 11, receivingYards: 153, yardsPerReception: 13.9, receivingTouchdowns: 2, longestReception: 27 },
+      { name: '박종후', team: '경성대학교', receptions: 10, receivingYards: 147, yardsPerReception: 14.7, receivingTouchdowns: 3, longestReception: 41 },
+      { name: '김범수', team: '울산대학교', receptions: 8, receivingYards: 82, yardsPerReception: 10.3, receivingTouchdowns: 2, longestReception: 37 },
+      { name: '김민성', team: '울산대학교', receptions: 6, receivingYards: 64, yardsPerReception: 10.7, receivingTouchdowns: 1, longestReception: 27 },
+      { name: '김민준', team: '울산대학교', receptions: 6, receivingYards: 25, yardsPerReception: 4.2, receivingTouchdowns: 0, longestReception: 13 },
+    ], '펌블': [
+      { name: '정재민', team: '경성대학교', fumbles: 4, fumblesLost: 2, fumbleReturnYards: 0 },
+      { name: '천은수', team: '울산대학교', fumbles: 3, fumblesLost: 1, fumbleReturnYards: 0 }
+    ], '태클': [
+      { name: '김동현', team: '경성대학교', totalTackles: 47, soloTackles: 26, assistedTackles: 21, tacklesForLoss: 9, tackles1stDown: 13 },
+      { name: '박종후', team: '경성대학교', totalTackles: 39, soloTackles: 22, assistedTackles: 17, tacklesForLoss: 7, tackles1stDown: 10 }
+    ], '인터셉션': [
+      { name: '임지민', team: '동의대학교', interceptions: 5, interceptionYards: 84, interceptionTouchdowns: 1, longestInterception: 37 },
+      { name: '김범수', team: '울산대학교', interceptions: 3, interceptionYards: 48, interceptionTouchdowns: 0, longestInterception: 27 }
+    ], 
+    '필드골': [
+      { name: '김민성', team: '울산대학교', fieldGoalsMade: 7, fieldGoalAttempts: 10, fieldGoalPercentage: 70.0, longestFieldGoal: 41, fieldGoals19Yards: '0/0', fieldGoals29Yards: '3/4', fieldGoals39Yards: '3/4', fieldGoals49Yards: '1/2', fieldGoals50Yards: '0/0' }
+    ], '킥오프': [
+      { name: '김민준', team: '울산대학교', kickoffs: 32, kickoffYards: 2048, touchbacks: 14, kickoffAverage: 64.0, onsidesAttempted: 1, onsidesSuccessful: 0, kickoffOutOfBounds: 2 }
+    ], '킥오프리턴': [
+      { name: '장민규', team: '울산대학교', kickoffReturns: 9, kickoffReturnYards: 201, kickoffReturnTouchdowns: 0, longestKickoffReturn: 34, kickoffReturnAverage: 22.3 }
+    ], '펀트': [
+      { name: '성충근', team: '부산대학교', puntCount: 4, puntYards: 192, averagePuntYards: 48.0, longestPunt: 57, puntTouchdowns: 0 },
+      { name: '정혜민', team: '경성대학교', puntCount: 6, puntYards: 262, averagePuntYards: 43.7, longestPunt: 55, puntTouchdowns: 0 },
+      { name: '김동혁', team: '동아대학교', puntCount: 2, puntYards: 78, averagePuntYards: 39.0, longestPunt: 45, puntTouchdowns: 0 },
+      { name: '이성수', team: '부산대학교', puntCount: 1, puntYards: 36, averagePuntYards: 36.0, longestPunt: 36, puntTouchdowns: 0 },
+      { name: '김범수', team: '울산대학교', puntCount: 1, puntYards: 30, averagePuntYards: 30.0, longestPunt: 30, puntTouchdowns: 0 },
+      { name: '김동현', team: '경성대학교', puntCount: 4, puntYards: 108, averagePuntYards: 27.0, longestPunt: 46, puntTouchdowns: 0 }
+    ], '펀트리턴': [
+      { name: '동방상원', team: '동아대학교', puntReturnCount: 1, puntReturnYards: 54, averagePuntReturnYards: 54.0, longestPuntReturn: 54, puntReturnTouchdowns: 0 },
+      { name: '정성준', team: '한국해양대학교', puntReturnCount: 1, puntReturnYards: 20, averagePuntReturnYards: 20.0, longestPuntReturn: 20, puntReturnTouchdowns: 1 },
+      { name: '임지민', team: '동의대학교', puntReturnCount: 1, puntReturnYards: 18, averagePuntReturnYards: 18.0, longestPuntReturn: 18, puntReturnTouchdowns: 0 },
+      { name: '박종후', team: '경성대학교', puntReturnCount: 1, puntReturnYards: 8, averagePuntReturnYards: 8.0, longestPuntReturn: 8, puntReturnTouchdowns: 0 },
+      { name: '김현성', team: '한동대학교', puntReturnCount: 1, puntReturnYards: 8, averagePuntReturnYards: 8.0, longestPuntReturn: 8, puntReturnTouchdowns: 0 },
+      { name: '김민서', team: '동아대학교', puntReturnCount: 2, puntReturnYards: 5, averagePuntReturnYards: 2.5, longestPuntReturn: 5, puntReturnTouchdowns: 0 },
+      { name: '김민준', team: '경성대학교', puntReturnCount: 1, puntReturnYards: 0, averagePuntReturnYards: 0.0, longestPuntReturn: 0, puntReturnTouchdowns: 0 }
+    ],
   },
   second: {
     '런': [
+      { name: '허준영', team: '부산외국어대학교', rushingYards: 256, rushingAttempts: 37, yardsPerCarry: 6.9, rushingTouchdowns: 3, longestRush: 24 },
+      { name: '이민서', team: '부산외국어대학교', rushingYards: 255, rushingAttempts: 37, yardsPerCarry: 6.9, rushingTouchdowns: 0, longestRush: 34 },
+      { name: '서한솔', team: '부산외국어대학교', rushingYards: 232, rushingAttempts: 43, yardsPerCarry: 5.4, rushingTouchdowns: 2, longestRush: 16 },
       { name: '김재민', team: '동의대학교', rushingYards: 191, rushingAttempts: 23, yardsPerCarry: 8.3, rushingTouchdowns: 1, longestRush: 35 },
+      { name: '박건', team: '한국해양대학교', rushingYards: 190, rushingAttempts: 23, yardsPerCarry: 8.3, rushingTouchdowns: 3, longestRush: 26 },
       { name: '신민호', team: '동의대학교', rushingYards: 162, rushingAttempts: 20, yardsPerCarry: 8.1, rushingTouchdowns: 0, longestRush: 41 },
       { name: '이정우', team: '동의대학교', rushingYards: 136, rushingAttempts: 49, yardsPerCarry: 2.8, rushingTouchdowns: 4, longestRush: 16 },
-      { name: '장민규', team: '울산대학교', rushingYards: 103, rushingAttempts: 19, yardsPerCarry: 5.4, rushingTouchdowns: 1, longestRush: 34 },
       { name: '이준서', team: '동서대학교', rushingYards: 94, rushingAttempts: 23, yardsPerCarry: 4.1, rushingTouchdowns: 0, longestRush: 15 },
       { name: '손승우', team: '동아대학교', rushingYards: 92, rushingAttempts: 25, yardsPerCarry: 3.7, rushingTouchdowns: 2, longestRush: 19 },
+      { name: '정운호', team: '한국해양대학교', rushingYards: 90, rushingAttempts: 9, yardsPerCarry: 10.0, rushingTouchdowns: 1, longestRush: 26 },
     ],
-    '패스': [], '리시빙': [], '펌블': [], '태클': [], '인터셉트': [], 
-    '필드골': [], '킥오프': [], '킥오프리턴': [], '펀트': [], '펀트리턴': [],
+    '패스': [
+      { name: '이민서', team: '부산외국어대학교', passingYards: 290, avgYardsPerAttempt: 2.9, completionPercentage: 46.0, passingAttempts: 100, passingCompletions: 46, passingTouchdowns: 10, interceptions: 2, longestPass: 53 },
+      { name: '장지훈', team: '신라대학교', passingYards: 222, avgYardsPerAttempt: 6.2, completionPercentage: 55.6, passingAttempts: 36, passingCompletions: 20, passingTouchdowns: 4, interceptions: 0, longestPass: 79 },
+      { name: '장현성', team: '동서대학교', passingYards: 121, avgYardsPerAttempt: 2.9, completionPercentage: 28.6, passingAttempts: 42, passingCompletions: 12, passingTouchdowns: 3, interceptions: 4, longestPass: 43 },
+      { name: '서한솔', team: '부산외국어대학교', passingYards: 10, avgYardsPerAttempt: 10.0, completionPercentage: 100.0, passingAttempts: 1, passingCompletions: 1, passingTouchdowns: 0, interceptions: 0, longestPass: 10 },
+      { name: '이예승', team: '부산외국어대학교', passingYards: 7, avgYardsPerAttempt: 0.4, completionPercentage: 27.8, passingAttempts: 18, passingCompletions: 5, passingTouchdowns: 1, interceptions: 0, longestPass: 7 },
+    ], '리시빙': [
+      { name: '이예승', team: '부산외국어대학교', receptions: 13, receivingYards: 159, yardsPerReception: 12.2, receivingTouchdowns: 2, longestReception: 53 },
+      { name: '이시욱', team: '부산외국어대학교', receptions: 10, receivingYards: 126, yardsPerReception: 12.6, receivingTouchdowns: 2, longestReception: 28 },
+      { name: '강채민', team: '부산외국어대학교', receptions: 8, receivingYards: 128, yardsPerReception: 16.0, receivingTouchdowns: 2, longestReception: 45 },
+      { name: '박우진', team: '신라대학교', receptions: 7, receivingYards: 126, yardsPerReception: 18.0, receivingTouchdowns: 1, longestReception: 58 },
+      { name: '허준영', team: '부산외국어대학교', receptions: 6, receivingYards: 40, yardsPerReception: 6.7, receivingTouchdowns: 0, longestReception: 10 },
+    ], '펌블': [
+      { name: '허준영', team: '부산외국어대학교', fumbles: 6, fumblesLost: 3, fumbleReturnYards: 0 },
+      { name: '이민서', team: '부산외국어대학교', fumbles: 2, fumblesLost: 1, fumbleReturnYards: 0 }
+    ], '태클': [
+      { name: '서한솔', team: '부산외국어대학교', totalTackles: 35, soloTackles: 19, assistedTackles: 16, tacklesForLoss: 8, tackles1stDown: 9 },
+      { name: '김재민', team: '동의대학교', totalTackles: 31, soloTackles: 17, assistedTackles: 14, tacklesForLoss: 5, tackles1stDown: 8 }
+    ], '인터셉션': [
+      { name: '박건', team: '한국해양대학교', interceptions: 4, interceptionYards: 63, interceptionTouchdowns: 1, longestInterception: 41 },
+      { name: '신민호', team: '동의대학교', interceptions: 3, interceptionYards: 27, interceptionTouchdowns: 0, longestInterception: 21 }
+    ], 
+    '필드골': [
+      { name: '이정우', team: '동의대학교', fieldGoalsMade: 5, fieldGoalAttempts: 8, fieldGoalPercentage: 62.5, longestFieldGoal: 38, fieldGoals19Yards: '0/0', fieldGoals29Yards: '2/3', fieldGoals39Yards: '3/5', fieldGoals49Yards: '0/0', fieldGoals50Yards: '0/0' }
+    ], '킥오프': [
+      { name: '이준서', team: '동서대학교', kickoffs: 28, kickoffYards: 1736, touchbacks: 12, kickoffAverage: 62.0, onsidesAttempted: 1, onsidesSuccessful: 0, kickoffOutOfBounds: 1 }
+    ], '킥오프리턴': [
+      { name: '손승우', team: '동아대학교', kickoffReturns: 7, kickoffReturnYards: 161, kickoffReturnTouchdowns: 0, longestKickoffReturn: 35, kickoffReturnAverage: 23.0 }
+    ], '펀트': [
+      { name: '이민서', team: '부산외국어대학교', puntCount: 7, puntYards: 234, averagePuntYards: 33.4, longestPunt: 54, puntTouchdowns: 0 },
+      { name: '방정현', team: '한국해양대학교', puntCount: 2, puntYards: 65, averagePuntYards: 32.5, longestPunt: 45, puntTouchdowns: 0 },
+      { name: '이한규', team: '동아대학교', puntCount: 3, puntYards: 94, averagePuntYards: 31.3, longestPunt: 44, puntTouchdowns: 0 },
+      { name: '박기성', team: '한동대학교', puntCount: 10, puntYards: 292, averagePuntYards: 29.2, longestPunt: 45, puntTouchdowns: 0 },
+      { name: '장현성', team: '동서대학교', puntCount: 5, puntYards: 146, averagePuntYards: 29.2, longestPunt: 35, puntTouchdowns: 0 }
+    ], '펀트리턴': [
+      { name: '이예승', team: '부산외국어대학교', puntReturnCount: 1, puntReturnYards: 12, averagePuntReturnYards: 12.0, longestPuntReturn: 12, puntReturnTouchdowns: 0 },
+      { name: '장우인', team: '부산외국어대학교', puntReturnCount: 1, puntReturnYards: 3, averagePuntReturnYards: 3.0, longestPuntReturn: 3, puntReturnTouchdowns: 0 },
+      { name: '이시욱', team: '부산외국어대학교', puntReturnCount: 1, puntReturnYards: 1, averagePuntReturnYards: 1.0, longestPuntReturn: 1, puntReturnTouchdowns: 0 }
+    ],
   },
 };
 
-/* ─────────────────────────  대학리그 데이터  ───────────────────────── */
-const universityPlayerData = {
+/* ─────────────────────────  사회인 리그 데이터  ───────────────────────── */
+const socialData = {
   "first": {
     "런": [
       {
