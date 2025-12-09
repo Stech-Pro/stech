@@ -41,7 +41,6 @@ export const TEAM_DIVISIONS = {
   '계명대학교': { region: 'Daegu-Gyeongbuk', division: '2부' },
   '금오공과대학교': { region: 'Daegu-Gyeongbuk', division: '2부' },
   '대구대학교': { region: 'Daegu-Gyeongbuk', division: '2부' },
-  '동국대학교(경주)': { region: 'Daegu-Gyeongbuk', division: '2부' },
   '영남대학교': { region: 'Daegu-Gyeongbuk', division: '2부' },
   
   // 부산경남리그 1부
