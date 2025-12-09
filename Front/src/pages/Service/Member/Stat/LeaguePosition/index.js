@@ -1,4 +1,4 @@
-import StatPosition from '../../../../../components/Stat/StatPosition';
+import StatPlayer from '../../../../../components/Stat/StatPlayer';
 import { TEAMS, TEAM_BY_ID} from '../../../../../data/TEAMS';
 import { useState, useEffect } from 'react';
 import { API_CONFIG } from '../../../../../config/api';
@@ -213,12 +213,12 @@ const LeaguePositionPage = () => {
   }
 
   if (error) {
-    return <StatPosition data={[]} teams={TEAMS} />;
+    return <StatPlayer teams={TEAMS} />;
   }
 
   return (
     <div>
-      <StatPosition data={data} teams={TEAMS} />
+      <StatPlayer teams={TEAMS} />
     </div>
   );
 };

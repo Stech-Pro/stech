@@ -1828,4 +1828,133 @@ export class KafaStatsController {
       };
     }
   }
+
+  // 전체 KAFA 통계 데이터 API
+  @Get('all-stats')
+  @ApiOperation({
+    summary: '🏈 전체 KAFA 통계 데이터 조회',
+    description: `
+    ## 🏈 전체 KAFA 통계 데이터 한 번에 조회
+    
+    대학/사회인 리그의 모든 팀/개인 통계를 오펜스/디펜스/스페셜팀으로 구분하여 제공합니다.
+    프론트엔드에서 자유롭게 필터링하고 분류할 수 있는 완전한 데이터셋입니다.
+    
+    ### 📊 포함된 데이터 구조
+    
+    **대학 (University)**
+    - **팀 스탯**: 오펜스(러싱/패싱/리시빙) + 디펜스(태클/인터셉션/색) + 스페셜(킥/펀트)
+    - **개인 스탯**: 오펜스(러싱/패싱/리시빙) + 디펜스(태클/인터셉션/색) + 스페셜(킥/펀트/리턴)
+    
+    **사회인 (Social)**
+    - **팀 스탯**: 동일 구조
+    - **개인 스탯**: 동일 구조
+    
+    ### 🎯 활용 방안
+    - 리그별 필터링 (대학/사회인)
+    - 팀/개인 구분 필터링
+    - 포지션별 필터링 (오펜스/디펜스/스페셜팀)
+    - 스탯 타입별 필터링 (러싱/패싱/태클 등)
+    - 순위별 정렬 및 검색
+    
+    ### ⚡ 성능 최적화
+    - 실시간 KAFA 사이트 크롤링
+    - DB 저장 없이 직접 제공
+    - 캐싱 없이 항상 최신 데이터
+    `,
+  })
+  @ApiQuery({
+    name: 'year',
+    required: false,
+    description: '특정 연도 조회 (선택사항)',
+    example: '2025'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '전체 KAFA 통계 데이터 조회 성공',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: { type: 'string', example: '전체 KAFA 통계 데이터 조회 완료' },
+        data: {
+          type: 'object',
+          properties: {
+            university: {
+              type: 'object',
+              properties: {
+                team: {
+                  type: 'object',
+                  properties: {
+                    offense: {
+                      type: 'object',
+                      properties: {
+                        rushing: { type: 'array', items: { type: 'object' } },
+                        passing: { type: 'array', items: { type: 'object' } },
+                        receiving: { type: 'array', items: { type: 'object' } }
+                      }
+                    },
+                    defense: {
+                      type: 'object',
+                      properties: {
+                        tackles: { type: 'array', items: { type: 'object' } },
+                        interceptions: { type: 'array', items: { type: 'object' } },
+                        sacks: { type: 'array', items: { type: 'object' } }
+                      }
+                    },
+                    special: {
+                      type: 'object',
+                      properties: {
+                        kicking: { type: 'array', items: { type: 'object' } },
+                        punting: { type: 'array', items: { type: 'object' } }
+                      }
+                    }
+                  }
+                },
+                individual: { type: 'object', description: '개인 통계 (팀과 동일 구조)' }
+              }
+            },
+            social: { type: 'object', description: '사회인 통계 (대학과 동일 구조)' }
+          }
+        },
+        meta: {
+          type: 'object',
+          properties: {
+            crawledAt: { type: 'string', example: '2025-12-01T13:45:00Z' },
+            categories: { type: 'array', items: { type: 'string' }, example: ['university', 'social'] },
+            units: { type: 'array', items: { type: 'string' }, example: ['team', 'individual'] },
+            phases: { type: 'array', items: { type: 'string' }, example: ['offense', 'defense', 'special'] },
+            totalStatTypes: { type: 'number', example: 18 }
+          }
+        }
+      }
+    }
+  })
+  async getAllKafaStats(@Query('year') year?: string) {
+    try {
+      const startTime = Date.now();
+      const data = await this.kafaStatsService.getAllKafaStats(year);
+      const duration = Date.now() - startTime;
+
+      return {
+        success: true,
+        message: `전체 KAFA 통계 데이터 조회 완료 (${Math.round(duration / 1000)}초 소요)`,
+        data,
+        meta: {
+          crawledAt: new Date().toISOString(),
+          categories: ['university', 'social'],
+          units: ['team', 'individual'],
+          phases: ['offense', 'defense', 'special'],
+          totalStatTypes: 18,
+          crawlDuration: `${Math.round(duration / 1000)}초`
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `전체 KAFA 통계 조회 실패: ${error.message}`,
+        error: error.message
+      };
+    }
+  }
+
 }

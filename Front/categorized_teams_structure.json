@@ -1,0 +1,316 @@
+{
+  "Seoul": {
+    "1부": [
+      {
+        "teamName": "한양대 라이온스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "연세대 이글스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "홍익대 카우보이스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "서울대 그린테러스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "건국대 레이징불스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "서울시립대 시티혹스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "국민대 레이저백스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "한국외대 블랙나이츠",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      }
+    ],
+    "2부": [
+      {
+        "teamName": "고려대 타이거스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "중앙대 블루드래곤스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "숭실대 크루세이더스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "경희대 커맨더스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "동국대 터스커스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "서강대 알바트로스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "동국대 터스커스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      }
+    ]
+  },
+  "Gyeonggi-Gangwon": {
+    "1부": [
+      {
+        "teamName": "강원대 카프라",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "인하대 틸 드래곤스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "성균관대 로얄스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "단국대 코디악베어스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      }
+    ],
+    "2부": [
+      {
+        "teamName": "용인대 화이트타이거스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "한림대 피닉스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "카이스트 매버릭스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "한신대 킬러웨일스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      }
+    ]
+  },
+  "Daegu-Gyeongbuk": {
+    "1부": [
+      {
+        "teamName": "경북대 오렌지파이터스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "경일대 블랙베어스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "한동대 홀리램스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "대구가톨릭대 스커드엔젤스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "대구한의대 라이노스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      }
+    ],
+    "2부": [
+      {
+        "teamName": "대구대 플라잉타이거스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "금오공과대 레이븐스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "영남대 페가수스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "계명대 슈퍼라이온스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      }
+    ]
+  },
+  "Busan-Gyeongnam": {
+    "1부": [
+      {
+        "teamName": "경성대 드래곤스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "동의대 터틀파이터스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "동아대 레오파즈",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "울산대 유니콘스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      }
+    ],
+    "2부": [
+      {
+        "teamName": "부산외국어대 토네이도",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "한국해양대 바이킹스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "동서대 블루돌핀스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "신라대 데빌스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      },
+      {
+        "teamName": "부산대 이글스",
+        "offense": {},
+        "defense": {},
+        "special": {}
+      }
+    ]
+  },
+  "Amateur": [
+    {
+      "teamName": "부산 그리폰즈",
+      "offense": {},
+      "defense": {},
+      "special": {}
+    },
+    {
+      "teamName": "삼성 블루스톰",
+      "offense": {},
+      "defense": {},
+      "special": {}
+    },
+    {
+      "teamName": "인천 라이노스",
+      "offense": {},
+      "defense": {},
+      "special": {}
+    },
+    {
+      "teamName": "군위 피닉스",
+      "offense": {},
+      "defense": {},
+      "special": {}
+    },
+    {
+      "teamName": "서울 골든이글스",
+      "offense": {},
+      "defense": {},
+      "special": {}
+    },
+    {
+      "teamName": "서울 디펜더스",
+      "offense": {},
+      "defense": {},
+      "special": {}
+    },
+    {
+      "teamName": "서울 바이킹스",
+      "offense": {},
+      "defense": {},
+      "special": {}
+    }
+  ]
+}

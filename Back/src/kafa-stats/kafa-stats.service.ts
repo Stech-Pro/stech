@@ -200,6 +200,13 @@ export class KafaStatsService {
     };
   }
 
+  // 러싱 야드 정보에서 숫자만 추출하는 헬퍼 함수
+  private cleanRushingYards(rushingYardStr: string): string {
+    // "383 (전진 : 434 / 후퇴 : -51)" 형식에서 383만 추출
+    const match = rushingYardStr.match(/^(-?\d+)/);
+    return match ? match[1] : rushingYardStr;
+  }
+
   // 특정 팀의 팀 스탯 조회
   async getSpecificTeamStats(league: 'uni' | 'soc', teamName: string, year?: string): Promise<TeamOffenseStats | null> {
     const allStats = await this.getTeamStats(league, year);
@@ -1905,6 +1912,426 @@ export class KafaStatsService {
     } catch (error) {
       this.logger.error(`❌ 경기 일반 정보 추출 실패: ${error.message}`);
       throw new Error(`경기 일반 정보 추출 실패: ${error.message}`);
+    }
+  }
+
+  // 특정 페이지의 팀 스탯 크롤링 (일반화)
+  async getTeamStatsByPage(league: 'uni' | 'soc', pageType: string, year?: string): Promise<any[]> {
+    try {
+      // KAFA 사이트의 오타를 위한 특별 처리: defense -> deffense
+      let actualPageType = pageType;
+      if (pageType === 'defense1' || pageType === 'defense2') {
+        actualPageType = pageType.replace('defense', 'deffense');
+      }
+      const url = `${this.baseUrl}/team_${league}_${actualPageType}.html`;
+      this.logger.log(`📊 팀 스탯 페이지 크롤링: ${url}`);
+      
+      const { data } = await axios.get(url, {
+        params: year ? { year } : {},
+        timeout: 10000,
+      });
+      
+      const $ = cheerio.load(data);
+      const stats: any[] = [];
+      
+      // 페이지 타입에 따른 필드 매핑 정의
+      const fieldMappings = this.getTeamStatFieldMapping(pageType);
+      
+      $('.stats_table tr').each((index, element) => {
+        // 첫 번째 행(헤더)은 건너뛰기
+        if (index === 0) return;
+        
+        const cells = $(element).find('td');
+        
+        if (cells.length >= 3) {
+          const teamName = $(cells[0]).text().trim();
+          
+          // 팀명이 유효한 경우만 추가
+          if (teamName && teamName !== '팀명') {
+            const statData: any = {
+              rank: index,
+              teamName,
+            };
+
+            // 각 셀의 데이터를 의미있는 필드명으로 파싱
+            cells.each((cellIndex, cell) => {
+              if (cellIndex === 0) return; // 팀명은 이미 처리됨
+              
+              const cellValue = $(cell).text().trim();
+              const fieldName = fieldMappings[cellIndex] || `unknown${cellIndex}`;
+              
+              // 숫자인지 확인하고 적절히 파싱
+              if (!isNaN(parseFloat(cellValue))) {
+                statData[fieldName] = parseFloat(cellValue);
+              } else {
+                statData[fieldName] = cellValue;
+              }
+            });
+            
+            stats.push(statData);
+          }
+        }
+      });
+      
+      this.logger.log(`✅ ${pageType} 팀 스탯 ${stats.length}개 크롤링 완료`);
+      return stats;
+    } catch (error) {
+      this.logger.error(`❌ 팀 스탯 페이지 크롤링 실패 (${pageType}): ${error.message}`);
+      return [];
+    }
+  }
+
+  // 팀 스탯 필드 매핑 정의
+  private getTeamStatFieldMapping(pageType: string): Record<number, string> {
+    const mappings: Record<string, Record<number, string>> = {
+      'offense1': { // 러싱
+        1: 'rushingYards',
+        2: 'yardsPerAttempt', 
+        3: 'attempts',
+        4: 'touchdowns',
+        5: 'longestRush'
+      },
+      'offense2': { // 패싱
+        1: 'passingYards',
+        2: 'yardsPerAttempt',
+        3: 'completionPercentage',
+        4: 'attempts',
+        5: 'completions',
+        6: 'touchdowns',
+        7: 'interceptions',
+        8: 'longestPass'
+      },
+      'offense3': { // 리시빙
+        1: 'receptions',
+        2: 'receivingYards',
+        3: 'yardsPerReception',
+        4: 'targets',
+        5: 'touchdowns',
+        6: 'longestReception'
+      },
+      'defense1': { // 태클 (KAFA: ATT, SACK, SOLO, COMBO)
+        1: 'totalTackles',    // ATT
+        2: 'sacks',          // SACK
+        3: 'soloTackles',    // SOLO
+        4: 'assistTackles'   // COMBO
+      },
+      'defense2': { // 인터셉션 (KAFA: INT, INT TD, INT YDS, LNG)
+        1: 'interceptions',          // INT
+        2: 'interceptionTd',         // INT TD
+        3: 'interceptionYards',      // INT YDS
+        4: 'longestInterception'     // LNG
+      },
+      'defense3': { // 색
+        1: 'sacks',
+        2: 'sackYards',
+        3: 'qbHurries',
+        4: 'passesDefended'
+      },
+      'special1': { // 킥킹
+        1: 'fieldGoalPercentage',
+        2: 'averageDistance',
+        3: 'fieldGoalsMade',
+        4: 'fieldGoalsAttempted',
+        5: 'longestMade',
+        6: 'longestAttempted'
+      },
+      'special2': { // 킥오프
+        1: 'avgKickoffYards',      // YDS AVG
+        2: 'kickoffCount',         // KO
+        3: 'kickoffYards',         // YDS
+        4: 'kickoffTouchdowns',    // TD
+        5: 'longestKickoff'        // LNG
+      },
+      'special3': { // 킥오프 리턴
+        1: 'avgReturnYards',       // YDS AVG
+        2: 'returns',              // KO RETURNS
+        3: 'returnYards',          // YDS
+        4: 'kickReturnTouchdowns', // TD
+        5: 'longestReturn'         // LNG
+      },
+      'special4': { // 펀팅
+        1: 'avgPuntYards',         // YDS AVG
+        2: 'puntCount',            // PUNTS
+        3: 'puntYards',            // YDS
+        4: 'puntTouchdowns',       // TD
+        5: 'longestPunt'           // LNG
+      },
+      'special5': { // 펀트 리턴
+        1: 'avgReturnYards',       // YDS AVG
+        2: 'returns',              // PUNT RETURNS
+        3: 'returnYards',          // YDS
+        4: 'puntReturnTouchdowns', // TD
+        5: 'longestReturn'         // LNG
+      }
+    };
+    
+    return mappings[pageType] || {};
+  }
+
+  // 개인 스탯 필드 매핑 정의
+  private getPlayerStatFieldMapping(pageNumber: number): Record<number, string> {
+    const mappings: Record<number, Record<number, string>> = {
+      1: { // 개인 러싱
+        2: 'rushingYards',
+        3: 'yardsPerAttempt',
+        4: 'attempts', 
+        5: 'touchdowns',
+        6: 'longestRush'
+      },
+      2: { // 개인 패싱
+        2: 'passingYards',
+        3: 'yardsPerAttempt',
+        4: 'completionPercentage',
+        5: 'attempts',
+        6: 'completions',
+        7: 'touchdowns',
+        8: 'interceptions',
+        9: 'longestPass'
+      },
+      3: { // 개인 리시빙
+        2: 'receptions',
+        3: 'receivingYards', 
+        4: 'yardsPerReception',
+        5: 'targets',
+        6: 'touchdowns',
+        7: 'longestReception'
+      },
+      4: { // 개인 태클
+        2: 'totalTackles',
+        3: 'soloTackles',
+        4: 'assistTackles',
+        5: 'tacklesForLoss'
+      },
+      5: { // 개인 인터셉션
+        2: 'interceptions',
+        3: 'interceptionYards',
+        4: 'touchdowns',
+        5: 'longestReturn'
+      },
+      6: { // 개인 색
+        2: 'sacks',
+        3: 'sackYards',
+        4: 'qbHurries',
+        5: 'passesDefended'
+      },
+      7: { // 개인 킥킹
+        2: 'fieldGoalPercentage',
+        3: 'averageDistance',
+        4: 'fieldGoalsMade',
+        5: 'fieldGoalsAttempted',
+        6: 'longestMade'
+      },
+      8: { // 개인 펀팅
+        2: 'averageDistance',
+        3: 'totalPunts',
+        4: 'totalYards',
+        5: 'inside20',
+        6: 'longestPunt'
+      },
+      9: { // 개인 리턴
+        2: 'returns',
+        3: 'returnYards',
+        4: 'yardsPerReturn',
+        5: 'touchdowns',
+        6: 'longestReturn'
+      }
+    };
+    
+    return mappings[pageNumber] || {};
+  }
+
+  // 특정 페이지의 개인 스탯 크롤링 (일반화)
+  async getPlayerStatsByPage(league: 'uni' | 'soc', pageNumber: number, year?: string): Promise<any[]> {
+    try {
+      const url = `${this.baseUrl}/ind_${league}${pageNumber}.html`;
+      this.logger.log(`📊 개인 스탯 페이지 크롤링: ${url}`);
+      
+      const { data } = await axios.get(url, {
+        params: year ? { year } : {},
+        timeout: 10000,
+      });
+      
+      const $ = cheerio.load(data);
+      const stats: any[] = [];
+      
+      // 페이지별 필드 매핑 가져오기
+      const fieldMappings = this.getPlayerStatFieldMapping(pageNumber);
+      
+      $('.stats_table tr').each((index, element) => {
+        // 첫 번째 행(헤더)은 건너뛰기
+        if (index === 0) return;
+        
+        const cells = $(element).find('td');
+        
+        if (cells.length >= 3) {
+          // 선수 정보 파싱 (일반적으로 두 번째 셀)
+          const playerCell = $(cells[1]).text().trim();
+          const playerInfo = this.parsePlayerInfo(playerCell);
+          
+          if (playerInfo.playerName && playerInfo.university) {
+            const statData: any = {
+              rank: index,
+              playerName: playerInfo.playerName,
+              university: playerInfo.university,
+              jerseyNumber: playerInfo.jerseyNumber,
+            };
+
+            // 각 셀의 데이터를 의미있는 필드명으로 파싱
+            cells.each((cellIndex, cell) => {
+              if (cellIndex === 0 || cellIndex === 1) return; // 순위와 선수 정보는 이미 처리됨
+              
+              const cellValue = $(cell).text().trim();
+              const fieldName = fieldMappings[cellIndex] || `unknown${cellIndex}`;
+              
+              // 러싱야드인 경우 전진/후퇴 정보 제거
+              let processedValue = cellValue;
+              if (fieldName === 'rushingYards') {
+                processedValue = this.cleanRushingYards(cellValue);
+              }
+              
+              // 숫자인지 확인하고 적절히 파싱
+              if (!isNaN(parseFloat(processedValue))) {
+                statData[fieldName] = parseFloat(processedValue);
+              } else {
+                statData[fieldName] = processedValue;
+              }
+            });
+            
+            stats.push(statData);
+          }
+        }
+      });
+      
+      this.logger.log(`✅ 개인 스탯 페이지 ${pageNumber} - ${stats.length}개 크롤링 완료`);
+      return stats;
+    } catch (error) {
+      this.logger.error(`❌ 개인 스탯 페이지 크롤링 실패 (페이지 ${pageNumber}): ${error.message}`);
+      return [];
+    }
+  }
+
+  // 전체 KAFA 통계 데이터 수집
+  async getAllKafaStats(year?: string): Promise<any> {
+    try {
+      this.logger.log(`🚀 전체 KAFA 통계 데이터 수집 시작 (년도: ${year || 'current'})`);
+      
+      const result = {
+        university: {
+          team: {
+            offense: {},
+            defense: {},
+            special: {}
+          },
+          individual: {
+            offense: {},
+            defense: {},
+            special: {}
+          }
+        },
+        social: {
+          team: {
+            offense: {},
+            defense: {},
+            special: {}
+          },
+          individual: {
+            offense: {},
+            defense: {},
+            special: {}
+          }
+        }
+      };
+
+      // 대학 팀 스탯 수집
+      this.logger.log('📊 대학 팀 스탯 수집 중...');
+      result.university.team.offense = {
+        rushing: await this.getTeamStatsByPage('uni', 'offense1', year),
+        passing: await this.getTeamStatsByPage('uni', 'offense2', year),
+        receiving: await this.getTeamStatsByPage('uni', 'offense3', year)
+      };
+
+      result.university.team.defense = {
+        tackles: await this.getTeamStatsByPage('uni', 'defense1', year),
+        interceptions: await this.getTeamStatsByPage('uni', 'defense2', year)
+        // sacks는 defense1에 포함되어 있음
+      };
+
+      result.university.team.special = {
+        kicking: await this.getTeamStatsByPage('uni', 'special1', year),
+        kickoff: await this.getTeamStatsByPage('uni', 'special2', year),
+        kickoffReturn: await this.getTeamStatsByPage('uni', 'special3', year),
+        punting: await this.getTeamStatsByPage('uni', 'special4', year),
+        puntReturn: await this.getTeamStatsByPage('uni', 'special5', year)
+      };
+
+      // 대학 개인 스탯 수집
+      this.logger.log('👤 대학 개인 스탯 수집 중...');
+      result.university.individual.offense = {
+        rushing: await this.getPlayerStatsByPage('uni', 1, year),
+        passing: await this.getPlayerStatsByPage('uni', 2, year),
+        receiving: await this.getPlayerStatsByPage('uni', 3, year)
+      };
+
+      result.university.individual.defense = {
+        tackles: await this.getPlayerStatsByPage('uni', 4, year),
+        interceptions: await this.getPlayerStatsByPage('uni', 5, year),
+        sacks: await this.getPlayerStatsByPage('uni', 6, year)
+      };
+
+      result.university.individual.special = {
+        kicking: await this.getPlayerStatsByPage('uni', 7, year),
+        punting: await this.getPlayerStatsByPage('uni', 8, year),
+        returns: await this.getPlayerStatsByPage('uni', 9, year)
+      };
+
+      // 사회인 팀 스탯 수집
+      this.logger.log('📊 사회인 팀 스탯 수집 중...');
+      result.social.team.offense = {
+        rushing: await this.getTeamStatsByPage('soc', 'offense1', year),
+        passing: await this.getTeamStatsByPage('soc', 'offense2', year),
+        receiving: await this.getTeamStatsByPage('soc', 'offense3', year)
+      };
+
+      result.social.team.defense = {
+        tackles: await this.getTeamStatsByPage('soc', 'defense1', year),
+        interceptions: await this.getTeamStatsByPage('soc', 'defense2', year)
+        // sacks는 defense1에 포함되어 있음
+      };
+
+      result.social.team.special = {
+        kicking: await this.getTeamStatsByPage('soc', 'special1', year),
+        kickoff: await this.getTeamStatsByPage('soc', 'special2', year),
+        kickoffReturn: await this.getTeamStatsByPage('soc', 'special3', year),
+        punting: await this.getTeamStatsByPage('soc', 'special4', year),
+        puntReturn: await this.getTeamStatsByPage('soc', 'special5', year)
+      };
+
+      // 사회인 개인 스탯 수집
+      this.logger.log('👤 사회인 개인 스탯 수집 중...');
+      result.social.individual.offense = {
+        rushing: await this.getPlayerStatsByPage('soc', 1, year),
+        passing: await this.getPlayerStatsByPage('soc', 2, year),
+        receiving: await this.getPlayerStatsByPage('soc', 3, year)
+      };
+
+      result.social.individual.defense = {
+        tackles: await this.getPlayerStatsByPage('soc', 4, year),
+        interceptions: await this.getPlayerStatsByPage('soc', 5, year),
+        sacks: await this.getPlayerStatsByPage('soc', 6, year)
+      };
+
+      result.social.individual.special = {
+        kicking: await this.getPlayerStatsByPage('soc', 7, year),
+        punting: await this.getPlayerStatsByPage('soc', 8, year),
+        returns: await this.getPlayerStatsByPage('soc', 9, year)
+      };
+
+      this.logger.log('✅ 전체 KAFA 통계 데이터 수집 완료');
+      return result;
+
+    } catch (error) {
+      this.logger.error(`❌ 전체 KAFA 통계 수집 실패: ${error.message}`);
+      throw new Error(`Failed to get all KAFA stats: ${error.message}`);
     }
   }
 }

@@ -1,0 +1,2201 @@
+{
+  "metadata": {
+    "source": "KAFA API",
+    "endpoint": "http://localhost:4000/api/kafa-stats/all-stats",
+    "crawled_at": "2025-12-07",
+    "crawled_timestamp": "2025-12-07T03:19:59.374Z",
+    "duration_ms": 25682,
+    "data_type": "team_stats",
+    "message": "전체 KAFA 통계 데이터 조회 완료 (26초 소요)",
+    "total_data_points": 225
+  },
+  "university": {
+    "team": {
+      "offense": {
+        "rushing": {
+          "unit_name": "rushing",
+          "description": "러싱",
+          "total_teams": 41,
+          "data": [
+            {
+              "rank": 1,
+              "teamName": "한양대학교 LIONS",
+              "rushingYards": 879,
+              "yardsPerAttempt": 4.4,
+              "attempts": 200,
+              "touchdowns": 7,
+              "longestRush": 54
+            },
+            {
+              "rank": 2,
+              "teamName": "연세대학교 EAGLES",
+              "rushingYards": 800,
+              "yardsPerAttempt": 4.7,
+              "attempts": 169,
+              "touchdowns": 11,
+              "longestRush": 68
+            },
+            {
+              "rank": 3,
+              "teamName": "경성대학교 Dragons",
+              "rushingYards": 798,
+              "yardsPerAttempt": 5.4,
+              "attempts": 147,
+              "touchdowns": 9,
+              "longestRush": 48
+            },
+            {
+              "rank": 4,
+              "teamName": "고려대학교 TIGERS",
+              "rushingYards": 796,
+              "yardsPerAttempt": 5.8,
+              "attempts": 137,
+              "touchdowns": 7,
+              "longestRush": 59
+            },
+            {
+              "rank": 5,
+              "teamName": "부산외국어대학교 TORNADO",
+              "rushingYards": 772,
+              "yardsPerAttempt": 6.2,
+              "attempts": 124,
+              "touchdowns": 6,
+              "longestRush": 34
+            },
+            {
+              "rank": 6,
+              "teamName": "경북대학교 ORANGE FIGHTERS",
+              "rushingYards": 673,
+              "yardsPerAttempt": 5.3,
+              "attempts": 127,
+              "touchdowns": 5,
+              "longestRush": 85
+            },
+            {
+              "rank": 7,
+              "teamName": "경일대학교 BLACK BEARS",
+              "rushingYards": 578,
+              "yardsPerAttempt": 3.5,
+              "attempts": 164,
+              "touchdowns": 4,
+              "longestRush": 32
+            },
+            {
+              "rank": 8,
+              "teamName": "동의대학교 Turtle Fighters",
+              "rushingYards": 568,
+              "yardsPerAttempt": 5.2,
+              "attempts": 109,
+              "touchdowns": 6,
+              "longestRush": 41
+            },
+            {
+              "rank": 9,
+              "teamName": "홍익대학교 COWBOYS",
+              "rushingYards": 563,
+              "yardsPerAttempt": 5.1,
+              "attempts": 111,
+              "touchdowns": 3,
+              "longestRush": 54
+            },
+            {
+              "rank": 10,
+              "teamName": "강원대학교 CAPRA",
+              "rushingYards": 535,
+              "yardsPerAttempt": 3.8,
+              "attempts": 141,
+              "touchdowns": 6,
+              "longestRush": 43
+            },
+            {
+              "rank": 11,
+              "teamName": "한국해양대학교 Vikings",
+              "rushingYards": 480,
+              "yardsPerAttempt": 5.9,
+              "attempts": 81,
+              "touchdowns": 8,
+              "longestRush": 26
+            },
+            {
+              "rank": 12,
+              "teamName": "대구대학교 Flying Tigers",
+              "rushingYards": 426,
+              "yardsPerAttempt": 5.5,
+              "attempts": 77,
+              "touchdowns": 6,
+              "longestRush": 67
+            },
+            {
+              "rank": 13,
+              "teamName": "서울대학교 GREEN TERRORS",
+              "rushingYards": 394,
+              "yardsPerAttempt": 5,
+              "attempts": 79,
+              "touchdowns": 2,
+              "longestRush": 39
+            },
+            {
+              "rank": 14,
+              "teamName": "중앙대학교 BLUE DRAGONS",
+              "rushingYards": 370,
+              "yardsPerAttempt": 5.4,
+              "attempts": 69,
+              "touchdowns": 4,
+              "longestRush": 55
+            },
+            {
+              "rank": 15,
+              "teamName": "숭실대학교 CRUSADERS",
+              "rushingYards": 368,
+              "yardsPerAttempt": 4.1,
+              "attempts": 90,
+              "touchdowns": 2,
+              "longestRush": 28
+            },
+            {
+              "rank": 16,
+              "teamName": "금오공과대학교 RAVENS",
+              "rushingYards": 355,
+              "yardsPerAttempt": 3.8,
+              "attempts": 94,
+              "touchdowns": 7,
+              "longestRush": 33
+            },
+            {
+              "rank": 17,
+              "teamName": "경희대학교 Commanders",
+              "rushingYards": 307,
+              "yardsPerAttempt": 5,
+              "attempts": 62,
+              "touchdowns": 2,
+              "longestRush": 52
+            },
+            {
+              "rank": 18,
+              "teamName": "동아대학교 LEOPARD",
+              "rushingYards": 293,
+              "yardsPerAttempt": 3.8,
+              "attempts": 77,
+              "touchdowns": 3,
+              "longestRush": 19
+            },
+            {
+              "rank": 19,
+              "teamName": "건국대학교 RAGING BULLS",
+              "rushingYards": 289,
+              "yardsPerAttempt": 4.8,
+              "attempts": 60,
+              "touchdowns": 1,
+              "longestRush": 32
+            },
+            {
+              "rank": 20,
+              "teamName": "용인대학교 WHITE TIGERS",
+              "rushingYards": 258,
+              "yardsPerAttempt": 7.4,
+              "attempts": 35,
+              "touchdowns": 2,
+              "longestRush": 63
+            },
+            {
+              "rank": 21,
+              "teamName": "동국대학교 TUSKERS",
+              "rushingYards": 250,
+              "yardsPerAttempt": 7.6,
+              "attempts": 33,
+              "touchdowns": 2,
+              "longestRush": 96
+            },
+            {
+              "rank": 22,
+              "teamName": "동서대학교 Blue Dolphins",
+              "rushingYards": 221,
+              "yardsPerAttempt": 4.1,
+              "attempts": 54,
+              "touchdowns": 2,
+              "longestRush": 40
+            },
+            {
+              "rank": 23,
+              "teamName": "인하대학교 Teal Dragons",
+              "rushingYards": 187,
+              "yardsPerAttempt": 5.1,
+              "attempts": 37,
+              "touchdowns": 3,
+              "longestRush": 80
+            },
+            {
+              "rank": 24,
+              "teamName": "한동대학교 Holy Rams",
+              "rushingYards": 184,
+              "yardsPerAttempt": 3.4,
+              "attempts": 54,
+              "touchdowns": 3,
+              "longestRush": 38
+            },
+            {
+              "rank": 25,
+              "teamName": "서강대학교 ALBATROSS",
+              "rushingYards": 180,
+              "yardsPerAttempt": 2.6,
+              "attempts": 70,
+              "touchdowns": 1,
+              "longestRush": 24
+            },
+            {
+              "rank": 26,
+              "teamName": "대구가톨릭대학교 Scud Angels",
+              "rushingYards": 180,
+              "yardsPerAttempt": 2.4,
+              "attempts": 74,
+              "touchdowns": 2,
+              "longestRush": 15
+            },
+            {
+              "rank": 27,
+              "teamName": "한림대학교 PHOENIX",
+              "rushingYards": 178,
+              "yardsPerAttempt": 5.2,
+              "attempts": 34,
+              "touchdowns": 2,
+              "longestRush": 35
+            },
+            {
+              "rank": 28,
+              "teamName": "서울시립대학교 CITY HAWKS",
+              "rushingYards": 177,
+              "yardsPerAttempt": 2.6,
+              "attempts": 68,
+              "touchdowns": 2,
+              "longestRush": 65
+            },
+            {
+              "rank": 29,
+              "teamName": "성균관대학교 ROYALS",
+              "rushingYards": 173,
+              "yardsPerAttempt": 2.6,
+              "attempts": 67,
+              "touchdowns": 5,
+              "longestRush": 38
+            },
+            {
+              "rank": 30,
+              "teamName": "카이스트 Mavericks",
+              "rushingYards": 170,
+              "yardsPerAttempt": 3,
+              "attempts": 57,
+              "touchdowns": 1,
+              "longestRush": 30
+            },
+            {
+              "rank": 31,
+              "teamName": "영남대학교 PEGASUS",
+              "rushingYards": 159,
+              "yardsPerAttempt": 3.2,
+              "attempts": 50,
+              "touchdowns": 3,
+              "longestRush": 17
+            },
+            {
+              "rank": 32,
+              "teamName": "국민대학교 Razorbacks",
+              "rushingYards": 152,
+              "yardsPerAttempt": 2.9,
+              "attempts": 52,
+              "touchdowns": 2,
+              "longestRush": 27
+            },
+            {
+              "rank": 33,
+              "teamName": "울산대학교 Unicorns",
+              "rushingYards": 142,
+              "yardsPerAttempt": 3.2,
+              "attempts": 44,
+              "touchdowns": 1,
+              "longestRush": 34
+            },
+            {
+              "rank": 34,
+              "teamName": "동국대학교 White Elephants",
+              "rushingYards": 127,
+              "yardsPerAttempt": 4.1,
+              "attempts": 31,
+              "touchdowns": 0,
+              "longestRush": 16
+            },
+            {
+              "rank": 35,
+              "teamName": "한신대학교 Killer Whales",
+              "rushingYards": 111,
+              "yardsPerAttempt": 2.6,
+              "attempts": 42,
+              "touchdowns": 0,
+              "longestRush": 16
+            },
+            {
+              "rank": 36,
+              "teamName": "한국외국어대학교 BLACK KNIGHTS",
+              "rushingYards": 106,
+              "yardsPerAttempt": 3.4,
+              "attempts": 31,
+              "touchdowns": 0,
+              "longestRush": 36
+            },
+            {
+              "rank": 37,
+              "teamName": "계명대학교 SUPER LIONS",
+              "rushingYards": 103,
+              "yardsPerAttempt": 4,
+              "attempts": 26,
+              "touchdowns": 0,
+              "longestRush": 18
+            },
+            {
+              "rank": 38,
+              "teamName": "신라대학교 Devils",
+              "rushingYards": 90,
+              "yardsPerAttempt": 3.1,
+              "attempts": 29,
+              "touchdowns": 2,
+              "longestRush": 40
+            },
+            {
+              "rank": 39,
+              "teamName": "부산대학교 Eagles",
+              "rushingYards": 51,
+              "yardsPerAttempt": 2,
+              "attempts": 25,
+              "touchdowns": 0,
+              "longestRush": 16
+            },
+            {
+              "rank": 40,
+              "teamName": "대구한의대학교 Rhinos",
+              "rushingYards": 42,
+              "yardsPerAttempt": 1.3,
+              "attempts": 32,
+              "touchdowns": 0,
+              "longestRush": 22
+            },
+            {
+              "rank": 41,
+              "teamName": "단국대학교 KODIAK BEARS",
+              "rushingYards": 34,
+              "yardsPerAttempt": 0.6,
+              "attempts": 53,
+              "touchdowns": 0,
+              "longestRush": 15
+            }
+          ],
+          "crawled_at": "2025-12-07"
+        },
+        "passing": {
+          "unit_name": "passing",
+          "description": "패싱",
+          "total_teams": 41,
+          "data": [
+            {
+              "rank": 1,
+              "teamName": "연세대학교 EAGLES",
+              "passingYards": 968,
+              "yardsPerAttempt": 6.3,
+              "completionPercentage": 48.1,
+              "attempts": 154,
+              "completions": 74,
+              "touchdowns": 20,
+              "interceptions": 8,
+              "longestPass": 80
+            },
+            {
+              "rank": 2,
+              "teamName": "경북대학교 ORANGE FIGHTERS",
+              "passingYards": 738,
+              "yardsPerAttempt": 5.1,
+              "completionPercentage": 52.7,
+              "attempts": 146,
+              "completions": 77,
+              "touchdowns": 12,
+              "interceptions": 5,
+              "longestPass": 90
+            },
+            {
+              "rank": 3,
+              "teamName": "성균관대학교 ROYALS",
+              "passingYards": 541,
+              "yardsPerAttempt": 3.9,
+              "completionPercentage": 29,
+              "attempts": 138,
+              "completions": 40,
+              "touchdowns": 5,
+              "interceptions": 9,
+              "longestPass": 59
+            },
+            {
+              "rank": 4,
+              "teamName": "고려대학교 TIGERS",
+              "passingYards": 527,
+              "yardsPerAttempt": 5.3,
+              "completionPercentage": 58,
+              "attempts": 100,
+              "completions": 58,
+              "touchdowns": 6,
+              "interceptions": 2,
+              "longestPass": 37
+            },
+            {
+              "rank": 5,
+              "teamName": "한양대학교 LIONS",
+              "passingYards": 481,
+              "yardsPerAttempt": 4.6,
+              "completionPercentage": 42.9,
+              "attempts": 105,
+              "completions": 45,
+              "touchdowns": 7,
+              "interceptions": 9,
+              "longestPass": 57
+            },
+            {
+              "rank": 6,
+              "teamName": "용인대학교 WHITE TIGERS",
+              "passingYards": 330,
+              "yardsPerAttempt": 7.9,
+              "completionPercentage": 47.6,
+              "attempts": 42,
+              "completions": 20,
+              "touchdowns": 7,
+              "interceptions": 3,
+              "longestPass": 72
+            },
+            {
+              "rank": 7,
+              "teamName": "서강대학교 ALBATROSS",
+              "passingYards": 316,
+              "yardsPerAttempt": 5.4,
+              "completionPercentage": 32.8,
+              "attempts": 58,
+              "completions": 19,
+              "touchdowns": 3,
+              "interceptions": 4,
+              "longestPass": 72
+            },
+            {
+              "rank": 8,
+              "teamName": "경일대학교 BLACK BEARS",
+              "passingYards": 314,
+              "yardsPerAttempt": 5.1,
+              "completionPercentage": 39.3,
+              "attempts": 61,
+              "completions": 24,
+              "touchdowns": 5,
+              "interceptions": 9,
+              "longestPass": 58
+            },
+            {
+              "rank": 9,
+              "teamName": "부산외국어대학교 TORNADO",
+              "passingYards": 307,
+              "yardsPerAttempt": 2.6,
+              "completionPercentage": 43.3,
+              "attempts": 120,
+              "completions": 52,
+              "touchdowns": 11,
+              "interceptions": 2,
+              "longestPass": 53
+            },
+            {
+              "rank": 10,
+              "teamName": "금오공과대학교 RAVENS",
+              "passingYards": 294,
+              "yardsPerAttempt": 5.5,
+              "completionPercentage": 45.3,
+              "attempts": 53,
+              "completions": 24,
+              "touchdowns": 2,
+              "interceptions": 3,
+              "longestPass": 35
+            },
+            {
+              "rank": 11,
+              "teamName": "울산대학교 Unicorns",
+              "passingYards": 254,
+              "yardsPerAttempt": 5.1,
+              "completionPercentage": 62,
+              "attempts": 50,
+              "completions": 31,
+              "touchdowns": 4,
+              "interceptions": 3,
+              "longestPass": 37
+            },
+            {
+              "rank": 12,
+              "teamName": "경성대학교 Dragons",
+              "passingYards": 245,
+              "yardsPerAttempt": 5.7,
+              "completionPercentage": 51.2,
+              "attempts": 43,
+              "completions": 22,
+              "touchdowns": 5,
+              "interceptions": 2,
+              "longestPass": 41
+            },
+            {
+              "rank": 13,
+              "teamName": "서울시립대학교 CITY HAWKS",
+              "passingYards": 230,
+              "yardsPerAttempt": 2.5,
+              "completionPercentage": 28.6,
+              "attempts": 91,
+              "completions": 26,
+              "touchdowns": 1,
+              "interceptions": 7,
+              "longestPass": 38
+            },
+            {
+              "rank": 14,
+              "teamName": "인하대학교 Teal Dragons",
+              "passingYards": 229,
+              "yardsPerAttempt": 4.3,
+              "completionPercentage": 43.4,
+              "attempts": 53,
+              "completions": 23,
+              "touchdowns": 1,
+              "interceptions": 6,
+              "longestPass": 37
+            },
+            {
+              "rank": 15,
+              "teamName": "서울대학교 GREEN TERRORS",
+              "passingYards": 227,
+              "yardsPerAttempt": 3.6,
+              "completionPercentage": 41.3,
+              "attempts": 63,
+              "completions": 26,
+              "touchdowns": 1,
+              "interceptions": 8,
+              "longestPass": 33
+            },
+            {
+              "rank": 16,
+              "teamName": "신라대학교 Devils",
+              "passingYards": 222,
+              "yardsPerAttempt": 6.2,
+              "completionPercentage": 55.6,
+              "attempts": 36,
+              "completions": 20,
+              "touchdowns": 4,
+              "interceptions": 0,
+              "longestPass": 79
+            },
+            {
+              "rank": 17,
+              "teamName": "강원대학교 CAPRA",
+              "passingYards": 218,
+              "yardsPerAttempt": 3.8,
+              "completionPercentage": 36.8,
+              "attempts": 57,
+              "completions": 21,
+              "touchdowns": 0,
+              "interceptions": 4,
+              "longestPass": 33
+            },
+            {
+              "rank": 18,
+              "teamName": "동국대학교 TUSKERS",
+              "passingYards": 215,
+              "yardsPerAttempt": 2.4,
+              "completionPercentage": 41.1,
+              "attempts": 90,
+              "completions": 37,
+              "touchdowns": 0,
+              "interceptions": 7,
+              "longestPass": 38
+            },
+            {
+              "rank": 19,
+              "teamName": "동의대학교 Turtle Fighters",
+              "passingYards": 211,
+              "yardsPerAttempt": 4,
+              "completionPercentage": 30.2,
+              "attempts": 53,
+              "completions": 16,
+              "touchdowns": 3,
+              "interceptions": 6,
+              "longestPass": 27
+            },
+            {
+              "rank": 20,
+              "teamName": "대구한의대학교 Rhinos",
+              "passingYards": 176,
+              "yardsPerAttempt": 2.7,
+              "completionPercentage": 36.9,
+              "attempts": 65,
+              "completions": 24,
+              "touchdowns": 1,
+              "interceptions": 1,
+              "longestPass": 17
+            },
+            {
+              "rank": 21,
+              "teamName": "한동대학교 Holy Rams",
+              "passingYards": 171,
+              "yardsPerAttempt": 3.3,
+              "completionPercentage": 30.8,
+              "attempts": 52,
+              "completions": 16,
+              "touchdowns": 1,
+              "interceptions": 6,
+              "longestPass": 30
+            },
+            {
+              "rank": 22,
+              "teamName": "숭실대학교 CRUSADERS",
+              "passingYards": 170,
+              "yardsPerAttempt": 2.6,
+              "completionPercentage": 52.3,
+              "attempts": 65,
+              "completions": 34,
+              "touchdowns": 6,
+              "interceptions": 4,
+              "longestPass": 33
+            },
+            {
+              "rank": 23,
+              "teamName": "국민대학교 Razorbacks",
+              "passingYards": 158,
+              "yardsPerAttempt": 1.9,
+              "completionPercentage": 27.7,
+              "attempts": 83,
+              "completions": 23,
+              "touchdowns": 2,
+              "interceptions": 8,
+              "longestPass": 22
+            },
+            {
+              "rank": 24,
+              "teamName": "단국대학교 KODIAK BEARS",
+              "passingYards": 154,
+              "yardsPerAttempt": 4.7,
+              "completionPercentage": 27.3,
+              "attempts": 33,
+              "completions": 9,
+              "touchdowns": 3,
+              "interceptions": 6,
+              "longestPass": 80
+            },
+            {
+              "rank": 25,
+              "teamName": "동서대학교 Blue Dolphins",
+              "passingYards": 121,
+              "yardsPerAttempt": 2.9,
+              "completionPercentage": 28.6,
+              "attempts": 42,
+              "completions": 12,
+              "touchdowns": 3,
+              "interceptions": 4,
+              "longestPass": 43
+            },
+            {
+              "rank": 26,
+              "teamName": "한국외국어대학교 BLACK KNIGHTS",
+              "passingYards": 117,
+              "yardsPerAttempt": 4.9,
+              "completionPercentage": 41.7,
+              "attempts": 24,
+              "completions": 10,
+              "touchdowns": 0,
+              "interceptions": 0,
+              "longestPass": 32
+            },
+            {
+              "rank": 27,
+              "teamName": "건국대학교 RAGING BULLS",
+              "passingYards": 85,
+              "yardsPerAttempt": 2.3,
+              "completionPercentage": 48.6,
+              "attempts": 37,
+              "completions": 18,
+              "touchdowns": 0,
+              "interceptions": 3,
+              "longestPass": 24
+            },
+            {
+              "rank": 28,
+              "teamName": "대구가톨릭대학교 Scud Angels",
+              "passingYards": 66,
+              "yardsPerAttempt": 3.7,
+              "completionPercentage": 50,
+              "attempts": 18,
+              "completions": 9,
+              "touchdowns": 0,
+              "interceptions": 1,
+              "longestPass": 16
+            },
+            {
+              "rank": 29,
+              "teamName": "중앙대학교 BLUE DRAGONS",
+              "passingYards": 61,
+              "yardsPerAttempt": 2.5,
+              "completionPercentage": 29.2,
+              "attempts": 24,
+              "completions": 7,
+              "touchdowns": 0,
+              "interceptions": 4,
+              "longestPass": 12
+            },
+            {
+              "rank": 30,
+              "teamName": "경희대학교 Commanders",
+              "passingYards": 56,
+              "yardsPerAttempt": 2.7,
+              "completionPercentage": 23.8,
+              "attempts": 21,
+              "completions": 5,
+              "touchdowns": 2,
+              "interceptions": 4,
+              "longestPass": 31
+            },
+            {
+              "rank": 31,
+              "teamName": "계명대학교 SUPER LIONS",
+              "passingYards": 36,
+              "yardsPerAttempt": 1.7,
+              "completionPercentage": 23.8,
+              "attempts": 21,
+              "completions": 5,
+              "touchdowns": 1,
+              "interceptions": 3,
+              "longestPass": 11
+            },
+            {
+              "rank": 32,
+              "teamName": "한국해양대학교 Vikings",
+              "passingYards": 31,
+              "yardsPerAttempt": 2.8,
+              "completionPercentage": 18.2,
+              "attempts": 11,
+              "completions": 2,
+              "touchdowns": 2,
+              "interceptions": 1,
+              "longestPass": 31
+            },
+            {
+              "rank": 33,
+              "teamName": "카이스트 Mavericks",
+              "passingYards": 31,
+              "yardsPerAttempt": 2.6,
+              "completionPercentage": 33.3,
+              "attempts": 12,
+              "completions": 4,
+              "touchdowns": 1,
+              "interceptions": 2,
+              "longestPass": 22
+            },
+            {
+              "rank": 34,
+              "teamName": "동아대학교 LEOPARD",
+              "passingYards": 28,
+              "yardsPerAttempt": 1.2,
+              "completionPercentage": 20.8,
+              "attempts": 24,
+              "completions": 5,
+              "touchdowns": 0,
+              "interceptions": 2,
+              "longestPass": 14
+            },
+            {
+              "rank": 35,
+              "teamName": "홍익대학교 COWBOYS",
+              "passingYards": 17,
+              "yardsPerAttempt": 0.5,
+              "completionPercentage": 37.1,
+              "attempts": 35,
+              "completions": 13,
+              "touchdowns": 1,
+              "interceptions": 1,
+              "longestPass": 15
+            },
+            {
+              "rank": 36,
+              "teamName": "대구대학교 Flying Tigers",
+              "passingYards": 14,
+              "yardsPerAttempt": 0.9,
+              "completionPercentage": 40,
+              "attempts": 15,
+              "completions": 6,
+              "touchdowns": 1,
+              "interceptions": 5,
+              "longestPass": 14
+            },
+            {
+              "rank": 37,
+              "teamName": "영남대학교 PEGASUS",
+              "passingYards": 13,
+              "yardsPerAttempt": 0.4,
+              "completionPercentage": 26.7,
+              "attempts": 30,
+              "completions": 8,
+              "touchdowns": 0,
+              "interceptions": 2,
+              "longestPass": 8
+            },
+            {
+              "rank": 38,
+              "teamName": "동국대학교 White Elephants",
+              "passingYards": 10,
+              "yardsPerAttempt": 0.9,
+              "completionPercentage": 27.3,
+              "attempts": 11,
+              "completions": 3,
+              "touchdowns": 0,
+              "interceptions": 2,
+              "longestPass": 15
+            },
+            {
+              "rank": 39,
+              "teamName": "한림대학교 PHOENIX",
+              "passingYards": 7,
+              "yardsPerAttempt": 0.6,
+              "completionPercentage": 16.7,
+              "attempts": 12,
+              "completions": 2,
+              "touchdowns": 0,
+              "interceptions": 1,
+              "longestPass": 7
+            },
+            {
+              "rank": 40,
+              "teamName": "부산대학교 Eagles",
+              "passingYards": 0,
+              "yardsPerAttempt": 0,
+              "completionPercentage": 23.1,
+              "attempts": 13,
+              "completions": 3,
+              "touchdowns": 1,
+              "interceptions": 0,
+              "longestPass": 0
+            },
+            {
+              "rank": 41,
+              "teamName": "한신대학교 Killer Whales",
+              "passingYards": 0,
+              "yardsPerAttempt": 0,
+              "completionPercentage": 22.2,
+              "attempts": 18,
+              "completions": 4,
+              "touchdowns": 1,
+              "interceptions": 2,
+              "longestPass": 0
+            }
+          ],
+          "crawled_at": "2025-12-07"
+        },
+        "receiving": {
+          "unit_name": "receiving",
+          "description": "리시빙",
+          "total_teams": 41,
+          "data": [
+            {
+              "rank": 1,
+              "teamName": "경북대학교 ORANGE FIGHTERS",
+              "receptions": 77,
+              "receivingYards": 901,
+              "yardsPerReception": 6.2,
+              "targets": 146,
+              "touchdowns": 12,
+              "longestReception": 90
+            },
+            {
+              "rank": 2,
+              "teamName": "연세대학교 EAGLES",
+              "receptions": 74,
+              "receivingYards": 1,
+              "yardsPerReception": 7,
+              "targets": 154,
+              "touchdowns": 20,
+              "longestReception": 80
+            },
+            {
+              "rank": 3,
+              "teamName": "고려대학교 TIGERS",
+              "receptions": 58,
+              "receivingYards": 530,
+              "yardsPerReception": 5.3,
+              "targets": 100,
+              "touchdowns": 6,
+              "longestReception": 37
+            },
+            {
+              "rank": 4,
+              "teamName": "부산외국어대학교 TORNADO",
+              "receptions": 52,
+              "receivingYards": 582,
+              "yardsPerReception": 4.9,
+              "targets": 120,
+              "touchdowns": 11,
+              "longestReception": 53
+            },
+            {
+              "rank": 5,
+              "teamName": "한양대학교 LIONS",
+              "receptions": 45,
+              "receivingYards": 666,
+              "yardsPerReception": 6.3,
+              "targets": 105,
+              "touchdowns": 7,
+              "longestReception": 57
+            },
+            {
+              "rank": 6,
+              "teamName": "성균관대학교 ROYALS",
+              "receptions": 40,
+              "receivingYards": 583,
+              "yardsPerReception": 4.2,
+              "targets": 138,
+              "touchdowns": 5,
+              "longestReception": 59
+            },
+            {
+              "rank": 7,
+              "teamName": "동국대학교 TUSKERS",
+              "receptions": 37,
+              "receivingYards": 290,
+              "yardsPerReception": 3.2,
+              "targets": 90,
+              "touchdowns": 0,
+              "longestReception": 38
+            },
+            {
+              "rank": 8,
+              "teamName": "숭실대학교 CRUSADERS",
+              "receptions": 34,
+              "receivingYards": 313,
+              "yardsPerReception": 4.8,
+              "targets": 65,
+              "touchdowns": 6,
+              "longestReception": 81
+            },
+            {
+              "rank": 9,
+              "teamName": "울산대학교 Unicorns",
+              "receptions": 31,
+              "receivingYards": 287,
+              "yardsPerReception": 5.7,
+              "targets": 50,
+              "touchdowns": 4,
+              "longestReception": 37
+            },
+            {
+              "rank": 10,
+              "teamName": "서울대학교 GREEN TERRORS",
+              "receptions": 26,
+              "receivingYards": 245,
+              "yardsPerReception": 3.9,
+              "targets": 63,
+              "touchdowns": 1,
+              "longestReception": 45
+            },
+            {
+              "rank": 11,
+              "teamName": "서울시립대학교 CITY HAWKS",
+              "receptions": 26,
+              "receivingYards": 242,
+              "yardsPerReception": 2.7,
+              "targets": 91,
+              "touchdowns": 1,
+              "longestReception": 38
+            },
+            {
+              "rank": 12,
+              "teamName": "금오공과대학교 RAVENS",
+              "receptions": 24,
+              "receivingYards": 299,
+              "yardsPerReception": 5.6,
+              "targets": 53,
+              "touchdowns": 2,
+              "longestReception": 35
+            },
+            {
+              "rank": 13,
+              "teamName": "대구한의대학교 Rhinos",
+              "receptions": 24,
+              "receivingYards": 161,
+              "yardsPerReception": 2.5,
+              "targets": 65,
+              "touchdowns": 1,
+              "longestReception": 17
+            },
+            {
+              "rank": 14,
+              "teamName": "경일대학교 BLACK BEARS",
+              "receptions": 24,
+              "receivingYards": 310,
+              "yardsPerReception": 5.1,
+              "targets": 61,
+              "touchdowns": 5,
+              "longestReception": 58
+            },
+            {
+              "rank": 15,
+              "teamName": "인하대학교 Teal Dragons",
+              "receptions": 23,
+              "receivingYards": 227,
+              "yardsPerReception": 4.3,
+              "targets": 53,
+              "touchdowns": 1,
+              "longestReception": 37
+            },
+            {
+              "rank": 16,
+              "teamName": "국민대학교 Razorbacks",
+              "receptions": 23,
+              "receivingYards": 210,
+              "yardsPerReception": 2.5,
+              "targets": 83,
+              "touchdowns": 2,
+              "longestReception": 53
+            },
+            {
+              "rank": 17,
+              "teamName": "경성대학교 Dragons",
+              "receptions": 22,
+              "receivingYards": 227,
+              "yardsPerReception": 5.3,
+              "targets": 43,
+              "touchdowns": 5,
+              "longestReception": 41
+            },
+            {
+              "rank": 18,
+              "teamName": "강원대학교 CAPRA",
+              "receptions": 21,
+              "receivingYards": 172,
+              "yardsPerReception": 3,
+              "targets": 57,
+              "touchdowns": 0,
+              "longestReception": 33
+            },
+            {
+              "rank": 19,
+              "teamName": "용인대학교 WHITE TIGERS",
+              "receptions": 20,
+              "receivingYards": 327,
+              "yardsPerReception": 7.8,
+              "targets": 42,
+              "touchdowns": 7,
+              "longestReception": 72
+            },
+            {
+              "rank": 20,
+              "teamName": "신라대학교 Devils",
+              "receptions": 20,
+              "receivingYards": 274,
+              "yardsPerReception": 7.6,
+              "targets": 36,
+              "touchdowns": 4,
+              "longestReception": 79
+            },
+            {
+              "rank": 21,
+              "teamName": "서강대학교 ALBATROSS",
+              "receptions": 19,
+              "receivingYards": 323,
+              "yardsPerReception": 5.6,
+              "targets": 58,
+              "touchdowns": 3,
+              "longestReception": 72
+            },
+            {
+              "rank": 22,
+              "teamName": "건국대학교 RAGING BULLS",
+              "receptions": 18,
+              "receivingYards": 185,
+              "yardsPerReception": 5,
+              "targets": 37,
+              "touchdowns": 0,
+              "longestReception": 26
+            },
+            {
+              "rank": 23,
+              "teamName": "동의대학교 Turtle Fighters",
+              "receptions": 16,
+              "receivingYards": 211,
+              "yardsPerReception": 4,
+              "targets": 53,
+              "touchdowns": 3,
+              "longestReception": 27
+            },
+            {
+              "rank": 24,
+              "teamName": "한동대학교 Holy Rams",
+              "receptions": 16,
+              "receivingYards": 198,
+              "yardsPerReception": 3.8,
+              "targets": 52,
+              "touchdowns": 1,
+              "longestReception": 30
+            },
+            {
+              "rank": 25,
+              "teamName": "홍익대학교 COWBOYS",
+              "receptions": 13,
+              "receivingYards": 58,
+              "yardsPerReception": 1.7,
+              "targets": 35,
+              "touchdowns": 1,
+              "longestReception": 37
+            },
+            {
+              "rank": 26,
+              "teamName": "동서대학교 Blue Dolphins",
+              "receptions": 12,
+              "receivingYards": 245,
+              "yardsPerReception": 5.8,
+              "targets": 42,
+              "touchdowns": 3,
+              "longestReception": 43
+            },
+            {
+              "rank": 27,
+              "teamName": "한국외국어대학교 BLACK KNIGHTS",
+              "receptions": 10,
+              "receivingYards": 113,
+              "yardsPerReception": 4.7,
+              "targets": 24,
+              "touchdowns": 0,
+              "longestReception": 32
+            },
+            {
+              "rank": 28,
+              "teamName": "대구가톨릭대학교 Scud Angels",
+              "receptions": 9,
+              "receivingYards": 76,
+              "yardsPerReception": 4.2,
+              "targets": 18,
+              "touchdowns": 0,
+              "longestReception": 16
+            },
+            {
+              "rank": 29,
+              "teamName": "단국대학교 KODIAK BEARS",
+              "receptions": 9,
+              "receivingYards": 156,
+              "yardsPerReception": 4.7,
+              "targets": 33,
+              "touchdowns": 3,
+              "longestReception": 80
+            },
+            {
+              "rank": 30,
+              "teamName": "영남대학교 PEGASUS",
+              "receptions": 8,
+              "receivingYards": 102,
+              "yardsPerReception": 3.4,
+              "targets": 30,
+              "touchdowns": 0,
+              "longestReception": 33
+            },
+            {
+              "rank": 31,
+              "teamName": "중앙대학교 BLUE DRAGONS",
+              "receptions": 7,
+              "receivingYards": 90,
+              "yardsPerReception": 3.8,
+              "targets": 24,
+              "touchdowns": 0,
+              "longestReception": 20
+            },
+            {
+              "rank": 32,
+              "teamName": "대구대학교 Flying Tigers",
+              "receptions": 6,
+              "receivingYards": 47,
+              "yardsPerReception": 3.1,
+              "targets": 15,
+              "touchdowns": 1,
+              "longestReception": 23
+            },
+            {
+              "rank": 33,
+              "teamName": "동아대학교 LEOPARD",
+              "receptions": 5,
+              "receivingYards": 45,
+              "yardsPerReception": 1.9,
+              "targets": 24,
+              "touchdowns": 0,
+              "longestReception": 14
+            },
+            {
+              "rank": 34,
+              "teamName": "계명대학교 SUPER LIONS",
+              "receptions": 5,
+              "receivingYards": 36,
+              "yardsPerReception": 1.7,
+              "targets": 21,
+              "touchdowns": 1,
+              "longestReception": 11
+            },
+            {
+              "rank": 35,
+              "teamName": "경희대학교 Commanders",
+              "receptions": 5,
+              "receivingYards": 66,
+              "yardsPerReception": 3.1,
+              "targets": 21,
+              "touchdowns": 2,
+              "longestReception": 31
+            },
+            {
+              "rank": 36,
+              "teamName": "카이스트 Mavericks",
+              "receptions": 4,
+              "receivingYards": 26,
+              "yardsPerReception": 2.2,
+              "targets": 12,
+              "touchdowns": 1,
+              "longestReception": 22
+            },
+            {
+              "rank": 37,
+              "teamName": "한신대학교 Killer Whales",
+              "receptions": 4,
+              "receivingYards": 1,
+              "yardsPerReception": 0.1,
+              "targets": 18,
+              "touchdowns": 1,
+              "longestReception": 1
+            },
+            {
+              "rank": 38,
+              "teamName": "부산대학교 Eagles",
+              "receptions": 3,
+              "receivingYards": 42,
+              "yardsPerReception": 3.2,
+              "targets": 13,
+              "touchdowns": 1,
+              "longestReception": 31
+            },
+            {
+              "rank": 39,
+              "teamName": "동국대학교 White Elephants",
+              "receptions": 3,
+              "receivingYards": 10,
+              "yardsPerReception": 0.9,
+              "targets": 11,
+              "touchdowns": 0,
+              "longestReception": 15
+            },
+            {
+              "rank": 40,
+              "teamName": "한국해양대학교 Vikings",
+              "receptions": 2,
+              "receivingYards": 71,
+              "yardsPerReception": 6.5,
+              "targets": 11,
+              "touchdowns": 2,
+              "longestReception": 40
+            },
+            {
+              "rank": 41,
+              "teamName": "한림대학교 PHOENIX",
+              "receptions": 2,
+              "receivingYards": 7,
+              "yardsPerReception": 0.6,
+              "targets": 12,
+              "touchdowns": 0,
+              "longestReception": 7
+            }
+          ],
+          "crawled_at": "2025-12-07"
+        }
+      },
+      "defense": {
+        "tackles": {
+          "unit_name": "tackles",
+          "description": "태클",
+          "total_teams": 41,
+          "data": [
+            {
+              "rank": 1,
+              "teamName": "연세대학교 EAGLES",
+              "totalTackles": 394,
+              "sacks": 10,
+              "soloTackles": 115,
+              "assistTackles": 41
+            },
+            {
+              "rank": 2,
+              "teamName": "한양대학교 LIONS",
+              "totalTackles": 358,
+              "sacks": 5,
+              "soloTackles": 119,
+              "assistTackles": 29
+            },
+            {
+              "rank": 3,
+              "teamName": "경일대학교 BLACK BEARS",
+              "totalTackles": 332,
+              "sacks": 6,
+              "soloTackles": 99,
+              "assistTackles": 15
+            },
+            {
+              "rank": 4,
+              "teamName": "경북대학교 ORANGE FIGHTERS",
+              "totalTackles": 279,
+              "sacks": 5,
+              "soloTackles": 105,
+              "assistTackles": 12
+            },
+            {
+              "rank": 5,
+              "teamName": "성균관대학교 ROYALS",
+              "totalTackles": 265,
+              "sacks": 1,
+              "soloTackles": 105,
+              "assistTackles": 19
+            },
+            {
+              "rank": 6,
+              "teamName": "부산외국어대학교 TORNADO",
+              "totalTackles": 258,
+              "sacks": 6,
+              "soloTackles": 97,
+              "assistTackles": 16
+            },
+            {
+              "rank": 7,
+              "teamName": "고려대학교 TIGERS",
+              "totalTackles": 256,
+              "sacks": 8,
+              "soloTackles": 84,
+              "assistTackles": 21
+            },
+            {
+              "rank": 8,
+              "teamName": "강원대학교 CAPRA",
+              "totalTackles": 249,
+              "sacks": 4,
+              "soloTackles": 59,
+              "assistTackles": 14
+            },
+            {
+              "rank": 9,
+              "teamName": "동의대학교 Turtle Fighters",
+              "totalTackles": 246,
+              "sacks": 2,
+              "soloTackles": 106,
+              "assistTackles": 27
+            },
+            {
+              "rank": 10,
+              "teamName": "서울시립대학교 CITY HAWKS",
+              "totalTackles": 231,
+              "sacks": 1,
+              "soloTackles": 50,
+              "assistTackles": 14
+            },
+            {
+              "rank": 11,
+              "teamName": "경성대학교 Dragons",
+              "totalTackles": 231,
+              "sacks": 1,
+              "soloTackles": 96,
+              "assistTackles": 27
+            },
+            {
+              "rank": 12,
+              "teamName": "서울대학교 GREEN TERRORS",
+              "totalTackles": 209,
+              "sacks": 8,
+              "soloTackles": 58,
+              "assistTackles": 7
+            },
+            {
+              "rank": 13,
+              "teamName": "국민대학교 Razorbacks",
+              "totalTackles": 198,
+              "sacks": 4,
+              "soloTackles": 43,
+              "assistTackles": 14
+            },
+            {
+              "rank": 14,
+              "teamName": "동국대학교 TUSKERS",
+              "totalTackles": 197,
+              "sacks": 2,
+              "soloTackles": 74,
+              "assistTackles": 30
+            },
+            {
+              "rank": 15,
+              "teamName": "홍익대학교 COWBOYS",
+              "totalTackles": 193,
+              "sacks": 1,
+              "soloTackles": 65,
+              "assistTackles": 19
+            },
+            {
+              "rank": 16,
+              "teamName": "서강대학교 ALBATROSS",
+              "totalTackles": 184,
+              "sacks": 1,
+              "soloTackles": 57,
+              "assistTackles": 12
+            },
+            {
+              "rank": 17,
+              "teamName": "숭실대학교 CRUSADERS",
+              "totalTackles": 161,
+              "sacks": 2,
+              "soloTackles": 46,
+              "assistTackles": 11
+            },
+            {
+              "rank": 18,
+              "teamName": "한동대학교 Holy Rams",
+              "totalTackles": 155,
+              "sacks": 1,
+              "soloTackles": 38,
+              "assistTackles": 5
+            },
+            {
+              "rank": 19,
+              "teamName": "인하대학교 Teal Dragons",
+              "totalTackles": 154,
+              "sacks": 1,
+              "soloTackles": 34,
+              "assistTackles": 3
+            },
+            {
+              "rank": 20,
+              "teamName": "단국대학교 KODIAK BEARS",
+              "totalTackles": 154,
+              "sacks": 2,
+              "soloTackles": 38,
+              "assistTackles": 8
+            },
+            {
+              "rank": 21,
+              "teamName": "금오공과대학교 RAVENS",
+              "totalTackles": 152,
+              "sacks": 1,
+              "soloTackles": 61,
+              "assistTackles": 9
+            },
+            {
+              "rank": 22,
+              "teamName": "대구한의대학교 Rhinos",
+              "totalTackles": 148,
+              "sacks": 2,
+              "soloTackles": 48,
+              "assistTackles": 10
+            },
+            {
+              "rank": 23,
+              "teamName": "대구대학교 Flying Tigers",
+              "totalTackles": 147,
+              "sacks": 2,
+              "soloTackles": 46,
+              "assistTackles": 15
+            },
+            {
+              "rank": 24,
+              "teamName": "신라대학교 Devils",
+              "totalTackles": 133,
+              "sacks": 0,
+              "soloTackles": 30,
+              "assistTackles": 10
+            },
+            {
+              "rank": 25,
+              "teamName": "중앙대학교 BLUE DRAGONS",
+              "totalTackles": 126,
+              "sacks": 5,
+              "soloTackles": 35,
+              "assistTackles": 3
+            },
+            {
+              "rank": 26,
+              "teamName": "대구가톨릭대학교 Scud Angels",
+              "totalTackles": 122,
+              "sacks": 0,
+              "soloTackles": 37,
+              "assistTackles": 5
+            },
+            {
+              "rank": 27,
+              "teamName": "경희대학교 Commanders",
+              "totalTackles": 119,
+              "sacks": 6,
+              "soloTackles": 41,
+              "assistTackles": 10
+            },
+            {
+              "rank": 28,
+              "teamName": "동서대학교 Blue Dolphins",
+              "totalTackles": 118,
+              "sacks": 2,
+              "soloTackles": 42,
+              "assistTackles": 9
+            },
+            {
+              "rank": 29,
+              "teamName": "건국대학교 RAGING BULLS",
+              "totalTackles": 118,
+              "sacks": 0,
+              "soloTackles": 44,
+              "assistTackles": 5
+            },
+            {
+              "rank": 30,
+              "teamName": "용인대학교 WHITE TIGERS",
+              "totalTackles": 114,
+              "sacks": 3,
+              "soloTackles": 42,
+              "assistTackles": 4
+            },
+            {
+              "rank": 31,
+              "teamName": "한신대학교 Killer Whales",
+              "totalTackles": 113,
+              "sacks": 0,
+              "soloTackles": 42,
+              "assistTackles": 8
+            },
+            {
+              "rank": 32,
+              "teamName": "한국해양대학교 Vikings",
+              "totalTackles": 111,
+              "sacks": 0,
+              "soloTackles": 30,
+              "assistTackles": 2
+            },
+            {
+              "rank": 33,
+              "teamName": "영남대학교 PEGASUS",
+              "totalTackles": 103,
+              "sacks": 0,
+              "soloTackles": 41,
+              "assistTackles": 11
+            },
+            {
+              "rank": 34,
+              "teamName": "동아대학교 LEOPARD",
+              "totalTackles": 102,
+              "sacks": 0,
+              "soloTackles": 46,
+              "assistTackles": 14
+            },
+            {
+              "rank": 35,
+              "teamName": "카이스트 Mavericks",
+              "totalTackles": 100,
+              "sacks": 0,
+              "soloTackles": 30,
+              "assistTackles": 7
+            },
+            {
+              "rank": 36,
+              "teamName": "울산대학교 Unicorns",
+              "totalTackles": 97,
+              "sacks": 0,
+              "soloTackles": 29,
+              "assistTackles": 3
+            },
+            {
+              "rank": 37,
+              "teamName": "계명대학교 SUPER LIONS",
+              "totalTackles": 72,
+              "sacks": 0,
+              "soloTackles": 21,
+              "assistTackles": 2
+            },
+            {
+              "rank": 38,
+              "teamName": "동국대학교 White Elephants",
+              "totalTackles": 67,
+              "sacks": 0,
+              "soloTackles": 34,
+              "assistTackles": 5
+            },
+            {
+              "rank": 39,
+              "teamName": "부산대학교 Eagles",
+              "totalTackles": 66,
+              "sacks": 0,
+              "soloTackles": 31,
+              "assistTackles": 5
+            },
+            {
+              "rank": 40,
+              "teamName": "한국외국어대학교 BLACK KNIGHTS",
+              "totalTackles": 50,
+              "sacks": 0,
+              "soloTackles": 23,
+              "assistTackles": 6
+            },
+            {
+              "rank": 41,
+              "teamName": "한림대학교 PHOENIX",
+              "totalTackles": 45,
+              "sacks": 0,
+              "soloTackles": 13,
+              "assistTackles": 1
+            }
+          ],
+          "crawled_at": "2025-12-07"
+        },
+        "interceptions": {
+          "unit_name": "interceptions",
+          "description": "인터셉션",
+          "total_teams": 39,
+          "data": [
+            {
+              "rank": 1,
+              "teamName": "연세대학교 EAGLES",
+              "interceptions": 13,
+              "interceptionTd": 2,
+              "interceptionYards": 83,
+              "longestInterception": 25
+            },
+            {
+              "rank": 2,
+              "teamName": "서울시립대학교 CITY HAWKS",
+              "interceptions": 10,
+              "interceptionTd": 1,
+              "interceptionYards": 187,
+              "longestInterception": 54
+            },
+            {
+              "rank": 3,
+              "teamName": "경일대학교 BLACK BEARS",
+              "interceptions": 9,
+              "interceptionTd": 1,
+              "interceptionYards": 235,
+              "longestInterception": 60
+            },
+            {
+              "rank": 4,
+              "teamName": "경성대학교 Dragons",
+              "interceptions": 9,
+              "interceptionTd": 1,
+              "interceptionYards": 174,
+              "longestInterception": 71
+            },
+            {
+              "rank": 5,
+              "teamName": "서울대학교 GREEN TERRORS",
+              "interceptions": 9,
+              "interceptionTd": 0,
+              "interceptionYards": 81,
+              "longestInterception": 25
+            },
+            {
+              "rank": 6,
+              "teamName": "강원대학교 CAPRA",
+              "interceptions": 9,
+              "interceptionTd": 1,
+              "interceptionYards": 142,
+              "longestInterception": 39
+            },
+            {
+              "rank": 7,
+              "teamName": "서강대학교 ALBATROSS",
+              "interceptions": 9,
+              "interceptionTd": 1,
+              "interceptionYards": 47,
+              "longestInterception": 25
+            },
+            {
+              "rank": 8,
+              "teamName": "성균관대학교 ROYALS",
+              "interceptions": 8,
+              "interceptionTd": 0,
+              "interceptionYards": 46,
+              "longestInterception": 20
+            },
+            {
+              "rank": 9,
+              "teamName": "경북대학교 ORANGE FIGHTERS",
+              "interceptions": 7,
+              "interceptionTd": 0,
+              "interceptionYards": 35,
+              "longestInterception": 16
+            },
+            {
+              "rank": 10,
+              "teamName": "고려대학교 TIGERS",
+              "interceptions": 7,
+              "interceptionTd": 1,
+              "interceptionYards": 104,
+              "longestInterception": 32
+            },
+            {
+              "rank": 11,
+              "teamName": "한양대학교 LIONS",
+              "interceptions": 6,
+              "interceptionTd": 0,
+              "interceptionYards": 87,
+              "longestInterception": 45
+            },
+            {
+              "rank": 12,
+              "teamName": "숭실대학교 CRUSADERS",
+              "interceptions": 5,
+              "interceptionTd": 0,
+              "interceptionYards": 71,
+              "longestInterception": 32
+            },
+            {
+              "rank": 13,
+              "teamName": "홍익대학교 COWBOYS",
+              "interceptions": 5,
+              "interceptionTd": 0,
+              "interceptionYards": 15,
+              "longestInterception": 10
+            },
+            {
+              "rank": 14,
+              "teamName": "영남대학교 PEGASUS",
+              "interceptions": 5,
+              "interceptionTd": 1,
+              "interceptionYards": 65,
+              "longestInterception": 50
+            },
+            {
+              "rank": 15,
+              "teamName": "금오공과대학교 RAVENS",
+              "interceptions": 5,
+              "interceptionTd": 0,
+              "interceptionYards": 19,
+              "longestInterception": 8
+            },
+            {
+              "rank": 16,
+              "teamName": "국민대학교 Razorbacks",
+              "interceptions": 4,
+              "interceptionTd": 0,
+              "interceptionYards": 89,
+              "longestInterception": 43
+            },
+            {
+              "rank": 17,
+              "teamName": "중앙대학교 BLUE DRAGONS",
+              "interceptions": 4,
+              "interceptionTd": 0,
+              "interceptionYards": 2,
+              "longestInterception": 2
+            },
+            {
+              "rank": 18,
+              "teamName": "단국대학교 KODIAK BEARS",
+              "interceptions": 3,
+              "interceptionTd": 0,
+              "interceptionYards": 80,
+              "longestInterception": 62
+            },
+            {
+              "rank": 19,
+              "teamName": "신라대학교 Devils",
+              "interceptions": 3,
+              "interceptionTd": 0,
+              "interceptionYards": 35,
+              "longestInterception": 20
+            },
+            {
+              "rank": 20,
+              "teamName": "대구대학교 Flying Tigers",
+              "interceptions": 3,
+              "interceptionTd": 0,
+              "interceptionYards": 5,
+              "longestInterception": 3
+            },
+            {
+              "rank": 21,
+              "teamName": "대구한의대학교 Rhinos",
+              "interceptions": 3,
+              "interceptionTd": 0,
+              "interceptionYards": 13,
+              "longestInterception": 13
+            },
+            {
+              "rank": 22,
+              "teamName": "동국대학교 TUSKERS",
+              "interceptions": 3,
+              "interceptionTd": 0,
+              "interceptionYards": 21,
+              "longestInterception": 20
+            },
+            {
+              "rank": 23,
+              "teamName": "인하대학교 Teal Dragons",
+              "interceptions": 3,
+              "interceptionTd": 0,
+              "interceptionYards": 28,
+              "longestInterception": 20
+            },
+            {
+              "rank": 24,
+              "teamName": "동국대학교 White Elephants",
+              "interceptions": 2,
+              "interceptionTd": 0,
+              "interceptionYards": 13,
+              "longestInterception": 13
+            },
+            {
+              "rank": 25,
+              "teamName": "경희대학교 Commanders",
+              "interceptions": 2,
+              "interceptionTd": 0,
+              "interceptionYards": 3,
+              "longestInterception": 3
+            },
+            {
+              "rank": 26,
+              "teamName": "울산대학교 Unicorns",
+              "interceptions": 2,
+              "interceptionTd": 0,
+              "interceptionYards": 38,
+              "longestInterception": 25
+            },
+            {
+              "rank": 27,
+              "teamName": "카이스트 Mavericks",
+              "interceptions": 2,
+              "interceptionTd": 0,
+              "interceptionYards": 12,
+              "longestInterception": 12
+            },
+            {
+              "rank": 28,
+              "teamName": "부산외국어대학교 TORNADO",
+              "interceptions": 2,
+              "interceptionTd": 0,
+              "interceptionYards": 15,
+              "longestInterception": 10
+            },
+            {
+              "rank": 29,
+              "teamName": "한국해양대학교 Vikings",
+              "interceptions": 2,
+              "interceptionTd": 0,
+              "interceptionYards": 3,
+              "longestInterception": 3
+            },
+            {
+              "rank": 30,
+              "teamName": "한림대학교 PHOENIX",
+              "interceptions": 2,
+              "interceptionTd": 1,
+              "interceptionYards": 3,
+              "longestInterception": 3
+            },
+            {
+              "rank": 31,
+              "teamName": "한동대학교 Holy Rams",
+              "interceptions": 2,
+              "interceptionTd": 0,
+              "interceptionYards": 20,
+              "longestInterception": 20
+            },
+            {
+              "rank": 32,
+              "teamName": "계명대학교 SUPER LIONS",
+              "interceptions": 1,
+              "interceptionTd": 0,
+              "interceptionYards": 5,
+              "longestInterception": 5
+            },
+            {
+              "rank": 33,
+              "teamName": "건국대학교 RAGING BULLS",
+              "interceptions": 1,
+              "interceptionTd": 0,
+              "interceptionYards": 0,
+              "longestInterception": 0
+            },
+            {
+              "rank": 34,
+              "teamName": "동서대학교 Blue Dolphins",
+              "interceptions": 1,
+              "interceptionTd": 0,
+              "interceptionYards": 0,
+              "longestInterception": 0
+            },
+            {
+              "rank": 35,
+              "teamName": "한신대학교 Killer Whales",
+              "interceptions": 1,
+              "interceptionTd": 0,
+              "interceptionYards": 0,
+              "longestInterception": 0
+            },
+            {
+              "rank": 36,
+              "teamName": "동아대학교 LEOPARD",
+              "interceptions": 1,
+              "interceptionTd": 0,
+              "interceptionYards": 0,
+              "longestInterception": 0
+            },
+            {
+              "rank": 37,
+              "teamName": "용인대학교 WHITE TIGERS",
+              "interceptions": 1,
+              "interceptionTd": 0,
+              "interceptionYards": 3,
+              "longestInterception": 3
+            },
+            {
+              "rank": 38,
+              "teamName": "대구가톨릭대학교 Scud Angels",
+              "interceptions": 1,
+              "interceptionTd": 0,
+              "interceptionYards": 6,
+              "longestInterception": 6
+            },
+            {
+              "rank": 39,
+              "teamName": "동의대학교 Turtle Fighters",
+              "interceptions": 1,
+              "interceptionTd": 0,
+              "interceptionYards": 35,
+              "longestInterception": 35
+            }
+          ],
+          "crawled_at": "2025-12-07"
+        }
+      },
+      "special": {
+        "kicking": {
+          "unit_name": "kicking",
+          "description": "킥킹",
+          "total_teams": 22,
+          "data": [
+            {
+              "rank": 1,
+              "teamName": "서울시립대학교 CITY HAWKS",
+              "fieldGoalPercentage": 100,
+              "averageDistance": 14,
+              "fieldGoalsMade": 2,
+              "fieldGoalsAttempted": 2,
+              "longestMade": 28,
+              "longestAttempted": 28
+            },
+            {
+              "rank": 2,
+              "teamName": "울산대학교 Unicorns",
+              "fieldGoalPercentage": 100,
+              "averageDistance": 25,
+              "fieldGoalsMade": 1,
+              "fieldGoalsAttempted": 1,
+              "longestMade": 25,
+              "longestAttempted": 25
+            },
+            {
+              "rank": 3,
+              "teamName": "건국대학교 RAGING BULLS",
+              "fieldGoalPercentage": 100,
+              "averageDistance": 53,
+              "fieldGoalsMade": 1,
+              "fieldGoalsAttempted": 1,
+              "longestMade": 53,
+              "longestAttempted": 53
+            },
+            {
+              "rank": 4,
+              "teamName": "한신대학교 Killer Whales",
+              "fieldGoalPercentage": 100,
+              "averageDistance": 0,
+              "fieldGoalsMade": 1,
+              "fieldGoalsAttempted": 1,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 5,
+              "teamName": "서강대학교 ALBATROSS",
+              "fieldGoalPercentage": 100,
+              "averageDistance": 0,
+              "fieldGoalsMade": 1,
+              "fieldGoalsAttempted": 1,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 6,
+              "teamName": "홍익대학교 COWBOYS",
+              "fieldGoalPercentage": 100,
+              "averageDistance": 0,
+              "fieldGoalsMade": 1,
+              "fieldGoalsAttempted": 1,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 7,
+              "teamName": "연세대학교 EAGLES",
+              "fieldGoalPercentage": 80,
+              "averageDistance": 20.5,
+              "fieldGoalsMade": 4,
+              "fieldGoalsAttempted": 5,
+              "longestMade": 82,
+              "longestAttempted": 35
+            },
+            {
+              "rank": 8,
+              "teamName": "서울대학교 GREEN TERRORS",
+              "fieldGoalPercentage": 75,
+              "averageDistance": 24,
+              "fieldGoalsMade": 3,
+              "fieldGoalsAttempted": 4,
+              "longestMade": 72,
+              "longestAttempted": 27
+            },
+            {
+              "rank": 9,
+              "teamName": "한양대학교 LIONS",
+              "fieldGoalPercentage": 75,
+              "averageDistance": 18.3,
+              "fieldGoalsMade": 3,
+              "fieldGoalsAttempted": 4,
+              "longestMade": 55,
+              "longestAttempted": 30
+            },
+            {
+              "rank": 10,
+              "teamName": "부산외국어대학교 TORNADO",
+              "fieldGoalPercentage": 75,
+              "averageDistance": 15,
+              "fieldGoalsMade": 3,
+              "fieldGoalsAttempted": 4,
+              "longestMade": 45,
+              "longestAttempted": 25
+            },
+            {
+              "rank": 11,
+              "teamName": "한국외국어대학교 BLACK KNIGHTS",
+              "fieldGoalPercentage": 50,
+              "averageDistance": 0,
+              "fieldGoalsMade": 2,
+              "fieldGoalsAttempted": 4,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 12,
+              "teamName": "강원대학교 CAPRA",
+              "fieldGoalPercentage": 42.9,
+              "averageDistance": 20.3,
+              "fieldGoalsMade": 3,
+              "fieldGoalsAttempted": 7,
+              "longestMade": 61,
+              "longestAttempted": 36
+            },
+            {
+              "rank": 13,
+              "teamName": "경일대학교 BLACK BEARS",
+              "fieldGoalPercentage": 33.3,
+              "averageDistance": 30,
+              "fieldGoalsMade": 1,
+              "fieldGoalsAttempted": 3,
+              "longestMade": 30,
+              "longestAttempted": 30
+            },
+            {
+              "rank": 14,
+              "teamName": "고려대학교 TIGERS",
+              "fieldGoalPercentage": 20,
+              "averageDistance": 0,
+              "fieldGoalsMade": 1,
+              "fieldGoalsAttempted": 5,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 15,
+              "teamName": "경희대학교 Commanders",
+              "fieldGoalPercentage": 0,
+              "averageDistance": 0,
+              "fieldGoalsMade": 0,
+              "fieldGoalsAttempted": 2,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 16,
+              "teamName": "성균관대학교 ROYALS",
+              "fieldGoalPercentage": 0,
+              "averageDistance": 0,
+              "fieldGoalsMade": 0,
+              "fieldGoalsAttempted": 3,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 17,
+              "teamName": "국민대학교 Razorbacks",
+              "fieldGoalPercentage": 0,
+              "averageDistance": 0,
+              "fieldGoalsMade": 0,
+              "fieldGoalsAttempted": 1,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 18,
+              "teamName": "중앙대학교 BLUE DRAGONS",
+              "fieldGoalPercentage": 0,
+              "averageDistance": 0,
+              "fieldGoalsMade": 0,
+              "fieldGoalsAttempted": 1,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 19,
+              "teamName": "동아대학교 LEOPARD",
+              "fieldGoalPercentage": 0,
+              "averageDistance": 0,
+              "fieldGoalsMade": 0,
+              "fieldGoalsAttempted": 1,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 20,
+              "teamName": "단국대학교 KODIAK BEARS",
+              "fieldGoalPercentage": 0,
+              "averageDistance": 0,
+              "fieldGoalsMade": 0,
+              "fieldGoalsAttempted": 2,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 21,
+              "teamName": "대구한의대학교 Rhinos",
+              "fieldGoalPercentage": 0,
+              "averageDistance": 0,
+              "fieldGoalsMade": 0,
+              "fieldGoalsAttempted": 2,
+              "longestMade": 0,
+              "longestAttempted": 0
+            },
+            {
+              "rank": 22,
+              "teamName": "경북대학교 ORANGE FIGHTERS",
+              "fieldGoalPercentage": 0,
+              "averageDistance": 0,
+              "fieldGoalsMade": 0,
+              "fieldGoalsAttempted": 2,
+              "longestMade": 0,
+              "longestAttempted": 0
+            }
+          ],
+          "crawled_at": "2025-12-07"
+        }
+      }
+    }
+  }
+}
