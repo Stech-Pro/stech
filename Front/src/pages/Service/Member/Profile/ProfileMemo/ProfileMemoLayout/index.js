@@ -1,8 +1,10 @@
 // ProfileMemoLayout/index.js
 
-import React, { createContext, useContext, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useMemo, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-// import { useAuth } from '../../../../../../context/AuthContext'; // 실제 환경에서는 이 줄의 주석을 해제하고 사용하세요.
+import { useAuth } from '../../../../../../context/AuthContext';
+import { fetchTeamGames, fetchGameClips } from '../../../../../../api/gameAPI';
+import { listMemos } from '../../../../../../api/memoAPI';
 
 // 2️⃣ 원본 데이터 (이 Clips 배열 안에 아래 defaultKeys에 해당하는 clipKey가 있는지 확인)
 export const SEED_GAMES = [
@@ -42,36 +44,117 @@ const MemoCtx = createContext({ list: [], map: {}, ready: true });
 export const useProfileMemo = () => useContext(MemoCtx);
 
 export default function ProfileMemoLayout() {
-  const auth = { role: 'player', user: {} };
-  const role = auth?.role || 'player';
-  const user = auth?.user || {};
-
-  // 1️⃣ 보여주고자 하는 클립 키 목록 (이 부분이 정확한지 확인)
-  // 이 키 값들에 해당하는 클립이 SEED_GAMES에 없으면 목록이 비게 됩니다.
-  const defaultKeys = ['BG-YS-2', 'BG-KU-3'];
+  const { user, token } = useAuth();
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
   
-  const memoKeys =
-    role === 'coach'
-      ? user?.teamMemoClipKeys || defaultKeys
-      : user?.memoClipKeys || defaultKeys;
-
-  const setOfKeys = useMemo(() => new Set((memoKeys || []).map(String)), [memoKeys]);
-
-  // 3️⃣ 필터링 로직 (위 1, 2번을 바탕으로 경기 목록을 만듦)
-  const value = useMemo(() => {
-    const list = SEED_GAMES.map((g) => {
-      const clips = (g.Clips || []).filter((c) => setOfKeys.has(String(c.clipKey)));
-      if (!clips.length) return null;
-      return { ...g, Clips: clips };
-    }).filter(Boolean);
-
-    const map = Object.fromEntries(list.map((g) => [g.gameKey, g]));
-    return { list, map, ready: true };
-  }, [setOfKeys]);
+  const role = user?.role || 'player';
+  const teamId = user?.team || user?.teamName || '';
 
   useEffect(() => {
-    console.log('[ProfileMemoLayout] games=', value.list.map((g) => g.gameKey));
-  }, [value]);
+    const loadMemoGames = async () => {
+      if (!teamId || !token) {
+        console.log('No teamId or token, using seed data');
+        // 비로그인 상태나 팀 정보 없을 때는 시드 데이터 사용
+        const defaultKeys = ['BG-YS-2', 'BG-KU-3'];
+        const setOfKeys = new Set(defaultKeys);
+        
+        const list = SEED_GAMES.map((g) => {
+          const clips = (g.Clips || []).filter((c) => setOfKeys.has(String(c.clipKey)));
+          if (!clips.length) return null;
+          return { ...g, Clips: clips };
+        }).filter(Boolean);
+        
+        setGames(list);
+        setReady(true);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        console.log('Loading games for team:', teamId);
+        console.log('User memos:', user?.memos);
+        
+        // 1. 사용자가 메모를 작성한 클립 목록 가져오기
+        const userMemoClips = user?.memos || [];
+        if (userMemoClips.length === 0) {
+          console.log('User has no memo clips');
+          setGames([]);
+          setReady(true);
+          setLoading(false);
+          return;
+        }
+        
+        // 2. 팀 경기 목록 가져오기
+        const teamGames = await fetchTeamGames(teamId);
+        console.log('Team games:', teamGames);
+        
+        // 3. 메모가 있는 경기만 필터링
+        const gamesWithMemoClips = [];
+        
+        for (const game of teamGames) {
+          try {
+            // 경기 클립 가져오기
+            const clips = await fetchGameClips(game.gameKey);
+            console.log(`Clips for ${game.gameKey}:`, clips);
+            
+            // 사용자가 메모를 작성한 클립만 필터링
+            const clipsWithMemos = clips.filter(clip => 
+              userMemoClips.some(memoClip => 
+                memoClip.gameKey === game.gameKey && 
+                memoClip.clipKey === clip.clipKey
+              )
+            );
+            
+            if (clipsWithMemos.length > 0) {
+              gamesWithMemoClips.push({
+                gameKey: game.gameKey,
+                date: game.date,
+                type: game.type,
+                score: { home: game.homeScore, away: game.awayScore },
+                location: game.location,
+                homeTeam: game.homeId,
+                awayTeam: game.awayId,
+                Clips: clipsWithMemos
+              });
+            }
+          } catch (err) {
+            console.error('Error processing game:', game.gameKey, err);
+          }
+        }
+        
+        console.log('Games with memo clips:', gamesWithMemoClips);
+        setGames(gamesWithMemoClips);
+        
+      } catch (error) {
+        console.error('Error loading memo games:', error);
+        // 오류 시 시드 데이터 사용
+        const defaultKeys = ['BG-YS-2', 'BG-KU-3'];
+        const setOfKeys = new Set(defaultKeys);
+        
+        const list = SEED_GAMES.map((g) => {
+          const clips = (g.Clips || []).filter((c) => setOfKeys.has(String(c.clipKey)));
+          if (!clips.length) return null;
+          return { ...g, Clips: clips };
+        }).filter(Boolean);
+        
+        setGames(list);
+      } finally {
+        setReady(true);
+        setLoading(false);
+      }
+    };
+
+    loadMemoGames();
+  }, [teamId, token, user?.memos]);
+
+  // 경기 목록과 맵 생성
+  const value = useMemo(() => {
+    const map = Object.fromEntries(games.map((g) => [g.gameKey, g]));
+    return { list: games, map, ready, loading };
+  }, [games, ready, loading]);
 
   return (
     <MemoCtx.Provider value={value}>

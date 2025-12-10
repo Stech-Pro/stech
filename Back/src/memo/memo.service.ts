@@ -44,6 +44,20 @@ export class MemoService {
 
     await memo.save();
 
+    // 사용자의 memos 배열에 clipKey 추가 (중복 방지)
+    console.log('🔍 메모 작성 전 user.memos:', user.memos);
+    const existingMemo = user.memos.find(
+      m => m.gameKey === gameKey && m.clipKey === clipKey
+    );
+    if (!existingMemo) {
+      user.memos.push({ gameKey, clipKey });
+      console.log('🔍 메모 추가 후 user.memos:', user.memos);
+      await user.save();
+      console.log('🔍 user.save() 완료');
+    } else {
+      console.log('🔍 이미 존재하는 메모:', existingMemo);
+    }
+
     // 팀 메모인 경우 알림 발송
     if (!isPrivate) {
       await this.sendTeamNotification(user, gameKey, memo._id.toString());

@@ -24,13 +24,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       console.log('사용자를 찾을 수 없음:', payload.id);
       throw new UnauthorizedException();
     }
-    console.log('JWT 검증 성공:', user.username);
+    console.log('JWT 검증 성공:', user.username, 'memos count:', user.memos?.length || 0);
     return {
       id: user._id,
       username: user.username,
-      team: user.teamName,
+      teamName: user.teamName,
+      team: user.teamName, // 호환성을 위해 유지
       role: user.role,
+      region: user.region,
       playerId: user.profile?.playerKey || null,
+      playerID: user.profile?.realName || user.username,
+      email: user.profile?.email || null,
+      bio: user.profile?.bio || null,
+      avatar: user.profile?.avatar || null,
+      memos: user.memos || [],
     };
   }
 }
