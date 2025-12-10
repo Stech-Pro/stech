@@ -11,7 +11,7 @@ import { fetchTeamStatsByKey } from '../../../../../api/teamAPI';
 import { fetchGameClips } from '../../../../../api/gameAPI';
 
 /* ========== 공용 드롭다운 (이 페이지 내부 구현) ========== */
-function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
+function Dropdown({ label, summary, isOpen, onToggle, onClose, children , className}) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
   };
 
   return (
-    <div className="ff-dropdown" ref={ref}>
+    <div className={`ff-dropdown ${className || ''}`} ref={ref}>
       <button
         type="button"
         className={`ff-dd-btn ${isOpen ? 'open' : ''}`}
@@ -494,6 +494,7 @@ const teamSummaryNode = selectedTeamOpt ? (
               <div className="ff-bar">
                 {/* TEAM */}
                 <Dropdown
+                 className="ff-dropdown--team"
                   label="공격팀"
                   summary={teamSummaryNode}
                   isOpen={openMenu === 'team'}

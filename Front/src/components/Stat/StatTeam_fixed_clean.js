@@ -158,7 +158,7 @@ const DIVISION_OPTIONS = ['1부', '2부'];
 const TEAM_CATEGORIES = {
   '오펜스': ['런', '패스', '리시빙', '득점'],
   '디펜스': ['태클', '인터셉트'],
-  '스페셜팀': ['필드골', '킥오프', '킥오프 리턴', '펀트', '펀트리턴']
+  '스페셜팀': ['필드골', '킥오프', '킥오프 리턴', '펀트', '펀트 리턴']
 };
 
 const PLAY_TYPES = Object.keys(TEAM_CATEGORIES);
@@ -308,12 +308,12 @@ const NEW_TEAM_COLUMNS = {
       { key: 'puntTouchdowns', label: '펀트\n터치다운' },
       { key: 'longestPunt', label: '가장 긴 펀트' },
     ],
-    '펀트리턴': [
+    '펀트 리턴': [
       { key: 'avgPuntReturnYards', label: '평균 펀트\n리턴 야드' },
       { key: 'puntReturns', label: '펀트 리턴 수' },
       { key: 'puntReturnYards', label: '펀트 리턴 야드' },
       { key: 'puntReturnTouchdowns', label: '펀트 리턴\n터치다운' },
-      { key: 'longestPuntReturn', label: '가장 긴\n펀트리턴' },
+      { key: 'longestPuntReturn', label: '가장 긴\n펀트 리턴' },
     ],
   },
 };
