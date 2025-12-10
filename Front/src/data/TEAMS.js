@@ -352,6 +352,12 @@ export const TEAMS = [
     logo: '/assets/images/svg/teams/Stechlogo.svg',
     region: 'Admin',
   },
+  {
+    id: 'GCF',
+    name: '경기강원올스타',
+    logo: '/assets/images/svg/teams/gcf.png',
+    region: 'Gyeonggi-Gangwon',
+  },
 ];
 
 export const GUEST_TEAMS = [
