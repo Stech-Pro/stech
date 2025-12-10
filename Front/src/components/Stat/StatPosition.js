@@ -235,7 +235,7 @@ const statColumns = {
       { key: 'yards_per_kick_return', label: '킥 리턴 당\n리턴 야드' },
       { key: 'punt_returns', label: '펀트 리턴\n시도 수' },
       { key: 'punt_return_yards', label: '펀트 리턴\n야드' },
-      { key: 'yards_per_punt_return', label: '펀트리턴\n리턴야드' },
+      { key: 'yards_per_punt_return', label: '펀트 리턴\n리턴야드' },
       { key: 'return_td', label: '리턴\n터치다운' },
     ],
   },

@@ -85,7 +85,7 @@ const DIVISION_OPTIONS = ['1부', '2부'];
 const TEAM_CATEGORIES = {
   '오펜스': ['런', '패스', '리시빙', '득점'],
   '디펜스': ['태클', '인터셉트'],
-  '스페셜팀': ['필드골', '킥오프', '킥오프 리턴', '펀트', '펀트리턴'],
+  '스페셜팀': ['필드골', '킥오프', '킥오프 리턴', '펀트', '펀트 리턴'],
 };
 
 const TEAM_CATEGORY_OPTIONS = Object.keys(TEAM_CATEGORIES);
@@ -101,7 +101,7 @@ const TEAM_COLUMNS = {
     ],
     '패스': [
       { key: 'passingYards', label: '패싱 야드' },
-      { key: 'yardsPerAttempt', label: '패스 시도 당 패싱 야드' },
+      { key: 'yardsPerAttempt', label: '패스 시도 당\n패싱 야드' },
       { key: 'completionPercentage', label: '패스 성공률' },
       { key: 'attempts', label: '패스 시도 수' },
       { key: 'completions', label: '패스 성공 수' },
@@ -167,12 +167,12 @@ const TEAM_COLUMNS = {
       { key: 'puntTouchdowns', label: '펀트 터치다운' },
       { key: 'longestPunt', label: '가장 긴 펀트' },
     ],
-    '펀트리턴': [
+    '펀트 리턴': [
       { key: 'avgPuntReturnYards', label: '평균 펀트 리턴 야드' },
       { key: 'puntReturnCount', label: '펀트 리턴 수' },
       { key: 'puntReturnYards', label: '펀트 리턴 야드' },
       { key: 'puntReturnTouchdowns', label: '펀트 리턴 터치다운' },
-      { key: 'longestPuntReturn', label: '가장 긴 펀트리턴' },
+      { key: 'longestPuntReturn', label: '가장 긴 펀트 리턴' },
     ],
   },
 };
@@ -193,7 +193,7 @@ const PRIMARY_TEAM_METRIC = {
     '킥오프': 'avgKickYards',
     '킥오프 리턴': 'avgKickReturnYards',
     '펀트': 'avgPuntYards',
-    '펀트리턴': 'avgPuntReturnYards',
+    '펀트 리턴': 'avgPuntReturnYards',
   },
 };
 
@@ -1108,7 +1108,7 @@ export default function StatTeam({
       else if (playType === '펀트') data = teamData.special.punting || [];
       else if (playType === '킥오프') data = teamData.special.kickoff || [];
       else if (playType === '킥오프 리턴') data = teamData.special['kickoff return'] || [];
-      else if (playType === '펀트리턴') data = teamData.special['punt return'] || [];
+      else if (playType === '펀트 리턴') data = teamData.special['punt return'] || [];
     }
     
     if (!data || !Array.isArray(data)) return [];

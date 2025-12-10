@@ -93,7 +93,7 @@ const STAT_TYPE_OPTIONS = [
   '킥오프',
   '킥오프리턴',
   '펀트',
-  '펀트리턴'
+  '펀트 리턴'
 ];
 
 const TEAM_TO_LEAGUE = {
@@ -223,12 +223,12 @@ const STAT_COLUMNS = {
     { key: 'puntTouchdowns', label: '펀트\n터치다운' },
     { key: 'longestPunt', label: '가장\n긴 펀트' },
   ],
-  '펀트리턴': [
+  '펀트 리턴': [
     { key: 'averagePuntReturnYards', label: '평균 펀트\n리턴 야드' },
     { key: 'puntReturnCount', label: '펀트\n리턴 수' },
     { key: 'puntReturnYards', label: '펀트\n리턴 야드' },
     { key: 'puntReturnTouchdowns', label: '펀트 리턴\n터치다운' },
-    { key: 'longestPuntReturn', label: '가장 긴\n펀트리턴' },
+    { key: 'longestPuntReturn', label: '가장 긴\n펀트 리턴' },
   ],
 };
 
@@ -244,7 +244,7 @@ const PRIMARY_METRIC = {
   '킥오프': 'averageKickoffYards',
   '킥오프리턴': 'averageKickReturnYards',
   '펀트': 'averagePuntYards',
-  '펀트리턴': 'averagePuntReturnYards',
+  '펀트 리턴': 'averagePuntReturnYards',
 };
 
 const LOWER_IS_BETTER = new Set([]);
@@ -390,7 +390,7 @@ const seoulPlayerData = {
       { name: '오성민', team: '한국외국어대학교', puntCount: 5, puntYards: 154, averagePuntYards: 30.8, longestPunt: 40, puntTouchdowns: 0 },
       { name: '김대웅', team: '홍익대학교', puntCount: 11, puntYards: 312, averagePuntYards: 28.4, longestPunt: 48, puntTouchdowns: 0 }
     ],
-    '펀트리턴': [
+    '펀트 리턴': [
       { name: '김정헌', team: '서울대학교', puntReturnCount: 1, puntReturnYards: 25, averagePuntReturnYards: 25.0, longestPuntReturn: 25, puntReturnTouchdowns: 0 },
       { name: '권용준', team: '서울시립대학교', puntReturnCount: 2, puntReturnYards: 42, averagePuntReturnYards: 21.0, longestPuntReturn: 30, puntReturnTouchdowns: 0 },
       { name: '손주익', team: '서울시립대학교', puntReturnCount: 1, puntReturnYards: 19, averagePuntReturnYards: 19.0, longestPuntReturn: 19, puntReturnTouchdowns: 0 },
@@ -503,7 +503,7 @@ const seoulPlayerData = {
       { name: '권준호', team: '경희대학교', puntCount: 7, puntYards: 244, averagePuntYards: 34.9, longestPunt: 57, puntTouchdowns: 0 },
       { name: '배민수', team: '중앙대학교', puntCount: 6, puntYards: 178, averagePuntYards: 29.7, longestPunt: 40, puntTouchdowns: 0 },
     ],
-    '펀트리턴': [
+    '펀트 리턴': [
       { name: '김승원', team: '숭실대학교', puntReturnCount: 1, puntReturnYards: 33, averagePuntReturnYards: 33.0, longestPuntReturn: 33, puntReturnTouchdowns: 0 },
       { name: '문태웅', team: '동국대학교', puntReturnCount: 1, puntReturnYards: 31, averagePuntReturnYards: 31.0, longestPuntReturn: 31, puntReturnTouchdowns: 0 },
       { name: '오승욱', team: '숭실대학교', puntReturnCount: 2, puntReturnYards: 23, averagePuntReturnYards: 11.5, longestPuntReturn: 15, puntReturnTouchdowns: 0 },
@@ -592,7 +592,7 @@ const gyeonggiPlayerData = {
       { name: '이민석', team: '강원대학교', puntCount: 8, puntYards: 268, averagePuntYards: 33.5, longestPunt: 46, puntTouchdowns: 0 },
       { name: '장용준', team: '인하대학교', puntCount: 7, puntYards: 208, averagePuntYards: 29.7, longestPunt: 42, puntTouchdowns: 0 },
       { name: '이동건', team: '강원대학교', puntCount: 3, puntYards: 85, averagePuntYards: 28.3, longestPunt: 42, puntTouchdowns: 0 }
-    ], '펀트리턴': [
+    ], '펀트 리턴': [
       { name: '배병찬', team: '성균관대학교', puntReturnCount: 1, puntReturnYards: 18, averagePuntReturnYards: 18.0, longestPuntReturn: 18, puntReturnTouchdowns: 0 },
       { name: '이상현', team: '단국대학교', puntReturnCount: 1, puntReturnYards: 17, averagePuntReturnYards: 17.0, longestPuntReturn: 17, puntReturnTouchdowns: 0 },
       { name: '조다빈', team: '성균관대학교', puntReturnCount: 7, puntReturnYards: 85, averagePuntReturnYards: 12.1, longestPuntReturn: 50, puntReturnTouchdowns: 0 },
@@ -640,7 +640,7 @@ const gyeonggiPlayerData = {
       { name: '김찬희', team: '용인대학교', puntCount: 6, puntYards: 195, averagePuntYards: 32.5, longestPunt: 45, puntTouchdowns: 0 },
       { name: '송영민', team: '카이스트', puntCount: 1, puntYards: 32, averagePuntYards: 32.0, longestPunt: 32, puntTouchdowns: 0 },
       { name: '김산', team: '한림대학교', puntCount: 2, puntYards: 62, averagePuntYards: 31.0, longestPunt: 35, puntTouchdowns: 0 }
-    ], '펀트리턴': [
+    ], '펀트 리턴': [
       { name: '안태현', team: '용인대학교', puntReturnCount: 1, puntReturnYards: 0, averagePuntReturnYards: 0.0, longestPuntReturn: 0, puntReturnTouchdowns: 0 }
     ]
   },
@@ -723,7 +723,7 @@ const daeguPlayerData = {
       { name: '김강민', team: '경북대학교', puntCount: 11, puntYards: 304, averagePuntYards: 27.6, longestPunt: 45, puntTouchdowns: 0 },
       { name: '유동윤', team: '경일대학교', puntCount: 1, puntYards: 55, averagePuntYards: 55.0, longestPunt: 55, puntTouchdowns: 0 },
       { name: '배민재', team: '경일대학교', puntCount: 24, puntYards: 961, averagePuntYards: 40.0, longestPunt: 56, puntTouchdowns: 0 }
-    ], '펀트리턴': [
+    ], '펀트 리턴': [
       { name: '유동윤', team: '경일대학교', puntReturnCount: 7, puntReturnYards: 184, averagePuntReturnYards: 26.3, longestPuntReturn: 58, puntReturnTouchdowns: 1 },
       { name: '전민우', team: '경북대학교', puntReturnCount: 1, puntReturnYards: 25, averagePuntReturnYards: 25.0, longestPuntReturn: 25, puntReturnTouchdowns: 0 },
       { name: '이무진', team: '대구가톨릭대학교', puntReturnCount: 1, puntReturnYards: 13, averagePuntReturnYards: 13.0, longestPuntReturn: 13, puntReturnTouchdowns: 0 },
@@ -783,7 +783,7 @@ const daeguPlayerData = {
       { name: '권지훈', team: '영남대학교', puntCount: 6, puntYards: 171, averagePuntYards: 28.5, longestPunt: 45, puntTouchdowns: 0 },
       { name: '곽도영', team: '대구대학교', puntCount: 7, puntYards: 198, averagePuntYards: 28.3, longestPunt: 42, puntTouchdowns: 0 },
       { name: '윤정근', team: '금오공과대학교', puntCount: 9, puntYards: 238, averagePuntYards: 26.4, longestPunt: 43, puntTouchdowns: 0 }
-    ], '펀트리턴': [
+    ], '펀트 리턴': [
       { name: '이민준', team: '영남대학교', puntReturnCount: 1, puntReturnYards: 15, averagePuntReturnYards: 15.0, longestPuntReturn: 15, puntReturnTouchdowns: 0 },
       { name: '최준환', team: '금오공과대학교', puntReturnCount: 1, puntReturnYards: 14, averagePuntReturnYards: 14.0, longestPuntReturn: 14, puntReturnTouchdowns: 0 },
       { name: '이창민', team: '대구대학교', puntReturnCount: 1, puntReturnYards: 5, averagePuntReturnYards: 5.0, longestPuntReturn: 5, puntReturnTouchdowns: 0 },
@@ -859,7 +859,7 @@ const busanPlayerData = {
       { name: '이한규', team: '동아대학교', puntCount: 3, puntYards: 94, averagePuntYards: 31.3, longestPunt: 44, puntTouchdowns: 0 },
       { name: '김범수', team: '울산대학교', puntCount: 1, puntYards: 30, averagePuntYards: 30.0, longestPunt: 30, puntTouchdowns: 0 },
       { name: '김동현', team: '경성대학교', puntCount: 4, puntYards: 108, averagePuntYards: 27.0, longestPunt: 46, puntTouchdowns: 0 }
-    ], '펀트리턴': [
+    ], '펀트 리턴': [
       { name: '동방상원', team: '동아대학교', puntReturnCount: 1, puntReturnYards: 54, averagePuntReturnYards: 54.0, longestPuntReturn: 54, puntReturnTouchdowns: 0 },
       { name: '임지민', team: '동의대학교', puntReturnCount: 1, puntReturnYards: 18, averagePuntReturnYards: 18.0, longestPuntReturn: 18, puntReturnTouchdowns: 0 },
       { name: '박종후', team: '경성대학교', puntReturnCount: 1, puntReturnYards: 8, averagePuntReturnYards: 8.0, longestPuntReturn: 8, puntReturnTouchdowns: 0 },
@@ -927,7 +927,7 @@ const busanPlayerData = {
       { name: '이민서', team: '부산외국어대학교', puntCount: 7, puntYards: 234, averagePuntYards: 33.4, longestPunt: 54, puntTouchdowns: 0 },
       { name: '방정현', team: '한국해양대학교', puntCount: 2, puntYards: 65, averagePuntYards: 32.5, longestPunt: 45, puntTouchdowns: 0 },
       { name: '장현성', team: '동서대학교', puntCount: 5, puntYards: 146, averagePuntYards: 29.2, longestPunt: 35, puntTouchdowns: 0 }
-    ], '펀트리턴': [
+    ], '펀트 리턴': [
       { name: '정성준', team: '한국해양대학교', puntReturnCount: 1, puntReturnYards: 20, averagePuntReturnYards: 20.0, longestPuntReturn: 20, puntReturnTouchdowns: 1 },
       { name: '이예승', team: '부산외국어대학교', puntReturnCount: 1, puntReturnYards: 12, averagePuntReturnYards: 12.0, longestPuntReturn: 12, puntReturnTouchdowns: 0 },
       { name: '장우인', team: '부산외국어대학교', puntReturnCount: 1, puntReturnYards: 3, averagePuntReturnYards: 3.0, longestPuntReturn: 3, puntReturnTouchdowns: 0 },
@@ -3848,7 +3848,7 @@ const socialData = {
         "longestPunt": 48
       }
     ],
-    "펀트리턴": [
+    "펀트 리턴": [
       {
         "name": "김정헌",
         "team": "서울대학교",
@@ -5711,7 +5711,7 @@ const socialData = {
         "longestPunt": 33
       }
     ],
-    "펀트리턴": [
+    "펀트 리턴": [
       {
         "name": "유동윤",
         "team": "경일대학교",
@@ -6435,7 +6435,7 @@ export default function StatPlayer({ teams = [] }) {
           {"name":"Donovan Lee Hunt","team":"서울 골든이글스","averagePuntYards":28.0,"puntCount":1,"puntYards":28,"puntTouchdowns":0,"longestPunt":28},
           {"name":"이규호","team":"서울 디펜더스","averagePuntYards":22.0,"puntCount":1,"puntYards":22,"puntTouchdowns":0,"longestPunt":22}
         ],
-        '펀트리턴': [
+        '펀트 리턴': [
           {"name":"신승한","team":"인천 라이노스","averagePuntReturnYards":25.0,"puntReturnCount":2,"puntReturnYards":50,"puntReturnTouchdowns":0,"longestPuntReturn":25},
           {"name":"정준희","team":"인천 라이노스","averagePuntReturnYards":19.0,"puntReturnCount":1,"puntReturnYards":19,"puntReturnTouchdowns":0,"longestPuntReturn":19},
           {"name":"신현솔","team":"군위 피닉스","averagePuntReturnYards":18.8,"puntReturnCount":4,"puntReturnYards":75,"puntReturnTouchdowns":0,"longestPuntReturn":33},
