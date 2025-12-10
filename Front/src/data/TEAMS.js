@@ -350,7 +350,13 @@ export const TEAMS = [
     id: 'ADMIN',
     name: '관리자',
     logo: '/assets/images/svg/teams/Stechlogo.svg',
-    region: 'Admin',
+    region: 'Admin', 
+  },
+  {
+    id: 'GC',
+    name: '경기강원올스타',
+    logo: '/assets/images/svg/teams/gcf.png',
+    region: 'Gyeonggi-Gangwon',
   },
 ];
 
@@ -364,7 +370,7 @@ export const GUEST_TEAMS = [
 
   //경기강원협회 /게스트용
   {
-    id: 'GCF',
+    id: 'GC',
     name: '경기강원올스타',
     logo: '/assets/images/svg/teams/gcf.png',
     region: 'Gyeonggi-Gangwon',
