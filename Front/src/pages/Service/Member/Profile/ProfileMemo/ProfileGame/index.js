@@ -25,7 +25,6 @@ export default function ProfileGame() {
         <div className="game-header-cell">날짜</div>
         <div className="game-header-cell">경기 결과</div>
         <div className="game-header-cell">세부사항</div>
-        <div className="game-header-cell">메모 개수</div>
       </div>
 
       <div className="game-list">
@@ -85,7 +84,6 @@ export default function ProfileGame() {
               </div>
 
               <div className="meta"><span>{location}</span></div>
-              <div className="memo-count"><span>{memoCount}</span></div>
             </div>
           );
         })}
