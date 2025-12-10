@@ -350,7 +350,7 @@ export const TEAMS = [
     id: 'ADMIN',
     name: '관리자',
     logo: '/assets/images/svg/teams/Stechlogo.svg',
-    region: 'Admin',
+    region: 'Admin', 
   },
   {
     id: 'GCF',
