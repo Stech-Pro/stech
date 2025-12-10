@@ -343,7 +343,7 @@ export default function ProfilePage() {
         </div>
         <div className="dropdowns-container">
           <select
-            className="dropdown"
+            className="pf-main-dropdown"
             value={careerPosition}
             onChange={(e) => setCareerPosition(e.target.value)}
           >
@@ -362,7 +362,7 @@ export default function ProfilePage() {
         </div>
         <div className="dropdowns-container">
           <select
-            className="dropdown"
+            className="pf-main-dropdown"
             value={seasonPosition}
             onChange={(e) => setSeasonPosition(e.target.value)}
           >

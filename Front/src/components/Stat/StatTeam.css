@@ -33,7 +33,7 @@
   border: 0.236px solid #6e6e6e;
   background: rgba(255, 255, 255, 0.4);
   display: grid;
-  grid-template-columns: 28rem 1fr;
+  grid-template-columns: 27rem 1fr;
   align-items: center;
   font-weight: 700;
 }

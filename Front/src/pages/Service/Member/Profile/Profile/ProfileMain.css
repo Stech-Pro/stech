@@ -179,3 +179,15 @@
     padding: 20px;
 }
 
+.pf-main-dropdown{
+  padding-left: 20px;
+  width: 100px;
+  height: 40px;
+  background-color: #353535;
+  color: white;
+  border: white 0.5px solid;
+  border-radius: 0.5rem;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
