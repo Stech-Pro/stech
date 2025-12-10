@@ -365,10 +365,19 @@ export default function ProfileModify() {
   };
 
 
-  const handleImageDelete = () => {
-    // ⚠️ TODO: 서버에 이미지 삭제 요청 로직 추가
-    setProfileData((prev) => ({ ...prev, profileImage: null }));
-    alert('프로필 이미지가 삭제되었습니다.');
+  const handleImageDelete = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('인증 토큰이 없습니다.');
+
+      // 서버에 프로필 이미지 삭제 요청
+      await updateProfile({ avatar: null }, token);
+      setProfileData((prev) => ({ ...prev, profileImage: null }));
+      alert('프로필 이미지가 삭제되었습니다.');
+    } catch (error) {
+      console.error('이미지 삭제 오류:', error);
+      alert('이미지 삭제에 실패했습니다: ' + (error.message || '알 수 없는 오류'));
+    }
   };
   // ------------------------------------------------------------------
 
