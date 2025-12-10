@@ -306,6 +306,7 @@ export class AuthService {
             email: user.profile?.contactInfo?.email || null,
             bio: user.profile?.bio || null,
             avatar: user.profile?.avatar || null,
+            profileImage: user.profile?.avatar || null,
             memos: user.memos || [],
           },
         },
@@ -784,6 +785,8 @@ export class AuthService {
       position: this.formatPositions(user.profile?.positions),
       region: this.formatRegionWithLeague(user.region, league),
       teamName: user.teamName,
+      avatar: user.profile?.avatar || null, // 프로필 이미지 추가
+      profileImage: user.profile?.avatar || null, // 프론트엔드 호환성을 위해 중복 필드
       kafaStats: kafaStats, // KAFA 협회 공식 스탯 추가
     };
 
@@ -898,6 +901,8 @@ export class AuthService {
       position: this.formatPositions(updatedUser.profile?.positions),
       region: this.formatRegionWithLeague(updatedUser.region, league),
       teamName: updatedUser.teamName,
+      avatar: updatedUser.profile?.avatar || null,
+      profileImage: updatedUser.profile?.avatar || null,
     };
 
     return {
