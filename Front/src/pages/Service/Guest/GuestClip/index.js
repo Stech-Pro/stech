@@ -120,7 +120,7 @@ export default function GuestClipPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const MY_TEAM_ID = 'GCF';
+  const MY_TEAM_ID = 'GC';
   const selfTeam = useMemo(
     () => (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || GUEST_TEAMS[0] || null,
     [MY_TEAM_ID],
