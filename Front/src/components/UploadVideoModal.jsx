@@ -508,10 +508,19 @@ const UploadVideoModal = ({
       const leagueNameAuto =
         gameType === '리그' ? getLeagueName(d, regionKey) : undefined;
 
-      const gameKey = `${String(home.id).slice(0, 2).toUpperCase()}${String(away.id)
-        .slice(0, 2)
-        .toUpperCase()}${d.format('YYYYMMDD')}`;
+      const getTeamCode = (teamId) => {
+        if (teamId === 'seoulVI') {
+          return 'SEVI';
+        }
+        // 기본 로직: 앞 두 글자 (예: 'GCF' -> 'GC', 'seoulVI' -> 'SE'였던 것을 위에서 처리)
+        return String(teamId).slice(0, 2).toUpperCase();
+      };
+      
+      const homeCode = getTeamCode(home.id);
+      const awayCode = getTeamCode(away.id);
 
+      const gameKey = `${homeCode}${awayCode}${d.format('YYYYMMDD')}`;
+      
       const gameInfo = {
         homeTeam: home.id,
         awayTeam: away.id,
