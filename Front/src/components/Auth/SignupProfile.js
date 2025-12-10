@@ -1,7 +1,7 @@
 // src/components/Auth/SignupProfileForm.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createProfile } from '../../api/authAPI';
+import { createProfile, createProfileWithAvatar } from '../../api/authAPI';
 import { useAuth } from '../../context/AuthContext';
 // RSComponents (React Select Components)를 명시적으로 가져옵니다.
 import Select, { components as RSComponents } from 'react-select'; 
@@ -355,31 +355,52 @@ const SignupProfileForm = () => {
       return;
     }
 
-    // 새로운 createProfile API에 맞춘 데이터 구조
-    const payload = {
-      realName: profileData.realName.trim(),
-      email: profileData.email.trim(),
-      nationality: profileData.nationality.trim(),
-      phone: profileData.phone.trim(),
-      address: `${profileData.address1} ${profileData.address2 || ''}`.trim(),
-      height: parseInt(profileData.height),
-      weight: parseInt(profileData.weight),
-      age: parseInt(profileData.age) || 20, // 기본값
-      career: profileData.grade.trim(),
-      position: profileData.position.trim(),
-      playerID: profileData.playerID.trim(),
-    };
-
-    console.log('전송할 payload:', payload);
-
     try {
-      const response = await createProfile(payload, token);
+      let response;
+      
+      if (profileData.profileImage) {
+        // 이미지가 있는 경우: FormData로 전송
+        const formData = new FormData();
+        formData.append('realName', profileData.realName.trim());
+        formData.append('email', profileData.email.trim());
+        formData.append('nationality', profileData.nationality.trim());
+        formData.append('phone', profileData.phone.trim());
+        formData.append('address', `${profileData.address1} ${profileData.address2 || ''}`.trim());
+        formData.append('height', profileData.height);
+        formData.append('weight', profileData.weight);
+        formData.append('age', profileData.age || '20');
+        formData.append('career', profileData.grade.trim());
+        formData.append('position', profileData.position.trim());
+        formData.append('playerID', profileData.playerID.trim());
+        formData.append('avatar', profileData.profileImage);
+
+        console.log('이미지와 함께 프로필 생성 중...');
+        response = await createProfileWithAvatar(formData, token);
+      } else {
+        // 이미지가 없는 경우: 기존 방식 사용
+        const payload = {
+          realName: profileData.realName.trim(),
+          email: profileData.email.trim(),
+          nationality: profileData.nationality.trim(),
+          phone: profileData.phone.trim(),
+          address: `${profileData.address1} ${profileData.address2 || ''}`.trim(),
+          height: parseInt(profileData.height),
+          weight: parseInt(profileData.weight),
+          age: parseInt(profileData.age) || 20,
+          career: profileData.grade.trim(),
+          position: profileData.position.trim(),
+          playerID: profileData.playerID.trim(),
+        };
+
+        console.log('프로필만 생성 중...');
+        response = await createProfile(payload, token);
+      }
 
       console.log('프로필 생성 응답:', response);
 
       // 새 토큰이 반환되면 저장
       if (response.data?.token) {
-        console.log('새 토큰 저장:', response.data.token); // 디버깅용
+        console.log('새 토큰 저장:', response.data.token);
         localStorage.setItem('token', response.data.token);
       }
 

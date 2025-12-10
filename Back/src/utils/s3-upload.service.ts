@@ -42,7 +42,7 @@ export class S3UploadService {
         Key: key,
         Body: file.buffer,
         ContentType: file.mimetype,
-        ACL: 'public-read', // 공개 읽기 권한
+        // ACL 제거 - 버킷 정책으로 공개 접근 설정
       };
 
       // S3에 파일 업로드 실행

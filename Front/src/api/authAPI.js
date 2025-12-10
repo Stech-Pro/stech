@@ -307,6 +307,60 @@ export const createProfile = async (profileData, token) => {
   );
 };
 
+// 프로필과 이미지를 함께 생성하는 새로운 함수
+export const createProfileWithAvatar = async (formData, token) => {
+  if (!token) throw new APIError('인증이 필요합니다.', 401);
+  
+  const response = await fetch(`${API_CONFIG.BASE_URL}/auth/create-profile-with-avatar`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      // FormData 사용 시 Content-Type 헤더는 브라우저가 자동으로 설정
+    },
+    body: formData,
+  });
+  
+  const data = await jsonOrText(response);
+  if (response.ok) return data;
+  
+  throw new APIError(
+    typeof data === 'object' 
+      ? data.message || '프로필 생성 실패' 
+      : '프로필 생성 실패',
+    response.status,
+    data
+  );
+};
+
+// 프로필 이미지 업로드 함수
+export const uploadAvatar = async (file, token) => {
+  if (!token) throw new APIError('인증이 필요합니다.', 401);
+  if (!file) throw new APIError('업로드할 파일이 없습니다.', 400);
+
+  const formData = new FormData();
+  formData.append('avatar', file);
+
+  const response = await fetch(`${API_CONFIG.BASE_URL}/auth/upload-avatar`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      // FormData 사용 시 Content-Type 헤더는 브라우저가 자동으로 설정
+    },
+    body: formData,
+  });
+
+  const data = await jsonOrText(response);
+  if (response.ok) return data;
+
+  throw new APIError(
+    typeof data === 'object' 
+      ? data.message || '이미지 업로드 실패' 
+      : '이미지 업로드 실패',
+    response.status,
+    data
+  );
+};
+
 export const myProfile = async (token) => {
   if (!token) throw new APIError('인증이 필요합니다.', 401);
 
@@ -351,35 +405,5 @@ export async function updateProfile(payload, accessToken) {
     typeof data === 'object' ? data.message || '프로필 업데이트 실패' : '프로필 업데이트 실패',
     res.status,
     data
-  );
-}
-
-export async function uploadAvatar(file, accessToken) {
-  if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
-
-  const formData = new FormData();
-  formData.append('avatar', file); // 백엔드가 'file' 키를 사용한다고 가정
-
-  const res = await fetch(
-    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPLOAD_AVATAR}`,
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        // FormData 사용 시 Content-Type 헤더는 생략합니다.
-      },
-      body: formData,
-    },
-  );
-
-  const data = await jsonOrText(res);
-  if (res.ok || res.status === 201) return data; 
-  
-  throw new APIError(
-    typeof data === 'object'
-      ? data.message || '프로필 이미지 업로드 실패'
-      : '프로필 이미지 업로드 실패',
-    res.status,
-    data,
   );
 }

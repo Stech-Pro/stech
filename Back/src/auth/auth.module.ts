@@ -20,6 +20,7 @@ import {
   PlayerGameStatsSchema,
 } from '../schemas/player-game-stats.schema';
 import { EmailService } from '../utils/email.service';
+import { S3UploadService } from '../utils/s3-upload.service';
 import { KafaStatsModule } from '../kafa-stats/kafa-stats.module';
 
 @Module({
@@ -39,7 +40,7 @@ import { KafaStatsModule } from '../kafa-stats/kafa-stats.module';
     KafaStatsModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, EmailService],
+  providers: [AuthService, JwtStrategy, EmailService, S3UploadService],
   exports: [AuthService, MongooseModule], // MongooseModule도 export하여 User 모델 사용 가능
 })
 export class AuthModule {}

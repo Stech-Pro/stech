@@ -32,6 +32,7 @@ import {
 import { TEAM_CODES } from '../common/constants/team-codes';
 import { EmailService } from '../utils/email.service';
 import { KafaStatsService } from '../kafa-stats/kafa-stats.service';
+import { S3UploadService } from '../utils/s3-upload.service';
 
 @Injectable()
 export class AuthService {
@@ -47,6 +48,7 @@ export class AuthService {
     private jwtService: JwtService,
     private emailService: EmailService,
     private kafaStatsService: KafaStatsService,
+    private s3UploadService: S3UploadService,
   ) {}
 
   async signup(signupDto: SignupDto) {
@@ -572,6 +574,7 @@ export class AuthService {
           'profile.career': profileData.career,
           'profile.positions.PS1': profileData.position,
           'profile.joinDate': new Date(),
+          'profile.avatar': profileData.avatar || 'https://via.placeholder.com/250x300',
         },
       },
       { new: true },
@@ -629,17 +632,124 @@ export class AuthService {
       throw new BadRequestException('이미지 파일만 업로드 가능합니다.');
     }
 
-    // S3 업로드 로직은 나중에 구현
-    const fileName = `avatars/${userId}_${Date.now()}_${file.originalname}`;
+    // S3에 업로드
+    const s3Result = await this.s3UploadService.uploadToS3(file, 'avatars');
+    
+    if (!s3Result.success) {
+      throw new BadRequestException(s3Result.error || '이미지 업로드에 실패했습니다.');
+    }
 
-    // 임시로 로컬 URL 반환
-    const avatarUrl = `https://temp-url.com/${fileName}`;
+    // 사용자 프로필에 avatar URL 저장
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      { $set: { 'profile.avatar': s3Result.url } },
+      { new: true }
+    );
+
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
 
     return {
       success: true,
       message: '프로필 이미지 업로드 성공',
       data: {
-        avatarUrl,
+        avatarUrl: s3Result.url,
+      },
+    };
+  }
+
+  async createProfileWithAvatar(userId: string, profileData: CreateProfileDto, file: Express.Multer.File) {
+    console.log('=== 프로필 + 이미지 생성 ===');
+    console.log('userId:', userId);
+    console.log('profileData:', profileData);
+    console.log('file:', file ? `${file.originalname} (${file.size} bytes)` : 'No file');
+
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    let avatarUrl = null;
+
+    // 파일이 있으면 S3에 업로드
+    if (file) {
+      // 파일 크기 제한 (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new BadRequestException('파일 크기는 5MB를 초과할 수 없습니다.');
+      }
+
+      // 이미지 파일 타입 확인
+      if (!file.mimetype.startsWith('image/')) {
+        throw new BadRequestException('이미지 파일만 업로드 가능합니다.');
+      }
+
+      const s3Result = await this.s3UploadService.uploadToS3(file, 'avatars');
+      
+      if (!s3Result.success) {
+        throw new BadRequestException(s3Result.error || '이미지 업로드에 실패했습니다.');
+      }
+
+      avatarUrl = s3Result.url;
+    }
+
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          'profile.realName': profileData.realName,
+          'profile.playerID': profileData.playerID,
+          'profile.contactInfo.email': profileData.email,
+          'profile.contactInfo.phone': profileData.phone,
+          'profile.contactInfo.address': profileData.address,
+          'profile.contactInfo.postalCode': profileData.postalCode || null,
+          'profile.physicalInfo.height': profileData.height,
+          'profile.physicalInfo.weight': profileData.weight,
+          'profile.physicalInfo.age': profileData.age,
+          'profile.physicalInfo.nationality': profileData.nationality,
+          'profile.career': profileData.career,
+          'profile.positions.PS1': profileData.position,
+          'profile.joinDate': new Date(),
+          'profile.avatar': avatarUrl || 'https://via.placeholder.com/250x300',
+        },
+      },
+      { new: true },
+    );
+
+    console.log('업데이트된 사용자:', updatedUser);
+
+    if (!updatedUser) {
+      throw new BadRequestException('프로필 생성에 실패했습니다.');
+    }
+
+    // 새로운 토큰 발급
+    const newToken = this.jwtService.sign({
+      id: updatedUser._id,
+      username: updatedUser.username,
+      team: updatedUser.teamName,
+      role: updatedUser.role,
+      playerId: updatedUser.profile?.playerID || null,
+      realName: updatedUser.profile?.realName || null,
+    });
+
+    console.log('✅ 프로필 + 이미지 생성 완료');
+
+    return {
+      success: true,
+      message: '프로필이 성공적으로 생성되었습니다.',
+      data: {
+        token: newToken,
+        profile: updatedUser.profile,
+        user: {
+          id: updatedUser._id,
+          username: updatedUser.username,
+          teamName: updatedUser.teamName,
+          role: updatedUser.role,
+          region: updatedUser.region,
+          realName: updatedUser.profile?.realName,
+          playerID: updatedUser.profile?.playerID,
+          avatar: updatedUser.profile?.avatar,
+        },
       },
     };
   }
@@ -855,6 +965,9 @@ export class AuthService {
     }
     if (updateData.position !== undefined) {
       updateFields['profile.positions.PS1'] = updateData.position; // 주 포지션은 PS1에 저장
+    }
+    if (updateData.avatar !== undefined) {
+      updateFields['profile.avatar'] = updateData.avatar;
     }
 
     // 업데이트할 필드가 없으면 에러

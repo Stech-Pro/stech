@@ -400,6 +400,23 @@ export class AuthController {
     return this.authService.uploadAvatar(req.user.id, file);
   }
 
+  @Post('create-profile-with-avatar')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @UseInterceptors(FileInterceptor('avatar'))
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '👤 프로필 + 이미지 생성',
+    description: '회원가입 후 프로필과 프로필 이미지를 함께 생성합니다.',
+  })
+  async createProfileWithAvatar(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createProfileDto: CreateProfileDto,
+  ) {
+    return this.authService.createProfileWithAvatar(req.user.id, createProfileDto, file);
+  }
+
   @Get('highlights')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
