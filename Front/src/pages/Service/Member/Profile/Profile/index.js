@@ -157,7 +157,7 @@ export default function ProfilePage() {
         
         // 4) 필수 필드 맵핑
         const profileInfo = {
-          profileImage: data.profileImage || data.avatar || 'https://via.placeholder.com/250x300',
+          profileImage: data.avatar || 'https://placehold.co/250x300?text=No+Image',
           fullName: data.fullName || data.realName || data.name || '이름 없음',
           email: data.email || 'email@example.com',
           address1: data.address1 || data.address || '',
@@ -170,6 +170,7 @@ export default function ProfilePage() {
           region: data.region || data.league || '',
           team: data.team || data.teamName || ''
         };
+        console.log("가공된 프로필 정보:", profileInfo);
 
         // 5) 상태 저장
         setProfileData(profileInfo);
