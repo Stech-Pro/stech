@@ -8,6 +8,7 @@
     logout as apiLogout,
     verifyToken as apiVerifyToken,
   } from '../api/authAPI';
+import { listMemos } from '../api/memoAPI';
 
   import {
     getToken,
@@ -84,6 +85,13 @@
             if (u) setUserData(u);
           } catch {}
         }
+        try {
+  const memos = await listMemos({}, getToken());
+  if (Array.isArray(memos)) u = { ...u, memos };
+  console.log('Loaded user memos:', memos);
+} catch (err) {
+  console.warn('메모 불러오기 실패:', err);
+}
         setUser(u);
 
         // ✨ 1. 프로필 완성 여부 판단: user 객체에 playerID이 있는지 확인합니다.

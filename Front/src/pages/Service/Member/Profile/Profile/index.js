@@ -107,7 +107,7 @@ const POSITION_STATS_CONFIG = {
 const fetchProfileDataFromBackend = async () => {
   await new Promise((r) => setTimeout(r, 1000));
   return {
-    profileImage: 'https://via.placeholder.com/250x300',
+    profileImage: 'https://placehold.co/250x300?text=No+Image',
     fullName: '김주전',
     email: 'joojeon.kim@example.com',
     address1: '서울시 광진구 능동로 120',
