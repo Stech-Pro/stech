@@ -4,6 +4,78 @@ import { FaChevronDown } from 'react-icons/fa';
 import './StatTeam.css';
 import { useStatInitial } from '../../hooks/useStatInitial';
 
+const SCHOOL_TO_TEAM_NAME = {
+  // ───── 서울 1부 ─────
+  '한양대학교': '한양대 라이온스',
+  '연세대학교': '연세대 이글스',
+  '홍익대학교': '홍익대 카우보이스',
+  '서울대학교': '서울대 그린테러스',
+  '건국대학교': '건국대 레이징불스',
+  '서울시립대학교': '서울시립대 시티혹스',
+  '국민대학교': '국민대 레이저백스',
+  '한국외국어대학교': '한국외대 블랙나이츠',
+
+  // ───── 서울 2부 ─────
+  '고려대학교': '고려대 타이거스',
+  '중앙대학교': '중앙대 블루드래곤스',
+  '숭실대학교': '숭실대 크루세이더스',
+  '경희대학교': '경희대 커맨더스',
+  '동국대학교': '동국대 터스커스',
+  '서강대학교': '서강대 알바트로스',
+
+  // ───── 경기강원 1부 ─────
+  '강원대학교': '강원대 카프라',            // TEAMS 기준 명칭
+  '인하대학교': '인하대 틸 드래곤스',
+  '성균관대학교': '성균관대 로얄스',
+  '단국대학교': '단국대 코디악베어스',
+
+  // ───── 경기강원 2부 ─────
+  '용인대학교': '용인대 화이트타이거스',
+  '한림대학교': '한림대 피닉스',
+  '한신대학교': '한신대 킬러웨일스',
+  '카이스트': '카이스트 매버릭스',
+
+  // ───── 대구경북 1부 ─────
+  '경북대학교': '경북대 오렌지파이터스',
+  '경일대학교': '경일대 블랙베어스',
+  '한동대학교': '한동대 홀리램스',
+  '대구가톨릭대학교': '대구가톨릭대 스커드엔젤스',
+  '대구한의대학교': '대구한의대 라이노스',
+
+  // ───── 대구경북 2부 ─────
+  '금오공과대학교': '금오공과대 레이븐스',
+  '대구대학교': '대구대 플라잉타이거스',
+  '영남대학교': '영남대 페가수스',
+  '계명대학교': '계명대 슈퍼라이온스',
+  // (2부 데이터에 '동국대학교'가 등장하는 구간이 있는데, 대구동국이면 아래로 매핑)
+  // 필요 시 안전하게 추가:
+  // '동국대학교(경주)': '동국대 화이트엘리펀츠',
+  // 데이터가 그냥 '동국대학교'면 아래 라인을 켜세요:
+  '동국대학교(대구경북)': '동국대 화이트엘리펀츠',
+
+  // ───── 부산경남 1부 ─────
+  '경성대학교': '경성대 드래곤스',
+  '동의대학교': '동의대 터틀파이터스',
+  '동아대학교': '동아대 레오파즈',
+  '울산대학교': '울산대 유니콘스',
+
+  // ───── 부산경남 2부 ─────
+  '부산외국어대학교': '부산외국어대 토네이도',
+  '한국해양대학교': '한국해양대 바이킹스',
+  '동서대학교': '동서대 블루돌핀스',
+  '신라대학교': '신라대 데빌스',
+  '부산대학교': '부산대 이글스',
+
+  // ───── 사회인 (이미 팀명 형태이므로 보통 필요 X) ─────
+  // '부산 그리폰즈': '부산 그리폰즈',
+  // '삼성 블루스톰': '삼성 블루스톰',
+  // '서울 골든이글스': '서울 골든이글스',
+  // '서울 디펜더스': '서울 디펜더스',
+  // '서울 바이킹스': '서울 바이킹스',
+  // '인천 라이노스': '인천 라이노스',
+  // '군위 피닉스': '군위 피닉스',
+};
+
 /* ─────────────────────────  공통 드롭다운  ───────────────────────── */
 function Dropdown({
   value,
@@ -195,31 +267,6 @@ const PRIMARY_TEAM_METRIC = {
     '펀트': 'avgPuntYards',
     '펀트 리턴': 'avgPuntReturnYards',
   },
-};
-
-// 팀별 리그 매핑
-const TEAM_TO_LEAGUE = {
-  '한양대학교': '서울',
-  '연세대학교': '서울',
-  '서울대학교': '서울',
-  '건국대학교': '서울',
-  '홍익대학교': '서울',
-  '고려대학교': '서울',
-  '중앙대학교': '서울',
-  '숭실대학교': '서울',
-  '성균관대학교': '경기강원',
-  '강원대학교': '경기강원',
-  '용인대학교': '경기강원',
-  '경북대학교': '대구경북',
-  '경일대학교': '대구경북',
-  '경성대학교': '부산경남',
-  '부산 그리폰즈': '사회인',
-  '서울 골든이글스': '사회인',
-  '삼성 블루스톰': '사회인',
-  '인천 라이노스': '사회인',
-  '군위 피닉스': '사회인',
-  '서울 디펜더스': '사회인',
-  '서울 바이킹스': '사회인',
 };
 
 const leagueHasDivisions = (league) => {
@@ -1069,13 +1116,114 @@ export default function StatTeam({
     }
   };
 
+// 학교명 → 팀명 (리그 문맥으로 모호성 처리)
+const toTeamName = (schoolName, leagueKey) => {
+  // 예: '동국대학교'가 리그에 따라 다르게 쓰일 수 있을 때 처리
+  if (schoolName === '동국대학교' && leagueKey === '대구경북') {
+    return SCHOOL_TO_TEAM_NAME['동국대학교(대구경북)'] || schoolName;
+  }
+  return SCHOOL_TO_TEAM_NAME[schoolName] || schoolName;
+};
+
+// 배열 내부의 row.teamName 치환
+const renameArrayTeamNames = (arr = [], leagueKey) =>
+  Array.isArray(arr)
+    ? arr.map((row) => ({
+        ...row,
+        teamName: toTeamName(row.teamName, leagueKey),
+      }))
+    : [];
+
+// KAFA 트리 전체를 순회하며 teamName을 한 번에 치환
+const normalizeTeamNamesInKafaData = (data) => {
+  if (!data) return data;
+  const out = {};
+
+  for (const leagueKey of Object.keys(data)) {
+    // 사회인은 보통 이미 팀명
+    if (leagueKey === '사회인') {
+      out[leagueKey] = data[leagueKey];
+      continue;
+    }
+
+    const league = data[leagueKey];
+    const nextLeague = {};
+
+    for (const divKey of Object.keys(league)) {
+      const div = league[divKey];
+      if (!div?.team) {
+        nextLeague[divKey] = div;
+        continue;
+      }
+      const team = div.team;
+
+      nextLeague[divKey] = {
+        ...div,
+        team: {
+          offense: {
+            rushing:    renameArrayTeamNames(team?.offense?.rushing, leagueKey),
+            passing:    renameArrayTeamNames(team?.offense?.passing, leagueKey),
+            receiving:  renameArrayTeamNames(team?.offense?.receiving, leagueKey),
+          },
+          defense: {
+            tackles:        renameArrayTeamNames(team?.defense?.tackles, leagueKey),
+            interceptions:  renameArrayTeamNames(team?.defense?.interceptions, leagueKey),
+          },
+          special: {
+            kicking:        renameArrayTeamNames(team?.special?.kicking, leagueKey),
+            punting:        renameArrayTeamNames(team?.special?.punting, leagueKey),
+            kickoff:        renameArrayTeamNames(team?.special?.kickoff, leagueKey),
+            ['kickoff return']: renameArrayTeamNames(team?.special?.['kickoff return'], leagueKey),
+            ['punt return']:    renameArrayTeamNames(team?.special?.['punt return'], leagueKey),
+          },
+        },
+      };
+    }
+
+    out[leagueKey] = nextLeague;
+  }
+
+  // 사회인 루트에 team이 바로 있는 구조도 안전하게 치환
+  if (data?.사회인?.team) {
+    const t = data.사회인.team;
+    out.사회인 = {
+      team: {
+        offense: {
+          rushing:    renameArrayTeamNames(t?.offense?.rushing, '사회인'),
+          passing:    renameArrayTeamNames(t?.offense?.passing, '사회인'),
+          receiving:  renameArrayTeamNames(t?.offense?.receiving, '사회인'),
+        },
+        defense: {
+          tackles:        renameArrayTeamNames(t?.defense?.tackles, '사회인'),
+          interceptions:  renameArrayTeamNames(t?.defense?.interceptions, '사회인'),
+        },
+        special: {
+          kicking:        renameArrayTeamNames(t?.special?.kicking, '사회인'),
+          punting:        renameArrayTeamNames(t?.special?.punting, '사회인'),
+          kickoff:        renameArrayTeamNames(t?.special?.kickoff, '사회인'),
+          ['kickoff return']: renameArrayTeamNames(t?.special?.['kickoff return'], '사회인'),
+          ['punt return']:    renameArrayTeamNames(t?.special?.['punt return'], '사회인'),
+        },
+      },
+    };
+  }
+
+  return out;
+};
+
+
+const normalizedKafaData = useMemo(
+  () => normalizeTeamNamesInKafaData(kafaData),
+  [kafaData]
+);
+
   const sortedTeams = useMemo(() => {
     // 리그별 데이터 선택
     let leagueData;
     if (league === '사회인') {
-      leagueData = kafaData.사회인;
+      leagueData = normalizedKafaData.사회인;
     } else {
-      const universityData = kafaData[league];
+      const universityData = normalizedKafaData[league];
       if (!universityData) return [];
       
       if (division === '1부') {
@@ -1277,7 +1425,7 @@ export default function StatTeam({
                           />
                         </div>
                       )}
-                      <span>{row.teamName}</span>
+                      <div className="team-table-cell team-name">{row.teamName}</div>
                     </div>
                   </div>
                   <div
