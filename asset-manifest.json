@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.91af0c50.css",
-    "main.js": "/static/js/main.0b9c0c18.js",
+    "main.js": "/static/js/main.9728c347.js",
     "static/media/HD.png": "/static/media/HD.6849a9fc423dc19d6350.png",
     "static/media/headimg.png": "/static/media/headimg.08a64629290141cfd3f2.png",
     "static/media/DW.png": "/static/media/DW.396463aae2bbdaf327da.png",
@@ -50,19 +50,34 @@
     "static/media/FAQheader.png": "/static/media/FAQheader.dbc142c28eaebe19eeb9.png",
     "static/media/GP.png": "/static/media/GP.eb65807754db6dd7ac94.png",
     "static/media/TP1.png": "/static/media/TP1.c36e4c0f34f04476b3bb.png",
+    "static/media/Kookmin-Razorbacks.png": "/static/media/Kookmin-Razorbacks.03cb078455bc2d6f309b.png",
     "static/media/TP4.png": "/static/media/TP4.dafc0703eeadf171082b.png",
+    "static/media/Kyunghee-Commanders.png": "/static/media/Kyunghee-Commanders.bc5bde5891e211fbdce8.png",
     "static/media/DU.png": "/static/media/DU.6422b14a5bd8c652a243.png",
     "static/media/Component.png": "/static/media/Component.6255d5b4d11720e57eb2.png",
     "static/media/HI.png": "/static/media/HI.c94ff13918931938159c.png",
+    "static/media/Korea-Univeristy-Tigers.png": "/static/media/Korea-Univeristy-Tigers.4bea4554d06378923da3.png",
     "static/media/GE.png": "/static/media/GE.ec8d7acfe213a2acc38e.png",
+    "static/media/UOS-City-Hawks.png": "/static/media/UOS-City-Hawks.8a4966f9914c3f2f1974.png",
+    "static/media/Dongguk-Tuskers.png": "/static/media/Dongguk-Tuskers.018236f3d229bb21f998.png",
     "static/media/SS.png": "/static/media/SS.86eefedb6c147d90f17b.png",
     "static/media/Gameimage.png": "/static/media/Gameimage.20ed702c5d1930d5ed0b.png",
     "static/media/BK.png": "/static/media/BK.3f71582742015d26d653.png",
     "static/media/HY.png": "/static/media/HY.28d6ee70a3fe90300858.png",
+    "static/media/ChungAng-Blue-Dragons.png": "/static/media/ChungAng-Blue-Dragons.2bdd206f61bd031fb7b3.png",
+    "static/media/Konkuk-Raging-Bulls.png": "/static/media/Konkuk-Raging-Bulls.fa1ffe561c9ef950a88f.png",
     "static/media/SN.png": "/static/media/SN.78efd2037ee910b2b526.png",
+    "static/media/Yonsei-Eagles.png": "/static/media/Yonsei-Eagles.d9a80545aa6cc565973c.png",
+    "static/media/Hongik-Cowboys.png": "/static/media/Hongik-Cowboys.52ed5781450ddf44d88b.png",
+    "static/media/soongsil-crusaders.png": "/static/media/soongsil-crusaders.f176d9fd4c8259294e47.png",
+    "static/media/Seoul-Vikings.png": "/static/media/Seoul-Vikings.0ef1fd5c1d464370004b.png",
+    "static/media/Hanyang-Lions.png": "/static/media/Hanyang-Lions.416d43287313ee9517dd.png",
     "static/media/Google_for_Startups_logo.jpg": "/static/media/Google_for_Startups_logo.ebc2919b667b87769256.jpg",
     "static/media/NoGroup.png": "/static/media/NoGroup.3fa4c6d4baef5fa809da.png",
     "static/media/detail.png": "/static/media/detail.e04927d03313fa93c765.png",
+    "static/media/Sogang-Albatross.png": "/static/media/Sogang-Albatross.726d09837a629b1039e2.png",
+    "static/media/SNU-Green-Terrors.png": "/static/media/SNU-Green-Terrors.0a7e5d54ea3fcf4b1a1e.png",
+    "static/media/HUFS-Black-Knights.png": "/static/media/HUFS-Black-Knights.6e3c7722b8087ac0005f.png",
     "static/media/mobilescreen.png": "/static/media/mobilescreen.c9ccad0c4d3b506d41fd.png",
     "static/media/stech.png": "/static/media/stech.2a8ec34a60cb99b15cce.png",
     "static/media/404Error.png": "/static/media/404Error.78ba7011f5629b39b096.png",
@@ -72,10 +87,10 @@
     "static/media/teamLogo.png": "/static/media/teamLogo.1cbc0faa7edd66f0a77c.png",
     "index.html": "/index.html",
     "main.91af0c50.css.map": "/static/css/main.91af0c50.css.map",
-    "main.0b9c0c18.js.map": "/static/js/main.0b9c0c18.js.map"
+    "main.9728c347.js.map": "/static/js/main.9728c347.js.map"
   },
   "entrypoints": [
     "static/css/main.91af0c50.css",
-    "static/js/main.0b9c0c18.js"
+    "static/js/main.9728c347.js"
   ]
 }
