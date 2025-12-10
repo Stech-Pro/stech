@@ -79,6 +79,7 @@ export default function ProfileMemoLayout() {
         
         // 1. 사용자가 메모를 작성한 클립 목록 가져오기
         const userMemoClips = user?.memos || [];
+        console.log('User memo clips:', user);
         if (userMemoClips.length === 0) {
           console.log('User has no memo clips');
           setGames([]);

@@ -2,21 +2,10 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProfileMemo } from '../ProfileMemoLayout';
 import './ProfileClip.css'; // CSS 파일 임포트
-import {TEAMS} from '../../../../../../data/TEAMS';
+import {TEAMS, TEAM_BY_ID} from '../../../../../../data/TEAMS';
+import { getMemoById } from '../../../../../../api/memoAPI';
 
-/* ───────────────────────────────
-   시드 게임/클립 (부산 그리폰즈)
-   ─────────────────────────────── */
 
-const findTeamMeta = (teamName) => {
-  // 팀 이름이 없으면 기본값 반환
-  if (!teamName) {
-    return { name: '알 수 없음', logo: '' };
-  }
-  // TEAMS 배열에서 이름이 일치하는 팀을 찾아서 반환, 없으면 기본값 반환
-  return TEAMS.find(t => t.name === teamName) || { name: teamName, logo: '' };
-};
-/* 라벨/표기 */
 const PT_LABEL = { RUN: '런', PASS: '패스', KICKOFF: '킥오프', PUNT: '펀트', PAT: 'PAT', TWOPT: '2PT', FIELDGOAL: 'FG' };
 const SIG_MAP = { 'TWOPTCONV.GOOD': '2PT 성공', 'TWOPTCONV.NOGOOD': '2PT 실패', PATGOOD: 'PAT 성공', PATNOGOOD: 'PAT 실패', 'FIELDGOAL.GOOD': 'FG 성공', 'FIELDGOAL.NOGOOD': 'FG 실패', TD: '터치다운', SACK: '색' };
 const DOWN_ALIAS = { PAT: 'PAT', TPT: '2PT', KICKOFF: '킥오프' };
@@ -47,8 +36,8 @@ export default function ProfileClip() {
   }
 
   // 실제 TEAMS 데이터를 사용해 정보 조회
-  const homeMeta = findTeamMeta(game.homeTeam);
-  const awayMeta = findTeamMeta(game.awayTeam);
+  const homeMeta = TEAM_BY_ID[game.homeTeam];
+  const awayMeta = TEAM_BY_ID[game.awayTeam];
 
   return (
     <div className="profile-clip-page-container">
@@ -70,8 +59,10 @@ export default function ProfileClip() {
 
       {/* 전폭 클립 리스트 */}
       <div className="profile-clip-list">
-        {game.Clips.map((c) => (
-          <div key={c.clipKey} className="clip-row">
+        {game.Clips.map((c) => {
+      
+        return(
+          <div key={c.clipKey} className="clip-row" >
             <div className="quarter-name"><div>{c.quarter}Q</div></div>
             <div className="clip-rows">
               <div className="clip-row1">
@@ -90,9 +81,12 @@ export default function ProfileClip() {
                   <div className="clip-sig" />
                 )}
               </div>
+              <div className='clip-row3'>
+                
+              </div>
             </div>
           </div>
-        ))}
+        );})}
         {game.Clips.length === 0 && (
           <div className="empty">
             이 경기에는 표시할 메모가 없습니다.
