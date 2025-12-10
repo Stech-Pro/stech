@@ -348,10 +348,10 @@ export default function ProfileModify() {
         if (!token) throw new Error('인증 토큰이 없습니다.');
 
         // 💡 API를 호출하여 파일을 업로드하고 URL을 받아옴
-        // authAPI.js 파일에 uploadAvatar 함수가 정의되어 있어야 합니다.
-        const { avatarUrl } = await uploadAvatar(file, token);
+        const response = await uploadAvatar(file, token);
 
         // API 응답으로 받은 실제 URL로 상태 업데이트
+        const avatarUrl = response.data?.avatarUrl;
         setProfileData((prev) => ({ ...prev, profileImage: avatarUrl }));
         alert('프로필 이미지가 성공적으로 업로드되었습니다.');
 

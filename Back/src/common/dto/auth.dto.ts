@@ -6,6 +6,7 @@ import {
   IsEmail,
   IsNumber,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SignupDto {
@@ -142,14 +143,17 @@ export class CreateProfileDto {
   address: string;
 
   @ApiProperty({ example: 180, description: '키 (cm)' })
+  @Transform(({ value }) => parseInt(value))
   @IsNumber()
   height: number;
 
   @ApiProperty({ example: 75, description: '몸무게 (kg)' })
+  @Transform(({ value }) => parseInt(value))
   @IsNumber()
   weight: number;
 
   @ApiProperty({ example: 22, description: '나이' })
+  @Transform(({ value }) => parseInt(value))
   @IsNumber()
   age: number;
 
@@ -170,6 +174,11 @@ export class CreateProfileDto {
   @IsOptional()
   @IsString()
   playerID?: string;
+
+  @ApiProperty({ example: 'https://via.placeholder.com/250x300', description: '프로필 사진 URL', required: false })
+  @IsOptional()
+  @IsString()
+  avatar?: string;
 }
 
 export class UpdateProfileDto {
@@ -226,16 +235,19 @@ export class UpdateProfileDto {
 
   @ApiProperty({ example: 180, description: '키 (cm)', required: false })
   @IsOptional()
+  @Transform(({ value }) => value ? parseInt(value) : undefined)
   @IsNumber()
   height?: number;
 
   @ApiProperty({ example: 75, description: '몸무게 (kg)', required: false })
   @IsOptional()
+  @Transform(({ value }) => value ? parseInt(value) : undefined)
   @IsNumber()
   weight?: number;
 
   @ApiProperty({ example: 22, description: '나이', required: false })
   @IsOptional()
+  @Transform(({ value }) => value ? parseInt(value) : undefined)
   @IsNumber()
   age?: number;
 
@@ -252,4 +264,9 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   position?: string;
+
+  @ApiProperty({ example: 'https://via.placeholder.com/250x300', description: '프로필 사진 URL', required: false })
+  @IsOptional()
+  @IsString()
+  avatar?: string;
 }
