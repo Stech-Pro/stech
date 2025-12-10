@@ -161,7 +161,7 @@ export default function GuestGamePage() {
           <div className="bottomRow">
             <div className="filterGroup">
               {/* 날짜 */}
-              <div className="datePickerWrap" ref={dateWrapRef}>
+              <div className="datePi  ckerWrap" ref={dateWrapRef}>
                 <button
                   className={`filterButton ${showDate || selectedDate ? 'active' : ''}`}
                   onClick={() => setShowDate(!showDate)}

@@ -1,4 +1,4 @@
-// 펀트리턴 협회 데이터 분류 결과
+// 펀트 리턴 협회 데이터 분류 결과
 
 import { TEAM_DIVISIONS } from './TEAM_DIVISIONS.js';
 
@@ -133,7 +133,7 @@ export const puntReturnClassification = {
   }
 };
 
-// 리그별 펀트리턴 통계 요약
+// 리그별 펀트 리턴 통계 요약
 export const puntReturnStats = {
   'Seoul 1부': puntReturnClassification.Seoul['1부'].length,
   'Seoul 2부': puntReturnClassification.Seoul['2부'].length,
@@ -145,7 +145,7 @@ export const puntReturnStats = {
   'Busan-Gyeongnam 2부': puntReturnClassification['Busan-Gyeongnam']['2부'].length
 };
 
-console.log('펀트리턴 협회 데이터 분류 결과:');
+console.log('펀트 리턴 협회 데이터 분류 결과:');
 console.log('서울리그 1부:', puntReturnStats['Seoul 1부'] + '명');
 console.log('서울리그 2부:', puntReturnStats['Seoul 2부'] + '명');
 console.log('경기강원 1부:', puntReturnStats['Gyeonggi-Gangwon 1부'] + '명');

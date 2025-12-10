@@ -279,29 +279,7 @@ export async function resetPassword(email, resetCode, newPassword) {
     data,
   );
 }
-export async function updateProfile(payload, accessToken) {
-  if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
 
-  const res = await fetch(
-    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROFILE}`, // '/auth/profile'
-    {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify(payload), // { avatar?, bio?, playerID?, email? }
-    }
-  );
-
-  const data = await jsonOrText(res);
-  if (res.ok) return data;
-  throw new APIError(
-    typeof data === 'object' ? data.message || '프로필 업데이트 실패' : '프로필 업데이트 실패',
-    res.status,
-    data
-  );
-}
 
 
 
@@ -351,3 +329,57 @@ export const myProfile = async (token) => {
     data
   );
 };
+
+export async function updateProfile(payload, accessToken) {
+  if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
+
+  const res = await fetch(
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.MY_PROFILE}`, // '/auth/profile'
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(payload), // { avatar?, bio?, playerID?, email? }
+    }
+  );
+
+  const data = await jsonOrText(res);
+  if (res.ok) return data;
+  throw new APIError(
+    typeof data === 'object' ? data.message || '프로필 업데이트 실패' : '프로필 업데이트 실패',
+    res.status,
+    data
+  );
+}
+
+export async function uploadAvatar(file, accessToken) {
+  if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
+
+  const formData = new FormData();
+  formData.append('avatar', file); // 백엔드가 'file' 키를 사용한다고 가정
+
+  const res = await fetch(
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.UPLOAD_AVATAR}`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        // FormData 사용 시 Content-Type 헤더는 생략합니다.
+      },
+      body: formData,
+    },
+  );
+
+  const data = await jsonOrText(res);
+  if (res.ok || res.status === 201) return data; 
+  
+  throw new APIError(
+    typeof data === 'object'
+      ? data.message || '프로필 이미지 업로드 실패'
+      : '프로필 이미지 업로드 실패',
+    res.status,
+    data,
+  );
+}

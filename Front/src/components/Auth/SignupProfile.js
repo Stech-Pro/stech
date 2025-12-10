@@ -3,7 +3,189 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createProfile } from '../../api/authAPI';
 import { useAuth } from '../../context/AuthContext';
+// RSComponents (React Select Components)를 명시적으로 가져옵니다.
+import Select, { components as RSComponents } from 'react-select'; 
+import CountryFlag from 'react-country-flag';
+import countries from 'i18n-iso-countries';
+import koLocale from 'i18n-iso-countries/langs/ko.json';
 
+countries.registerLocale(koLocale);
+
+// ISO2<->ISO3 헬퍼
+const toAlpha3 = (alpha2) => {
+  try {
+    return countries.alpha2ToAlpha3(alpha2) || '';
+  } catch {
+    return '';
+  }
+};
+const toAlpha2 = (alpha3) => {
+  try {
+    return countries.alpha3ToAlpha2(alpha3) || '';
+  } catch {
+    return '';
+  }
+};
+
+// 한국어 국가 옵션 목록 생성 (value = ISO3)
+const buildCountryOptions = () => {
+  const namesKo = countries.getNames('ko', { select: 'official' }); // { KR: '대한민국', US: '미국', ... }
+  return Object.entries(namesKo)
+    .map(([alpha2, label]) => ({
+      value: toAlpha3(alpha2), // 저장: ISO3 (KOR/USA/…)
+      label, // 표시: 한국어 국가명
+      alpha2, // 플래그용
+    }))
+    .filter((o) => !!o.value)
+    .sort((a, b) => a.label.localeCompare(b.label, 'ko'));
+};
+const COUNTRY_OPTIONS = buildCountryOptions();
+
+// 포지션 옵션 목록 생성 (value = label)
+const POSITION_OPTIONS = [
+  { value: 'QB', label: 'QB' },
+  { value: 'RB', label: 'RB' },
+  { value: 'WR', label: 'WR' },
+  { value: 'TE', label: 'TE' },
+  { value: 'OL', label: 'OL' },
+  { value: 'DL', label: 'DL' },
+  { value: 'LB', label: 'LB' },
+  { value: 'DB', label: 'DB' },
+  { value: 'K', label: 'K' },
+  { value: 'P', label: 'P' },
+];
+
+// ***********************************************
+// react-select 공통 스타일 및 컴포넌트 정의
+// ***********************************************
+
+// 1. react-select 기본 화살표를 숨기는 컴포넌트 (CSS background-image를 사용하기 위함)
+const NullIndicator = () => null; 
+
+// 2. 국적 필드 렌더(옵션/싱글밸류): 국기 + 한글명
+const Option = (props) => {
+  const { alpha2, label } = props.data;
+  return (
+    <RSComponents.Option {...props}>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <CountryFlag
+          svg
+          countryCode={alpha2}
+          style={{ width: 16, height: 12 }}
+        />
+        <span>{label}</span>
+      </span>
+    </RSComponents.Option>
+  );
+};
+const SingleValue = (props) => {
+  const { alpha2, label } = props.data;
+  return (
+    <RSComponents.SingleValue {...props}>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <CountryFlag
+          svg
+          countryCode={alpha2}
+          style={{ width: 16, height: 12 }}
+        />
+        <span>{label}</span>
+      </span>
+    </RSComponents.SingleValue>
+  );
+};
+
+// 3. 포지션 필드 렌더(옵션/싱글밸류): 단순 텍스트 (국기 없음)
+const PositionOption = (props) => {
+  const { label } = props.data;
+  return (
+    <RSComponents.Option {...props}>
+      <span>{label}</span>
+    </RSComponents.Option>
+  );
+};
+const PositionSingleValue = (props) => {
+  const { label } = props.data;
+  return (
+    <RSComponents.SingleValue {...props}>
+      <span>{label}</span>
+    </RSComponents.SingleValue>
+  );
+};
+
+// 4. react-select 스타일 오버라이드 객체 (모든 Select 컴포넌트에 공통 적용)
+const selectStyles = {
+  // Control (입력 필드) 스타일: 기존 input/select 스타일을 따름
+  control: (provided, state) => ({
+    ...provided,
+    backgroundColor: 'transparent',
+    border: state.isFocused ? '1px solid white' : '1px solid white', 
+    borderRadius: '10px',
+    padding: '0', 
+    color: '#ffffff',
+    fontSize: '16px',
+    minHeight: '40px', 
+    boxShadow: 'none',
+    cursor: 'pointer',
+    '&:hover': {
+      borderColor: 'white',
+    },
+  }),
+  // SingleValue (선택된 값) 스타일
+  singleValue: (provided) => ({
+    ...provided,
+    color: '#ffffff',
+    margin: '0',
+    padding: '0 0 0 10px', // 왼쪽 패딩 추가
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  }),
+  // Menu (드롭다운 목록) 스타일
+  menu: (provided) => ({
+    ...provided,
+    backgroundColor: '#444444', 
+    borderRadius: '10px',
+    zIndex: 2,
+    border: '1px solid white',
+    marginTop: '5px',
+  }),
+  // Option (드롭다운 항목) 스타일
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isSelected
+      ? '#f77705' // 선택된 항목
+      : state.isFocused
+      ? '#616161' // 호버/포커스된 항목
+      : 'transparent',
+    color: '#ffffff',
+    '&:active': {
+      backgroundColor: '#f77705',
+    },
+    cursor: 'pointer',
+    padding: '10px',
+  }),
+  // IndicatorSeparator (구분선) 제거
+  indicatorSeparator: () => ({
+    display: 'none',
+  }),
+  // Placeholder 스타일
+  placeholder: (provided) => ({
+    ...provided,
+    color: '#b8b8b8', 
+    padding: '0 0 0 10px', 
+  }),
+  // Input (검색 입력 필드) 스타일
+  input: (provided) => ({
+    ...provided,
+    color: '#ffffff',
+    padding: '0',
+    margin: '0',
+  }),
+};
+
+// ***********************************************
+// 컴포넌트 본문
+// ***********************************************
 const DAUM_POSTCODE_URL =
   'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
 
@@ -21,8 +203,8 @@ const SignupProfileForm = () => {
     weight: '',
     age: '',
     grade: '',
-    nationality: '',
-    position: '',
+    nationality: 'KOR',
+    position: '', // 초기값 빈 문자열
     avatarUrl: '',
     phone: '',
     career: '',
@@ -38,33 +220,12 @@ const SignupProfileForm = () => {
     setProfileData((prev) => ({ ...prev, [name]: value }));
   };
 
-//   const handleImageUpload = async (file) => {
-//   if (!file) return;
-
-//   try {
-//     const response = await uploadAvatar(file, token);
-//     const avatarUrl = response.data.avatarUrl;
-    
-//     setProfileData(prev => ({
-//       ...prev,
-//       avatarUrl: avatarUrl
-//     }));
-    
-//     alert('이미지 업로드 성공!');
-//   } catch (error) {
-//     console.error('이미지 업로드 오류:', error);
-//     alert('이미지 업로드에 실패했습니다.');
-//   }
-// };
-
-const handleImageChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    setProfileData(prev => ({ ...prev, profileImage: file }));
-    // 즉시 업로드하거나 프로필 생성 시 업로드
-    // handleImageUpload(file);
-  }
-};
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileData((prev) => ({ ...prev, profileImage: file }));
+    }
+  };
 
   const handleAddressSearch = () => {
     if (!scriptLoaded) {
@@ -209,12 +370,12 @@ const handleImageChange = (e) => {
       playerID: profileData.playerID.trim(),
     };
 
-    console.log('전송할 payload:', payload); 
-   
+    console.log('전송할 payload:', payload);
+
     try {
       const response = await createProfile(payload, token);
-      
-      console.log('프로필 생성 응답:', response); 
+
+      console.log('프로필 생성 응답:', response);
 
       // 새 토큰이 반환되면 저장
       if (response.data?.token) {
@@ -222,12 +383,13 @@ const handleImageChange = (e) => {
         localStorage.setItem('token', response.data.token);
       }
 
-
       alert('프로필이 생성되었습니다.');
       navigate('/service');
     } catch (err) {
       console.error('프로필 생성 오류:', err);
-      alert('프로필 생성에 실패했습니다: ' + (err.message || '알 수 없는 오류'));
+      alert(
+        '프로필 생성에 실패했습니다: ' + (err.message || '알 수 없는 오류'),
+      );
     }
   };
   return (
@@ -401,34 +563,55 @@ const handleImageChange = (e) => {
         </div>
         <div className="profileformGroup">
           <label>국적</label>
-          <input
-            type="text"
-            name="nationality"
-            value={profileData.nationality}
-            onChange={handleChange}
-            placeholder="예: KOR"
+          <Select
+            inputId="nationality"
+            classNamePrefix="nationality" // CSS 타겟팅용
+            placeholder="국가 선택"
+            options={COUNTRY_OPTIONS}
+            components={{ Option, SingleValue, DropdownIndicator: NullIndicator }} // DropdownIndicator 제거
+            isSearchable
+            styles={selectStyles} // 커스텀 스타일 적용
+            value={(() => {
+              const alpha3 = profileData.nationality; // KOR/USA/…
+              const alpha2 = alpha3 ? toAlpha2(alpha3) : '';
+              const selectedOption = COUNTRY_OPTIONS.find((o) => o.alpha2 === alpha2);
+              return selectedOption || null;
+            })()}
+            onChange={(opt) =>
+              setProfileData((prev) => ({
+                ...prev,
+                nationality: opt ? opt.value : '',
+              }))
+            }
           />
         </div>
 
         <div className="profileformGroup">
           <label>포지션 (주포지션)</label>
-          <select
+          {/* <select> 태그를 Select 컴포넌트로 변경 */}
+          <Select
+            inputId="position"
             name="position"
-            value={profileData.position}
-            onChange={handleChange}
-          >
-            <option value="">포지션 선택</option>
-            <option value="QB">QB</option>
-            <option value="RB">RB</option>
-            <option value="WR">WR</option>
-            <option value="TE">TE</option>
-            <option value="OL">OL</option>
-            <option value="DL">DL</option>
-            <option value="LB">LB</option>
-            <option value="DB">DB</option>
-            <option value="K">K</option>
-            <option value="P">P</option>
-          </select>
+            classNamePrefix="position-select" // CSS 타겟팅용
+            placeholder="포지션 선택"
+            options={POSITION_OPTIONS}
+            components={{ 
+              Option: PositionOption, 
+              SingleValue: PositionSingleValue, 
+              DropdownIndicator: NullIndicator // DropdownIndicator 제거
+            }} 
+            isSearchable={false} // 포지션은 검색 불필요
+            styles={selectStyles} // 커스텀 스타일 적용
+            value={POSITION_OPTIONS.find(
+              (opt) => opt.value === profileData.position
+            )}
+            onChange={(opt) =>
+              setProfileData((prev) => ({
+                ...prev,
+                position: opt ? opt.value : '',
+              }))
+            }
+          />
         </div>
       </div>
 

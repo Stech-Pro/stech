@@ -18,6 +18,17 @@
   position: relative;
   display: inline-block;
 }
+.ff-dropdown.ff-dropdown--team .ff-dd-btn {
+  min-width: 10rem;   /* 필요하면 14~16rem까지 조절 */
+}
+.ff-dropdown.ff-dropdown--team .ff-dd-menu {
+  width: 10rem;       /* 버튼보다 살짝 넓게 */
+}
+.ff-dropdown .ff-dd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .ff-dd-btn {
   min-width: 8.125rem;
   height: 3rem;

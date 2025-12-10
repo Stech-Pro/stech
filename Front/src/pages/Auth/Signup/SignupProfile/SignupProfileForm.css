@@ -109,7 +109,7 @@
     font-size: 16px;
 }
 
-.profileformGroup select {
+.profileformGroup select, .profileformGroup Select {
   appearance: none;
   background-color: transparent;
   border: 1px solid white;
@@ -221,4 +221,200 @@
     padding: 10px;
     color: #b8b8b8;
     text-align: center;
+}
+/*
+ * react-select 스타일 오버라이드
+ * classNamePrefix="nationality"를 사용했기 때문에 .nationality-control 등의 클래스가 생성됨
+ */
+
+/* 1. Control 컴포넌트 (전체 입력 필드) */
+.profileformGroup .nationality__control {
+  /* Control 컴포넌트에 select 태그의 배경 이미지 스타일을 적용 */
+  background-color: transparent !important;
+  border: 1px solid white !important;
+  border-radius: 10px !important;
+  padding: 0; /* Padding은 SingleValue/Placeholder에서 조정 */
+  color: #ffffff !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+
+  /* select 태그에 있던 드롭다운 화살표 배경 이미지 */
+  background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3cpolyline points="6 9 12 15 18 9"%3e%3c/polyline%3e%3c/svg%3e');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  min-height: 40px; /* 적절한 높이 설정 (패딩 10px 고려) */
+}
+
+/* 포커스 시 테두리 스타일 */
+.profileformGroup .nationality__control--is-focused {
+  border-color: #f77705 !important;
+  box-shadow: none !important;
+}
+
+/* 2. Menu 컴포넌트 (드롭다운 목록) */
+.profileformGroup .nationality__menu {
+  /* styles prop에서 설정했으나, 혹시 몰라 클래스 기반으로도 설정 */
+  background-color: #444444;
+  border: 1px solid white;
+  border-radius: 10px;
+  margin-top: 5px; /* Control과의 간격 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 3. Option 컴포넌트 (개별 항목) */
+.profileformGroup .nationality__option {
+  /* 기본 글자색 */
+  color: #ffffff;
+  /* styles prop에서 설정 */
+}
+
+/* 호버/포커스된 옵션 */
+.profileformGroup .nationality__option--is-focused {
+  background-color: #616161 !important;
+}
+
+/* 선택된 옵션 */
+.profileformGroup .nationality__option--is-selected {
+  background-color: #f77705 !important;
+  color: white !important;
+}
+
+/* 4. ValueContainer (값 및 검색 영역) */
+.profileformGroup .nationality__value-container {
+  padding: 0; /* 내부 패딩 제거 (SingleValue/Placeholder에 적용) */
+}
+
+/*
+ * ***********************************************
+ * react-select 공통 스타일 (nationality, position-select)
+ * ***********************************************
+ */
+
+/* 1. Control 컴포넌트 (전체 입력 필드): 
+   기존 select의 border, background-color, font-size, 그리고 **커스텀 화살표**를 적용합니다. 
+*/
+.profileformGroup .nationality__control,
+.profileformGroup .position-select__control {
+  /* Control 컴포넌트에 select 태그의 스타일을 적용 */
+  background-color: transparent !important;
+  border: 1px solid white !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  min-height: 40px; 
+
+  /* select 태그에 있던 드롭다운 화살표 배경 이미지 */
+  background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3cpolyline points="6 9 12 15 18 9"%3e%3c/polyline%3e%3c/svg%3e');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  
+  /* react-select의 기본 box-shadow 및 padding 초기화 */
+  box-shadow: none !important;
+  padding: 0 !important; 
+}
+
+/* 포커스 시 테두리 스타일 (원한다면) */
+.profileformGroup .nationality__control--is-focused,
+.profileformGroup .position-select__control--is-focused {
+  border-color: white !important; /* 포커스 시 테두리색 */
+}
+
+/* 2. Placeholder (선택 전 텍스트) */
+.profileformGroup .nationality__placeholder,
+.profileformGroup .position-select__placeholder {
+  margin: 0;
+}
+
+/* 3. ValueContainer (선택된 값 텍스트) */
+.profileformGroup .nationality__single-value,
+.profileformGroup .position-select__single-value {
+  margin: 0;
+}
+
+/* 4. Menu (드롭다운 목록) - styles prop에서 설정되었지만, 클래스로도 설정 가능 */
+.profileformGroup .nationality__menu,
+.profileformGroup .position-select__menu {
+  background-color: #444444;
+  border: 1px solid white;
+  border-radius: 10px;
+}
+
+/* 5. Option (드롭다운 항목) - styles prop에서 설정되었지만, 클래스로도 설정 가능 */
+.profileformGroup .nationality__option--is-focused,
+.profileformGroup .position-select__option--is-focused {
+  background-color: #616161 !important; /* 호버 시 배경색 */
+  color: #ffffff;
+}
+.profileformGroup .nationality__option--is-selected,
+.profileformGroup .position-select__option--is-selected {
+  background-color: #f77705 !important; /* 선택된 항목 배경색 */
+  color: white !important;
+}
+
+/* 6. 기존 select/option 스타일은 Select 컴포넌트에 더이상 영향을 주지 않으므로 그대로 두거나 제거 가능 */
+/*
+.profileformGroup select, .profileformGroup Select { ... }
+.profileformGroup select option { ... } 
+*/
+/*
+ * ***********************************************
+ * react-select 공통 스타일: 높이 및 정렬 조정
+ * ***********************************************
+ */
+
+/* 1. Control 컴포넌트 (전체 입력 필드) 높이 고정 및 내부 정렬 */
+.profileformGroup .nationality__control,
+.profileformGroup .position-select__control {
+  /* 기존 스타일 유지 */
+  background-color: transparent !important;
+  border: 1px solid white !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+
+  /* **핵심 수정:** 명시적인 최소 높이 지정 (버튼 크기 통일) */
+  min-height: 40px !important; 
+  height: 40px !important; /* 높이를 고정 */
+
+  /* 기존 select 태그에 있던 드롭다운 화살표 배경 이미지 */
+  background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3cpolyline points="6 9 12 15 18 9"%3e%3c/polyline%3e%3c/svg%3e');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  
+  box-shadow: none !important;
+  padding: 0 !important; 
+}
+
+/* 2. ValueContainer (선택된 값 및 검색/플레이스홀더를 담는 컨테이너) */
+.profileformGroup .nationality__value-container,
+.profileformGroup .position-select__value-container {
+  /* **핵심 수정:** 높이를 Control과 맞추고 Flexbox를 이용해 세로 중앙 정렬 */
+  padding: 0 0 0 10px !important; /* 왼쪽 패딩만 유지 */
+  height: 100%; /* Control 높이에 맞춤 */
+  align-items: center; /* 세로 중앙 정렬 */
+}
+
+/* 3. Indicators Container (화살표 영역) */
+.profileformGroup .nationality__indicators,
+.profileformGroup .position-select__indicators {
+    height: 100%;
+    /* 내부 요소들이 세로 중앙에 오도록 정렬 */
+    align-items: center; 
+}
+
+/* 4. SingleValue (선택된 값) - 기존 스타일에서 마진만 재확인 */
+.profileformGroup .nationality__single-value,
+.profileformGroup .position-select__single-value {
+  margin: 0 !important; /* 마진 제거 */
+}
+
+/* 5. Placeholder (선택 전 텍스트) */
+.profileformGroup .nationality__placeholder,
+.profileformGroup .position-select__placeholder {
+  margin: 0 !important; /* 마진 제거 */
 }

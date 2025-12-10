@@ -18,6 +18,7 @@ export const API_CONFIG = {
     VERIFY_TEAM_CODE: '/auth/verify-team-code',
     VERIFY_TOKEN: '/auth/verify-token',
     MY_PROFILE: '/auth/my-profile',
+    UPLOAD_AVATAR: '/auth/upload-avatar',
 
     //video upload
     UPLOAD_VIDEO: '/video/upload',

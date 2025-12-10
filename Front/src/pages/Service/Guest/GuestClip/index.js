@@ -13,7 +13,7 @@ import UploadVideoModal from '../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../assets/images/logos/Stechlogo.svg';
 import { useAuth } from '../../../../context/AuthContext';
 
-function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
+function Dropdown({ label, summary, isOpen, onToggle, onClose, children,className }) {
   const ref = useRef(null);
   useEffect(() => {
     const onClickOutside = (e) => {
@@ -31,7 +31,7 @@ function Dropdown({ label, summary, isOpen, onToggle, onClose, children }) {
   }, [onClose, isOpen]);
 
   return (
-    <div className="ff-dropdown" ref={ref}>
+    <div className={`ff-dropdown ${className || ''}`} ref={ref}>
       <button
         type="button"
         className={`ff-dd-btn ${isOpen ? 'open' : ''}`}
@@ -364,6 +364,7 @@ export default function GuestClipPage() {
             <div className="filterGroup">
               <div className="ff-bar">
                 <Dropdown
+                  className="ff-dropdown--team"   
                   label="공격팀"
                   summary={teamSummary}
                   isOpen={openMenu === 'team'}
