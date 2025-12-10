@@ -39,10 +39,11 @@
             if (stored) setUser(stored);
             // 서버로 user 최신화
             try {
-              const v = await apiVerifyToken(token); // { user }
-              if (v?.user) {
-                setUser(v.user);
-                setUserData(v.user);
+              const v = await apiVerifyToken(token); // { success, data: { user } }
+              const userData = v?.data?.user || v?.user;
+              if (userData) {
+                setUser(userData);
+                setUserData(userData);
               }
             } catch {
               // 검증 실패하면 세션 정리
@@ -79,7 +80,7 @@
         if (!u) {
           try {
             const v = await apiVerifyToken(getToken());
-            u = v?.user ?? null;
+            u = v?.data?.user || v?.user || null;
             if (u) setUserData(u);
           } catch {}
         }

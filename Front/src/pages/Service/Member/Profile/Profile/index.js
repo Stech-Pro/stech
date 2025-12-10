@@ -131,45 +131,63 @@ export default function ProfilePage() {
   const [seasonPosition, setSeasonPosition] = useState('');
 
   useEffect(() => {
-  const loadProfile = async () => {
-    try {
-      setIsLoading(true);
-
-      // 1) 토큰 가져오기
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('No token found');
-        setIsLoading(false);
-        return;
-      }
-
-      // 2) 백엔드에서 프로필 요청
-      const data = await myProfile(token);
-      console.log("백엔드에서 받은 프로필:", data);
-
-      // 3) 상태 저장
-      setProfileData(data);
-      setCareerPosition(data.position);
-      setSeasonPosition(data.position);
-
-    } catch (error) {
-      console.error("프로필 불러오기 오류:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  loadProfile();
-}, []);
-  useEffect(() => {
     const loadProfile = async () => {
-      setIsLoading(true);
-      const data = await fetchProfileDataFromBackend();
-      setProfileData(data);
-      setCareerPosition(data.position);
-      setSeasonPosition(data.position);
-      setIsLoading(false);
+      try {
+        setIsLoading(true);
+
+        // 1) 토큰 가져오기
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No token found');
+          // mock 데이터 사용 (개발용)
+          const mockData = await fetchProfileDataFromBackend();
+          setProfileData(mockData);
+          setCareerPosition(mockData.position);
+          setSeasonPosition(mockData.position);
+          setIsLoading(false);
+          return;
+        }
+
+        // 2) 백엔드에서 프로필 요청
+        const response = await myProfile(token);
+        console.log("백엔드에서 받은 프로필:", response);
+        
+        // 3) 응답 데이터 처리
+        const data = response.data || response;
+        
+        // 4) 필수 필드 맵핑
+        const profileInfo = {
+          profileImage: data.profileImage || data.avatar || 'https://via.placeholder.com/250x300',
+          fullName: data.fullName || data.playerID || data.name || '이름 없음',
+          email: data.email || 'email@example.com',
+          address1: data.address1 || data.address || '',
+          address2: data.address2 || '',
+          height: data.height || '',
+          weight: data.weight || '',
+          position: data.position || 'QB',
+          age: data.age || '',
+          career: data.career || '',
+          region: data.region || data.league || '',
+          team: data.team || data.teamName || ''
+        };
+
+        // 5) 상태 저장
+        setProfileData(profileInfo);
+        setCareerPosition(profileInfo.position);
+        setSeasonPosition(profileInfo.position);
+
+      } catch (error) {
+        console.error("프로필 불러오기 오류:", error);
+        // 오류 시 mock 데이터 사용
+        const mockData = await fetchProfileDataFromBackend();
+        setProfileData(mockData);
+        setCareerPosition(mockData.position);
+        setSeasonPosition(mockData.position);
+      } finally {
+        setIsLoading(false);
+      }
     };
+
     loadProfile();
   }, []);
 

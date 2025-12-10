@@ -11,6 +11,7 @@ import {
   updateMemo as apiUpdateMemo,
 } from '../../api/memoAPI';
 import { useAuth } from '../../context/AuthContext';
+import { verifyToken as apiVerifyToken } from '../../api/authAPI';
 
 const safeTrim = (str) => (typeof str === 'string' ? str.trim() : '');
 const safeString = (v) => (typeof v === 'string' ? v : '');
@@ -23,7 +24,7 @@ export default function VideoMemo({
   clipInfo = {},
   onMemoCountChange,
 }) {
-  const { token } = useAuth();
+  const { token, updateUserData } = useAuth();
   const [isPrivate, setIsPrivate] = useState(false);
   const [memoContent, setMemoContent] = useState('');
   const [serverMemos, setServerMemos] = useState([]);
@@ -150,6 +151,17 @@ export default function VideoMemo({
       });
 
       setMemoContent('');
+
+      // ✅ 메모 작성 성공 시 AuthContext의 user 상태를 최신으로 갱신
+      try {
+        const updatedUserData = await apiVerifyToken(token);
+        if (updatedUserData?.user) {
+          updateUserData(updatedUserData.user);
+        }
+      } catch (e) {
+        console.error('사용자 정보 갱신 실패:', e);
+        // 사용자 정보 갱신 실패는 메모 저장에 영향을 주지 않으므로 무시
+      }
     } catch (e) {
       console.error('메모 저장 실패:', e);
       alert(e?.message || '메모 저장 실패');

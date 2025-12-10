@@ -306,6 +306,7 @@ export class AuthService {
             email: user.profile?.contactInfo?.email || null,
             bio: user.profile?.bio || null,
             avatar: user.profile?.avatar || null,
+            memos: user.memos || [],
           },
         },
       };
