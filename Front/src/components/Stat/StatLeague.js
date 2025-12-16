@@ -786,6 +786,7 @@ export default function StatLeague({ data, teams = [] }) {
     return (
       divisionList.find((d) => d.name === selectedDivision) ||
       divisionList.find((d) => d.name === '1부') ||
+      divisionList.find((d) => d.name === '정규') ||
       divisionList[0]
     );
   }, [divisionList, selectedDivision, hasDivisions]);
