@@ -163,7 +163,7 @@ const STAT_TYPE_OPTIONS = [
   '인터셉션',
   '필드골',
   '킥오프',
-  '킥오프리턴',
+  '킥 오프 리턴',
   '펀트',
   '펀트 리턴'
 ];
@@ -281,7 +281,7 @@ const STAT_COLUMNS = {
     { key: 'kickoffTouchdowns', label: '킥오프 터치다운' },
     { key: 'longestKickoff', label: '가장\n긴 킥오프' },
   ],
-  '킥오프리턴': [
+  '킥 오프 리턴': [
     { key: 'averageKickReturnYards', label: '평균 킥\n리턴 야드' },
     { key: 'kickReturnCount', label: '킥 리턴 수' },
     { key: 'kickReturnYards', label: '킥 리턴 야드' },
@@ -314,7 +314,7 @@ const PRIMARY_METRIC = {
   '인터셉션': 'interceptions',
   '필드골': 'fieldGoalPercentage',
   '킥오프': 'averageKickoffYards',
-  '킥오프리턴': 'averageKickReturnYards',
+  '킥 오프 리턴': 'averageKickReturnYards',
   '펀트': 'averagePuntYards',
   '펀트 리턴': 'averagePuntReturnYards',
 };
@@ -437,7 +437,7 @@ const seoulPlayerData = {
       { name: '원재훈', team: '국민대학교', averageKickoffYards: 39.3, kickoffCount: 3, kickoffYards: 118, kickoffTouchdowns: 0, longestKickoff: 65 },
       { name: '황현석', team: '건국대학교', averageKickoffYards: 35.7, kickoffCount: 3, kickoffYards: 107, kickoffTouchdowns: 0, longestKickoff: 54 },
     ],
-    '킥오프리턴': [
+    '킥 오프 리턴': [
       { name: '이선우', team: '서울대학교', averageKickReturnYards: 57.5, kickReturnCount: 2, kickReturnYards: 107, kickReturnTouchdowns: 1, longestKickReturn: 88 },
       { name: '권용준', team: '서울시립대학교', averageKickReturnYards: 29.0, kickReturnCount: 2, kickReturnYards: 95, kickReturnTouchdowns: 0, longestKickReturn: 33 },
       { name: '황승연', team: '연세대학교', averageKickReturnYards: 28.0, kickReturnCount: 1, kickReturnYards: 30, kickReturnTouchdowns: 0, longestKickReturn: 28 },
@@ -558,7 +558,7 @@ const seoulPlayerData = {
       { name: '엄홍재', team: '서강대학교', averageKickoffYards: 41.1, kickoffCount: 8, kickoffYards: 329, kickoffTouchdowns: 0, longestKickoff: 65 },
       { name: '최수종', team: '고려대학교', averageKickoffYards: 36.3, kickoffCount: 20, kickoffYards: 725, kickoffTouchdowns: 0, longestKickoff: 62 },
     ],
-    '킥오프리턴': [
+    '킥 오프 리턴': [
       { name: '장우영', team: '숭실대학교', averageKickReturnYards: 43.0, kickReturnCount: 1, kickReturnYards: 44, kickReturnTouchdowns: 0, longestKickReturn: 43 },
       { name: '김두호', team: '경희대학교', averageKickReturnYards: 31.3, kickReturnCount: 4, kickReturnYards: 165, kickReturnTouchdowns: 0, longestKickReturn: 75 },
       { name: '강지민', team: '서강대학교', averageKickReturnYards: 29.5, kickReturnCount: 2, kickReturnYards: 105, kickReturnTouchdowns: 0, longestKickReturn: 32 },
@@ -652,7 +652,7 @@ const gyeonggiPlayerData = {
       { name: '배성민', team: '성균관대학교', averageKickoffYards: 47.2, kickoffCount: 6, kickoffYards: 283, kickoffTouchdowns: 0, longestKickoff: 50 },
       { name: '박지훈', team: '강원대학교', averageKickoffYards: 45.9, kickoffCount: 11, kickoffYards: 505, kickoffTouchdowns: 0, longestKickoff: 60 },
       { name: '장용준', team: '인하대학교', averageKickoffYards: 44.6, kickoffCount: 11, kickoffYards: 491, kickoffTouchdowns: 0, longestKickoff: 57 },
-    ], '킥오프리턴': [
+    ], '킥 오프 리턴': [
       { name: '이승재', team: '인하대학교', averageKickReturnYards: 45.0, kickReturnCount: 2, kickReturnYards: 110, kickReturnTouchdowns: 1, longestKickReturn: 90 },
       { name: '임성원', team: '강원대학교', averageKickReturnYards: 42.0, kickReturnCount: 1, kickReturnYards: 55, kickReturnTouchdowns: 0, longestKickReturn: 42 },
       { name: '박윤서', team: '인하대학교', averageKickReturnYards: 35.2, kickReturnCount: 5, kickReturnYards: 232, kickReturnTouchdowns: 2, longestKickReturn: 70 },
@@ -698,7 +698,7 @@ const gyeonggiPlayerData = {
       { name: '박현기', team: '카이스트', averageKickoffYards: 45.0, kickoffCount: 1, kickoffYards: 45, kickoffTouchdowns: 0, longestKickoff: 45 },
       { name: '김산', team: '한림대학교', averageKickoffYards: 40.8, kickoffCount: 4, kickoffYards: 163, kickoffTouchdowns: 0, longestKickoff: 53 },
       { name: '김찬희', team: '용인대학교', averageKickoffYards: 39.5, kickoffCount: 8, kickoffYards: 316, kickoffTouchdowns: 0, longestKickoff: 54 }
-    ], '킥오프리턴': [
+    ], '킥 오프 리턴': [
       { name: '한지섭', team: '한림대학교', averageKickReturnYards: 45.0, kickReturnCount: 1, kickReturnYards: 45, kickReturnTouchdowns: 0, longestKickReturn: 45 },
       { name: '장준영', team: '카이스트', averageKickReturnYards: 23.0, kickReturnCount: 1, kickReturnYards: 47, kickReturnTouchdowns: 0, longestKickReturn: 23 },
       { name: '안태현', team: '용인대학교', averageKickReturnYards: 23.0, kickReturnCount: 1, kickReturnYards: 50, kickReturnTouchdowns: 0, longestKickReturn: 23 },
@@ -777,7 +777,7 @@ const daeguPlayerData = {
       { name: '박기성', team: '한동대학교', averageKickoffYards: 48.4, kickoffCount: 5, kickoffYards: 242, kickoffTouchdowns: 0, longestKickoff: 55 },
       { name: '황희재', team: '경북대학교', averageKickoffYards: 44.3, kickoffCount: 11, kickoffYards: 487, kickoffTouchdowns: 0, longestKickoff: 55 },
       { name: '김현수', team: '경일대학교', averageKickoffYards: 38.0, kickoffCount: 3, kickoffYards: 114, kickoffTouchdowns: 0, longestKickoff: 45 },
-    ], '킥오프리턴': [
+    ], '킥 오프 리턴': [
       { name: '조현영', team: '경북대학교', averageKickReturnYards: 25.3, kickReturnCount: 4, kickReturnYards: 221, kickReturnTouchdowns: 0, longestKickReturn: 29 },
       { name: '황희재', team: '경북대학교', averageKickReturnYards: 21.3, kickReturnCount: 3, kickReturnYards: 173, kickReturnTouchdowns: 0, longestKickReturn: 24 },
       { name: '허유현', team: '한동대학교', averageKickReturnYards: 21.0, kickReturnCount: 2, kickReturnYards: 115, kickReturnTouchdowns: 0, longestKickReturn: 22 },
@@ -847,7 +847,7 @@ const daeguPlayerData = {
       { name: '강경서', team: '금오공과대학교', averageKickoffYards: 47.0, kickoffCount: 2, kickoffYards: 94, kickoffTouchdowns: 0, longestKickoff: 48 },
       { name: '유재원', team: '대구대학교', averageKickoffYards: 46.9, kickoffCount: 9, kickoffYards: 422, kickoffTouchdowns: 0, longestKickoff: 65 },
       { name: '윤정근', team: '금오공과대학교', averageKickoffYards: 43.1, kickoffCount: 10, kickoffYards: 431, kickoffTouchdowns: 0, longestKickoff: 57 },
-    ], '킥오프리턴': [
+    ], '킥 오프 리턴': [
       { name: '강경서', team: '금오공과대학교', averageKickReturnYards: 32.5, kickReturnCount: 2, kickReturnYards: 93, kickReturnTouchdowns: 0, longestKickReturn: 33 },
       { name: '노현용', team: '영남대학교', averageKickReturnYards: 20.0, kickReturnCount: 1, kickReturnYards: 37, kickReturnTouchdowns: 0, longestKickReturn: 20 },
       { name: '이민준', team: '영남대학교', averageKickReturnYards: 18.0, kickReturnCount: 1, kickReturnYards: 50, kickReturnTouchdowns: 0, longestKickReturn: 18 },
@@ -918,7 +918,7 @@ const busanPlayerData = {
       { name: '김민성', team: '울산대학교', averageKickoffYards: 45.0, kickoffCount: 3, kickoffYards: 135, kickoffTouchdowns: 0, longestKickoff: 50 },
       { name: '김혁', team: '동의대학교', averageKickoffYards: 44.2, kickoffCount: 5, kickoffYards: 221, kickoffTouchdowns: 0, longestKickoff: 58 },
       { name: '홍세민', team: '경성대학교', averageKickoffYards: 40.5, kickoffCount: 4, kickoffYards: 162, kickoffTouchdowns: 0, longestKickoff: 47 },
-    ], '킥오프리턴': [
+    ], '킥 오프 리턴': [
       { name: '임지민', team: '동의대학교', averageKickReturnYards: 26.4, kickReturnCount: 5, kickReturnYards: 245, kickReturnTouchdowns: 0, longestKickReturn: 46 },
       { name: '하태창', team: '울산대학교', averageKickReturnYards: 26.0, kickReturnCount: 1, kickReturnYards: 55, kickReturnTouchdowns: 0, longestKickReturn: 26 },
       { name: '박종후', team: '경성대학교', averageKickReturnYards: 18.0, kickReturnCount: 3, kickReturnYards: 56, kickReturnTouchdowns: 0, longestKickReturn: 24 },
@@ -985,7 +985,7 @@ const busanPlayerData = {
       { name: '박기용', team: '신라대학교', averageKickoffYards: 49.9, kickoffCount: 7, kickoffYards: 349, kickoffTouchdowns: 0, longestKickoff: 65 },
       { name: '방정현', team: '한국해양대학교', averageKickoffYards: 47.4, kickoffCount: 12, kickoffYards: 569, kickoffTouchdowns: 0, longestKickoff: 54 },
       { name: '안현태', team: '동서대학교', averageKickoffYards: 44.6, kickoffCount: 5, kickoffYards: 223, kickoffTouchdowns: 0, longestKickoff: 62 },
-    ], '킥오프리턴': [
+    ], '킥 오프 리턴': [
       { name: '이성수', team: '부산대학교', averageKickReturnYards: 33.7, kickReturnCount: 3, kickReturnYards: 103, kickReturnTouchdowns: 1, longestKickReturn: 63 },
       { name: '권동규', team: '신라대학교', averageKickReturnYards: 28.0, kickReturnCount: 1, kickReturnYards: 37, kickReturnTouchdowns: 0, longestKickReturn: 28 },
       { name: '이현호', team: '동서대학교', averageKickReturnYards: 23.5, kickReturnCount: 2, kickReturnYards: 105, kickReturnTouchdowns: 0, longestKickReturn: 24 },
@@ -3493,7 +3493,7 @@ const socialData = {
         "longestKickoff": 52
       }
     ],
-    "킥오프리턴": [
+    "킥 오프 리턴": [
       {
         "name": "정운호",
         "team": "한국해양대학교",
@@ -5473,7 +5473,7 @@ const socialData = {
         "longestKickoff": 30
       }
     ],
-    "킥오프리턴": [
+    "킥 오프 리턴": [
       {
         "name": "이정우",
         "team": "동의대학교",
@@ -6454,7 +6454,7 @@ export default function StatPlayer({ teams = [] }) {
           {"name":"이지원","team":"군위 피닉스","averageKickoffYards":35.0,"kickoffCount":1,"kickoffYards":35,"kickoffTouchdowns":0,"longestKickoff":35},
           {"name":"한규철","team":"서울 골든이글스","averageKickoffYards":31.2,"kickoffCount":19,"kickoffYards":593,"kickoffTouchdowns":0,"longestKickoff":57}
         ],
-        '킥오프리턴': [
+        '킥 오프 리턴': [
           {"name":"김남기","team":"서울 디펜더스","averageKickReturnYards":37.5,"kickReturnCount":4,"kickReturnYards":183,"kickReturnTouchdowns":1,"longestKickReturn":80},
           {"name":"강대련","team":"인천 라이노스","averageKickReturnYards":35.0,"kickReturnCount":1,"kickReturnYards":52,"kickReturnTouchdowns":0,"longestKickReturn":35},
           {"name":"최경서","team":"삼성 블루스톰","averageKickReturnYards":33.5,"kickReturnCount":2,"kickReturnYards":98,"kickReturnTouchdowns":0,"longestKickReturn":35},

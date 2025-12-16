@@ -1,4 +1,4 @@
-// 킥오프리턴 협회 데이터 분류 결과
+// 킥 오프 리턴 협회 데이터 분류 결과
 
 import { TEAM_DIVISIONS } from './TEAM_DIVISIONS.js';
 
@@ -133,7 +133,7 @@ export const kickoffReturnClassification = {
   }
 };
 
-// 리그별 킥오프리턴 통계 요약
+// 리그별 킥 오프 리턴 통계 요약
 export const kickoffReturnStats = {
   'Seoul 1부': kickoffReturnClassification.Seoul['1부'].length,
   'Seoul 2부': kickoffReturnClassification.Seoul['2부'].length,
@@ -145,7 +145,7 @@ export const kickoffReturnStats = {
   'Busan-Gyeongnam 2부': kickoffReturnClassification['Busan-Gyeongnam']['2부'].length
 };
 
-console.log('킥오프리턴 협회 데이터 분류 결과:');
+console.log('킥 오프 리턴 협회 데이터 분류 결과:');
 console.log('서울리그 1부:', kickoffReturnStats['Seoul 1부'] + '명');
 console.log('서울리그 2부:', kickoffReturnStats['Seoul 2부'] + '명');
 console.log('경기강원 1부:', kickoffReturnStats['Gyeonggi-Gangwon 1부'] + '명');
