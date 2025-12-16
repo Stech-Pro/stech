@@ -165,8 +165,6 @@ export const FALL_2025_DATA = {
               ],
             },
           ],
-
-          /* 결승/순위/승강전 — 너가 준 결과 유지 */
           final: [
             {
               stage: '결승전',
@@ -375,7 +373,12 @@ export const FALL_2025_DATA = {
           groups: [
             {
               name: '리그',
-              teams: ['성균관대 로얄스', '강원대 카프라', '단국대 코디악베어스', '인하대 틸 드래곤스'],
+              teams: [
+                '성균관대 로얄스',
+                '강원대 카프라',
+                '단국대 코디악베어스',
+                '인하대 틸 드래곤스',
+              ],
               matches: [
                 {
                   stage: '조별',
@@ -446,7 +449,12 @@ export const FALL_2025_DATA = {
           groups: [
             {
               name: '리그',
-              teams: ['한신대 킬러웨일스', '한림대 피닉스', '카이스트 매버릭스', '용인대 화이트타이거스'],
+              teams: [
+                '한신대 킬러웨일스',
+                '한림대 피닉스',
+                '카이스트 매버릭스',
+                '용인대 화이트타이거스',
+              ],
               matches: [
                 {
                   stage: '조별',
@@ -523,7 +531,12 @@ export const FALL_2025_DATA = {
           groups: [
             {
               name: '리그',
-              teams: ['경성대 드래곤스', '동아대 레오파즈', '동의대 터틀파이터스', '울산대 유니콘스'],
+              teams: [
+                '경성대 드래곤스',
+                '동아대 레오파즈',
+                '동의대 터틀파이터스',
+                '울산대 유니콘스',
+              ],
               matches: [
                 {
                   stage: '조별',
@@ -668,7 +681,6 @@ export const FALL_2025_DATA = {
         },
       ],
     },
-
 
     대구경북: {
       event: '추계',
@@ -874,7 +886,7 @@ export const FALL_2025_DATA = {
       event: '추계', // KNFL 시즌
       divisions: [
         {
-          name: '정규리그',
+          name: '정규',
           groups: [
             {
               name: '전체',
@@ -1099,7 +1111,9 @@ export const FALL_2025_DATA = {
                   winner: '군위 피닉스',
                 },
               ],
-              final: [
+            },
+          ],
+          final: [
             {
               stage: '결승전',
               date: '2025-12-14',
@@ -1109,8 +1123,6 @@ export const FALL_2025_DATA = {
               homeScore: 37,
               awayScore: 21,
               winner: '삼성 블루스톰',
-            },
-          ],
             },
           ],
         },
