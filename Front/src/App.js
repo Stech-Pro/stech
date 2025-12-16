@@ -8,7 +8,20 @@ const App = () => {
     <BrowserRouter>
       <AuthProvider>
         <AppRouter />
-        <Toaster position="bottom-center" />
+        <Toaster
+          position="top-center"
+          containerStyle={{
+            top: '50%',
+            transform: 'translateY(-50%)',
+          }}
+          toastOptions={{
+            duration: 4000,
+            style: {
+              fontSize: '16px',
+              padding: '16px 24px',
+            },
+          }}
+        />
       </AuthProvider>
     </BrowserRouter>
   );

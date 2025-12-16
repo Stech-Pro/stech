@@ -10,6 +10,7 @@ import {
   putToS3,
 } from '../api/videoUploadAPI';
 import DateTimeDropdown from './DateTimeDropdown.js';
+import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -500,6 +501,9 @@ const UploadVideoModal = ({
     try {
       setLoading(true);
 
+      // 🔔 업로드 시작 토스트
+      toast.loading('영상 업로드를 준비하고 있습니다...', { id: 'upload' });
+
       const d = dayjs(matchDate).tz(KST);
       const DOW = ['일', '월', '화', '수', '목', '금', '토'];
       const dow = DOW[d.day()];
@@ -515,7 +519,7 @@ const UploadVideoModal = ({
         // 기본 로직: 앞 두 글자 (예: 'GCF' -> 'GC', 'seoulVI' -> 'SE'였던 것을 위에서 처리)
         return String(teamId).slice(0, 2).toUpperCase();
       };
-      
+
       const homeCode = getTeamCode(home.id);
       const awayCode = getTeamCode(away.id);
 
@@ -537,6 +541,7 @@ const UploadVideoModal = ({
       };
 
       // 1) 업로드 준비
+      toast.loading('서버에 업로드 준비 중...', { id: 'upload' });
       const prep = await prepareMatchUpload({
         gameKey,
         gameInfo,
@@ -568,7 +573,13 @@ const UploadVideoModal = ({
       });
       if (pairs.length === 0) throw new Error('업로드할 파일/URL이 없습니다.');
 
+      // 🔔 S3 업로드 시작
+      const totalFiles = pairs.length;
+      toast.loading('영상 업로드 중... 0%', { id: 'upload' });
+
       const batchSize = 3;
+      let uploadedCount = 0;
+
       for (let i = 0; i < pairs.length; i += batchSize) {
         const batch = pairs.slice(i, i + batchSize);
 
@@ -582,6 +593,11 @@ const UploadVideoModal = ({
           ),
         );
 
+        // 업로드 진행 상황 업데이트
+        uploadedCount += batch.filter((_, idx) => first[idx].status === 'fulfilled').length;
+        const percentage = Math.round((uploadedCount / totalFiles) * 100);
+        toast.loading(`영상 업로드 중... ${percentage}%`, { id: 'upload' });
+
         // 실패만 2차 재시도
         const retryTargets = batch.filter((_, idx) => first[idx].status === 'rejected');
         if (retryTargets.length) {
@@ -593,6 +609,13 @@ const UploadVideoModal = ({
               }),
             ),
           );
+
+          // 재시도 후 성공한 파일 카운트 추가
+          const retrySuccessCnt = second.filter((r) => r.status === 'fulfilled').length;
+          uploadedCount += retrySuccessCnt;
+          const percentage = Math.round((uploadedCount / totalFiles) * 100);
+          toast.loading(`영상 업로드 중... ${percentage}%`, { id: 'upload' });
+
           const failCnt = second.filter((r) => r.status === 'rejected').length;
           if (failCnt) {
             console.error('S3 업로드 실패 배치:', { batch, first, second });
@@ -602,6 +625,8 @@ const UploadVideoModal = ({
       }
 
       // 3) 완료 보고
+      toast.loading('업로드 완료 처리 중...', { id: 'upload' });
+
       const uploadedVideos = {
         Q1: (uploadUrls.Q1 || []).map((u) => u.fileName),
         Q2: (uploadUrls.Q2 || []).map((u) => u.fileName),
@@ -611,10 +636,16 @@ const UploadVideoModal = ({
 
       await completeMatchUpload({ gameKey, uploadedVideos }, { timeoutMs: 120000 });
 
+      // 🎉 업로드 성공
+      toast.success('영상 업로드가 완료되었습니다!', { id: 'upload', duration: 3000 });
+
       onUploaded?.();
       handleClose();
     } catch (err) {
-      setError(err?.message || '업로드 중 오류가 발생했습니다.');
+      // ❌ 업로드 실패
+      const errorMsg = err?.message || '업로드 중 오류가 발생했습니다.';
+      toast.error(errorMsg, { id: 'upload', duration: 5000 });
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
