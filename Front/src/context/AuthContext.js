@@ -86,12 +86,20 @@ import { listMemos } from '../api/memoAPI';
           } catch {}
         }
         try {
-  const memos = await listMemos({}, getToken());
-  if (Array.isArray(memos)) u = { ...u, memos };
-  console.log('Loaded user memos:', memos);
-} catch (err) {
-  console.warn('메모 불러오기 실패:', err);
-}
+          const memos = await listMemos({}, getToken());
+          console.log('✅ 로그인 시 메모 로드:', memos);
+
+          if (Array.isArray(memos)) {
+            u = { ...u, memos };
+            console.log(`✅ 총 ${memos.length}개의 메모를 user 객체에 추가했습니다.`);
+          } else {
+            console.warn('⚠️ 메모 응답이 배열이 아닙니다:', memos);
+            u = { ...u, memos: [] };
+          }
+        } catch (err) {
+          console.error('❌ 메모 불러오기 실패:', err);
+          u = { ...u, memos: [] };
+        }
         setUser(u);
 
         // ✨ 1. 프로필 완성 여부 판단: user 객체에 playerID이 있는지 확인합니다.

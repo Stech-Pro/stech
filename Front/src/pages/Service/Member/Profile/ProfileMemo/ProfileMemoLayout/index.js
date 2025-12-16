@@ -1,8 +1,9 @@
 // src/pages/Service/Member/Profile/ProfileMemo/ProfileMemoLayout/index.js (혹은 동일 파일)
 import React, { createContext, useContext, useMemo, useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../../../../context/AuthContext';
 import { fetchTeamGames, fetchGameByKey } from '../../../../../../api/gameAPI';
+import { listMemos } from '../../../../../../api/memoAPI';
 
 const MemoCtx = createContext({ list: [], map: {}, ready: true });
 export const useProfileMemo = () => useContext(MemoCtx);
@@ -12,6 +13,7 @@ const normalizeClipKey = (k) => String(k ?? '').split('__')[0];
 
 export default function ProfileMemoLayout() {
   const { user, token } = useAuth();
+  const location = useLocation();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
@@ -30,11 +32,27 @@ export default function ProfileMemoLayout() {
       try {
         setLoading(true);
 
-        // ✅ user.memos 그대로 사용
-        const memos = Array.isArray(user.memos) ? user.memos : [];
-        console.log('Loaded memos from user context:', memos);
+        // 🔥 항상 최신 메모를 서버에서 가져오기
+        let memos = [];
+        try {
+          const response = await listMemos({}, token);
+          console.log('✅ 메모 API 응답:', response);
+
+          if (Array.isArray(response)) {
+            memos = response;
+          } else {
+            console.warn('⚠️ 메모 응답이 배열이 아닙니다:', response);
+            memos = [];
+          }
+
+          console.log(`✅ 총 ${memos.length}개의 메모를 불러왔습니다.`);
+        } catch (err) {
+          console.error('❌ 메모 불러오기 실패:', err);
+          memos = [];
+        }
 
         if (memos.length === 0) {
+          console.log('ℹ️ 메모가 없습니다.');
           setGames([]);
           setReady(true);
           setLoading(false);
@@ -112,9 +130,9 @@ export default function ProfileMemoLayout() {
       }
     };
 
-    // deps: user 객체가 바뀌거나 user.memos 배열이 바뀔 때 동작
+    // deps: user 객체가 바뀌거나 경로가 바뀔 때 동작 (탭 전환 시 리로드)
     load();
-  }, [user, token, user?.memos]);
+  }, [user, token, location.pathname]);
 
   const value = useMemo(() => {
     const map = Object.fromEntries(games.map(g => [g.gameKey, g]));
