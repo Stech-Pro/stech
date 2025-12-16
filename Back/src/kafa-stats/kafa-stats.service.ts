@@ -5,6 +5,8 @@ import * as cheerio from 'cheerio';
 import axios from 'axios';
 import { wrapper } from 'axios-cookiejar-support';
 import { CookieJar } from 'tough-cookie';
+import * as fs from 'fs';
+import * as path from 'path';
 import { 
   TeamOffenseStats, 
   PlayerStats, 
@@ -2332,6 +2334,535 @@ export class KafaStatsService {
     } catch (error) {
       this.logger.error(`❌ 전체 KAFA 통계 수집 실패: ${error.message}`);
       throw new Error(`Failed to get all KAFA stats: ${error.message}`);
+    }
+  }
+
+  // JSON 파일 저장/조회 메서드 추가
+
+  // KAFA 선수 데이터를 JSON 파일로 저장
+  async savePlayersToJson(league: 'uni' | 'soc' = 'uni'): Promise<{
+    success: boolean;
+    message: string;
+    savedCount: number;
+    filePath: string;
+  }> {
+    try {
+      this.logger.log(`📁 KAFA ${league} 선수 데이터를 JSON으로 저장 시작...`);
+      
+      // 1. KAFA 사이트에서 최신 선수 데이터 크롤링
+      const players = await this.getPlayerStats(league);
+      
+      if (!players || players.length === 0) {
+        return {
+          success: false,
+          message: '크롤링된 선수 데이터가 없습니다.',
+          savedCount: 0,
+          filePath: ''
+        };
+      }
+
+      // 2. data 폴더 생성 (없으면)
+      const dataDir = path.join(process.cwd(), 'data');
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+
+      // 3. JSON 파일로 저장 (덮어쓰기)
+      const fileName = `kafa-${league}-players.json`;
+      const filePath = path.join(dataDir, fileName);
+
+      const jsonData = {
+        league,
+        crawledAt: new Date().toISOString(),
+        totalCount: players.length,
+        players: players.map(player => ({
+          rank: player.rank,
+          playerName: player.playerName,
+          university: player.university,
+          jerseyNumber: player.jerseyNumber,
+          rushYards: player.rushYards,
+          yardsPerAttempt: player.yardsPerAttempt,
+          attempts: player.attempts,
+          touchdowns: player.touchdowns,
+          longest: player.longest
+        }))
+      };
+
+      // 단일 파일로 저장 (덮어쓰기)
+      fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2), 'utf8');
+
+      this.logger.log(`✅ JSON 저장 완료: ${fileName} (${players.length}명)`);
+
+      return {
+        success: true,
+        message: `${players.length}명의 선수 데이터를 JSON 파일로 저장했습니다.`,
+        savedCount: players.length,
+        filePath: filePath
+      };
+
+    } catch (error) {
+      this.logger.error(`❌ JSON 저장 실패: ${error.message}`);
+      return {
+        success: false,
+        message: `JSON 저장 실패: ${error.message}`,
+        savedCount: 0,
+        filePath: ''
+      };
+    }
+  }
+
+  // JSON 파일에서 선수 데이터 조회
+  async getPlayersFromJson(league: 'uni' | 'soc' = 'uni'): Promise<{
+    success: boolean;
+    message: string;
+    data: any;
+  }> {
+    try {
+      const dataDir = path.join(process.cwd(), 'data');
+      const fileName = `kafa-${league}-players.json`;
+      const filePath = path.join(dataDir, fileName);
+
+      if (!fs.existsSync(filePath)) {
+        return {
+          success: false,
+          message: `저장된 ${league} 선수 데이터가 없습니다. 먼저 크롤링하여 저장해주세요.`,
+          data: null
+        };
+      }
+
+      const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      
+      this.logger.log(`📖 JSON 파일에서 ${league} 선수 데이터 조회: ${jsonData.totalCount}명`);
+
+      return {
+        success: true,
+        message: `${jsonData.totalCount}명의 선수 데이터를 조회했습니다.`,
+        data: jsonData
+      };
+
+    } catch (error) {
+      this.logger.error(`❌ JSON 조회 실패: ${error.message}`);
+      return {
+        success: false,
+        message: `JSON 조회 실패: ${error.message}`,
+        data: null
+      };
+    }
+  }
+
+  // 저장된 JSON 파일 목록 조회
+  async getJsonFileList(): Promise<{
+    success: boolean;
+    files: Array<{
+      fileName: string;
+      league: string;
+      size: string;
+      createdAt: string;
+    }>;
+  }> {
+    try {
+      const dataDir = path.join(process.cwd(), 'data');
+      
+      if (!fs.existsSync(dataDir)) {
+        return { success: true, files: [] };
+      }
+
+      const files = fs.readdirSync(dataDir)
+        .filter(file => file.startsWith('kafa-') && file.endsWith('.json'))
+        .map(file => {
+          const filePath = path.join(dataDir, file);
+          const stats = fs.statSync(filePath);
+          const league = file.includes('-uni-') ? 'uni' : 'soc';
+          
+          return {
+            fileName: file,
+            league,
+            size: `${(stats.size / 1024).toFixed(1)} KB`,
+            createdAt: stats.mtime.toISOString()
+          };
+        })
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      return { success: true, files };
+
+    } catch (error) {
+      this.logger.error(`❌ 파일 목록 조회 실패: ${error.message}`);
+      return { success: false, files: [] };
+    }
+  }
+
+  // 11개 스탯 타입 매핑 정의
+  private readonly STAT_TYPE_MAPPING = {
+    1: { key: 'rushing', name: 'RUSHING' },
+    2: { key: 'passing', name: 'PASSING' },
+    3: { key: 'receiving', name: 'RECEIVING' },
+    4: { key: 'fumbles', name: 'FUMBLES' },
+    5: { key: 'tackles', name: 'TACKLES' },
+    6: { key: 'interceptions', name: 'INTERCEPTIONS' },
+    7: { key: 'fieldgoals', name: 'FIELD GOALS' },
+    8: { key: 'kickoffs', name: 'KICKOFFS' },
+    9: { key: 'kickoffreturns', name: 'KICKOFF RETURNS' },
+    10: { key: 'punting', name: 'PUNTING' },
+    11: { key: 'puntreturns', name: 'PUNTING RETURNS' }
+  };
+
+  // 모든 스탯 타입 크롤링 및 JSON 저장
+  async scrapeAllStatsToJson(league: 'uni' | 'soc' = 'uni'): Promise<{
+    success: boolean;
+    message: string;
+    results: Array<{
+      statType: string;
+      success: boolean;
+      count: number;
+      filePath: string;
+    }>;
+  }> {
+    try {
+      this.logger.log(`📁 모든 KAFA ${league} 스탯 크롤링 시작...`);
+      
+      const results = [];
+      
+      // 11개 스탯 타입 순차적으로 크롤링
+      for (const [pageNum, statInfo] of Object.entries(this.STAT_TYPE_MAPPING)) {
+        try {
+          this.logger.log(`🔄 ${statInfo.name} 크롤링 중... (페이지 ${pageNum})`);
+          
+          const players = await this.getPlayerStatsByPage(league, parseInt(pageNum));
+          
+          if (players && players.length > 0) {
+            const saveResult = await this.saveStatTypeToJson(league, statInfo.key, statInfo.name, players);
+            
+            results.push({
+              statType: statInfo.key,
+              success: saveResult.success,
+              count: saveResult.savedCount,
+              filePath: saveResult.filePath
+            });
+            
+            this.logger.log(`✅ ${statInfo.name}: ${players.length}명 저장 완료`);
+          } else {
+            results.push({
+              statType: statInfo.key,
+              success: false,
+              count: 0,
+              filePath: ''
+            });
+            
+            this.logger.warn(`⚠️ ${statInfo.name}: 데이터 없음`);
+          }
+          
+          // 서버 부하 방지를 위한 딜레이
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+        } catch (error) {
+          this.logger.error(`❌ ${statInfo.name} 크롤링 실패: ${error.message}`);
+          results.push({
+            statType: statInfo.key,
+            success: false,
+            count: 0,
+            filePath: ''
+          });
+        }
+      }
+      
+      const successCount = results.filter(r => r.success).length;
+      const totalPlayers = results.reduce((sum, r) => sum + r.count, 0);
+      
+      this.logger.log(`✅ 전체 크롤링 완료: ${successCount}/11개 스탯, 총 ${totalPlayers}명`);
+      
+      return {
+        success: true,
+        message: `${successCount}/11개 스탯 타입 크롤링 완료, 총 ${totalPlayers}명 저장`,
+        results
+      };
+      
+    } catch (error) {
+      this.logger.error(`❌ 전체 스탯 크롤링 실패: ${error.message}`);
+      return {
+        success: false,
+        message: `전체 스탯 크롤링 실패: ${error.message}`,
+        results: []
+      };
+    }
+  }
+
+  // 특정 스탯 타입을 JSON 파일로 저장
+  private async saveStatTypeToJson(
+    league: 'uni' | 'soc',
+    statKey: string,
+    statName: string,
+    players: any[]
+  ): Promise<{
+    success: boolean;
+    message: string;
+    savedCount: number;
+    filePath: string;
+  }> {
+    try {
+      // data 폴더 생성
+      const dataDir = path.join(process.cwd(), 'data');
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+
+      // 파일명 생성
+      const fileName = `kafa-${league}-${statKey}.json`;
+      const filePath = path.join(dataDir, fileName);
+
+      // JSON 데이터 구성
+      const jsonData = {
+        statType: statKey,
+        statName: statName,
+        league,
+        crawledAt: new Date().toISOString(),
+        totalCount: players.length,
+        players: players.map((player, index) => ({
+          rank: index + 1,
+          playerName: player.playerName || '',
+          university: player.university || '',
+          jerseyNumber: player.jerseyNumber || 0,
+          ...this.extractStatFields(player, statKey)
+        }))
+      };
+
+      // JSON 파일 저장
+      fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2), 'utf8');
+
+      return {
+        success: true,
+        message: `${statName} 데이터 저장 완료`,
+        savedCount: players.length,
+        filePath
+      };
+
+    } catch (error) {
+      return {
+        success: false,
+        message: `${statName} 저장 실패: ${error.message}`,
+        savedCount: 0,
+        filePath: ''
+      };
+    }
+  }
+
+  // 스탯 타입별로 필드 추출
+  private extractStatFields(player: any, statKey: string): any {
+    switch (statKey) {
+      case 'rushing':
+        return {
+          rushingYards: player.rushYards || 0,
+          yardsPerAttempt: player.yardsPerAttempt || 0,
+          attempts: player.attempts || 0,
+          touchdowns: player.touchdowns || 0,
+          longest: player.longest || 0
+        };
+      
+      case 'passing':
+        return {
+          completions: player.completions || 0,
+          attempts: player.attempts || 0,
+          passingYards: player.passingYards || 0,
+          touchdowns: player.touchdowns || 0,
+          interceptions: player.interceptions || 0,
+          rating: player.rating || 0
+        };
+      
+      case 'receiving':
+        return {
+          receptions: player.receptions || 0,
+          receivingYards: player.receivingYards || 0,
+          touchdowns: player.touchdowns || 0,
+          longest: player.longest || 0,
+          yardsPerReception: player.yardsPerReception || 0
+        };
+      
+      case 'fumbles':
+        return {
+          fumbles: player.fumbles || 0,
+          lost: player.lost || 0,
+          recovered: player.recovered || 0
+        };
+      
+      case 'tackles':
+        return {
+          totalTackles: player.totalTackles || 0,
+          soloTackles: player.soloTackles || 0,
+          assistTackles: player.assistTackles || 0,
+          tacklesForLoss: player.tacklesForLoss || 0
+        };
+      
+      case 'interceptions':
+        return {
+          interceptions: player.interceptions || 0,
+          returnYards: player.returnYards || 0,
+          touchdowns: player.touchdowns || 0,
+          longest: player.longest || 0
+        };
+      
+      case 'fieldgoals':
+        return {
+          made: player.made || 0,
+          attempts: player.attempts || 0,
+          percentage: player.percentage || 0,
+          longest: player.longest || 0,
+          blocked: player.blocked || 0
+        };
+      
+      case 'kickoffs':
+        return {
+          kickoffs: player.kickoffs || 0,
+          yards: player.yards || 0,
+          touchbacks: player.touchbacks || 0,
+          average: player.average || 0
+        };
+      
+      case 'kickoffreturns':
+        return {
+          returns: player.returns || 0,
+          returnYards: player.returnYards || 0,
+          touchdowns: player.touchdowns || 0,
+          longest: player.longest || 0,
+          average: player.average || 0
+        };
+      
+      case 'punting':
+        return {
+          punts: player.punts || 0,
+          yards: player.yards || 0,
+          average: player.average || 0,
+          longest: player.longest || 0,
+          blocked: player.blocked || 0
+        };
+      
+      case 'puntreturns':
+        return {
+          returns: player.returns || 0,
+          returnYards: player.returnYards || 0,
+          touchdowns: player.touchdowns || 0,
+          longest: player.longest || 0,
+          average: player.average || 0
+        };
+      
+      default:
+        // 기본값으로 모든 필드 반환
+        return {
+          value1: player.value1 || 0,
+          value2: player.value2 || 0,
+          value3: player.value3 || 0,
+          value4: player.value4 || 0,
+          value5: player.value5 || 0
+        };
+    }
+  }
+
+  // 저장된 특정 스탯 타입 조회
+  async getStatTypeFromJson(league: 'uni' | 'soc', statType: string): Promise<{
+    success: boolean;
+    message: string;
+    data: any;
+  }> {
+    try {
+      const dataDir = path.join(process.cwd(), 'data');
+      const fileName = `kafa-${league}-${statType}.json`;
+      const filePath = path.join(dataDir, fileName);
+
+      if (!fs.existsSync(filePath)) {
+        return {
+          success: false,
+          message: `저장된 ${league} ${statType} 데이터가 없습니다. 먼저 크롤링하여 저장해주세요.`,
+          data: null
+        };
+      }
+
+      const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      
+      this.logger.log(`📖 ${league} ${statType} 데이터 조회: ${jsonData.totalCount}명`);
+
+      return {
+        success: true,
+        message: `${jsonData.totalCount}명의 ${jsonData.statName} 데이터를 조회했습니다.`,
+        data: jsonData
+      };
+
+    } catch (error) {
+      this.logger.error(`❌ ${statType} 조회 실패: ${error.message}`);
+      return {
+        success: false,
+        message: `${statType} 조회 실패: ${error.message}`,
+        data: null
+      };
+    }
+  }
+
+  // 저장된 모든 스탯 파일 목록 조회
+  async getAllStatFiles(league?: 'uni' | 'soc'): Promise<{
+    success: boolean;
+    files: Array<{
+      fileName: string;
+      statType: string;
+      statName: string;
+      league: string;
+      size: string;
+      createdAt: string;
+      playerCount: number;
+    }>;
+  }> {
+    try {
+      const dataDir = path.join(process.cwd(), 'data');
+      
+      if (!fs.existsSync(dataDir)) {
+        return { success: true, files: [] };
+      }
+
+      const files = fs.readdirSync(dataDir)
+        .filter(file => {
+          const isKafaStatFile = file.startsWith('kafa-') && 
+                                file.endsWith('.json') && 
+                                !file.includes('players.json'); // 기존 단일 파일 제외
+          
+          if (league) {
+            return isKafaStatFile && file.includes(`-${league}-`);
+          }
+          return isKafaStatFile;
+        })
+        .map(file => {
+          const filePath = path.join(dataDir, file);
+          const stats = fs.statSync(filePath);
+          
+          // 파일명에서 정보 추출
+          const parts = file.replace('.json', '').split('-');
+          const fileLeague = parts[1]; // uni or soc
+          const statType = parts[2]; // rushing, passing, etc.
+          
+          // 파일에서 플레이어 수 읽기
+          let playerCount = 0;
+          let statName = statType.toUpperCase();
+          
+          try {
+            const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+            playerCount = jsonData.totalCount || 0;
+            statName = jsonData.statName || statType.toUpperCase();
+          } catch (error) {
+            // 파일 읽기 실패 시 기본값 사용
+          }
+          
+          return {
+            fileName: file,
+            statType,
+            statName,
+            league: fileLeague,
+            size: `${(stats.size / 1024).toFixed(1)} KB`,
+            createdAt: stats.mtime.toISOString(),
+            playerCount
+          };
+        })
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      return { success: true, files };
+
+    } catch (error) {
+      this.logger.error(`❌ 스탯 파일 목록 조회 실패: ${error.message}`);
+      return { success: false, files: [] };
     }
   }
 }

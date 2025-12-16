@@ -1957,4 +1957,460 @@ export class KafaStatsController {
     }
   }
 
+  // === JSON 파일 저장/조회 API ===
+
+  // KAFA 선수 데이터 크롤링 및 JSON 저장 API
+  @Post('scrape-and-save/:league')
+  @ApiOperation({
+    summary: '🔄 KAFA 선수 데이터 크롤링 및 JSON 저장',
+    description: `
+    ## 🔄 KAFA 사이트 크롤링 및 JSON 파일 저장
+
+    버튼 클릭으로 실행할 수 있는 크롤링 + 저장 API입니다.
+    
+    ### 📋 동작 과정
+    1. KAFA 사이트에서 최신 선수 데이터 크롤링
+    2. 데이터 정제 및 구조화
+    3. JSON 파일로 로컬 저장 (\`data/\` 폴더)
+    4. 타임스탬프 파일 + 최신 파일 두 개 저장
+    
+    ### 💾 저장 형태
+    - \`kafa-uni-players-latest.json\`: 항상 최신 데이터 (덮어쓰기)
+    - \`kafa-uni-players-2025-12-16T10-30-00.json\`: 백업용 타임스탬프 파일
+    
+    ### 🎯 프론트엔드 연동
+    - "최신 데이터 가져오기" 버튼 → 이 API 호출
+    - 성공 시 → GET API로 데이터 조회하여 화면 표시
+    `,
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: '리그 구분 (uni: 대학, soc: 사회인)',
+    example: 'uni',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 크롤링 및 JSON 저장 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '45명의 선수 데이터를 JSON 파일로 저장했습니다.',
+        data: {
+          league: 'uni',
+          savedCount: 45,
+          filePath: '/path/to/data/kafa-uni-players-latest.json',
+          crawledAt: '2025-12-16T10:30:00.000Z'
+        }
+      }
+    }
+  })
+  async scrapeAndSaveToJson(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const result = await this.kafaStatsService.savePlayersToJson(league);
+      
+      return {
+        success: result.success,
+        message: result.message,
+        data: {
+          league,
+          savedCount: result.savedCount,
+          filePath: result.filePath,
+          crawledAt: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `크롤링 및 저장 실패: ${error.message}`,
+        data: null
+      };
+    }
+  }
+
+  // JSON 파일에서 선수 데이터 조회 API
+  @Get('players-json/:league')
+  @ApiOperation({
+    summary: '📖 저장된 JSON에서 선수 데이터 조회',
+    description: `
+    ## 📖 JSON 파일에서 빠른 데이터 조회
+
+    로컬에 저장된 JSON 파일에서 선수 데이터를 즉시 조회합니다.
+    크롤링 없이 빠르게 응답하므로 프론트엔드 화면 표시용으로 적합합니다.
+    
+    ### 🚀 장점
+    - 즉시 응답 (크롤링 시간 없음)
+    - 네트워크 오류에 영향 받지 않음  
+    - KAFA 사이트 부하 없음
+    
+    ### ⚠️ 주의사항
+    - 먼저 \`POST /scrape-and-save/:league\`로 데이터 저장 필요
+    - 저장된 파일이 없으면 404 에러 반환
+    `,
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: '리그 구분',
+    example: 'uni',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ JSON 데이터 조회 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '45명의 선수 데이터를 조회했습니다.',
+        data: {
+          league: 'uni',
+          crawledAt: '2025-12-16T10:30:00.000Z',
+          totalCount: 45,
+          players: [
+            {
+              rank: 1,
+              playerName: '홍길동',
+              university: '한양대학교',
+              jerseyNumber: 25,
+              rushYards: 427,
+              yardsPerAttempt: 7.0,
+              attempts: 61,
+              touchdowns: 4,
+              longest: 59
+            }
+          ]
+        }
+      }
+    }
+  })
+  async getPlayersFromJson(@Param('league') league: 'uni' | 'soc') {
+    const result = await this.kafaStatsService.getPlayersFromJson(league);
+    
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message,
+        data: null
+      };
+    }
+
+    return {
+      success: true,
+      message: result.message,
+      data: result.data
+    };
+  }
+
+  // 저장된 JSON 파일 목록 조회 API
+  @Get('json-files')
+  @ApiOperation({
+    summary: '📂 저장된 JSON 파일 목록 조회',
+    description: `
+    ## 📂 로컬에 저장된 모든 JSON 파일 목록
+
+    \`data/\` 폴더에 저장된 모든 KAFA JSON 파일의 목록을 조회합니다.
+    파일 크기, 생성 시간 등 메타 정보도 함께 제공합니다.
+    
+    ### 📋 활용 방안
+    - 관리자 페이지에서 저장된 파일 현황 확인
+    - 백업 파일 관리
+    - 저장 용량 모니터링
+    `,
+  })
+  async getJsonFiles() {
+    try {
+      const result = await this.kafaStatsService.getJsonFileList();
+      
+      return {
+        success: result.success,
+        message: `${result.files.length}개의 JSON 파일을 찾았습니다.`,
+        data: {
+          totalFiles: result.files.length,
+          files: result.files
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `파일 목록 조회 실패: ${error.message}`,
+        data: { files: [] }
+      };
+    }
+  }
+
+  // === 11개 스탯 타입별 JSON 저장/조회 API ===
+
+  // 모든 스탯 타입 크롤링 및 저장 API
+  @Post('scrape-all-stats/:league')
+  @ApiOperation({
+    summary: '🚀 모든 스탯 타입 크롤링 및 JSON 저장',
+    description: `
+    ## 🚀 11개 모든 스탯 타입을 한번에 크롤링
+
+    RUSHING부터 PUNTING RETURNS까지 11개 스탯을 모두 크롤링하여 각각 별도 JSON 파일로 저장합니다.
+    
+    ### 📋 크롤링되는 스탯 타입
+    1. **RUSHING** (ind_uni1) → \`kafa-uni-rushing.json\`
+    2. **PASSING** (ind_uni2) → \`kafa-uni-passing.json\`
+    3. **RECEIVING** (ind_uni3) → \`kafa-uni-receiving.json\`
+    4. **FUMBLES** (ind_uni4) → \`kafa-uni-fumbles.json\`
+    5. **TACKLES** (ind_uni5) → \`kafa-uni-tackles.json\`
+    6. **INTERCEPTIONS** (ind_uni6) → \`kafa-uni-interceptions.json\`
+    7. **FIELD GOALS** (ind_uni7) → \`kafa-uni-fieldgoals.json\`
+    8. **KICKOFFS** (ind_uni8) → \`kafa-uni-kickoffs.json\`
+    9. **KICKOFF RETURNS** (ind_uni9) → \`kafa-uni-kickoffreturns.json\`
+    10. **PUNTING** (ind_uni10) → \`kafa-uni-punting.json\`
+    11. **PUNTING RETURNS** (ind_uni11) → \`kafa-uni-puntreturns.json\`
+    
+    ### 🎯 장점
+    - **포지션별 조회**: QB는 패싱만, RB는 러싱만 필요한 데이터만 가져오기
+    - **빠른 응답**: 스탯별로 분리되어 있어 필요한 것만 조회
+    - **구조화된 데이터**: 각 스탯 타입에 맞는 필드 구조로 저장
+    - **실시간 업데이트**: 버튼 클릭으로 최신 KAFA 데이터 반영
+    
+    ### ⏱️ 소요 시간
+    - 약 15-20초 (11개 페이지 + 1초씩 딜레이)
+    - 진행 상황은 서버 로그에서 확인 가능
+    `,
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: '리그 구분 (uni: 대학, soc: 사회인)',
+    example: 'uni',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 전체 스탯 크롤링 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '11/11개 스탯 타입 크롤링 완료, 총 450명 저장',
+        data: {
+          league: 'uni',
+          totalStats: 11,
+          successCount: 11,
+          totalPlayers: 450,
+          completedAt: '2025-12-16T10:45:00.000Z',
+          results: [
+            {
+              statType: 'rushing',
+              success: true,
+              count: 45,
+              filePath: '/data/kafa-uni-rushing.json'
+            },
+            {
+              statType: 'passing',
+              success: true,
+              count: 25,
+              filePath: '/data/kafa-uni-passing.json'
+            }
+          ]
+        }
+      }
+    }
+  })
+  async scrapeAllStatsToJson(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+      const result = await this.kafaStatsService.scrapeAllStatsToJson(league);
+      const duration = Date.now() - startTime;
+      
+      const successCount = result.results.filter(r => r.success).length;
+      const totalPlayers = result.results.reduce((sum, r) => sum + r.count, 0);
+
+      return {
+        success: result.success,
+        message: result.message,
+        data: {
+          league,
+          totalStats: 11,
+          successCount,
+          totalPlayers,
+          duration: `${Math.round(duration / 1000)}초`,
+          completedAt: new Date().toISOString(),
+          results: result.results
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `전체 스탯 크롤링 실패: ${error.message}`,
+        data: null
+      };
+    }
+  }
+
+  // 특정 스탯 타입 조회 API
+  @Get('stat-json/:league/:statType')
+  @ApiOperation({
+    summary: '📊 특정 스탯 타입 데이터 조회',
+    description: `
+    ## 📊 저장된 특정 스탯 타입 데이터 조회
+
+    포지션별로 필요한 스탯만 빠르게 조회할 수 있습니다.
+    
+    ### 🎯 사용 예시
+    - **QB 분석**: \`/stat-json/uni/passing\` → 패싱 스탯만
+    - **RB 분석**: \`/stat-json/uni/rushing\` → 러싱 스탯만  
+    - **WR 분석**: \`/stat-json/uni/receiving\` → 리시빙 스탯만
+    - **K 분석**: \`/stat-json/uni/fieldgoals\` → 필드골 스탯만
+    
+    ### 📋 사용 가능한 스탯 타입
+    - \`rushing\`, \`passing\`, \`receiving\`
+    - \`fumbles\`, \`tackles\`, \`interceptions\`
+    - \`fieldgoals\`, \`kickoffs\`, \`kickoffreturns\`
+    - \`punting\`, \`puntreturns\`
+    
+    ### ⚡ 성능
+    - 즉시 응답 (크롤링 없음)
+    - 캐시된 JSON 파일에서 직접 읽기
+    - 네트워크 의존 없음
+    `,
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: '리그 구분',
+    example: 'uni',
+  })
+  @ApiParam({
+    name: 'statType',
+    enum: [
+      'rushing', 'passing', 'receiving', 'fumbles', 'tackles', 
+      'interceptions', 'fieldgoals', 'kickoffs', 'kickoffreturns', 
+      'punting', 'puntreturns'
+    ],
+    description: '스탯 타입',
+    example: 'rushing',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 스탯 데이터 조회 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '45명의 RUSHING 데이터를 조회했습니다.',
+        data: {
+          statType: 'rushing',
+          statName: 'RUSHING',
+          league: 'uni',
+          crawledAt: '2025-12-16T10:45:00Z',
+          totalCount: 45,
+          players: [
+            {
+              rank: 1,
+              playerName: '김태현',
+              university: '고려대학교',
+              jerseyNumber: 25,
+              rushingYards: 427,
+              yardsPerAttempt: 7.0,
+              attempts: 61,
+              touchdowns: 4,
+              longest: 59
+            }
+          ]
+        }
+      }
+    }
+  })
+  async getStatTypeFromJson(
+    @Param('league') league: 'uni' | 'soc',
+    @Param('statType') statType: string
+  ) {
+    const result = await this.kafaStatsService.getStatTypeFromJson(league, statType);
+    
+    return {
+      success: result.success,
+      message: result.message,
+      data: result.data
+    };
+  }
+
+  // 저장된 모든 스탯 파일 목록 조회 API  
+  @Get('all-stat-files')
+  @ApiOperation({
+    summary: '📂 저장된 모든 스탯 파일 목록 조회',
+    description: `
+    ## 📂 스탯별로 분리된 모든 JSON 파일 목록
+
+    11개 스탯 타입별로 저장된 JSON 파일들의 목록과 메타 정보를 조회합니다.
+    
+    ### 📋 제공 정보
+    - **파일명**: \`kafa-uni-rushing.json\` 등
+    - **스탯 타입**: \`rushing\`, \`passing\` 등
+    - **스탯명**: \`RUSHING\`, \`PASSING\` 등  
+    - **리그**: \`uni\` 또는 \`soc\`
+    - **파일 크기**: KB 단위
+    - **생성 시간**: ISO 형식
+    - **선수 수**: 해당 스탯의 선수 수
+    
+    ### 🎯 활용 방안
+    - 관리자 대시보드에서 현황 확인
+    - 어떤 스탯이 언제 마지막으로 업데이트되었는지 확인
+    - 각 스탯별 선수 수 비교
+    `,
+  })
+  @ApiQuery({
+    name: 'league',
+    required: false,
+    enum: ['uni', 'soc'],
+    description: '특정 리그만 필터링 (선택사항)',
+    example: 'uni'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 스탯 파일 목록 조회 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '22개의 스탯 파일을 찾았습니다.',
+        data: {
+          totalFiles: 22,
+          byLeague: {
+            uni: 11,
+            soc: 11
+          },
+          files: [
+            {
+              fileName: 'kafa-uni-rushing.json',
+              statType: 'rushing',
+              statName: 'RUSHING',
+              league: 'uni',
+              size: '15.2 KB',
+              createdAt: '2025-12-16T10:45:00.000Z',
+              playerCount: 45
+            }
+          ]
+        }
+      }
+    }
+  })
+  async getAllStatFiles(@Query('league') league?: 'uni' | 'soc') {
+    try {
+      const result = await this.kafaStatsService.getAllStatFiles(league);
+      
+      // 리그별 통계 계산
+      const byLeague = result.files.reduce((acc, file) => {
+        acc[file.league] = (acc[file.league] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      return {
+        success: result.success,
+        message: `${result.files.length}개의 스탯 파일을 찾았습니다.`,
+        data: {
+          totalFiles: result.files.length,
+          byLeague,
+          files: result.files
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `스탯 파일 목록 조회 실패: ${error.message}`,
+        data: { files: [] }
+      };
+    }
+  }
+
 }

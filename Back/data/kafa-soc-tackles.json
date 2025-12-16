@@ -1,0 +1,509 @@
+{
+  "statType": "tackles",
+  "statName": "TACKLES",
+  "league": "soc",
+  "crawledAt": "2025-12-16T06:00:11.406Z",
+  "totalCount": 50,
+  "players": [
+    {
+      "rank": 1,
+      "playerName": "우제욱",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 44,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 2,
+      "playerName": "황준근",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 36,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 3,
+      "playerName": "김상진",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 24,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 4,
+      "playerName": "박경균",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 3,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 5,
+      "playerName": "김병규",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 95,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 6,
+      "playerName": "이용준",
+      "university": "인천 라이노스",
+      "jerseyNumber": 49,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 7,
+      "playerName": "박시현",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 0,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 8,
+      "playerName": "안태현",
+      "university": "군위 피닉스",
+      "jerseyNumber": 59,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 9,
+      "playerName": "김성연",
+      "university": "군위 피닉스",
+      "jerseyNumber": 55,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 10,
+      "playerName": "황미륵",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 99,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 11,
+      "playerName": "류도현",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 81,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 12,
+      "playerName": "김용환",
+      "university": "군위 피닉스",
+      "jerseyNumber": 2,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 13,
+      "playerName": "이재복",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 19,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 14,
+      "playerName": "김도헌",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 10,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 15,
+      "playerName": "김도헌",
+      "university": "인천 라이노스",
+      "jerseyNumber": 36,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 16,
+      "playerName": "김현호",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 5,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 17,
+      "playerName": "강대련",
+      "university": "인천 라이노스",
+      "jerseyNumber": 39,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 18,
+      "playerName": "민홍",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 7,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 19,
+      "playerName": "안준호",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 93,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 20,
+      "playerName": "박준수",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 57,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 21,
+      "playerName": "권순우",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 99,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 22,
+      "playerName": "배용희",
+      "university": "군위 피닉스",
+      "jerseyNumber": 99,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 23,
+      "playerName": "권용빈",
+      "university": "군위 피닉스",
+      "jerseyNumber": 27,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 24,
+      "playerName": "이재건",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 23,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 25,
+      "playerName": "김한주",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 88,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 26,
+      "playerName": "김태수",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 98,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 27,
+      "playerName": "엄재원",
+      "university": "군위 피닉스",
+      "jerseyNumber": 95,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 28,
+      "playerName": "정현우",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 30,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 29,
+      "playerName": "이정규",
+      "university": "인천 라이노스",
+      "jerseyNumber": 24,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 30,
+      "playerName": "정예담",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 98,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 31,
+      "playerName": "박영화",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 15,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 32,
+      "playerName": "신동화",
+      "university": "군위 피닉스",
+      "jerseyNumber": 12,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 33,
+      "playerName": "이준기",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 52,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 34,
+      "playerName": "황윤경",
+      "university": "군위 피닉스",
+      "jerseyNumber": 0,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 35,
+      "playerName": "임준형",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 21,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 36,
+      "playerName": "스위프트(Gregg Swift)",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 3,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 37,
+      "playerName": "양두열",
+      "university": "군위 피닉스",
+      "jerseyNumber": 3,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 38,
+      "playerName": "부동환",
+      "university": "군위 피닉스",
+      "jerseyNumber": 96,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 39,
+      "playerName": "이지윤",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 3,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 40,
+      "playerName": "최정희",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 4,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 41,
+      "playerName": "김우석",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 52,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 42,
+      "playerName": "홍재화",
+      "university": "인천 라이노스",
+      "jerseyNumber": 96,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 43,
+      "playerName": "김희준",
+      "university": "인천 라이노스",
+      "jerseyNumber": 25,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 44,
+      "playerName": "정기훈",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 38,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 45,
+      "playerName": "김민수",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 38,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 46,
+      "playerName": "서호진",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 89,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 47,
+      "playerName": "이재석",
+      "university": "군위 피닉스",
+      "jerseyNumber": 21,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 48,
+      "playerName": "현성준",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 20,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 49,
+      "playerName": "박재상",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 33,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    },
+    {
+      "rank": 50,
+      "playerName": "권오윤",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 56,
+      "totalTackles": 0,
+      "soloTackles": 0,
+      "assistTackles": 0,
+      "tacklesForLoss": 0
+    }
+  ]
+}

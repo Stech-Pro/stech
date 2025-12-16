@@ -1,0 +1,509 @@
+{
+  "statType": "kickoffs",
+  "statName": "KICKOFFS",
+  "league": "uni",
+  "crawledAt": "2025-12-16T05:53:17.182Z",
+  "totalCount": 50,
+  "players": [
+    {
+      "rank": 1,
+      "playerName": "이종혁",
+      "university": "서울대학교",
+      "jerseyNumber": 8,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 2,
+      "playerName": "박형우",
+      "university": "경일대학교",
+      "jerseyNumber": 61,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 3,
+      "playerName": "윤석진",
+      "university": "서울시립대학교",
+      "jerseyNumber": 27,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 4,
+      "playerName": "김태준",
+      "university": "경희대학교",
+      "jerseyNumber": 54,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 5,
+      "playerName": "배민재",
+      "university": "경일대학교",
+      "jerseyNumber": 89,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 6,
+      "playerName": "최준근",
+      "university": "강원대학교",
+      "jerseyNumber": 99,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 7,
+      "playerName": "김민규",
+      "university": "영남대학교",
+      "jerseyNumber": 28,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 8,
+      "playerName": "김진혁",
+      "university": "서울대학교",
+      "jerseyNumber": 58,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 9,
+      "playerName": "김진구",
+      "university": "대구가톨릭대학교",
+      "jerseyNumber": 56,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 10,
+      "playerName": "엄정훈",
+      "university": "카이스트",
+      "jerseyNumber": 87,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 11,
+      "playerName": "권준호",
+      "university": "경희대학교",
+      "jerseyNumber": 64,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 12,
+      "playerName": "이무진",
+      "university": "대구가톨릭대학교",
+      "jerseyNumber": 35,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 13,
+      "playerName": "송영민",
+      "university": "카이스트",
+      "jerseyNumber": 63,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 14,
+      "playerName": "이성수",
+      "university": "부산대학교",
+      "jerseyNumber": 21,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 15,
+      "playerName": "이영준",
+      "university": "동국대학교",
+      "jerseyNumber": 72,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 16,
+      "playerName": "박기용",
+      "university": "신라대학교",
+      "jerseyNumber": 8,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 17,
+      "playerName": "권지훈",
+      "university": "영남대학교",
+      "jerseyNumber": 3,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 18,
+      "playerName": "전민우",
+      "university": "경북대학교",
+      "jerseyNumber": 12,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 19,
+      "playerName": "조다빈",
+      "university": "성균관대학교",
+      "jerseyNumber": 80,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 20,
+      "playerName": "김동혁",
+      "university": "동아대학교",
+      "jerseyNumber": 43,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 21,
+      "playerName": "박기성",
+      "university": "한동대학교",
+      "jerseyNumber": 49,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 22,
+      "playerName": "장혜인",
+      "university": "서울시립대학교",
+      "jerseyNumber": 90,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 23,
+      "playerName": "배민수",
+      "university": "중앙대학교",
+      "jerseyNumber": 64,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 24,
+      "playerName": "방정현",
+      "university": "한국해양대학교",
+      "jerseyNumber": 91,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 25,
+      "playerName": "배성민",
+      "university": "성균관대학교",
+      "jerseyNumber": 10,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 26,
+      "playerName": "강경서",
+      "university": "금오공과대학교",
+      "jerseyNumber": 21,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 27,
+      "playerName": "김준영",
+      "university": "울산대학교",
+      "jerseyNumber": 76,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 28,
+      "playerName": "유재원",
+      "university": "대구대학교",
+      "jerseyNumber": 77,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 29,
+      "playerName": "정혜민",
+      "university": "경성대학교",
+      "jerseyNumber": 22,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 30,
+      "playerName": "김현빈",
+      "university": "용인대학교",
+      "jerseyNumber": 82,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 31,
+      "playerName": "박지훈",
+      "university": "강원대학교",
+      "jerseyNumber": 88,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 32,
+      "playerName": "신민호",
+      "university": "동의대학교",
+      "jerseyNumber": 87,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 33,
+      "playerName": "최윤수",
+      "university": "연세대학교",
+      "jerseyNumber": 88,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 34,
+      "playerName": "박현기",
+      "university": "카이스트",
+      "jerseyNumber": 69,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 35,
+      "playerName": "김민성",
+      "university": "울산대학교",
+      "jerseyNumber": 14,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 36,
+      "playerName": "장용준",
+      "university": "인하대학교",
+      "jerseyNumber": 11,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 37,
+      "playerName": "안현태",
+      "university": "동서대학교",
+      "jerseyNumber": 77,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 38,
+      "playerName": "황희재",
+      "university": "경북대학교",
+      "jerseyNumber": 8,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 39,
+      "playerName": "김혁",
+      "university": "동의대학교",
+      "jerseyNumber": 1,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 40,
+      "playerName": "소진규",
+      "university": "한양대학교",
+      "jerseyNumber": 10,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 41,
+      "playerName": "윤정근",
+      "university": "금오공과대학교",
+      "jerseyNumber": 8,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 42,
+      "playerName": "이찬희",
+      "university": "한양대학교",
+      "jerseyNumber": 12,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 43,
+      "playerName": "엄홍재",
+      "university": "서강대학교",
+      "jerseyNumber": 31,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 44,
+      "playerName": "김산",
+      "university": "한림대학교",
+      "jerseyNumber": 80,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 45,
+      "playerName": "홍세민",
+      "university": "경성대학교",
+      "jerseyNumber": 95,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 46,
+      "playerName": "김찬희",
+      "university": "용인대학교",
+      "jerseyNumber": 55,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 47,
+      "playerName": "원재훈",
+      "university": "국민대학교",
+      "jerseyNumber": 8,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 48,
+      "playerName": "김현수",
+      "university": "경일대학교",
+      "jerseyNumber": 53,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 49,
+      "playerName": "최수종",
+      "university": "고려대학교",
+      "jerseyNumber": 86,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 50,
+      "playerName": "황현석",
+      "university": "건국대학교",
+      "jerseyNumber": 25,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    }
+  ]
+}

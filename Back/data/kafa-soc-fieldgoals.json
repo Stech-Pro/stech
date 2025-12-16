@@ -1,0 +1,86 @@
+{
+  "statType": "fieldgoals",
+  "statName": "FIELD GOALS",
+  "league": "soc",
+  "crawledAt": "2025-12-16T06:00:14.507Z",
+  "totalCount": 7,
+  "players": [
+    {
+      "rank": 1,
+      "playerName": "이준기",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 52,
+      "made": 0,
+      "attempts": 0,
+      "percentage": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 2,
+      "playerName": "최경서",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 8,
+      "made": 0,
+      "attempts": 0,
+      "percentage": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 3,
+      "playerName": "박준수",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 57,
+      "made": 0,
+      "attempts": 0,
+      "percentage": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 4,
+      "playerName": "김세종",
+      "university": "군위 피닉스",
+      "jerseyNumber": 16,
+      "made": 0,
+      "attempts": 0,
+      "percentage": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 5,
+      "playerName": "신승한",
+      "university": "인천 라이노스",
+      "jerseyNumber": 10,
+      "made": 0,
+      "attempts": 0,
+      "percentage": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 6,
+      "playerName": "한규철",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 22,
+      "made": 0,
+      "attempts": 0,
+      "percentage": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 7,
+      "playerName": "이기태",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 22,
+      "made": 0,
+      "attempts": 0,
+      "percentage": 0,
+      "longest": 0,
+      "blocked": 0
+    }
+  ]
+}
