@@ -53,12 +53,28 @@ export async function listMemos({ gameKey, clipKey } = {}, token = getToken()) {
 
   const res = await fetch(url, { headers: buildHeaders(token) });
   const data = await jsonOrText(res);
-  if (res.ok) return data;
-  throw new APIError(
-    typeof data === 'object' ? data.message || '메모 목록 조회 실패' : '메모 목록 조회 실패',
-    res.status,
-    data
-  );
+  if (!res.ok) {
+    throw new APIError(
+      typeof data === 'object' ? data.message || '메모 목록 조회 실패' : '메모 목록 조회 실패',
+      res.status,
+      data
+    );
+  }
+
+  // 백엔드 응답: { success: true, memos: [...] }
+  // memos 배열만 반환
+  if (data && typeof data === 'object' && Array.isArray(data.memos)) {
+    return data.memos;
+  }
+
+  // 응답이 이미 배열이면 그대로 반환
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  // 예상치 못한 응답 형식
+  console.warn('예상치 못한 메모 응답 형식:', data);
+  return [];
 }
 
 /** 특정 메모 조회 (GET /memos/:memoId) */
