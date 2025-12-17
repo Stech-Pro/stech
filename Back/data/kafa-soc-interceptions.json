@@ -1,0 +1,339 @@
+{
+  "statType": "interceptions",
+  "statName": "INTERCEPTIONS",
+  "league": "soc",
+  "crawledAt": "2025-12-16T06:00:13.124Z",
+  "totalCount": 33,
+  "players": [
+    {
+      "rank": 1,
+      "playerName": "스위프트(Gregg Swift)",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 3,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 2,
+      "playerName": "임준형",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 21,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 3,
+      "playerName": "김승혁",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 19,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 4,
+      "playerName": "현성준",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 20,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 5,
+      "playerName": "강대련",
+      "university": "인천 라이노스",
+      "jerseyNumber": 39,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 6,
+      "playerName": "안준호",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 93,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 7,
+      "playerName": "황윤경",
+      "university": "군위 피닉스",
+      "jerseyNumber": 0,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 8,
+      "playerName": "정기훈",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 38,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 9,
+      "playerName": "김용환",
+      "university": "군위 피닉스",
+      "jerseyNumber": 2,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 10,
+      "playerName": "문형원",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 2,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 11,
+      "playerName": "김봉재",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 17,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 12,
+      "playerName": "김한주",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 88,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 13,
+      "playerName": "양두열",
+      "university": "군위 피닉스",
+      "jerseyNumber": 3,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 14,
+      "playerName": "김상진",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 24,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 15,
+      "playerName": "박경균",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 3,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 16,
+      "playerName": "이준기",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 52,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 17,
+      "playerName": "김도헌",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 10,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 18,
+      "playerName": "우제욱",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 44,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 19,
+      "playerName": "다리우스 (Darius)",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 5,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 20,
+      "playerName": "김희준",
+      "university": "인천 라이노스",
+      "jerseyNumber": 25,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 21,
+      "playerName": "김광록",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 6,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 22,
+      "playerName": "이상윤",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 14,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 23,
+      "playerName": "박영화",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 15,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 24,
+      "playerName": "배용희",
+      "university": "군위 피닉스",
+      "jerseyNumber": 99,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 25,
+      "playerName": "민홍",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 7,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 26,
+      "playerName": "윤석규",
+      "university": "인천 라이노스",
+      "jerseyNumber": 43,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 27,
+      "playerName": "김도헌",
+      "university": "인천 라이노스",
+      "jerseyNumber": 36,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 28,
+      "playerName": "정승훈",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 33,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 29,
+      "playerName": "조지훈",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 4,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 30,
+      "playerName": "권용빈",
+      "university": "군위 피닉스",
+      "jerseyNumber": 27,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 31,
+      "playerName": "이찬우",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 2,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 32,
+      "playerName": "최종현",
+      "university": "인천 라이노스",
+      "jerseyNumber": 6,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    },
+    {
+      "rank": 33,
+      "playerName": "황준근",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 36,
+      "interceptions": 0,
+      "returnYards": 0,
+      "touchdowns": 0,
+      "longest": 0
+    }
+  ]
+}

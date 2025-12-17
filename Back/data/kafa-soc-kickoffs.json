@@ -1,0 +1,129 @@
+{
+  "statType": "kickoffs",
+  "statName": "KICKOFFS",
+  "league": "soc",
+  "crawledAt": "2025-12-16T06:00:16.071Z",
+  "totalCount": 12,
+  "players": [
+    {
+      "rank": 1,
+      "playerName": "김상진",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 24,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 2,
+      "playerName": "이기태",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 22,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 3,
+      "playerName": "최경서",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 8,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 4,
+      "playerName": "소윤호",
+      "university": "인천 라이노스",
+      "jerseyNumber": 65,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 5,
+      "playerName": "황미륵",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 99,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 6,
+      "playerName": "김세종",
+      "university": "군위 피닉스",
+      "jerseyNumber": 16,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 7,
+      "playerName": "박준수",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 57,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 8,
+      "playerName": "김주오",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 97,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 9,
+      "playerName": "이준기",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 52,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 10,
+      "playerName": "인천 라이노스 ??번 김연준",
+      "university": "미상",
+      "jerseyNumber": 0,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 11,
+      "playerName": "이지원",
+      "university": "군위 피닉스",
+      "jerseyNumber": 1,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    },
+    {
+      "rank": 12,
+      "playerName": "한규철",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 22,
+      "kickoffs": 0,
+      "yards": 0,
+      "touchbacks": 0,
+      "average": 0
+    }
+  ]
+}

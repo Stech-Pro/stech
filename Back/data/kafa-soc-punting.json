@@ -1,0 +1,163 @@
+{
+  "statType": "punting",
+  "statName": "PUNTING",
+  "league": "soc",
+  "crawledAt": "2025-12-16T06:00:19.290Z",
+  "totalCount": 14,
+  "players": [
+    {
+      "rank": 1,
+      "playerName": "말릭 (Malik)",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 7,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 2,
+      "playerName": "김주오",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 97,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 3,
+      "playerName": "박준수",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 57,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 4,
+      "playerName": "이준기",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 52,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 5,
+      "playerName": "황미륵",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 99,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 6,
+      "playerName": "염준석",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 16,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 7,
+      "playerName": "백용주",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 10,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 8,
+      "playerName": "이정규",
+      "university": "인천 라이노스",
+      "jerseyNumber": 24,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 9,
+      "playerName": "이민우",
+      "university": "군위 피닉스",
+      "jerseyNumber": 9,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 10,
+      "playerName": "강대련",
+      "university": "인천 라이노스",
+      "jerseyNumber": 39,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 11,
+      "playerName": "최경서",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 8,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 12,
+      "playerName": "김세종",
+      "university": "군위 피닉스",
+      "jerseyNumber": 16,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 13,
+      "playerName": "Donovan Lee Hunt",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 15,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 14,
+      "playerName": "이규호",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 59,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    }
+  ]
+}
