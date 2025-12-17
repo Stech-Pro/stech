@@ -10,6 +10,7 @@ import {
   putToS3,
 } from '../api/videoUploadAPI';
 import DateTimeDropdown from './DateTimeDropdown.js';
+import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -17,6 +18,17 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const KST = 'Asia/Seoul';
+
+// 업로드 전용 토스트 옵션
+const UPLOAD_TOAST_OPTIONS = {
+  position: 'bottom-right',
+  style: {
+    fontSize: '18px',
+    padding: '20px 28px',
+    minWidth: '320px',
+    fontWeight: '500',
+  },
+};
 
 /* ───────── 파일 미리보기 유틸 ───────── */
 function formatBytes(bytes = 0) {
@@ -378,6 +390,13 @@ const UploadVideoModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // 업로드 진행 상태
+  const [uploadProgress, setUploadProgress] = useState({
+    show: false,
+    message: '',
+    type: 'loading' // 'loading' | 'success' | 'error'
+  });
+
   const closePreviewVideos = () => {
     document.querySelectorAll('.fpm-video').forEach((v) => v?.pause?.());
   };
@@ -499,6 +518,7 @@ const UploadVideoModal = ({
 
     try {
       setLoading(true);
+      setUploadProgress({ show: true, message: '영상 업로드를 준비하고 있습니다...', type: 'loading' });
 
       const d = dayjs(matchDate).tz(KST);
       const DOW = ['일', '월', '화', '수', '목', '금', '토'];
@@ -515,7 +535,7 @@ const UploadVideoModal = ({
         // 기본 로직: 앞 두 글자 (예: 'GCF' -> 'GC', 'seoulVI' -> 'SE'였던 것을 위에서 처리)
         return String(teamId).slice(0, 2).toUpperCase();
       };
-      
+
       const homeCode = getTeamCode(home.id);
       const awayCode = getTeamCode(away.id);
 
@@ -537,6 +557,7 @@ const UploadVideoModal = ({
       };
 
       // 1) 업로드 준비
+      setUploadProgress({ show: true, message: '서버에 업로드 준비 중...', type: 'loading' });
       const prep = await prepareMatchUpload({
         gameKey,
         gameInfo,
@@ -568,7 +589,13 @@ const UploadVideoModal = ({
       });
       if (pairs.length === 0) throw new Error('업로드할 파일/URL이 없습니다.');
 
+      // 🔔 S3 업로드 시작
+      const totalFiles = pairs.length;
+      setUploadProgress({ show: true, message: '영상 업로드 중... 0%', type: 'loading' });
+
       const batchSize = 3;
+      let uploadedCount = 0;
+
       for (let i = 0; i < pairs.length; i += batchSize) {
         const batch = pairs.slice(i, i + batchSize);
 
@@ -582,6 +609,11 @@ const UploadVideoModal = ({
           ),
         );
 
+        // 업로드 진행 상황 업데이트
+        uploadedCount += batch.filter((_, idx) => first[idx].status === 'fulfilled').length;
+        const percentage = Math.round((uploadedCount / totalFiles) * 100);
+        setUploadProgress({ show: true, message: `영상 업로드 중... ${percentage}%`, type: 'loading' });
+
         // 실패만 2차 재시도
         const retryTargets = batch.filter((_, idx) => first[idx].status === 'rejected');
         if (retryTargets.length) {
@@ -593,6 +625,13 @@ const UploadVideoModal = ({
               }),
             ),
           );
+
+          // 재시도 후 성공한 파일 카운트 추가
+          const retrySuccessCnt = second.filter((r) => r.status === 'fulfilled').length;
+          uploadedCount += retrySuccessCnt;
+          const percentage = Math.round((uploadedCount / totalFiles) * 100);
+          setUploadProgress({ show: true, message: `영상 업로드 중... ${percentage}%`, type: 'loading' });
+
           const failCnt = second.filter((r) => r.status === 'rejected').length;
           if (failCnt) {
             console.error('S3 업로드 실패 배치:', { batch, first, second });
@@ -602,6 +641,8 @@ const UploadVideoModal = ({
       }
 
       // 3) 완료 보고
+      setUploadProgress({ show: true, message: '업로드 완료 처리 중...', type: 'loading' });
+
       const uploadedVideos = {
         Q1: (uploadUrls.Q1 || []).map((u) => u.fileName),
         Q2: (uploadUrls.Q2 || []).map((u) => u.fileName),
@@ -611,10 +652,23 @@ const UploadVideoModal = ({
 
       await completeMatchUpload({ gameKey, uploadedVideos }, { timeoutMs: 120000 });
 
-      onUploaded?.();
-      handleClose();
+      // 🎉 업로드 성공
+      setUploadProgress({ show: true, message: '영상 업로드가 완료되었습니다!', type: 'success' });
+
+      setTimeout(() => {
+        setUploadProgress({ show: false, message: '', type: 'loading' });
+        onUploaded?.();
+        handleClose();
+      }, 2000);
     } catch (err) {
-      setError(err?.message || '업로드 중 오류가 발생했습니다.');
+      // ❌ 업로드 실패
+      const errorMsg = err?.message || '업로드 중 오류가 발생했습니다.';
+      setUploadProgress({ show: true, message: errorMsg, type: 'error' });
+      setError(errorMsg);
+
+      setTimeout(() => {
+        setUploadProgress({ show: false, message: '', type: 'loading' });
+      }, 5000);
     } finally {
       setLoading(false);
     }
@@ -624,7 +678,48 @@ const UploadVideoModal = ({
 
   return (
     <div className="uvm-overlay" onClick={handleClose}>
-      <div className="uvm-card" onClick={(e) => e.stopPropagation()}>
+      <div className="uvm-card" onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
+
+        {/* 업로드 진행 상황 토스트 */}
+        {uploadProgress.show && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '24px',
+              right: '24px',
+              backgroundColor: uploadProgress.type === 'success' ? '#10b981' : uploadProgress.type === 'error' ? '#ef4444' : '#3b82f6',
+              color: 'white',
+              padding: '20px 28px',
+              borderRadius: '12px',
+              fontSize: '18px',
+              fontWeight: '600',
+              minWidth: '320px',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.3)',
+              zIndex: 1000,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              animation: 'slideInRight 0.3s ease-out',
+            }}
+          >
+            {uploadProgress.type === 'loading' && (
+              <div
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  border: '3px solid rgba(255, 255, 255, 0.3)',
+                  borderTopColor: 'white',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                }}
+              />
+            )}
+            {uploadProgress.type === 'success' && <span style={{ fontSize: '24px' }}>✓</span>}
+            {uploadProgress.type === 'error' && <span style={{ fontSize: '24px' }}>✕</span>}
+            <span>{uploadProgress.message}</span>
+          </div>
+        )}
+
         {/* 상단: 로고 + 닫기 */}
         <div className="uvm-topbar">
           <div className="uvm-topbar-col1" />

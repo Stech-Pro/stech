@@ -720,3 +720,24 @@
   -moz-appearance: textfield;
   appearance: textfield; /* 신규 브라우저 */
 }
+
+/* 업로드 토스트 애니메이션 */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
