@@ -1,224 +1,137 @@
-import StatPlayer from '../../../../../components/Stat/StatPlayer';
-import { TEAMS, TEAM_BY_ID} from '../../../../../data/TEAMS';
+import StatPosition from '../../../../../components/Stat/StatPosition';
+import { TEAMS } from '../../../../../data/TEAMS';
 import { useState, useEffect } from 'react';
-import { API_CONFIG } from '../../../../../config/api';
+import { getKafaStats } from '../../../../../api/kafaStatsAPI';
+import { transformKafaToStatPlayer } from '../../../../../utils/kafaDataTransformer';
+import toast from 'react-hot-toast';
 
 const LeaguePositionPage = () => {
-  const [data, setData] = useState([]);
+  const [transformedData, setTransformedData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchPlayers = async () => {
+    const fetchAndTransformKafaData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_CONFIG.BASE_URL}/player/rankings`);
-        const result = await response.json();
-        console.log('🐛 선수 데이터 API 응답:', result);
+        setError(null);
 
-        if (result.success && result.data) {
-          const transformedData = [];
+        // KAFA 통계 타입들 (API에서 사용하는 영어 타입)
+        const statTypes = [
+          'rushing',
+          'passing',
+          'receiving',
+          'fumbles',
+          'tackles',
+          'interceptions',
+          'fieldgoals',
+          'kickoffs',
+          'kickoffreturns',
+          'punting',
+          'puntreturns'
+        ];
 
-          result.data.forEach((player, index) => {
-            // 팀명 매핑
-            const frontendTeamName = TEAM_BY_ID[player.teamName];
-            // 백엔드에서 이미 포지션별로 분리된 선수 데이터 처리
-            const playerData = {
-              id: player._id,
-              rank: index + 1,
-              name: player.name,
-              team: frontendTeamName?.name || player.teamName,
-              position: player.position, // 현재 표시할 포지션
-              positions: player.positions, // 전체 포지션 목록
-              primaryPosition: player.primaryPosition,
-              division: '1부',
+        // 모든 데이터를 statType별로 저장
+        const dataByStatType = {};
 
-              // 게임 스탯
-              games: player.stats?.gamesPlayed || 0,
+        // 대학 리그(uni)와 사회인 리그(soc) 데이터 가져오기
+        for (const statType of statTypes) {
+          dataByStatType[statType] = [];
 
-              // QB 패스 스탯
-              passing_attempts: player.stats?.passingAttempts || 0,
-              pass_completions: player.stats?.passingCompletions || 0,
-              completion_percentage: player.stats?.completionPercentage || 0,
-              passing_yards: player.stats?.passingYards || 0,
-              passing_td: player.stats?.passingTouchdowns || 0,
-              interceptions:
-                player.stats?.passingInterceptions ||
-                player.stats?.interceptions ||
-                0,
-              longest_pass: player.stats?.longestPass || 0,
-              sacks: player.stats?.sacks || 0,
+          try {
+            // 대학 리그 데이터
+            const uniResult = await getKafaStats('uni', statType);
+            console.log(`📊 KAFA uni ${statType} 응답:`, uniResult);
 
-              // 러싱 스탯 (포지션별 구분)
-              rushing_attempts:
-                player.stats?.rbRushingAttempts ||
-                player.stats?.wrRushingAttempts ||
-                player.stats?.teRushingAttempts ||
-                player.stats?.rushingAttempts ||
-                0,
-              rushing_yards:
-                player.stats?.rbRushingYards ||
-                player.stats?.wrRushingYards ||
-                player.stats?.teRushingYards ||
-                player.stats?.rushingYards ||
-                0,
-              yards_per_carry:
-                player.stats?.rbYardsPerCarry ||
-                player.stats?.wrYardsPerCarry ||
-                player.stats?.teYardsPerCarry ||
-                player.stats?.yardsPerCarry ||
-                0,
-              rushing_td:
-                player.stats?.rbRushingTouchdowns ||
-                player.stats?.wrRushingTouchdowns ||
-                player.stats?.teRushingTouchdowns ||
-                player.stats?.rushingTouchdowns ||
-                0,
-              longest_rushing:
-                player.stats?.rbLongestRush ||
-                player.stats?.wrLongestRush ||
-                player.stats?.teLongestRush ||
-                player.stats?.longestRush ||
-                0,
+            if (uniResult?.success && uniResult.data?.players && Array.isArray(uniResult.data.players)) {
+              console.log(`✅ uni ${statType}: ${uniResult.data.players.length}명 추가`);
+              dataByStatType[statType].push(...uniResult.data.players);
+            } else if (uniResult?.success && Array.isArray(uniResult.data)) {
+              console.log(`✅ uni ${statType}: ${uniResult.data.length}명 추가`);
+              dataByStatType[statType].push(...uniResult.data);
+            }
+          } catch (err) {
+            console.warn(`❌ KAFA uni ${statType} 실패:`, err.message);
+          }
 
-              // 리시빙 스탯 (포지션별 구분)
-              targets:
-                player.stats?.rbReceivingTargets ||
-                player.stats?.wrReceivingTargets ||
-                player.stats?.teReceivingTargets ||
-                player.stats?.receivingTargets ||
-                0,
-              receptions:
-                player.stats?.rbReceptions ||
-                player.stats?.wrReceptions ||
-                player.stats?.teReceptions ||
-                player.stats?.receptions ||
-                0,
-              receiving_yards:
-                player.stats?.rbReceivingYards ||
-                player.stats?.wrReceivingYards ||
-                player.stats?.teReceivingYards ||
-                player.stats?.receivingYards ||
-                0,
-              yards_per_catch:
-                player.stats?.rbYardsPerReception ||
-                player.stats?.wrYardsPerReception ||
-                player.stats?.teYardsPerReception ||
-                player.stats?.yardsPerReception ||
-                0,
-              receiving_td:
-                player.stats?.rbReceivingTouchdowns ||
-                player.stats?.wrReceivingTouchdowns ||
-                player.stats?.teReceivingTouchdowns ||
-                player.stats?.receivingTouchdowns ||
-                0,
-              longest_reception:
-                player.stats?.rbLongestReception ||
-                player.stats?.wrLongestReception ||
-                player.stats?.teLongestReception ||
-                player.stats?.longestReception ||
-                0,
-              receiving_first_downs:
-                player.stats?.rbReceivingFirstDowns ||
-                player.stats?.wrReceivingFirstDowns ||
-                player.stats?.teReceivingFirstDowns ||
-                player.stats?.receivingFirstDowns ||
-                0,
+          try {
+            // 사회인 리그 데이터
+            const socResult = await getKafaStats('soc', statType);
+            console.log(`📊 KAFA soc ${statType} 응답:`, socResult);
 
-              // 수비 스탯 (tackles와 sacks는 QB용과 수비용 통합)
-              tackles: player.stats?.tackles || 0,
-              fumbles: player.stats?.fumbles || 0,
-              fumbles_lost: player.stats?.fumblesLost || 0,
-
-              // 패스/런별 펌블 스탯 (포지션별 구분)
-              passingFumbles: player.stats?.passingFumbles || 0,
-              rushingFumbles: player.stats?.rushingFumbles || 0,
-              passingFumblesLost: player.stats?.passingFumblesLost || 0,
-              rushingFumblesLost: player.stats?.rushingFumblesLost || 0,
-
-              // 스페셜 팀 스탯
-              kick_returns: player.stats?.kickReturns || 0,
-              kick_return_yards: player.stats?.kickReturnYards || 0,
-              yards_per_kick_return: player.stats?.yardsPerKickReturn || 0,
-              punt_returns: player.stats?.puntReturns || 0,
-              punt_return_yards: player.stats?.puntReturnYards || 0,
-              yards_per_punt_return: player.stats?.yardsPerPuntReturn || 0,
-              return_td: player.stats?.returnTouchdowns || 0,
-
-              // 키커 스탯
-              extra_points_attempted: player.stats?.extraPointsAttempted || 0,
-              extra_points_made: player.stats?.extraPointsMade || 0,
-              field_goal: `${player.stats?.fieldGoalsMade || 0}-${
-                player.stats?.fieldGoalsAttempted || 0
-              }`,
-              field_goal_percentage: player.stats?.fieldGoalPercentage || 0,
-
-              longest_field_goal: player.stats?.longestFieldGoal || 0,
-
-              // 펀터 스탯
-              punt_count: player.stats?.puntCount || 0,
-              punt_yards: player.stats?.puntYards || 0,
-              average_punt_yard: player.stats?.averagePuntYard || 0,
-              longest_punt: player.stats?.longestPunt || 0,
-              touchbacks: player.stats?.touchbacks || 0,
-              touchback_percentage: player.stats?.touchbackPercentage || 0,
-              inside20: player.stats?.inside20 || 0,
-              inside20_percentage: player.stats?.inside20Percentage || 0,
-
-              // OL 스탯
-              penalties: player.stats?.penalties || 0,
-              sacks_allowed: player.stats?.sacksAllowed || 0,
-
-              // 수비 스탯 (DL, LB, DB 공통)
-              TFL: player.stats?.tfl || 0,
-              forced_fumbles: player.stats?.forcedFumbles || 0,
-              fumble_recovery: player.stats?.fumbleRecoveries || 0,
-              fumble_recovered_yards: player.stats?.fumbleRecoveryYards || 0,
-              pass_defended: player.stats?.passesDefended || 0,
-              interception_yards: player.stats?.interceptionYards || 0,
-              touchdowns: player.stats?.defensiveTouchdowns || 0,
-            };
-
-            transformedData.push(playerData);
-
-            console.log(
-              `🐛 선수 데이터: ${player.name} - 포지션: ${
-                player.position
-              } (전체: ${player.positions?.join(', ')})`,
-            );
-          });
-
-          console.log(
-            `🐛 변환된 선수 데이터 ${transformedData.length}명:`,
-            transformedData.slice(0, 2),
-          );
-          console.log('🐛 첫 5명 선수 팀명:', transformedData.slice(0, 5).map(p => p.team));
-          setData(transformedData);
-        } else {
-          throw new Error('Failed to fetch player data');
+            if (socResult?.success && socResult.data?.players && Array.isArray(socResult.data.players)) {
+              console.log(`✅ soc ${statType}: ${socResult.data.players.length}명 추가`);
+              dataByStatType[statType].push(...socResult.data.players);
+            } else if (socResult?.success && Array.isArray(socResult.data)) {
+              console.log(`✅ soc ${statType}: ${socResult.data.length}명 추가`);
+              dataByStatType[statType].push(...socResult.data);
+            }
+          } catch (err) {
+            console.warn(`❌ KAFA soc ${statType} 실패:`, err.message);
+          }
         }
+
+        console.log('📋 dataByStatType:', dataByStatType);
+
+        // 각 리그별로 데이터 변환
+        const transformedByLeague = {
+          '서울': transformKafaToStatPlayer(dataByStatType, '서울'),
+          '경기강원': transformKafaToStatPlayer(dataByStatType, '경기강원'),
+          '대구경북': transformKafaToStatPlayer(dataByStatType, '대구경북'),
+          '부산경남': transformKafaToStatPlayer(dataByStatType, '부산경남'),
+          '사회인': transformKafaToStatPlayer(dataByStatType, '사회인'),
+        };
+
+        console.log('🔄 변환된 데이터:', transformedByLeague);
+        setTransformedData(transformedByLeague);
+
       } catch (err) {
-        console.error('Error fetching players:', err);
+        console.error('❌ KAFA 데이터 로딩 실패:', err);
         setError(err.message);
+        toast.error(err.message || 'KAFA 통계 데이터 로딩 실패');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPlayers();
+    fetchAndTransformKafaData();
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div style={{
+        padding: '40px',
+        textAlign: 'center',
+        fontSize: '18px',
+        color: '#666'
+      }}>
+        🔄 KAFA 통계 데이터를 불러오는 중...
+      </div>
+    );
   }
 
   if (error) {
-    return <StatPlayer teams={TEAMS} />;
+    return (
+      <div style={{
+        padding: '40px',
+        textAlign: 'center',
+      }}>
+        <div style={{ fontSize: '18px', color: '#d63031', marginBottom: '16px' }}>
+          ⚠️ 데이터를 불러오지 못했습니다
+        </div>
+        <div style={{ fontSize: '14px', color: '#666', marginBottom: '24px' }}>
+          {error}
+        </div>
+        <div style={{ fontSize: '14px', color: '#666' }}>
+          Admin 페이지에서 KAFA 크롤링을 먼저 실행해주세요.
+        </div>
+      </div>
+    );
   }
 
   return (
     <div>
-      <StatPlayer teams={TEAMS} />
+      <StatPosition data={transformedData} teams={TEAMS} />
     </div>
   );
 };
