@@ -2090,50 +2090,63 @@ export class KafaStatsService {
         8: 'interceptions',
         9: 'longestPass'
       },
-      3: { // 개인 리시빙
+      3: { // 개인 리시빙 (REC, REC YDS, YDS/ATT, TD, LNG)
         2: 'receptions',
         3: 'receivingYards', 
         4: 'yardsPerReception',
-        5: 'targets',
-        6: 'touchdowns',
-        7: 'longestReception'
+        5: 'touchdowns',
+        6: 'longestReception'
       },
-      4: { // 개인 태클
+      4: { // 개인 펌블 (FF, FR, FR TD)
+        2: 'forcedFumbles',
+        3: 'fumbleRecoveries', 
+        4: 'fumbleRecoveryTDs'
+      },
+      5: { // 개인 태클 (ATT, SACK, SOLO, COMBO)
         2: 'totalTackles',
-        3: 'soloTackles',
-        4: 'assistTackles',
-        5: 'tacklesForLoss'
+        3: 'sacks',
+        4: 'soloTackles',
+        5: 'assistTackles'
       },
-      5: { // 개인 인터셉션
+      6: { // 개인 인터셉션 (INT, INT TD, INT YDS, LNG)
         2: 'interceptions',
-        3: 'interceptionYards',
-        4: 'touchdowns',
+        3: 'touchdowns',
+        4: 'interceptionYards',
         5: 'longestReturn'
       },
-      6: { // 개인 색
-        2: 'sacks',
-        3: 'sackYards',
-        4: 'qbHurries',
-        5: 'passesDefended'
-      },
-      7: { // 개인 킥킹
+      7: { // 개인 킥킹 (FG%, YDS AVG, FGM, ATT, YDS, LNG)
         2: 'fieldGoalPercentage',
         3: 'averageDistance',
         4: 'fieldGoalsMade',
         5: 'fieldGoalsAttempted',
-        6: 'longestMade'
+        6: 'totalYards',
+        7: 'longestMade'
       },
-      8: { // 개인 펀팅
+      8: { // 개인 킥오프 (YDS AVG, KO, YDS, TD, LNG)
+        2: 'averageDistance',
+        3: 'kickoffs',
+        4: 'yards',
+        5: 'touchdowns',
+        6: 'longest'
+      },
+      9: { // 개인 킥오프 리턴 (YDS AVG, KO RETURNS, YDS, TD, LNG)
+        2: 'yardsPerReturn',
+        3: 'returns',
+        4: 'returnYards',
+        5: 'touchdowns',
+        6: 'longestReturn'
+      },
+      10: { // 개인 펀팅 (YDS AVG, PUNTS, YDS, TD, LNG)
         2: 'averageDistance',
         3: 'totalPunts',
         4: 'totalYards',
-        5: 'inside20',
+        5: 'touchdowns',
         6: 'longestPunt'
       },
-      9: { // 개인 리턴
-        2: 'returns',
-        3: 'returnYards',
-        4: 'yardsPerReturn',
+      11: { // 개인 펀트 리턴 (YDS AVG, PUNT RETURNS, YDS, TD, LNG)
+        2: 'yardsPerReturn',
+        3: 'returns',
+        4: 'returnYards',
         5: 'touchdowns',
         6: 'longestReturn'
       }
@@ -2650,11 +2663,11 @@ export class KafaStatsService {
     switch (statKey) {
       case 'rushing':
         return {
-          rushingYards: player.rushYards || 0,
+          rushingYards: player.rushingYards || 0,
           yardsPerAttempt: player.yardsPerAttempt || 0,
           attempts: player.attempts || 0,
           touchdowns: player.touchdowns || 0,
-          longest: player.longest || 0
+          longest: player.longestRush || 0
         };
       
       case 'passing':
@@ -2664,7 +2677,9 @@ export class KafaStatsService {
           passingYards: player.passingYards || 0,
           touchdowns: player.touchdowns || 0,
           interceptions: player.interceptions || 0,
-          rating: player.rating || 0
+          longest: player.longestPass || 0,
+          yardsPerAttempt: player.yardsPerAttempt || 0,
+          completionPercentage: player.completionPercentage || 0
         };
       
       case 'receiving':
@@ -2672,75 +2687,77 @@ export class KafaStatsService {
           receptions: player.receptions || 0,
           receivingYards: player.receivingYards || 0,
           touchdowns: player.touchdowns || 0,
-          longest: player.longest || 0,
+          longest: player.longestReception || 0,
           yardsPerReception: player.yardsPerReception || 0
         };
       
       case 'fumbles':
         return {
-          fumbles: player.fumbles || 0,
-          lost: player.lost || 0,
-          recovered: player.recovered || 0
+          forcedFumbles: player.forcedFumbles || 0,
+          fumbleRecoveries: player.fumbleRecoveries || 0,
+          fumbleRecoveryTDs: player.fumbleRecoveryTDs || 0
         };
       
       case 'tackles':
         return {
           totalTackles: player.totalTackles || 0,
+          sacks: player.sacks || 0,
           soloTackles: player.soloTackles || 0,
-          assistTackles: player.assistTackles || 0,
-          tacklesForLoss: player.tacklesForLoss || 0
+          assistTackles: player.assistTackles || 0
         };
       
       case 'interceptions':
         return {
           interceptions: player.interceptions || 0,
-          returnYards: player.returnYards || 0,
           touchdowns: player.touchdowns || 0,
-          longest: player.longest || 0
+          returnYards: player.interceptionYards || 0,
+          longest: player.longestReturn || 0
         };
       
       case 'fieldgoals':
         return {
-          made: player.made || 0,
-          attempts: player.attempts || 0,
-          percentage: player.percentage || 0,
-          longest: player.longest || 0,
-          blocked: player.blocked || 0
+          percentage: player.fieldGoalPercentage || 0,
+          averageDistance: player.averageDistance || 0,
+          fieldGoalsMade: player.fieldGoalsMade || 0,
+          fieldGoalsAttempted: player.fieldGoalsAttempted || 0,
+          totalYards: player.totalYards || 0,
+          longest: player.longestMade || 0
         };
       
       case 'kickoffs':
         return {
+          averageDistance: player.averageDistance || 0,
           kickoffs: player.kickoffs || 0,
           yards: player.yards || 0,
-          touchbacks: player.touchbacks || 0,
-          average: player.average || 0
+          touchdowns: player.touchdowns || 0,
+          longest: player.longest || 0
         };
       
       case 'kickoffreturns':
         return {
+          average: player.yardsPerReturn || 0,
           returns: player.returns || 0,
           returnYards: player.returnYards || 0,
           touchdowns: player.touchdowns || 0,
-          longest: player.longest || 0,
-          average: player.average || 0
+          longest: player.longestReturn || 0
         };
       
       case 'punting':
         return {
-          punts: player.punts || 0,
-          yards: player.yards || 0,
-          average: player.average || 0,
-          longest: player.longest || 0,
-          blocked: player.blocked || 0
+          average: player.averageDistance || 0,
+          punts: player.totalPunts || 0,
+          yards: player.totalYards || 0,
+          touchdowns: player.touchdowns || 0,
+          longest: player.longestPunt || 0
         };
       
       case 'puntreturns':
         return {
+          average: player.yardsPerReturn || 0,
           returns: player.returns || 0,
           returnYards: player.returnYards || 0,
           touchdowns: player.touchdowns || 0,
-          longest: player.longest || 0,
-          average: player.average || 0
+          longest: player.longestReturn || 0
         };
       
       default:
