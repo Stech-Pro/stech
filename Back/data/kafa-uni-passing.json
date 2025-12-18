@@ -2,7 +2,7 @@
   "statType": "passing",
   "statName": "PASSING",
   "league": "uni",
-  "crawledAt": "2025-12-16T05:53:02.763Z",
+  "crawledAt": "2025-12-18T04:39:32.188Z",
   "totalCount": 50,
   "players": [
     {
@@ -199,18 +199,6 @@
     },
     {
       "rank": 17,
-      "playerName": "변지성",
-      "university": "성균관대학교",
-      "jerseyNumber": 1,
-      "completions": 15,
-      "attempts": 55,
-      "passingYards": 176,
-      "touchdowns": 0,
-      "interceptions": 6,
-      "rating": 0
-    },
-    {
-      "rank": 18,
       "playerName": "김민우",
       "university": "대구한의대학교",
       "jerseyNumber": 19,
@@ -219,6 +207,18 @@
       "passingYards": 176,
       "touchdowns": 1,
       "interceptions": 1,
+      "rating": 0
+    },
+    {
+      "rank": 18,
+      "playerName": "변지성",
+      "university": "성균관대학교",
+      "jerseyNumber": 1,
+      "completions": 15,
+      "attempts": 55,
+      "passingYards": 176,
+      "touchdowns": 0,
+      "interceptions": 6,
       "rating": 0
     },
     {
@@ -547,18 +547,6 @@
     },
     {
       "rank": 46,
-      "playerName": "서한솔",
-      "university": "부산외국어대학교",
-      "jerseyNumber": 4,
-      "completions": 1,
-      "attempts": 1,
-      "passingYards": 10,
-      "touchdowns": 0,
-      "interceptions": 0,
-      "rating": 0
-    },
-    {
-      "rank": 47,
       "playerName": "김민석",
       "university": "경일대학교",
       "jerseyNumber": 91,
@@ -570,7 +558,7 @@
       "rating": 0
     },
     {
-      "rank": 48,
+      "rank": 47,
       "playerName": "이재호",
       "university": "동국대학교",
       "jerseyNumber": 7,
@@ -579,6 +567,18 @@
       "passingYards": 10,
       "touchdowns": 0,
       "interceptions": 2,
+      "rating": 0
+    },
+    {
+      "rank": 48,
+      "playerName": "서한솔",
+      "university": "부산외국어대학교",
+      "jerseyNumber": 4,
+      "completions": 1,
+      "attempts": 1,
+      "passingYards": 10,
+      "touchdowns": 0,
+      "interceptions": 0,
       "rating": 0
     },
     {
@@ -595,14 +595,14 @@
     },
     {
       "rank": 50,
-      "playerName": "조윤수",
-      "university": "한림대학교",
-      "jerseyNumber": 15,
-      "completions": 2,
-      "attempts": 12,
+      "playerName": "이예승",
+      "university": "부산외국어대학교",
+      "jerseyNumber": 9,
+      "completions": 5,
+      "attempts": 18,
       "passingYards": 7,
-      "touchdowns": 0,
-      "interceptions": 1,
+      "touchdowns": 1,
+      "interceptions": 0,
       "rating": 0
     }
   ]
