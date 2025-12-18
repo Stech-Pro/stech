@@ -2,14 +2,14 @@
   "statType": "punting",
   "statName": "PUNTING",
   "league": "uni",
-  "crawledAt": "2025-12-16T05:53:21.399Z",
+  "crawledAt": "2025-12-18T04:39:49.833Z",
   "totalCount": 50,
   "players": [
     {
       "rank": 1,
-      "playerName": "윤제혁",
-      "university": "울산대학교",
-      "jerseyNumber": 44,
+      "playerName": "유동윤",
+      "university": "경일대학교",
+      "jerseyNumber": 18,
       "punts": 0,
       "yards": 0,
       "average": 0,
@@ -18,9 +18,9 @@
     },
     {
       "rank": 2,
-      "playerName": "유동윤",
-      "university": "경일대학교",
-      "jerseyNumber": 18,
+      "playerName": "윤제혁",
+      "university": "울산대학교",
+      "jerseyNumber": 44,
       "punts": 0,
       "yards": 0,
       "average": 0,
@@ -315,6 +315,17 @@
     },
     {
       "rank": 29,
+      "playerName": "김찬희",
+      "university": "용인대학교",
+      "jerseyNumber": 55,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 30,
       "playerName": "방정현",
       "university": "한국해양대학교",
       "jerseyNumber": 91,
@@ -325,21 +336,10 @@
       "blocked": 0
     },
     {
-      "rank": 30,
+      "rank": 31,
       "playerName": "김진혁",
       "university": "서울대학교",
       "jerseyNumber": 58,
-      "punts": 0,
-      "yards": 0,
-      "average": 0,
-      "longest": 0,
-      "blocked": 0
-    },
-    {
-      "rank": 31,
-      "playerName": "김찬희",
-      "university": "용인대학교",
-      "jerseyNumber": 55,
       "punts": 0,
       "yards": 0,
       "average": 0,
@@ -436,17 +436,6 @@
     },
     {
       "rank": 40,
-      "playerName": "장현성",
-      "university": "동서대학교",
-      "jerseyNumber": 7,
-      "punts": 0,
-      "yards": 0,
-      "average": 0,
-      "longest": 0,
-      "blocked": 0
-    },
-    {
-      "rank": 41,
       "playerName": "박기성",
       "university": "한동대학교",
       "jerseyNumber": 49,
@@ -457,10 +446,21 @@
       "blocked": 0
     },
     {
-      "rank": 42,
+      "rank": 41,
       "playerName": "황희재",
       "university": "경북대학교",
       "jerseyNumber": 8,
+      "punts": 0,
+      "yards": 0,
+      "average": 0,
+      "longest": 0,
+      "blocked": 0
+    },
+    {
+      "rank": 42,
+      "playerName": "장현성",
+      "university": "동서대학교",
+      "jerseyNumber": 7,
       "punts": 0,
       "yards": 0,
       "average": 0,

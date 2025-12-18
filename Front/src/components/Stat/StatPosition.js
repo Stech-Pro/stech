@@ -235,11 +235,13 @@ const STAT_COLUMNS = {
   ],
   '패스': [
     { key: 'passingYards', label: '패싱 야드' },
-    { key: 'passingCompletions', label: '패스 성공' },
-    { key: 'passingAttempts', label: '패스 시도' },
+    { key: 'avgYardsPerAttempt', label: '패스 시도당\n패싱야드' },
     { key: 'completionPercentage', label: '패스 성공률' },
+    { key: 'passingAttempts', label: '패스 시도' },
+    { key: 'passingCompletions', label: '패스 성공' },
     { key: 'passingTouchdowns', label: '패싱\n터치다운' },
     { key: 'interceptions', label: '인터셉션' },
+    { key: 'longestPass', label: '가장\n긴 패스' },
   ],
   '리시빙': [
     { key: 'receptions', label: '패스 캐치 수' },
@@ -251,28 +253,34 @@ const STAT_COLUMNS = {
   '펌블': [
     { key: 'fumbles', label: '펌블' },
     { key: 'fumblesLost', label: '펌블 턴오버' },
+    { key: 'fumbleTouchdowns', label: '펌블 터치다운' },
   ],
   '태클': [
     { key: 'tackles', label: '태클' },
+    { key: 'sacks', label: '색' },
     { key: 'soloTackles', label: '솔로 태클' },
     { key: 'assistTackles', label: '콤보 태클' },
   ],
   '인터셉션': [
     { key: 'interceptions', label: '인터셉션' },
-    { key: 'interceptionYards', label: '인터셉트 야드' },
     { key: 'interceptionTouchdowns', label: '인터셉트\n터치다운' },
+    { key: 'interceptionYards', label: '인터셉트 야드' },
     { key: 'longestInterception', label: '가장 긴\n인터셉트 야드' },
   ],
   '필드골': [
     { key: 'fieldGoalPercentage', label: '필드골 성공률' },
+    { key: 'averageFieldGoalDistance', label: '평균\n필드골 거리' },
     { key: 'fieldGoalsMade', label: '필드골 성공' },
     { key: 'fieldGoalsAttempted', label: '필드골 시도' },
+    { key: 'fieldGoalYards', label: '필드골 야드' },
     { key: 'longestFieldGoal', label: '가장\n긴 필드골' },
   ],
   '킥오프': [
     { key: 'averageKickoffYards', label: '평균 킥 야드' },
     { key: 'kickoffCount', label: '킥오프 수' },
     { key: 'kickoffYards', label: '킥오프 야드' },
+    { key: 'kickoffTouchdowns', label: '킥오프 터치다운' },
+    { key: 'longestKickoff', label: '가장\n긴 킥오프' },
   ],
   '킥 오프 리턴': [
     { key: 'averageKickReturnYards', label: '평균 킥\n리턴 야드' },
@@ -285,6 +293,7 @@ const STAT_COLUMNS = {
     { key: 'averagePuntYards', label: '평균 펀트 야드' },
     { key: 'puntCount', label: '펀트 수' },
     { key: 'puntYards', label: '펀트 야드' },
+    { key: 'puntTouchdowns', label: '펀트 터치다운' },
     { key: 'longestPunt', label: '가장\n긴 펀트' },
   ],
   '펀트 리턴': [
