@@ -188,6 +188,12 @@ const ServiceSidebar = () => {
       label: 'JSON Explorer',
       icon: <BiSolidBarChartAlt2 />,
     },
+    {
+      path: '/service/admin/kafa-scraper',
+      label: 'KAFA 크롤링',
+      icon: <BiSolidBarChartAlt2 />,
+      description: 'KAFA Stats Scraper',
+    },
   ];
 
   // Footer Items

@@ -74,6 +74,7 @@ export default function AppRouter() {
 
         <Route path="admin" element={<AdminPages.AdminLayout />}>
           <Route index element={<AdminPages.JsonEx />} />
+          <Route path="kafa-scraper" element={<AdminPages.KafaScraper />} />
           <Route path="analysis" element={<AdminPages.AnalysisLayout />} >
             <Route index element={<AdminPages.AnalysisPage />} />
             <Route path=":gameKey/clips" element={<AdminPages.AnalysisClipsPage />} />

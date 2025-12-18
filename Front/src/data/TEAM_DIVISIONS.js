@@ -54,7 +54,20 @@ export const TEAM_DIVISIONS = {
   '한국해양대학교': { region: 'Busan-Gyeongnam', division: '2부' },
   '신라대학교': { region: 'Busan-Gyeongnam', division: '2부' },
   '동서대학교': { region: 'Busan-Gyeongnam', division: '2부' },
-  '부산외국어대학교': { region: 'Busan-Gyeongnam', division: '2부' }
+  '부산외국어대학교': { region: 'Busan-Gyeongnam', division: '2부' },
+
+  // 대구경북 - 추가 팀
+  '동국대학교(경주)': { region: 'Daegu-Gyeongbuk', division: '2부' },
+  '부경대학교': { region: 'Busan-Gyeongnam', division: '2부' },
+
+  // 사회인 리그
+  '군위 피닉스': { region: 'Amateur', division: null },
+  '부산 그리폰즈': { region: 'Amateur', division: null },
+  '삼성 블루스톰': { region: 'Amateur', division: null },
+  '서울 골든이글스': { region: 'Amateur', division: null },
+  '서울 디펜더스': { region: 'Amateur', division: null },
+  '서울 바이킹스': { region: 'Amateur', division: null },
+  '인천 라이노스': { region: 'Amateur', division: null }
 };
 
 // 리전별로 팀 목록 조회 함수
