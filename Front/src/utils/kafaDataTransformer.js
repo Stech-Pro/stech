@@ -217,7 +217,7 @@ function mapPlayerFields(player, kafaStatType) {
         : 0,
       passingTouchdowns: player.touchdowns || 0,
       interceptions: player.interceptions || 0,
-      longestPass: 0, // KAFA JSON에 없음
+      longestPass: player.longest || 0,
     },
     'receiving': {
       receptions: player.receptions || 0,
@@ -227,13 +227,13 @@ function mapPlayerFields(player, kafaStatType) {
       longestReception: player.longest || 0,
     },
     'fumbles': {
-      fumbles: player.fumbles || 0,
-      fumblesLost: player.lost || 0,
-      fumbleTouchdowns: 0, // KAFA JSON에 없음
+      fumbles: player.forcedFumbles || 0,
+      fumblesLost: player.fumbleRecoveries || 0,
+      fumbleTouchdowns: player.fumbleRecoveryTDs || 0, 
     },
     'tackles': {
       tackles: player.totalTackles || 0,
-      sacks: 0, // KAFA JSON에 없음
+      sacks: player.sacks || 0,
       soloTackles: player.soloTackles || 0,
       assistTackles: player.assistTackles || 0,
     },
@@ -245,18 +245,18 @@ function mapPlayerFields(player, kafaStatType) {
     },
     'fieldgoals': {
       fieldGoalPercentage: player.percentage || 0,
-      averageFieldGoalDistance: 0, // KAFA JSON에 없음
-      fieldGoalsMade: player.made || 0,
-      fieldGoalsAttempted: player.attempts || 0,
-      fieldGoalYards: 0, // KAFA JSON에 없음
+      averageFieldGoalDistance: player.averageDistance || 0,
+      fieldGoalsMade: player.fieldGoalsMade || 0,
+      fieldGoalsAttempted: player.fieldGoalsAttempted || 0,
+      fieldGoalYards: player.totalYards || 0,
       longestFieldGoal: player.longest || 0,
     },
     'kickoffs': {
-      averageKickoffYards: player.average || 0,
+      averageKickoffYards: player.averageDistance || 0,
       kickoffCount: player.kickoffs || 0,
       kickoffYards: player.yards || 0,
-      kickoffTouchdowns: 0, // KAFA JSON에 없음
-      longestKickoff: 0, // KAFA JSON에 없음 (longest 필드는 있지만 0)
+      kickoffTouchdowns: player.touchdowns || 0,
+      longestKickoff: player.longest || 0,
     },
     'kickoffreturns': {
       averageKickReturnYards: player.average || 0,
@@ -269,7 +269,7 @@ function mapPlayerFields(player, kafaStatType) {
       averagePuntYards: player.average || 0,
       puntCount: player.punts || 0,
       puntYards: player.yards || 0,
-      puntTouchdowns: 0, // KAFA JSON에 없음
+      puntTouchdowns: player.touchdowns || 0,
       longestPunt: player.longest || 0,
     },
     'puntreturns': {
