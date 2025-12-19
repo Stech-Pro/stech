@@ -41,13 +41,10 @@ const LeaguePositionPage = () => {
           try {
             // 대학 리그 데이터
             const uniResult = await getKafaStats('uni', statType);
-            console.log(`📊 KAFA uni ${statType} 응답:`, uniResult);
 
             if (uniResult?.success && uniResult.data?.players && Array.isArray(uniResult.data.players)) {
-              console.log(`✅ uni ${statType}: ${uniResult.data.players.length}명 추가`);
               dataByStatType[statType].push(...uniResult.data.players);
             } else if (uniResult?.success && Array.isArray(uniResult.data)) {
-              console.log(`✅ uni ${statType}: ${uniResult.data.length}명 추가`);
               dataByStatType[statType].push(...uniResult.data);
             }
           } catch (err) {
@@ -57,13 +54,10 @@ const LeaguePositionPage = () => {
           try {
             // 사회인 리그 데이터
             const socResult = await getKafaStats('soc', statType);
-            console.log(`📊 KAFA soc ${statType} 응답:`, socResult);
 
             if (socResult?.success && socResult.data?.players && Array.isArray(socResult.data.players)) {
-              console.log(`✅ soc ${statType}: ${socResult.data.players.length}명 추가`);
               dataByStatType[statType].push(...socResult.data.players);
             } else if (socResult?.success && Array.isArray(socResult.data)) {
-              console.log(`✅ soc ${statType}: ${socResult.data.length}명 추가`);
               dataByStatType[statType].push(...socResult.data);
             }
           } catch (err) {
@@ -71,7 +65,6 @@ const LeaguePositionPage = () => {
           }
         }
 
-        console.log('📋 dataByStatType:', dataByStatType);
 
         // 각 리그별로 데이터 변환
         const transformedByLeague = {
@@ -82,11 +75,9 @@ const LeaguePositionPage = () => {
           '사회인': transformKafaToStatPlayer(dataByStatType, '사회인'),
         };
 
-        console.log('🔄 변환된 데이터:', transformedByLeague);
         setTransformedData(transformedByLeague);
 
       } catch (err) {
-        console.error('❌ KAFA 데이터 로딩 실패:', err);
         setError(err.message);
         toast.error(err.message || 'KAFA 통계 데이터 로딩 실패');
       } finally {
