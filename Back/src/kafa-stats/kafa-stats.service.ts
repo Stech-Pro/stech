@@ -2094,8 +2094,9 @@ export class KafaStatsService {
         2: 'receptions',
         3: 'receivingYards', 
         4: 'yardsPerReception',
-        5: 'touchdowns',
-        6: 'longestReception'
+        5: 'targets',
+        6: 'touchdowns',
+        7: 'longestReception'
       },
       4: { // 개인 펌블 (FF, FR, FR TD)
         2: 'forcedFumbles',
@@ -2688,7 +2689,8 @@ export class KafaStatsService {
           receivingYards: player.receivingYards || 0,
           touchdowns: player.touchdowns || 0,
           longest: player.longestReception || 0,
-          yardsPerReception: player.yardsPerReception || 0
+          yardsPerReception: player.yardsPerReception || 0,
+          targets: player.targets || 0
         };
       
       case 'fumbles':
