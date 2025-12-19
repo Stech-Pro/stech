@@ -117,7 +117,6 @@ function transformUniversityLeague(kafaDataByStatType, targetLeague) {
     const koreanStatType = KAFA_STAT_TYPE_TO_KOREAN[kafaStatType];
 
     if (!koreanStatType) {
-      console.warn(`Unknown KAFA stat type: ${kafaStatType}`);
       return;
     }
 
@@ -153,7 +152,6 @@ function transformSocialLeague(kafaDataByStatType) {
     const koreanStatType = KAFA_STAT_TYPE_TO_KOREAN[kafaStatType];
 
     if (!koreanStatType) {
-      console.warn(`Unknown KAFA stat type: ${kafaStatType}`);
       return;
     }
 
@@ -297,7 +295,6 @@ function groupPlayersByDivision(players, targetLeague, kafaStatType) {
     const teamInfo = TEAM_DIVISIONS[universityName];
 
     if (!teamInfo) {
-      console.warn(`Unknown university/team: ${universityName}`);
       return;
     }
 
@@ -327,10 +324,7 @@ function groupPlayersByDivision(players, targetLeague, kafaStatType) {
     }
   });
 
-  console.log(`🔍 groupPlayersByDivision - ${targetLeague} 1부: ${first.length}명, 2부: ${second.length}명`);
-  if (first.length > 0) {
-    console.log('🔍 샘플 데이터 (1부):', first[0]);
-  }
+
 
   return { first, second };
 }

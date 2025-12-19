@@ -366,26 +366,19 @@ export default function StatPosition({ teams = [], data = null }) {
     }
 
     const leagueData = data[league];
-    console.log(`🔍 getCurrentData - league: ${league}, statType: ${statType}, division: ${division}`);
-    console.log(`🔍 leagueData structure:`, Object.keys(leagueData));
+
 
     // 사회인 리그는 division이 없음
     if (league === '사회인') {
       const result = leagueData[statType] || [];
-      console.log(`🔍 사회인 ${statType} 데이터: ${result.length}명`);
-      if (result.length > 0) {
-        console.log('🔍 샘플:', result[0]);
-      }
+
       return result;
     }
 
     // 대학 리그는 division 확인
     const divisionKey = division === '1부' ? 'first' : 'second';
     const result = leagueData[divisionKey]?.[statType] || [];
-    console.log(`🔍 ${league} ${division} ${statType} 데이터: ${result.length}명`);
-    if (result.length > 0) {
-      console.log('🔍 샘플:', result[0]);
-    }
+   
     return result;
   };
 
