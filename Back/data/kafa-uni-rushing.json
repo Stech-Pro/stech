@@ -2,558 +2,1240 @@
   "statType": "rushing",
   "statName": "RUSHING",
   "league": "uni",
-  "crawledAt": "2025-12-18T04:39:30.082Z",
-  "totalCount": 50,
+  "crawledAt": "2025-12-22T17:01:01.043Z",
+  "totalCount": 112,
   "players": [
     {
       "rank": 1,
       "playerName": "김태현",
       "university": "고려대학교",
       "jerseyNumber": 25,
-      "rushingYards": 0,
+      "rushingYards": 427,
       "yardsPerAttempt": 7,
       "attempts": 61,
       "touchdowns": 4,
-      "longest": 0
+      "longest": 59
     },
     {
       "rank": 2,
       "playerName": "이효원",
       "university": "경북대학교",
       "jerseyNumber": 31,
-      "rushingYards": 0,
+      "rushingYards": 383,
       "yardsPerAttempt": 6.7,
       "attempts": 57,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 85
     },
     {
       "rank": 3,
       "playerName": "변지욱",
       "university": "경일대학교",
       "jerseyNumber": 32,
-      "rushingYards": 0,
+      "rushingYards": 382,
       "yardsPerAttempt": 6.1,
       "attempts": 63,
       "touchdowns": 3,
-      "longest": 0
+      "longest": 32
     },
     {
       "rank": 4,
       "playerName": "김민겸",
       "university": "한양대학교",
       "jerseyNumber": 26,
-      "rushingYards": 0,
+      "rushingYards": 319,
       "yardsPerAttempt": 5.1,
       "attempts": 62,
       "touchdowns": 4,
-      "longest": 0
+      "longest": 42
     },
     {
       "rank": 5,
       "playerName": "이재성",
       "university": "연세대학교",
       "jerseyNumber": 21,
-      "rushingYards": 0,
+      "rushingYards": 299,
       "yardsPerAttempt": 6.1,
       "attempts": 49,
       "touchdowns": 3,
-      "longest": 0
+      "longest": 35
     },
     {
       "rank": 6,
       "playerName": "이준상",
       "university": "연세대학교",
       "jerseyNumber": 7,
-      "rushingYards": 0,
+      "rushingYards": 286,
       "yardsPerAttempt": 6,
       "attempts": 48,
       "touchdowns": 3,
-      "longest": 0
+      "longest": 32
     },
     {
       "rank": 7,
       "playerName": "허준영",
       "university": "부산외국어대학교",
       "jerseyNumber": 19,
-      "rushingYards": 0,
+      "rushingYards": 256,
       "yardsPerAttempt": 6.9,
       "attempts": 37,
       "touchdowns": 3,
-      "longest": 0
+      "longest": 24
     },
     {
       "rank": 8,
       "playerName": "이민서",
       "university": "부산외국어대학교",
       "jerseyNumber": 1,
-      "rushingYards": 0,
+      "rushingYards": 255,
       "yardsPerAttempt": 6.9,
       "attempts": 37,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 34
     },
     {
       "rank": 9,
       "playerName": "차경훈",
       "university": "한양대학교",
       "jerseyNumber": 30,
-      "rushingYards": 0,
+      "rushingYards": 253,
       "yardsPerAttempt": 3.8,
       "attempts": 67,
       "touchdowns": 2,
-      "longest": 0
+      "longest": 30
     },
     {
       "rank": 10,
       "playerName": "김도훈",
       "university": "고려대학교",
       "jerseyNumber": 89,
-      "rushingYards": 0,
+      "rushingYards": 248,
       "yardsPerAttempt": 7.3,
       "attempts": 34,
       "touchdowns": 2,
-      "longest": 0
+      "longest": 35
     },
     {
       "rank": 11,
-      "playerName": "이기쁨",
-      "university": "강원대학교",
-      "jerseyNumber": 7,
-      "rushingYards": 0,
-      "yardsPerAttempt": 7.7,
-      "attempts": 30,
-      "touchdowns": 2,
-      "longest": 0
-    },
-    {
-      "rank": 12,
       "playerName": "서한솔",
       "university": "부산외국어대학교",
       "jerseyNumber": 4,
-      "rushingYards": 0,
+      "rushingYards": 232,
       "yardsPerAttempt": 5.4,
       "attempts": 43,
       "touchdowns": 2,
-      "longest": 0
+      "longest": 16
+    },
+    {
+      "rank": 12,
+      "playerName": "이기쁨",
+      "university": "강원대학교",
+      "jerseyNumber": 7,
+      "rushingYards": 232,
+      "yardsPerAttempt": 7.7,
+      "attempts": 30,
+      "touchdowns": 2,
+      "longest": 41
     },
     {
       "rank": 13,
       "playerName": "김재민",
       "university": "동의대학교",
       "jerseyNumber": 13,
-      "rushingYards": 0,
+      "rushingYards": 191,
       "yardsPerAttempt": 8.3,
       "attempts": 23,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 35
     },
     {
       "rank": 14,
       "playerName": "박건",
       "university": "한국해양대학교",
       "jerseyNumber": 33,
-      "rushingYards": 0,
+      "rushingYards": 190,
       "yardsPerAttempt": 8.3,
       "attempts": 23,
       "touchdowns": 3,
-      "longest": 0
+      "longest": 26
     },
     {
       "rank": 15,
       "playerName": "정재민",
       "university": "경성대학교",
       "jerseyNumber": 33,
-      "rushingYards": 0,
+      "rushingYards": 188,
       "yardsPerAttempt": 5.7,
       "attempts": 33,
       "touchdowns": 2,
-      "longest": 0
+      "longest": 39
     },
     {
       "rank": 16,
-      "playerName": "이명환",
-      "university": "서울대학교",
-      "jerseyNumber": 35,
-      "rushingYards": 0,
-      "yardsPerAttempt": 6.8,
-      "attempts": 25,
-      "touchdowns": 1,
-      "longest": 0
-    },
-    {
-      "rank": 17,
       "playerName": "이찬희",
       "university": "한양대학교",
       "jerseyNumber": 12,
-      "rushingYards": 0,
+      "rushingYards": 169,
       "yardsPerAttempt": 4,
       "attempts": 42,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 17
     },
     {
-      "rank": 18,
+      "rank": 17,
       "playerName": "장우영",
       "university": "숭실대학교",
       "jerseyNumber": 26,
-      "rushingYards": 0,
+      "rushingYards": 169,
       "yardsPerAttempt": 3.7,
       "attempts": 46,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 28
+    },
+    {
+      "rank": 18,
+      "playerName": "이명환",
+      "university": "서울대학교",
+      "jerseyNumber": 35,
+      "rushingYards": 169,
+      "yardsPerAttempt": 6.8,
+      "attempts": 25,
+      "touchdowns": 1,
+      "longest": 39
     },
     {
       "rank": 19,
       "playerName": "신민호",
       "university": "동의대학교",
       "jerseyNumber": 87,
-      "rushingYards": 0,
+      "rushingYards": 162,
       "yardsPerAttempt": 8.1,
       "attempts": 20,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 41
     },
     {
       "rank": 20,
       "playerName": "강경서",
       "university": "금오공과대학교",
       "jerseyNumber": 21,
-      "rushingYards": 0,
+      "rushingYards": 159,
       "yardsPerAttempt": 4.8,
       "attempts": 33,
       "touchdowns": 4,
-      "longest": 0
+      "longest": 33
     },
     {
       "rank": 21,
       "playerName": "황승연",
       "university": "연세대학교",
       "jerseyNumber": 34,
-      "rushingYards": 0,
+      "rushingYards": 153,
       "yardsPerAttempt": 3.7,
       "attempts": 41,
       "touchdowns": 3,
-      "longest": 0
+      "longest": 68
     },
     {
       "rank": 22,
       "playerName": "김범진",
       "university": "대구대학교",
       "jerseyNumber": 98,
-      "rushingYards": 0,
+      "rushingYards": 151,
       "yardsPerAttempt": 6.9,
       "attempts": 22,
       "touchdowns": 2,
-      "longest": 0
+      "longest": 65
     },
     {
       "rank": 23,
       "playerName": "이주헌",
       "university": "동국대학교",
       "jerseyNumber": 22,
-      "rushingYards": 0,
+      "rushingYards": 148,
       "yardsPerAttempt": 18.5,
       "attempts": 8,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 96
     },
     {
       "rank": 24,
       "playerName": "이동규",
       "university": "서울대학교",
       "jerseyNumber": 7,
-      "rushingYards": 0,
+      "rushingYards": 145,
       "yardsPerAttempt": 4.5,
       "attempts": 32,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 18
     },
     {
       "rank": 25,
       "playerName": "권순웅",
       "university": "홍익대학교",
       "jerseyNumber": 26,
-      "rushingYards": 0,
+      "rushingYards": 144,
       "yardsPerAttempt": 6.9,
       "attempts": 21,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 54
     },
     {
       "rank": 26,
       "playerName": "김동현",
       "university": "경성대학교",
       "jerseyNumber": 1,
-      "rushingYards": 0,
+      "rushingYards": 140,
       "yardsPerAttempt": 6.1,
       "attempts": 23,
       "touchdowns": 3,
-      "longest": 0
+      "longest": 37
     },
     {
       "rank": 27,
-      "playerName": "이정우",
-      "university": "동의대학교",
-      "jerseyNumber": 22,
-      "rushingYards": 0,
-      "yardsPerAttempt": 2.8,
-      "attempts": 49,
-      "touchdowns": 4,
-      "longest": 0
-    },
-    {
-      "rank": 28,
       "playerName": "이민석",
       "university": "강원대학교",
       "jerseyNumber": 13,
-      "rushingYards": 0,
+      "rushingYards": 136,
       "yardsPerAttempt": 5,
       "attempts": 27,
       "touchdowns": 2,
-      "longest": 0
+      "longest": 22
+    },
+    {
+      "rank": 28,
+      "playerName": "이정우",
+      "university": "동의대학교",
+      "jerseyNumber": 22,
+      "rushingYards": 136,
+      "yardsPerAttempt": 2.8,
+      "attempts": 49,
+      "touchdowns": 4,
+      "longest": 16
     },
     {
       "rank": 29,
       "playerName": "고승주",
       "university": "경북대학교",
       "jerseyNumber": 15,
-      "rushingYards": 0,
+      "rushingYards": 134,
       "yardsPerAttempt": 5.4,
       "attempts": 25,
       "touchdowns": 3,
-      "longest": 0
+      "longest": 37
     },
     {
       "rank": 30,
-      "playerName": "김준호",
-      "university": "홍익대학교",
-      "jerseyNumber": 25,
-      "rushingYards": 0,
-      "yardsPerAttempt": 4.4,
-      "attempts": 29,
-      "touchdowns": 1,
-      "longest": 0
-    },
-    {
-      "rank": 31,
       "playerName": "김상구",
       "university": "용인대학교",
       "jerseyNumber": 39,
-      "rushingYards": 0,
+      "rushingYards": 127,
       "yardsPerAttempt": 21.2,
       "attempts": 6,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 63
+    },
+    {
+      "rank": 31,
+      "playerName": "김준호",
+      "university": "홍익대학교",
+      "jerseyNumber": 25,
+      "rushingYards": 127,
+      "yardsPerAttempt": 4.4,
+      "attempts": 29,
+      "touchdowns": 1,
+      "longest": 20
     },
     {
       "rank": 32,
       "playerName": "박종후",
       "university": "경성대학교",
       "jerseyNumber": 93,
-      "rushingYards": 0,
+      "rushingYards": 125,
       "yardsPerAttempt": 4.8,
       "attempts": 26,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 30
     },
     {
       "rank": 33,
       "playerName": "김민준",
       "university": "경성대학교",
       "jerseyNumber": 12,
-      "rushingYards": 0,
+      "rushingYards": 122,
       "yardsPerAttempt": 5.3,
       "attempts": 23,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 27
     },
     {
       "rank": 34,
       "playerName": "허유현",
       "university": "한동대학교",
       "jerseyNumber": 33,
-      "rushingYards": 0,
+      "rushingYards": 116,
       "yardsPerAttempt": 5.3,
       "attempts": 22,
       "touchdowns": 2,
-      "longest": 0
+      "longest": 38
     },
     {
       "rank": 35,
       "playerName": "김건원",
       "university": "서울시립대학교",
       "jerseyNumber": 21,
-      "rushingYards": 0,
+      "rushingYards": 107,
       "yardsPerAttempt": 5.4,
       "attempts": 20,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 65
     },
     {
       "rank": 36,
       "playerName": "전민재",
       "university": "영남대학교",
       "jerseyNumber": 29,
-      "rushingYards": 0,
+      "rushingYards": 106,
       "yardsPerAttempt": 4.1,
       "attempts": 26,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 17
     },
     {
       "rank": 37,
       "playerName": "배수환",
       "university": "중앙대학교",
       "jerseyNumber": 1,
-      "rushingYards": 0,
+      "rushingYards": 105,
       "yardsPerAttempt": 4.6,
       "attempts": 23,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 21
     },
     {
       "rank": 38,
-      "playerName": "장민규",
-      "university": "울산대학교",
-      "jerseyNumber": 22,
-      "rushingYards": 0,
-      "yardsPerAttempt": 5.4,
-      "attempts": 19,
-      "touchdowns": 1,
-      "longest": 0
-    },
-    {
-      "rank": 39,
       "playerName": "김승현",
       "university": "경성대학교",
       "jerseyNumber": 15,
-      "rushingYards": 0,
+      "rushingYards": 103,
       "yardsPerAttempt": 6.1,
       "attempts": 17,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 37
+    },
+    {
+      "rank": 39,
+      "playerName": "장민규",
+      "university": "울산대학교",
+      "jerseyNumber": 22,
+      "rushingYards": 103,
+      "yardsPerAttempt": 5.4,
+      "attempts": 19,
+      "touchdowns": 1,
+      "longest": 34
     },
     {
       "rank": 40,
       "playerName": "이재승",
       "university": "중앙대학교",
       "jerseyNumber": 99,
-      "rushingYards": 0,
+      "rushingYards": 100,
       "yardsPerAttempt": 8.3,
       "attempts": 12,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 47
     },
     {
       "rank": 41,
       "playerName": "김하은",
       "university": "성균관대학교",
       "jerseyNumber": 88,
-      "rushingYards": 0,
+      "rushingYards": 99,
       "yardsPerAttempt": 3.1,
       "attempts": 32,
       "touchdowns": 3,
-      "longest": 0
+      "longest": 38
     },
     {
       "rank": 42,
       "playerName": "유현석",
       "university": "강원대학교",
       "jerseyNumber": 2,
-      "rushingYards": 0,
+      "rushingYards": 95,
       "yardsPerAttempt": 3,
       "attempts": 32,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 16
     },
     {
       "rank": 43,
       "playerName": "김형준",
       "university": "대구대학교",
       "jerseyNumber": 14,
-      "rushingYards": 0,
+      "rushingYards": 95,
       "yardsPerAttempt": 10.6,
       "attempts": 9,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 67
     },
     {
       "rank": 44,
       "playerName": "안태현",
       "university": "용인대학교",
       "jerseyNumber": 13,
-      "rushingYards": 0,
+      "rushingYards": 94,
       "yardsPerAttempt": 4.9,
       "attempts": 19,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 16
     },
     {
       "rank": 45,
       "playerName": "이준서",
       "university": "동서대학교",
       "jerseyNumber": 25,
-      "rushingYards": 0,
+      "rushingYards": 94,
       "yardsPerAttempt": 4.1,
       "attempts": 23,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 15
     },
     {
       "rank": 46,
       "playerName": "장우혁",
       "university": "인하대학교",
       "jerseyNumber": 28,
-      "rushingYards": 0,
+      "rushingYards": 93,
       "yardsPerAttempt": 15.5,
       "attempts": 6,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 80
     },
     {
       "rank": 47,
       "playerName": "허우인",
       "university": "건국대학교",
       "jerseyNumber": 22,
-      "rushingYards": 0,
+      "rushingYards": 93,
       "yardsPerAttempt": 6.6,
       "attempts": 14,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 32
     },
     {
       "rank": 48,
       "playerName": "손승우",
       "university": "동아대학교",
       "jerseyNumber": 99,
-      "rushingYards": 0,
+      "rushingYards": 92,
       "yardsPerAttempt": 3.7,
       "attempts": 25,
       "touchdowns": 2,
-      "longest": 0
+      "longest": 19
     },
     {
       "rank": 49,
       "playerName": "구도현",
       "university": "경북대학교",
       "jerseyNumber": 23,
-      "rushingYards": 0,
+      "rushingYards": 90,
       "yardsPerAttempt": 3.6,
       "attempts": 25,
       "touchdowns": 0,
-      "longest": 0
+      "longest": 17
     },
     {
       "rank": 50,
       "playerName": "정운호",
       "university": "한국해양대학교",
       "jerseyNumber": 48,
-      "rushingYards": 0,
+      "rushingYards": 90,
       "yardsPerAttempt": 10,
       "attempts": 9,
       "touchdowns": 1,
-      "longest": 0
+      "longest": 26
+    },
+    {
+      "rank": 94,
+      "playerName": "반태우",
+      "university": "경희대학교",
+      "jerseyNumber": 3,
+      "rushingYards": 81,
+      "yardsPerAttempt": 4.3,
+      "attempts": 19,
+      "touchdowns": 0,
+      "longest": 19
+    },
+    {
+      "rank": 95,
+      "playerName": "김민서",
+      "university": "동아대학교",
+      "jerseyNumber": 1,
+      "rushingYards": 80,
+      "yardsPerAttempt": 4.2,
+      "attempts": 19,
+      "touchdowns": 1,
+      "longest": 17
+    },
+    {
+      "rank": 87,
+      "playerName": "김병현",
+      "university": "경일대학교",
+      "jerseyNumber": 28,
+      "rushingYards": 79,
+      "yardsPerAttempt": 2,
+      "attempts": 40,
+      "touchdowns": 0,
+      "longest": 15
+    },
+    {
+      "rank": 89,
+      "playerName": "엄홍재",
+      "university": "서강대학교",
+      "jerseyNumber": 31,
+      "rushingYards": 78,
+      "yardsPerAttempt": 2.7,
+      "attempts": 29,
+      "touchdowns": 0,
+      "longest": 19
+    },
+    {
+      "rank": 112,
+      "playerName": "손혁빈",
+      "university": "경희대학교",
+      "jerseyNumber": 25,
+      "rushingYards": 77,
+      "yardsPerAttempt": 4.5,
+      "attempts": 17,
+      "touchdowns": 0,
+      "longest": 28
+    },
+    {
+      "rank": 93,
+      "playerName": "이승현",
+      "university": "서강대학교",
+      "jerseyNumber": 16,
+      "rushingYards": 75,
+      "yardsPerAttempt": 3.8,
+      "attempts": 20,
+      "touchdowns": 1,
+      "longest": 16
+    },
+    {
+      "rank": 91,
+      "playerName": "윤정근",
+      "university": "금오공과대학교",
+      "jerseyNumber": 8,
+      "rushingYards": 74,
+      "yardsPerAttempt": 3.1,
+      "attempts": 24,
+      "touchdowns": 2,
+      "longest": 21
+    },
+    {
+      "rank": 70,
+      "playerName": "김찬용",
+      "university": "홍익대학교",
+      "jerseyNumber": 17,
+      "rushingYards": 72,
+      "yardsPerAttempt": 9,
+      "attempts": 8,
+      "touchdowns": 0,
+      "longest": 35
+    },
+    {
+      "rank": 56,
+      "playerName": "김제민",
+      "university": "중앙대학교",
+      "jerseyNumber": 10,
+      "rushingYards": 71,
+      "yardsPerAttempt": 17.8,
+      "attempts": 4,
+      "touchdowns": 1,
+      "longest": 55
+    },
+    {
+      "rank": 92,
+      "playerName": "이무진",
+      "university": "대구가톨릭대학교",
+      "jerseyNumber": 35,
+      "rushingYards": 71,
+      "yardsPerAttempt": 3,
+      "attempts": 24,
+      "touchdowns": 2,
+      "longest": 14
+    },
+    {
+      "rank": 67,
+      "playerName": "박정빈",
+      "university": "경희대학교",
+      "jerseyNumber": 8,
+      "rushingYards": 69,
+      "yardsPerAttempt": 9.9,
+      "attempts": 7,
+      "touchdowns": 1,
+      "longest": 52
+    },
+    {
+      "rank": 88,
+      "playerName": "박윤선",
+      "university": "국민대학교",
+      "jerseyNumber": 26,
+      "rushingYards": 67,
+      "yardsPerAttempt": 2,
+      "attempts": 34,
+      "touchdowns": 1,
+      "longest": 24
+    },
+    {
+      "rank": 99,
+      "playerName": "조윤수",
+      "university": "한림대학교",
+      "jerseyNumber": 15,
+      "rushingYards": 65,
+      "yardsPerAttempt": 6.5,
+      "attempts": 10,
+      "touchdowns": 1,
+      "longest": 35
+    },
+    {
+      "rank": 109,
+      "playerName": "정혜민",
+      "university": "경성대학교",
+      "jerseyNumber": 22,
+      "rushingYards": 63,
+      "yardsPerAttempt": 5.3,
+      "attempts": 12,
+      "touchdowns": 1,
+      "longest": 48
+    },
+    {
+      "rank": 101,
+      "playerName": "김세윤",
+      "university": "홍익대학교",
+      "jerseyNumber": 81,
+      "rushingYards": 60,
+      "yardsPerAttempt": 5.5,
+      "attempts": 11,
+      "touchdowns": 1,
+      "longest": 24
+    },
+    {
+      "rank": 51,
+      "playerName": "이건",
+      "university": "한양대학교",
+      "jerseyNumber": 7,
+      "rushingYards": 54,
+      "yardsPerAttempt": 54,
+      "attempts": 1,
+      "touchdowns": 1,
+      "longest": 54
+    },
+    {
+      "rank": 83,
+      "playerName": "김대현",
+      "university": "한국외국어대학교",
+      "jerseyNumber": 27,
+      "rushingYards": 51,
+      "yardsPerAttempt": 7.3,
+      "attempts": 7,
+      "touchdowns": 0,
+      "longest": 36
+    },
+    {
+      "rank": 96,
+      "playerName": "박윤서",
+      "university": "인하대학교",
+      "jerseyNumber": 49,
+      "rushingYards": 51,
+      "yardsPerAttempt": 3.6,
+      "attempts": 14,
+      "touchdowns": 2,
+      "longest": 16
+    },
+    {
+      "rank": 59,
+      "playerName": "김무겸",
+      "university": "동서대학교",
+      "jerseyNumber": 33,
+      "rushingYards": 49,
+      "yardsPerAttempt": 16.3,
+      "attempts": 3,
+      "touchdowns": 0,
+      "longest": 40
+    },
+    {
+      "rank": 64,
+      "playerName": "한지섭",
+      "university": "한림대학교",
+      "jerseyNumber": 24,
+      "rushingYards": 49,
+      "yardsPerAttempt": 12.3,
+      "attempts": 4,
+      "touchdowns": 0,
+      "longest": 19
+    },
+    {
+      "rank": 69,
+      "playerName": "윤상준",
+      "university": "고려대학교",
+      "jerseyNumber": 10,
+      "rushingYards": 47,
+      "yardsPerAttempt": 9.4,
+      "attempts": 5,
+      "touchdowns": 0,
+      "longest": 21
+    },
+    {
+      "rank": 102,
+      "playerName": "최은찬",
+      "university": "동국대학교",
+      "jerseyNumber": 10,
+      "rushingYards": 45,
+      "yardsPerAttempt": 4.1,
+      "attempts": 11,
+      "touchdowns": 1,
+      "longest": 12
+    },
+    {
+      "rank": 73,
+      "playerName": "우재윤",
+      "university": "국민대학교",
+      "jerseyNumber": 11,
+      "rushingYards": 44,
+      "yardsPerAttempt": 8.8,
+      "attempts": 5,
+      "touchdowns": 0,
+      "longest": 27
+    },
+    {
+      "rank": 74,
+      "playerName": "김승원",
+      "university": "숭실대학교",
+      "jerseyNumber": 97,
+      "rushingYards": 44,
+      "yardsPerAttempt": 8.8,
+      "attempts": 5,
+      "touchdowns": 0,
+      "longest": 14
+    },
+    {
+      "rank": 77,
+      "playerName": "이은광",
+      "university": "신라대학교",
+      "jerseyNumber": 0,
+      "rushingYards": 43,
+      "yardsPerAttempt": 8.6,
+      "attempts": 5,
+      "touchdowns": 2,
+      "longest": 40
+    },
+    {
+      "rank": 105,
+      "playerName": "곽효석",
+      "university": "중앙대학교",
+      "jerseyNumber": 87,
+      "rushingYards": 42,
+      "yardsPerAttempt": 3,
+      "attempts": 14,
+      "touchdowns": 1,
+      "longest": 13
+    },
+    {
+      "rank": 111,
+      "playerName": "김기웅",
+      "university": "홍익대학교",
+      "jerseyNumber": 33,
+      "rushingYards": 40,
+      "yardsPerAttempt": 6.7,
+      "attempts": 6,
+      "touchdowns": 0,
+      "longest": 32
+    },
+    {
+      "rank": 68,
+      "playerName": "김록겸",
+      "university": "고려대학교",
+      "jerseyNumber": 7,
+      "rushingYards": 38,
+      "yardsPerAttempt": 9.5,
+      "attempts": 4,
+      "touchdowns": 0,
+      "longest": 15
+    },
+    {
+      "rank": 98,
+      "playerName": "이은성",
+      "university": "대구대학교",
+      "jerseyNumber": 99,
+      "rushingYards": 36,
+      "yardsPerAttempt": 6,
+      "attempts": 6,
+      "touchdowns": 1,
+      "longest": 16
+    },
+    {
+      "rank": 75,
+      "playerName": "강상모",
+      "university": "동의대학교",
+      "jerseyNumber": 43,
+      "rushingYards": 35,
+      "yardsPerAttempt": 8.8,
+      "attempts": 4,
+      "touchdowns": 0,
+      "longest": 32
+    },
+    {
+      "rank": 103,
+      "playerName": "김동규",
+      "university": "숭실대학교",
+      "jerseyNumber": 99,
+      "rushingYards": 34,
+      "yardsPerAttempt": 3.1,
+      "attempts": 11,
+      "touchdowns": 1,
+      "longest": 9
+    },
+    {
+      "rank": 104,
+      "playerName": "김준영",
+      "university": "강원대학교",
+      "jerseyNumber": 47,
+      "rushingYards": 34,
+      "yardsPerAttempt": 4.3,
+      "attempts": 8,
+      "touchdowns": 1,
+      "longest": 12
+    },
+    {
+      "rank": 58,
+      "playerName": "권태영",
+      "university": "건국대학교",
+      "jerseyNumber": 45,
+      "rushingYards": 33,
+      "yardsPerAttempt": 16.5,
+      "attempts": 2,
+      "touchdowns": 0,
+      "longest": 26
+    },
+    {
+      "rank": 106,
+      "playerName": "문찬호",
+      "university": "고려대학교",
+      "jerseyNumber": 9,
+      "rushingYards": 31,
+      "yardsPerAttempt": 2.1,
+      "attempts": 15,
+      "touchdowns": 1,
+      "longest": 27
+    },
+    {
+      "rank": 52,
+      "playerName": "김현빈",
+      "university": "용인대학교",
+      "jerseyNumber": 82,
+      "rushingYards": 30,
+      "yardsPerAttempt": 30,
+      "attempts": 1,
+      "touchdowns": 1,
+      "longest": 30
+    },
+    {
+      "rank": 84,
+      "playerName": "박승원",
+      "university": "성균관대학교",
+      "jerseyNumber": 87,
+      "rushingYards": 29,
+      "yardsPerAttempt": 7.3,
+      "attempts": 4,
+      "touchdowns": 1,
+      "longest": 23
+    },
+    {
+      "rank": 90,
+      "playerName": "성지훈",
+      "university": "단국대학교",
+      "jerseyNumber": 26,
+      "rushingYards": 28,
+      "yardsPerAttempt": 1.2,
+      "attempts": 24,
+      "touchdowns": 0,
+      "longest": 15
+    },
+    {
+      "rank": 110,
+      "playerName": "이동건",
+      "university": "강원대학교",
+      "jerseyNumber": 1,
+      "rushingYards": 28,
+      "yardsPerAttempt": 2.8,
+      "attempts": 10,
+      "touchdowns": 0,
+      "longest": 43
+    },
+    {
+      "rank": 71,
+      "playerName": "문영민",
+      "university": "동국대학교",
+      "jerseyNumber": 82,
+      "rushingYards": 27,
+      "yardsPerAttempt": 9,
+      "attempts": 3,
+      "touchdowns": 0,
+      "longest": 32
+    },
+    {
+      "rank": 62,
+      "playerName": "김대규",
+      "university": "대구대학교",
+      "jerseyNumber": 80,
+      "rushingYards": 26,
+      "yardsPerAttempt": 13,
+      "attempts": 2,
+      "touchdowns": 0,
+      "longest": 14
+    },
+    {
+      "rank": 76,
+      "playerName": "이재원",
+      "university": "계명대학교",
+      "jerseyNumber": 10,
+      "rushingYards": 26,
+      "yardsPerAttempt": 8.7,
+      "attempts": 3,
+      "touchdowns": 0,
+      "longest": 18
+    },
+    {
+      "rank": 97,
+      "playerName": "서정현",
+      "university": "한국해양대학교",
+      "jerseyNumber": 38,
+      "rushingYards": 25,
+      "yardsPerAttempt": 5,
+      "attempts": 5,
+      "touchdowns": 1,
+      "longest": 8
+    },
+    {
+      "rank": 81,
+      "playerName": "김동혁",
+      "university": "동아대학교",
+      "jerseyNumber": 43,
+      "rushingYards": 22,
+      "yardsPerAttempt": 7.3,
+      "attempts": 3,
+      "touchdowns": 0,
+      "longest": 14
+    },
+    {
+      "rank": 82,
+      "playerName": "이채민",
+      "university": "용인대학교",
+      "jerseyNumber": 30,
+      "rushingYards": 22,
+      "yardsPerAttempt": 7.3,
+      "attempts": 3,
+      "touchdowns": 0,
+      "longest": 13
+    },
+    {
+      "rank": 53,
+      "playerName": "김진혁",
+      "university": "서울대학교",
+      "jerseyNumber": 58,
+      "rushingYards": 21,
+      "yardsPerAttempt": 21,
+      "attempts": 1,
+      "touchdowns": 0,
+      "longest": 21
+    },
+    {
+      "rank": 85,
+      "playerName": "전승원",
+      "university": "한동대학교",
+      "jerseyNumber": 42,
+      "rushingYards": 21,
+      "yardsPerAttempt": 7,
+      "attempts": 3,
+      "touchdowns": 0,
+      "longest": 8
+    },
+    {
+      "rank": 54,
+      "playerName": "권준호",
+      "university": "경희대학교",
+      "jerseyNumber": 64,
+      "rushingYards": 20,
+      "yardsPerAttempt": 20,
+      "attempts": 1,
+      "touchdowns": 1,
+      "longest": 20
+    },
+    {
+      "rank": 107,
+      "playerName": "이주람",
+      "university": "한동대학교",
+      "jerseyNumber": 1,
+      "rushingYards": 19,
+      "yardsPerAttempt": 1.6,
+      "attempts": 12,
+      "touchdowns": 1,
+      "longest": 15
+    },
+    {
+      "rank": 55,
+      "playerName": "정주영",
+      "university": "동국대학교",
+      "jerseyNumber": 86,
+      "rushingYards": 18,
+      "yardsPerAttempt": 18,
+      "attempts": 1,
+      "touchdowns": 0,
+      "longest": 18
+    },
+    {
+      "rank": 57,
+      "playerName": "서은호",
+      "university": "홍익대학교",
+      "jerseyNumber": 18,
+      "rushingYards": 17,
+      "yardsPerAttempt": 17,
+      "attempts": 1,
+      "touchdowns": 0,
+      "longest": 17
+    },
+    {
+      "rank": 78,
+      "playerName": "김민성",
+      "university": "홍익대학교",
+      "jerseyNumber": 4,
+      "rushingYards": 17,
+      "yardsPerAttempt": 8.5,
+      "attempts": 2,
+      "touchdowns": 0,
+      "longest": 25
+    },
+    {
+      "rank": 79,
+      "playerName": "하태창",
+      "university": "울산대학교",
+      "jerseyNumber": 23,
+      "rushingYards": 17,
+      "yardsPerAttempt": 8.5,
+      "attempts": 2,
+      "touchdowns": 0,
+      "longest": 10
+    },
+    {
+      "rank": 60,
+      "playerName": "김동현",
+      "university": "홍익대학교",
+      "jerseyNumber": 73,
+      "rushingYards": 16,
+      "yardsPerAttempt": 16,
+      "attempts": 1,
+      "touchdowns": 0,
+      "longest": 16
+    },
+    {
+      "rank": 61,
+      "playerName": "이상현",
+      "university": "단국대학교",
+      "jerseyNumber": 17,
+      "rushingYards": 14,
+      "yardsPerAttempt": 14,
+      "attempts": 1,
+      "touchdowns": 0,
+      "longest": 14
+    },
+    {
+      "rank": 63,
+      "playerName": "임재섭",
+      "university": "경희대학교",
+      "jerseyNumber": 88,
+      "rushingYards": 13,
+      "yardsPerAttempt": 13,
+      "attempts": 1,
+      "touchdowns": 0,
+      "longest": 13
+    },
+    {
+      "rank": 65,
+      "playerName": "장동윤",
+      "university": "동서대학교",
+      "jerseyNumber": 99,
+      "rushingYards": 12,
+      "yardsPerAttempt": 12,
+      "attempts": 1,
+      "touchdowns": 0,
+      "longest": 12
+    },
+    {
+      "rank": 66,
+      "playerName": "장혜성",
+      "university": "성균관대학교",
+      "jerseyNumber": 9,
+      "rushingYards": 10,
+      "yardsPerAttempt": 10,
+      "attempts": 1,
+      "touchdowns": 1,
+      "longest": 10
+    },
+    {
+      "rank": 100,
+      "playerName": "곽도영",
+      "university": "대구대학교",
+      "jerseyNumber": 88,
+      "rushingYards": 10,
+      "yardsPerAttempt": 2,
+      "attempts": 5,
+      "touchdowns": 1,
+      "longest": 7
+    },
+    {
+      "rank": 72,
+      "playerName": "이재혁",
+      "university": "서강대학교",
+      "jerseyNumber": 38,
+      "rushingYards": 9,
+      "yardsPerAttempt": 9,
+      "attempts": 1,
+      "touchdowns": 0,
+      "longest": 9
+    },
+    {
+      "rank": 80,
+      "playerName": "최승현",
+      "university": "대구대학교",
+      "jerseyNumber": 18,
+      "rushingYards": 8,
+      "yardsPerAttempt": 8,
+      "attempts": 1,
+      "touchdowns": 0,
+      "longest": 8
+    },
+    {
+      "rank": 86,
+      "playerName": "김강민",
+      "university": "경북대학교",
+      "jerseyNumber": 7,
+      "rushingYards": 7,
+      "yardsPerAttempt": 7,
+      "attempts": 1,
+      "touchdowns": 0,
+      "longest": 7
+    },
+    {
+      "rank": 108,
+      "playerName": "이민준",
+      "university": "영남대학교",
+      "jerseyNumber": 5,
+      "rushingYards": -4,
+      "yardsPerAttempt": -1,
+      "attempts": 4,
+      "touchdowns": 1,
+      "longest": 10
     }
   ]
 }

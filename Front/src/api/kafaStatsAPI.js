@@ -20,7 +20,7 @@ const buildHeaders = (token) => {
 };
 
 /**
- * KAFA 통계 크롤링 실행
+ * KAFA 통계 크롤링 실행 (개선된 러싱 다중정렬 크롤링 사용)
  * @param {string} league - 'uni' (대학) 또는 'soc' (사회인)
  * @param {string} token - JWT 토큰
  */
@@ -29,7 +29,8 @@ export async function scrapeKafaStats(league, token = getToken()) {
     throw new APIError('리그는 uni 또는 soc만 가능합니다.', 400);
   }
 
-  const url = `${BASE_URL}/kafa-stats/scrape-all-stats/${league}`;
+  // 러싱 스탯은 새로운 다중정렬 크롤링 사용
+  const url = `${BASE_URL}/kafa-stats/scrape-rushing-all-sorts/${league}`;
 
   try {
     const res = await fetch(url, {
