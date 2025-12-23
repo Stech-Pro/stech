@@ -47,7 +47,7 @@ export class MemoService {
     // 사용자의 memos 배열에 clipKey 추가 (중복 방지)
     console.log('🔍 메모 작성 전 user.memos:', user.memos);
     const existingMemo = user.memos.find(
-      m => m.gameKey === gameKey && m.clipKey === clipKey
+      (m) => m.gameKey === gameKey && m.clipKey === clipKey,
     );
     if (!existingMemo) {
       user.memos.push({ gameKey, clipKey });

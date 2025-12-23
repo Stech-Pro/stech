@@ -91,8 +91,10 @@ export class KafaStatsController {
 
     // 팀 필터링
     if (teamFilter) {
-      stats = stats.filter((stat) =>
-        stat.teamName.includes(teamFilter) || teamFilter.includes(stat.teamName),
+      stats = stats.filter(
+        (stat) =>
+          stat.teamName.includes(teamFilter) ||
+          teamFilter.includes(stat.teamName),
       );
     }
 
@@ -157,15 +159,19 @@ export class KafaStatsController {
 
     // 팀 필터링
     if (teamFilter) {
-      stats = stats.filter((stat) =>
-        stat.university.includes(teamFilter) || teamFilter.includes(stat.university),
+      stats = stats.filter(
+        (stat) =>
+          stat.university.includes(teamFilter) ||
+          teamFilter.includes(stat.university),
       );
     }
 
     // 선수 필터링
     if (playerFilter) {
-      stats = stats.filter((stat) =>
-        stat.playerName.includes(playerFilter) || playerFilter.includes(stat.playerName),
+      stats = stats.filter(
+        (stat) =>
+          stat.playerName.includes(playerFilter) ||
+          playerFilter.includes(stat.playerName),
       );
     }
 
@@ -186,7 +192,8 @@ export class KafaStatsController {
   @Get('soc/teams')
   @ApiOperation({
     summary: '🏢 사회인 팀 러싱 스탯 조회',
-    description: 'KAFA 웹사이트에서 사회인 리그 팀들의 러싱 스탯을 실시간으로 가져옵니다.',
+    description:
+      'KAFA 웹사이트에서 사회인 리그 팀들의 러싱 스탯을 실시간으로 가져옵니다.',
   })
   @ApiQuery({ name: 'year', required: false })
   @ApiQuery({ name: 'team', required: false })
@@ -197,8 +204,10 @@ export class KafaStatsController {
     let stats = await this.kafaStatsService.getTeamStats('soc', year);
 
     if (teamFilter) {
-      stats = stats.filter((stat) =>
-        stat.teamName.includes(teamFilter) || teamFilter.includes(stat.teamName),
+      stats = stats.filter(
+        (stat) =>
+          stat.teamName.includes(teamFilter) ||
+          teamFilter.includes(stat.teamName),
       );
     }
 
@@ -219,7 +228,8 @@ export class KafaStatsController {
   @Get('soc/players')
   @ApiOperation({
     summary: '👨‍💼 사회인 개인 선수 러싱 스탯 조회',
-    description: 'KAFA 웹사이트에서 사회인 리그 개인 선수들의 러싱 스탯을 실시간으로 가져옵니다.',
+    description:
+      'KAFA 웹사이트에서 사회인 리그 개인 선수들의 러싱 스탯을 실시간으로 가져옵니다.',
   })
   @ApiQuery({ name: 'year', required: false })
   @ApiQuery({ name: 'team', required: false })
@@ -232,14 +242,18 @@ export class KafaStatsController {
     let stats = await this.kafaStatsService.getPlayerStats('soc', year);
 
     if (teamFilter) {
-      stats = stats.filter((stat) =>
-        stat.university.includes(teamFilter) || teamFilter.includes(stat.university),
+      stats = stats.filter(
+        (stat) =>
+          stat.university.includes(teamFilter) ||
+          teamFilter.includes(stat.university),
       );
     }
 
     if (playerFilter) {
-      stats = stats.filter((stat) =>
-        stat.playerName.includes(playerFilter) || playerFilter.includes(stat.playerName),
+      stats = stats.filter(
+        (stat) =>
+          stat.playerName.includes(playerFilter) ||
+          playerFilter.includes(stat.playerName),
       );
     }
 
@@ -260,7 +274,8 @@ export class KafaStatsController {
   @Get('team/:teamName')
   @ApiOperation({
     summary: '🔍 특정 팀 스탯 조회',
-    description: '팀명으로 해당 팀의 스탯을 조회합니다. 대학/사회인 리그를 자동으로 감지합니다.',
+    description:
+      '팀명으로 해당 팀의 스탯을 조회합니다. 대학/사회인 리그를 자동으로 감지합니다.',
   })
   @ApiParam({
     name: 'teamName',
@@ -526,18 +541,18 @@ export class KafaStatsController {
     - ind_uni4-11: 기타 스탯들
     `,
   })
-  @ApiQuery({ 
-    name: 'league', 
-    required: false, 
+  @ApiQuery({
+    name: 'league',
+    required: false,
     enum: ['uni', 'soc'],
-    description: '리그 구분 (기본값: uni)'
+    description: '리그 구분 (기본값: uni)',
   })
   async exploreAllStats(@Query('league') league: 'uni' | 'soc' = 'uni') {
     const results = await this.kafaStatsService.exploreAllStatPages(league);
     return {
       success: true,
       message: '모든 스탯 페이지 탐색 완료',
-      data: results
+      data: results,
     };
   }
 
@@ -573,7 +588,10 @@ export class KafaStatsController {
     @Query('league') league: 'uni' | 'soc' = 'uni',
     @Query('season') season: string = '2025',
   ) {
-    const result = await this.kafaStatsService.crawlAndMergeAllStats(league, season);
+    const result = await this.kafaStatsService.crawlAndMergeAllStats(
+      league,
+      season,
+    );
     return result;
   }
 
@@ -598,9 +616,9 @@ export class KafaStatsController {
       required: ['username', 'password'],
       example: {
         username: 'your_kafa_id',
-        password: 'your_password'
-      }
-    }
+        password: 'your_password',
+      },
+    },
   })
   async loginToKafa(
     @Body('username') username: string,
@@ -640,7 +658,9 @@ export class KafaStatsController {
   })
   async crawlMatchData(@Param('matchId') matchId: string) {
     try {
-      const matchData = await this.kafaStatsService.crawlMatchData(parseInt(matchId));
+      const matchData = await this.kafaStatsService.crawlMatchData(
+        parseInt(matchId),
+      );
       return {
         success: true,
         message: '경기 데이터 크롤링 성공',
@@ -685,11 +705,14 @@ export class KafaStatsController {
   })
   async getPlayData(
     @Param('matchId') matchId: string,
-    @Query('quarter') quarter?: string
+    @Query('quarter') quarter?: string,
   ) {
     try {
-      const playData = await this.kafaStatsService.getPlayDataFromDB(parseInt(matchId), quarter);
-      
+      const playData = await this.kafaStatsService.getPlayDataFromDB(
+        parseInt(matchId),
+        quarter,
+      );
+
       // 쿼터별로 그룹핑
       const groupedData = playData.reduce((acc, play) => {
         if (!acc[play.quarter]) {
@@ -706,10 +729,10 @@ export class KafaStatsController {
           matchId: parseInt(matchId),
           totalPlays: playData.length,
           quarters: groupedData,
-          playsByQuarter: Object.keys(groupedData).map(q => ({
+          playsByQuarter: Object.keys(groupedData).map((q) => ({
             quarter: q,
-            playCount: groupedData[q].length
-          }))
+            playCount: groupedData[q].length,
+          })),
         },
       };
     } catch (error) {
@@ -769,32 +792,34 @@ export class KafaStatsController {
           homeTeam: {
             fullName: '경희대학교',
             code: 'KI',
-            isHome: true
+            isHome: true,
           },
           awayTeam: {
             fullName: '연세대학교',
             code: 'YS',
-            isHome: false
+            isHome: false,
           },
           finalScore: {
             home: 12,
-            away: 7
+            away: 7,
           },
           quarterScores: {
             q1: { home: 6, away: 0 },
             q2: { home: 0, away: 7 },
             q3: { home: 6, away: 0 },
-            q4: { home: 0, away: 0 }
+            q4: { home: 0, away: 0 },
           },
           processedAt: '2025-11-26T07:30:00.000Z',
-          dataSource: 'crawled'
-        }
-      }
-    }
+          dataSource: 'crawled',
+        },
+      },
+    },
   })
   async getGameGeneralInfo(@Param('matchId') matchId: string) {
     try {
-      const result = await this.kafaStatsService.getGameGeneralInfo(parseInt(matchId));
+      const result = await this.kafaStatsService.getGameGeneralInfo(
+        parseInt(matchId),
+      );
       return result;
     } catch (error) {
       return {
@@ -859,10 +884,10 @@ export class KafaStatsController {
         data: {
           matchId: 295,
           homeTeam: 'KI',
-          awayTeam: 'YS', 
+          awayTeam: 'YS',
           totalPlays: 127,
           teamStats: {
-            'KI': {
+            KI: {
               teamName: 'KI',
               totalPlays: 65,
               rushingPlays: 45,
@@ -876,27 +901,27 @@ export class KafaStatsController {
               scores: 3,
               thirdDownAttempts: 12,
               thirdDownConversions: 7,
-              thirdDownPercentage: 58
-            }
+              thirdDownPercentage: 58,
+            },
           },
           quarterStats: {
             '1qtr': { plays: 35, scores: 1 },
             '2qtr': { plays: 36, scores: 2 },
             '3qtr': { plays: 25, scores: 0 },
-            '4qtr': { plays: 31, scores: 1 }
-          }
-        }
-      }
-    }
+            '4qtr': { plays: 31, scores: 1 },
+          },
+        },
+      },
+    },
   })
   async calculateGameRecordStats(
     @Param('matchId') matchId: string,
-    @Query('quarter') quarter?: string
+    @Query('quarter') quarter?: string,
   ) {
     try {
       const stats = await this.kafaStatsService.calculateGameRecordStats(
         parseInt(matchId),
-        quarter
+        quarter,
       );
 
       return stats;
@@ -956,18 +981,18 @@ export class KafaStatsController {
             gameDate: '2025-11-01',
             homeTeam: {
               name: '경성대학교',
-              initial: 'KS'
+              initial: 'KS',
             },
             awayTeam: {
               name: '한양대학교',
-              initial: 'HY'
+              initial: 'HY',
             },
             venue: '군위종합운동장',
             score: {
               home: 14,
               away: 17,
-              display: 'KS 14 - HY 17'
-            }
+              display: 'KS 14 - HY 17',
+            },
           },
           detailedScores: {
             quarterlyScores: {
@@ -976,23 +1001,23 @@ export class KafaStatsController {
                 quarter2: 0,
                 quarter3: 6,
                 quarter4: 0,
-                total: 14
+                total: 14,
               },
               away: {
                 quarter1: 7,
                 quarter2: 0,
                 quarter3: 7,
                 quarter4: 0,
-                total: 17
-              }
+                total: 17,
+              },
             },
             startTime: '14:00',
             endTime: '16:45',
-            weather: ''
-          }
-        }
-      }
-    }
+            weather: '',
+          },
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 400,
@@ -1001,12 +1026,14 @@ export class KafaStatsController {
       example: {
         success: false,
         error: '경기 ID 287을 찾을 수 없습니다.',
-        data: null
-      }
-    }
+        data: null,
+      },
+    },
   })
   async getMatchGeneralInfo(@Param('matchId') matchId: string) {
-    const result = await this.kafaMatchInfoService.getMatchGeneralInfo(parseInt(matchId));
+    const result = await this.kafaMatchInfoService.getMatchGeneralInfo(
+      parseInt(matchId),
+    );
     return result;
   }
 
@@ -1037,7 +1064,9 @@ export class KafaStatsController {
     example: 268,
   })
   async getCompleteMatchData(@Param('matchId') matchId: string) {
-    const result = await this.kafaMatchInfoService.getCompleteMatchData(parseInt(matchId));
+    const result = await this.kafaMatchInfoService.getCompleteMatchData(
+      parseInt(matchId),
+    );
     return result;
   }
 
@@ -1064,15 +1093,16 @@ export class KafaStatsController {
   async updateMatch(@Param('matchId') matchId: string) {
     try {
       const matchIdNum = parseInt(matchId);
-      
+
       // 1. KAFA에서 최신 데이터 크롤링
-      const result = await this.kafaMatchInfoService.getCompleteMatchData(matchIdNum);
-      
+      const result =
+        await this.kafaMatchInfoService.getCompleteMatchData(matchIdNum);
+
       if (!result.success || !result.data) {
         return {
           success: false,
           message: `경기 ${matchId} 크롤링 실패`,
-          data: null
+          data: null,
         };
       }
 
@@ -1085,18 +1115,26 @@ export class KafaStatsController {
         homeTeam: {
           name: result.data.generalInfo?.homeTeam?.name || '',
           initial: result.data.generalInfo?.homeTeam?.initial || '',
-          fullName: result.data.generalInfo?.homeTeam?.name || ''
+          fullName: result.data.generalInfo?.homeTeam?.name || '',
         },
         awayTeam: {
           name: result.data.generalInfo?.awayTeam?.name || '',
           initial: result.data.generalInfo?.awayTeam?.initial || '',
-          fullName: result.data.generalInfo?.awayTeam?.name || ''
+          fullName: result.data.generalInfo?.awayTeam?.name || '',
         },
         homeScore: result.data.detailedScores?.quarterlyScores?.home || {
-          quarter1: 0, quarter2: 0, quarter3: 0, quarter4: 0, total: 0
+          quarter1: 0,
+          quarter2: 0,
+          quarter3: 0,
+          quarter4: 0,
+          total: 0,
         },
         awayScore: result.data.detailedScores?.quarterlyScores?.away || {
-          quarter1: 0, quarter2: 0, quarter3: 0, quarter4: 0, total: 0
+          quarter1: 0,
+          quarter2: 0,
+          quarter3: 0,
+          quarter4: 0,
+          total: 0,
         },
         leagueType: result.data.generalInfo?.leagueType || '전체',
         startTime: result.data.detailedScores?.startTime || '',
@@ -1106,34 +1144,36 @@ export class KafaStatsController {
         plays: [],
         totalPlays: 0,
         crawledAt: new Date(),
-        lastUpdatedAt: new Date()
+        lastUpdatedAt: new Date(),
       };
 
       // 3. 플레이 데이터 변환
       if (result.data.playByPlay?.quarters) {
-        Object.entries(result.data.playByPlay.quarters).forEach(([quarter, quarterData]: [string, any]) => {
-          if (quarterData.plays) {
-            quarterData.plays.forEach(play => {
-              matchData.plays.push({
-                quarter: play.quarter || quarter,
-                playNumber: play.playNumber || '',
-                time: play.time || '',
-                offenseTeam: play.offenseTeam || '',
-                ballOn: play.ballOn || '',
-                down: play.down || '',
-                quarterback: play.quarterback || '',
-                playType: play.playType || '',
-                gainYd: play.gainYd || '',
-                tackleBy: play.tackleBy || '',
-                sack: play.sack || '',
-                penalty: play.penalty || '',
-                penaltyName: play.penaltyName || '',
-                score: play.score || '',
-                remark: play.remark || ''
+        Object.entries(result.data.playByPlay.quarters).forEach(
+          ([quarter, quarterData]: [string, any]) => {
+            if (quarterData.plays) {
+              quarterData.plays.forEach((play) => {
+                matchData.plays.push({
+                  quarter: play.quarter || quarter,
+                  playNumber: play.playNumber || '',
+                  time: play.time || '',
+                  offenseTeam: play.offenseTeam || '',
+                  ballOn: play.ballOn || '',
+                  down: play.down || '',
+                  quarterback: play.quarterback || '',
+                  playType: play.playType || '',
+                  gainYd: play.gainYd || '',
+                  tackleBy: play.tackleBy || '',
+                  sack: play.sack || '',
+                  penalty: play.penalty || '',
+                  penaltyName: play.penaltyName || '',
+                  score: play.score || '',
+                  remark: play.remark || '',
+                });
               });
-            });
-          }
-        });
+            }
+          },
+        );
         matchData.totalPlays = matchData.plays.length;
       }
 
@@ -1149,20 +1189,19 @@ export class KafaStatsController {
           awayTeam: matchData.awayTeam.name,
           score: `${matchData.homeScore.total} - ${matchData.awayScore.total}`,
           totalPlays: matchData.totalPlays,
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       };
-
     } catch (error) {
       return {
         success: false,
         message: `경기 ${matchId} 업데이트 실패: ${error.message}`,
-        data: null
+        data: null,
       };
     }
   }
 
-  // 저장된 경기 데이터 조회 
+  // 저장된 경기 데이터 조회
   @Get('match/:matchId')
   @ApiOperation({
     summary: '📋 저장된 경기 데이터 조회',
@@ -1176,31 +1215,32 @@ export class KafaStatsController {
   async getSavedMatch(@Param('matchId') matchId: string) {
     try {
       const matchIdNum = parseInt(matchId);
-      
+
       // KafaBatchService를 통해 저장된 데이터 조회
       const mongoose = require('mongoose');
       const db = mongoose.connection.db;
-      const match = await db.collection('kafa_matches').findOne({ matchId: matchIdNum });
+      const match = await db
+        .collection('kafa_matches')
+        .findOne({ matchId: matchIdNum });
 
       if (!match) {
         return {
           success: false,
           message: `경기 ${matchId}가 저장되어 있지 않습니다. 먼저 업데이트하세요.`,
-          data: null
+          data: null,
         };
       }
 
       return {
         success: true,
         message: `경기 ${matchId} 조회 완료`,
-        data: match
+        data: match,
       };
-
     } catch (error) {
       return {
         success: false,
         message: `경기 ${matchId} 조회 실패: ${error.message}`,
-        data: null
+        data: null,
       };
     }
   }
@@ -1209,8 +1249,8 @@ export class KafaStatsController {
   private getLeagueIdByMatchId(matchId: number): number {
     const LEAGUE_RANGES = [
       { index: 19, min: 290, max: 300 },
-      { index: 20, min: 194, max: 252 }, 
-      { index: 21, min: 247, max: 277 },  // 268번이 여기에 속함
+      { index: 20, min: 194, max: 252 },
+      { index: 21, min: 247, max: 277 }, // 268번이 여기에 속함
       { index: 22, min: 278, max: 285 },
       { index: 23, min: 286, max: 289 },
       { index: 24, min: 286, max: 297 },
@@ -1242,7 +1282,9 @@ export class KafaStatsController {
     example: 268,
   })
   async crawlSpecificMatch(@Param('matchId') matchId: string) {
-    const result = await this.kafaBatchService.crawlSpecificMatch(parseInt(matchId));
+    const result = await this.kafaBatchService.crawlSpecificMatch(
+      parseInt(matchId),
+    );
     return result;
   }
 
@@ -1267,7 +1309,7 @@ export class KafaStatsController {
     return {
       success: true,
       message: '배치 상태 조회 완료',
-      data: status
+      data: status,
     };
   }
 
@@ -1308,8 +1350,8 @@ export class KafaStatsController {
       data: {
         leagueId: leagueId || '전체',
         status: status || '전체',
-        matches: []
-      }
+        matches: [],
+      },
     };
   }
 
@@ -1332,19 +1374,19 @@ export class KafaStatsController {
         message: '리그 목록 조회 성공',
         data: {
           totalLeagues: leagues.length,
-          leagues: leagues.map(league => ({
+          leagues: leagues.map((league) => ({
             leagueId: league.leagueId,
             name: league.name,
             category: league.category,
-            division: league.division
-          }))
-        }
+            division: league.division,
+          })),
+        },
       };
     } catch (error) {
       return {
         success: false,
         message: `리그 목록 조회 실패: ${error.message}`,
-        data: { leagues: [] }
+        data: { leagues: [] },
       };
     }
   }
@@ -1368,21 +1410,21 @@ export class KafaStatsController {
   async updateLeague(@Param('leagueId') leagueId: string) {
     try {
       const leagueIdNum = parseInt(leagueId);
-      
+
       // KafaLeagueCrawlerService로 특정 리그 크롤링
-      const result = await this.kafaBatchService.crawlSpecificLeague(leagueIdNum);
-      
+      const result =
+        await this.kafaBatchService.crawlSpecificLeague(leagueIdNum);
+
       return {
         success: true,
         message: `리그 ${leagueId} 업데이트 완료`,
-        data: result
+        data: result,
       };
-
     } catch (error) {
       return {
         success: false,
         message: `리그 ${leagueId} 업데이트 실패: ${error.message}`,
-        data: null
+        data: null,
       };
     }
   }
@@ -1408,24 +1450,23 @@ export class KafaStatsController {
     try {
       // 1. 먼저 리그 목록 업데이트
       const leagueResult = await this.kafaBatchService.updateLeagues();
-      
+
       // 2. 모든 리그의 경기 업데이트
       const matchResult = await this.kafaBatchService.updateMatches();
-      
+
       return {
         success: true,
         message: '모든 리그 업데이트 완료',
         data: {
           leagues: leagueResult,
-          matches: matchResult
-        }
+          matches: matchResult,
+        },
       };
-
     } catch (error) {
       return {
         success: false,
         message: `모든 리그 업데이트 실패: ${error.message}`,
-        data: null
+        data: null,
       };
     }
   }
@@ -1441,27 +1482,27 @@ export class KafaStatsController {
       // KafaBatchService를 통해 올바른 DB 조회
       const match = await this.kafaBatchService.getMatchInfo(parseInt(matchId));
       const allMatches = await this.kafaBatchService.getAllMatches();
-      
+
       return {
         success: true,
         message: `경기 ${matchId} DB 조회 결과`,
         data: {
           targetMatch: match,
-          allMatchIds: allMatches.map(m => m.matchId).sort((a, b) => a - b),
+          allMatchIds: allMatches.map((m) => m.matchId).sort((a, b) => a - b),
           totalMatches: allMatches.length,
-          allMatches: allMatches.map(m => ({
+          allMatches: allMatches.map((m) => ({
             matchId: m.matchId,
             homeTeam: m.homeTeam?.name || '미정',
             awayTeam: m.awayTeam?.name || '미정',
-            leagueId: m.leagueId
-          }))
-        }
+            leagueId: m.leagueId,
+          })),
+        },
       };
     } catch (error) {
       return {
         success: false,
         message: `DB 조회 실패: ${error.message}`,
-        data: null
+        data: null,
       };
     }
   }
@@ -1480,15 +1521,16 @@ export class KafaStatsController {
   async saveMatchDirectly(@Param('matchId') matchId: string) {
     try {
       const matchIdNum = parseInt(matchId);
-      
+
       // 1. 실시간 크롤링으로 데이터 가져오기
-      const result = await this.kafaMatchInfoService.getCompleteMatchData(matchIdNum);
-      
+      const result =
+        await this.kafaMatchInfoService.getCompleteMatchData(matchIdNum);
+
       if (!result.success || !result.data) {
         return {
           success: false,
           message: `경기 ${matchId} 크롤링 실패`,
-          data: null
+          data: null,
         };
       }
 
@@ -1501,18 +1543,30 @@ export class KafaStatsController {
         homeTeam: {
           name: result.data.generalInfo?.homeTeam?.name || '',
           initial: result.data.generalInfo?.homeTeam?.initial || '',
-          fullName: `${result.data.generalInfo?.homeTeam?.name} ${result.data.generalInfo?.homeTeam?.initial}` || ''
+          fullName:
+            `${result.data.generalInfo?.homeTeam?.name} ${result.data.generalInfo?.homeTeam?.initial}` ||
+            '',
         },
         awayTeam: {
           name: result.data.generalInfo?.awayTeam?.name || '',
           initial: result.data.generalInfo?.awayTeam?.initial || '',
-          fullName: `${result.data.generalInfo?.awayTeam?.name} ${result.data.generalInfo?.awayTeam?.initial}` || ''
+          fullName:
+            `${result.data.generalInfo?.awayTeam?.name} ${result.data.generalInfo?.awayTeam?.initial}` ||
+            '',
         },
         homeScore: result.data.detailedScores?.quarterlyScores?.home || {
-          quarter1: 0, quarter2: 0, quarter3: 0, quarter4: 0, total: 0
+          quarter1: 0,
+          quarter2: 0,
+          quarter3: 0,
+          quarter4: 0,
+          total: 0,
         },
         awayScore: result.data.detailedScores?.quarterlyScores?.away || {
-          quarter1: 0, quarter2: 0, quarter3: 0, quarter4: 0, total: 0
+          quarter1: 0,
+          quarter2: 0,
+          quarter3: 0,
+          quarter4: 0,
+          total: 0,
         },
         leagueType: result.data.generalInfo?.leagueType || '전체',
         startTime: result.data.detailedScores?.startTime || '',
@@ -1522,34 +1576,36 @@ export class KafaStatsController {
         plays: [],
         totalPlays: 0,
         crawledAt: new Date(),
-        lastUpdatedAt: new Date()
+        lastUpdatedAt: new Date(),
       };
 
       // 3. 플레이 데이터 변환
       if (result.data.playByPlay?.quarters) {
-        Object.entries(result.data.playByPlay.quarters).forEach(([quarter, quarterData]: [string, any]) => {
-          if (quarterData.plays) {
-            quarterData.plays.forEach(play => {
-              matchData.plays.push({
-                quarter: play.quarter || quarter,
-                playNumber: play.playNumber || '',
-                time: play.time || '',
-                offenseTeam: play.offenseTeam || '',
-                ballOn: play.ballOn || '',
-                down: play.down || '',
-                quarterback: play.quarterback || '',
-                playType: play.playType || '',
-                gainYd: play.gainYd || '',
-                tackleBy: play.tackleBy || '',
-                sack: play.sack || '',
-                penalty: play.penalty || '',
-                penaltyName: play.penaltyName || '',
-                score: play.score || '',
-                remark: play.remark || ''
+        Object.entries(result.data.playByPlay.quarters).forEach(
+          ([quarter, quarterData]: [string, any]) => {
+            if (quarterData.plays) {
+              quarterData.plays.forEach((play) => {
+                matchData.plays.push({
+                  quarter: play.quarter || quarter,
+                  playNumber: play.playNumber || '',
+                  time: play.time || '',
+                  offenseTeam: play.offenseTeam || '',
+                  ballOn: play.ballOn || '',
+                  down: play.down || '',
+                  quarterback: play.quarterback || '',
+                  playType: play.playType || '',
+                  gainYd: play.gainYd || '',
+                  tackleBy: play.tackleBy || '',
+                  sack: play.sack || '',
+                  penalty: play.penalty || '',
+                  penaltyName: play.penaltyName || '',
+                  score: play.score || '',
+                  remark: play.remark || '',
+                });
               });
-            });
-          }
-        });
+            }
+          },
+        );
         matchData.totalPlays = matchData.plays.length;
       }
 
@@ -1557,12 +1613,12 @@ export class KafaStatsController {
       // KafaBatchService의 private method 대신 직접 처리
       const mongoose = require('mongoose');
       const KafaMatch = mongoose.model('KafaMatch');
-      
+
       // 기존 경기가 있으면 업데이트, 없으면 생성
       await KafaMatch.findOneAndUpdate(
         { matchId: matchIdNum },
         { $set: matchData },
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
 
       return {
@@ -1573,15 +1629,14 @@ export class KafaStatsController {
           totalPlays: matchData.totalPlays,
           homeTeam: matchData.homeTeam.name,
           awayTeam: matchData.awayTeam.name,
-          score: `${matchData.homeScore.total} - ${matchData.awayScore.total}`
-        }
+          score: `${matchData.homeScore.total} - ${matchData.awayScore.total}`,
+        },
       };
-
     } catch (error) {
       return {
         success: false,
         message: `경기 ${matchId} 저장 실패: ${error.message}`,
-        data: null
+        data: null,
       };
     }
   }
@@ -1593,7 +1648,7 @@ export class KafaStatsController {
   @Get('v2/leagues')
   @ApiOperation({
     summary: '📋 V2: 리그 목록 조회',
-    description: '크롤링된 리그 목록과 실제 L_l_index 매핑 정보를 조회합니다.'
+    description: '크롤링된 리그 목록과 실제 L_l_index 매핑 정보를 조회합니다.',
   })
   async getLeaguesV2() {
     try {
@@ -1603,13 +1658,13 @@ export class KafaStatsController {
         message: '리그 목록 조회 완료',
         data: {
           totalLeagues: leagues.length,
-          leagues
-        }
+          leagues,
+        },
       };
     } catch (error) {
       return {
         success: false,
-        message: `리그 목록 조회 실패: ${error.message}`
+        message: `리그 목록 조회 실패: ${error.message}`,
       };
     }
   }
@@ -1635,12 +1690,12 @@ export class KafaStatsController {
       await this.kafaV2CrawlerService.crawlAllLeagues();
       return {
         success: true,
-        message: '리그 목록 크롤링 완료'
+        message: '리그 목록 크롤링 완료',
       };
     } catch (error) {
       return {
         success: false,
-        message: `리그 목록 크롤링 실패: ${error.message}`
+        message: `리그 목록 크롤링 실패: ${error.message}`,
       };
     }
   }
@@ -1674,12 +1729,12 @@ export class KafaStatsController {
       await this.kafaV2CrawlerService.crawlMatchesForLeague(leagueIdNum);
       return {
         success: true,
-        message: `리그 ${leagueId}의 경기 목록 크롤링 완료`
+        message: `리그 ${leagueId}의 경기 목록 크롤링 완료`,
       };
     } catch (error) {
       return {
         success: false,
-        message: `리그 ${leagueId} 경기 목록 크롤링 실패: ${error.message}`
+        message: `리그 ${leagueId} 경기 목록 크롤링 실패: ${error.message}`,
       };
     }
   }
@@ -1712,22 +1767,25 @@ export class KafaStatsController {
   })
   async crawlMatchDetailsV2(
     @Param('leagueId') leagueId: string,
-    @Param('matchIndex') matchIndex: string
+    @Param('matchIndex') matchIndex: string,
   ) {
     try {
       const leagueIdNum = parseInt(leagueId);
       const matchIndexNum = parseInt(matchIndex);
-      
-      await this.kafaV2CrawlerService.crawlMatchDetails(leagueIdNum, matchIndexNum);
-      
+
+      await this.kafaV2CrawlerService.crawlMatchDetails(
+        leagueIdNum,
+        matchIndexNum,
+      );
+
       return {
         success: true,
-        message: `리그 ${leagueId} 경기 ${matchIndex} 상세 정보 크롤링 완료`
+        message: `리그 ${leagueId} 경기 ${matchIndex} 상세 정보 크롤링 완료`,
       };
     } catch (error) {
       return {
         success: false,
-        message: `리그 ${leagueId} 경기 ${matchIndex} 크롤링 실패: ${error.message}`
+        message: `리그 ${leagueId} 경기 ${matchIndex} 크롤링 실패: ${error.message}`,
       };
     }
   }
@@ -1736,7 +1794,8 @@ export class KafaStatsController {
   @Get('v2/league/:leagueId/matches')
   @ApiOperation({
     summary: '🆕 V2: 특정 리그의 경기 목록 조회',
-    description: '새로운 구조로 저장된 특정 리그의 모든 경기 목록을 조회합니다.',
+    description:
+      '새로운 구조로 저장된 특정 리그의 모든 경기 목록을 조회합니다.',
   })
   @ApiParam({
     name: 'leagueId',
@@ -1746,21 +1805,22 @@ export class KafaStatsController {
   async getLeagueMatchesV2(@Param('leagueId') leagueId: string) {
     try {
       const leagueIdNum = parseInt(leagueId);
-      const matches = await this.kafaV2CrawlerService.getLeagueMatches(leagueIdNum);
-      
+      const matches =
+        await this.kafaV2CrawlerService.getLeagueMatches(leagueIdNum);
+
       return {
         success: true,
         message: `리그 ${leagueId}의 경기 목록 조회 완료`,
         data: {
           leagueId: leagueIdNum,
           totalMatches: matches.length,
-          matches: matches
-        }
+          matches: matches,
+        },
       };
     } catch (error) {
       return {
         success: false,
-        message: `리그 ${leagueId} 경기 목록 조회 실패: ${error.message}`
+        message: `리그 ${leagueId} 경기 목록 조회 실패: ${error.message}`,
       };
     }
   }
@@ -1797,7 +1857,7 @@ export class KafaStatsController {
     } catch (error) {
       return {
         success: false,
-        message: `전체 업데이트 실패: ${error.message}`
+        message: `전체 업데이트 실패: ${error.message}`,
       };
     }
   }
@@ -1815,16 +1875,18 @@ export class KafaStatsController {
     name: 'leagueId',
     type: 'number',
     description: '업데이트할 리그 ID (L_l_index)',
-    example: 19
+    example: 19,
   })
   async updateLeagueV2(@Param('leagueId') leagueId: string) {
     try {
-      const result = await this.kafaV2CrawlerService.updateLeague(parseInt(leagueId));
+      const result = await this.kafaV2CrawlerService.updateLeague(
+        parseInt(leagueId),
+      );
       return result;
     } catch (error) {
       return {
         success: false,
-        message: `리그 ${leagueId} 업데이트 실패: ${error.message}`
+        message: `리그 ${leagueId} 업데이트 실패: ${error.message}`,
       };
     }
   }
@@ -1866,7 +1928,7 @@ export class KafaStatsController {
     name: 'year',
     required: false,
     description: '특정 연도 조회 (선택사항)',
-    example: '2025'
+    example: '2025',
   })
   @ApiResponse({
     status: 200,
@@ -1890,44 +1952,65 @@ export class KafaStatsController {
                       properties: {
                         rushing: { type: 'array', items: { type: 'object' } },
                         passing: { type: 'array', items: { type: 'object' } },
-                        receiving: { type: 'array', items: { type: 'object' } }
-                      }
+                        receiving: { type: 'array', items: { type: 'object' } },
+                      },
                     },
                     defense: {
                       type: 'object',
                       properties: {
                         tackles: { type: 'array', items: { type: 'object' } },
-                        interceptions: { type: 'array', items: { type: 'object' } },
-                        sacks: { type: 'array', items: { type: 'object' } }
-                      }
+                        interceptions: {
+                          type: 'array',
+                          items: { type: 'object' },
+                        },
+                        sacks: { type: 'array', items: { type: 'object' } },
+                      },
                     },
                     special: {
                       type: 'object',
                       properties: {
                         kicking: { type: 'array', items: { type: 'object' } },
-                        punting: { type: 'array', items: { type: 'object' } }
-                      }
-                    }
-                  }
+                        punting: { type: 'array', items: { type: 'object' } },
+                      },
+                    },
+                  },
                 },
-                individual: { type: 'object', description: '개인 통계 (팀과 동일 구조)' }
-              }
+                individual: {
+                  type: 'object',
+                  description: '개인 통계 (팀과 동일 구조)',
+                },
+              },
             },
-            social: { type: 'object', description: '사회인 통계 (대학과 동일 구조)' }
-          }
+            social: {
+              type: 'object',
+              description: '사회인 통계 (대학과 동일 구조)',
+            },
+          },
         },
         meta: {
           type: 'object',
           properties: {
             crawledAt: { type: 'string', example: '2025-12-01T13:45:00Z' },
-            categories: { type: 'array', items: { type: 'string' }, example: ['university', 'social'] },
-            units: { type: 'array', items: { type: 'string' }, example: ['team', 'individual'] },
-            phases: { type: 'array', items: { type: 'string' }, example: ['offense', 'defense', 'special'] },
-            totalStatTypes: { type: 'number', example: 18 }
-          }
-        }
-      }
-    }
+            categories: {
+              type: 'array',
+              items: { type: 'string' },
+              example: ['university', 'social'],
+            },
+            units: {
+              type: 'array',
+              items: { type: 'string' },
+              example: ['team', 'individual'],
+            },
+            phases: {
+              type: 'array',
+              items: { type: 'string' },
+              example: ['offense', 'defense', 'special'],
+            },
+            totalStatTypes: { type: 'number', example: 18 },
+          },
+        },
+      },
+    },
   })
   async getAllKafaStats(@Query('year') year?: string) {
     try {
@@ -1945,14 +2028,14 @@ export class KafaStatsController {
           units: ['team', 'individual'],
           phases: ['offense', 'defense', 'special'],
           totalStatTypes: 18,
-          crawlDuration: `${Math.round(duration / 1000)}초`
-        }
+          crawlDuration: `${Math.round(duration / 1000)}초`,
+        },
       };
     } catch (error) {
       return {
         success: false,
         message: `전체 KAFA 통계 조회 실패: ${error.message}`,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -2000,15 +2083,15 @@ export class KafaStatsController {
           league: 'uni',
           savedCount: 45,
           filePath: '/path/to/data/kafa-uni-players-latest.json',
-          crawledAt: '2025-12-16T10:30:00.000Z'
-        }
-      }
-    }
+          crawledAt: '2025-12-16T10:30:00.000Z',
+        },
+      },
+    },
   })
   async scrapeAndSaveToJson(@Param('league') league: 'uni' | 'soc') {
     try {
       const result = await this.kafaStatsService.savePlayersToJson(league);
-      
+
       return {
         success: result.success,
         message: result.message,
@@ -2016,14 +2099,14 @@ export class KafaStatsController {
           league,
           savedCount: result.savedCount,
           filePath: result.filePath,
-          crawledAt: new Date().toISOString()
-        }
+          crawledAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       return {
         success: false,
         message: `크롤링 및 저장 실패: ${error.message}`,
-        data: null
+        data: null,
       };
     }
   }
@@ -2075,28 +2158,28 @@ export class KafaStatsController {
               yardsPerAttempt: 7.0,
               attempts: 61,
               touchdowns: 4,
-              longest: 59
-            }
-          ]
-        }
-      }
-    }
+              longest: 59,
+            },
+          ],
+        },
+      },
+    },
   })
   async getPlayersFromJson(@Param('league') league: 'uni' | 'soc') {
     const result = await this.kafaStatsService.getPlayersFromJson(league);
-    
+
     if (!result.success) {
       return {
         success: false,
         message: result.message,
-        data: null
+        data: null,
       };
     }
 
     return {
       success: true,
       message: result.message,
-      data: result.data
+      data: result.data,
     };
   }
 
@@ -2119,20 +2202,20 @@ export class KafaStatsController {
   async getJsonFiles() {
     try {
       const result = await this.kafaStatsService.getJsonFileList();
-      
+
       return {
         success: result.success,
         message: `${result.files.length}개의 JSON 파일을 찾았습니다.`,
         data: {
           totalFiles: result.files.length,
-          files: result.files
-        }
+          files: result.files,
+        },
       };
     } catch (error) {
       return {
         success: false,
         message: `파일 목록 조회 실패: ${error.message}`,
-        data: { files: [] }
+        data: { files: [] },
       };
     }
   }
@@ -2196,26 +2279,26 @@ export class KafaStatsController {
               statType: 'rushing',
               success: true,
               count: 45,
-              filePath: '/data/kafa-uni-rushing.json'
+              filePath: '/data/kafa-uni-rushing.json',
             },
             {
               statType: 'passing',
               success: true,
               count: 25,
-              filePath: '/data/kafa-uni-passing.json'
-            }
-          ]
-        }
-      }
-    }
+              filePath: '/data/kafa-uni-passing.json',
+            },
+          ],
+        },
+      },
+    },
   })
   async scrapeAllStatsToJson(@Param('league') league: 'uni' | 'soc') {
     try {
       const startTime = Date.now();
       const result = await this.kafaStatsService.scrapeAllStatsToJson(league);
       const duration = Date.now() - startTime;
-      
-      const successCount = result.results.filter(r => r.success).length;
+
+      const successCount = result.results.filter((r) => r.success).length;
       const totalPlayers = result.results.reduce((sum, r) => sum + r.count, 0);
 
       return {
@@ -2228,14 +2311,14 @@ export class KafaStatsController {
           totalPlayers,
           duration: `${Math.round(duration / 1000)}초`,
           completedAt: new Date().toISOString(),
-          results: result.results
-        }
+          results: result.results,
+        },
       };
     } catch (error) {
       return {
         success: false,
         message: `전체 스탯 크롤링 실패: ${error.message}`,
-        data: null
+        data: null,
       };
     }
   }
@@ -2276,9 +2359,17 @@ export class KafaStatsController {
   @ApiParam({
     name: 'statType',
     enum: [
-      'rushing', 'passing', 'receiving', 'fumbles', 'tackles', 
-      'interceptions', 'fieldgoals', 'kickoffs', 'kickoffreturns', 
-      'punting', 'puntreturns'
+      'rushing',
+      'passing',
+      'receiving',
+      'fumbles',
+      'tackles',
+      'interceptions',
+      'fieldgoals',
+      'kickoffs',
+      'kickoffreturns',
+      'punting',
+      'puntreturns',
     ],
     description: '스탯 타입',
     example: 'rushing',
@@ -2306,27 +2397,30 @@ export class KafaStatsController {
               yardsPerAttempt: 7.0,
               attempts: 61,
               touchdowns: 4,
-              longest: 59
-            }
-          ]
-        }
-      }
-    }
+              longest: 59,
+            },
+          ],
+        },
+      },
+    },
   })
   async getStatTypeFromJson(
     @Param('league') league: 'uni' | 'soc',
-    @Param('statType') statType: string
+    @Param('statType') statType: string,
   ) {
-    const result = await this.kafaStatsService.getStatTypeFromJson(league, statType);
-    
+    const result = await this.kafaStatsService.getStatTypeFromJson(
+      league,
+      statType,
+    );
+
     return {
       success: result.success,
       message: result.message,
-      data: result.data
+      data: result.data,
     };
   }
 
-  // 저장된 모든 스탯 파일 목록 조회 API  
+  // 저장된 모든 스탯 파일 목록 조회 API
   @Get('all-stat-files')
   @ApiOperation({
     summary: '📂 저장된 모든 스탯 파일 목록 조회',
@@ -2355,7 +2449,7 @@ export class KafaStatsController {
     required: false,
     enum: ['uni', 'soc'],
     description: '특정 리그만 필터링 (선택사항)',
-    example: 'uni'
+    example: 'uni',
   })
   @ApiResponse({
     status: 200,
@@ -2368,7 +2462,7 @@ export class KafaStatsController {
           totalFiles: 22,
           byLeague: {
             uni: 11,
-            soc: 11
+            soc: 11,
           },
           files: [
             {
@@ -2378,37 +2472,40 @@ export class KafaStatsController {
               league: 'uni',
               size: '15.2 KB',
               createdAt: '2025-12-16T10:45:00.000Z',
-              playerCount: 45
-            }
-          ]
-        }
-      }
-    }
+              playerCount: 45,
+            },
+          ],
+        },
+      },
+    },
   })
   async getAllStatFiles(@Query('league') league?: 'uni' | 'soc') {
     try {
       const result = await this.kafaStatsService.getAllStatFiles(league);
-      
+
       // 리그별 통계 계산
-      const byLeague = result.files.reduce((acc, file) => {
-        acc[file.league] = (acc[file.league] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      
+      const byLeague = result.files.reduce(
+        (acc, file) => {
+          acc[file.league] = (acc[file.league] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
+
       return {
         success: result.success,
         message: `${result.files.length}개의 스탯 파일을 찾았습니다.`,
         data: {
           totalFiles: result.files.length,
           byLeague,
-          files: result.files
-        }
+          files: result.files,
+        },
       };
     } catch (error) {
       return {
         success: false,
         message: `스탯 파일 목록 조회 실패: ${error.message}`,
-        data: { files: [] }
+        data: { files: [] },
       };
     }
   }
@@ -2457,7 +2554,7 @@ export class KafaStatsController {
                 { name: 'YDS/ATT', players: 50, uniquePlayers: 38 },
                 { name: 'ATT', players: 50, uniquePlayers: 42 },
                 { name: 'TD', players: 50, uniquePlayers: 35 },
-                { name: 'LNG', players: 50, uniquePlayers: 40 }
+                { name: 'LNG', players: 50, uniquePlayers: 40 },
               ],
               totalCrawled: 250,
               uniquePlayers: 127,
@@ -2474,14 +2571,14 @@ export class KafaStatsController {
                   attempts: 71,
                   touchdowns: 6,
                   longest: 45,
-                  foundInSorts: ['YDS/ATT', 'ATT']
-                }
-              ]
-            }
-          }
-        }
-      }
-    }
+                  foundInSorts: ['YDS/ATT', 'ATT'],
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 400,
@@ -2492,23 +2589,263 @@ export class KafaStatsController {
           example: {
             success: false,
             message: 'Puppeteer 초기화 실패',
-            error: 'Browser launch failed'
+            error: 'Browser launch failed',
+          },
+        },
+      },
+    },
+  })
+  async scrapeRushingAllSorts(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+
+      const result =
+        await this.kafaStatsService.scrapeRushingWithAllSorts(league);
+
+      const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+
+      return {
+        success: true,
+        message: `${league === 'uni' ? '대학' : '사회인'} 러싱 스탯을 5가지 정렬로 크롤링 완료`,
+        data: {
+          ...result,
+          processingTime: `${processingTime}s`,
+        },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `러싱 다중 정렬 크롤링 실패: ${error.message}`,
+        error: error.message,
+      };
+    }
+  }
+
+  // 패싱 스탯 다중 정렬 크롤링 API
+  @Post('scrape-passing-all-sorts/:league')
+  @ApiOperation({
+    summary: '🏈 패싱 스탯 모든 정렬 방식 크롤링',
+    description: `
+    ## 🏈 패싱 스탯을 6가지 정렬로 크롤링하여 모든 선수 수집
+    기존의 50명 제한을 우회하기 위해 각 정렬 방식별로 크롤링합니다.
+    
+    ### 📋 크롤링하는 정렬 방식
+    1. **PASS YDS**: 패싱 야드순 (기본)
+    2. **COMP %**: 패스 성공률순 (정확성 기준)
+    3. **ATT**: 패스 시도순 (많이 던지는 QB)
+    4. **TD**: 패싱 터치다운순 (득점 능력)
+    5. **INT**: 인터셉션 적은순 (안전한 QB)
+    6. **LNG**: 최장 패스순 (빅암 QB)
+
+    ### 🎯 목적
+    - 기존 컬럼 매핑 오류 해결 (0값 문제 수정)
+    - 50명 → 80-100명으로 확장
+    - 모든 카테고리별 상위 QB 발견
+    
+    ### ⚡ 개선사항
+    - Chrome/Puppeteer 불필요
+    - 기존 검증된 패싱 로직 활용
+    - JSON 파일 자동 업데이트
+    `,
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: 'uni: 대학리그, soc: 사회인리그',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '크롤링 성공 - 패싱 스탯 다중 정렬 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: {
+          type: 'string',
+          example: '대학 패싱 스탯을 6가지 정렬로 크롤링 완료',
+        },
+        data: {
+          type: 'object',
+          properties: {
+            league: { type: 'string', example: 'uni' },
+            statType: { type: 'string', example: 'passing' },
+            uniquePlayers: { type: 'number', example: 85 },
+            totalCrawled: { type: 'number', example: 300 },
+            duplicatesRemoved: { type: 'number', example: 215 },
+            processingTime: { type: 'string', example: '12.4s' },
+          },
+        },
+      },
+    },
+  })
+  async scrapePassingAllSorts(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+
+      const result =
+        await this.kafaStatsService.scrapePassingWithAllSorts(league);
+
+      const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+
+      return {
+        success: true,
+        message: `${league === 'uni' ? '대학' : '사회인'} 패싱 스탯을 6가지 정렬로 크롤링 완료`,
+        data: {
+          ...result,
+          processingTime: `${processingTime}s`,
+        },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `패싱 다중 정렬 크롤링 실패: ${error.message}`,
+        error: error.message,
+      };
+    }
+  }
+
+  @Post('scrape-receiving-all-sorts/:league')
+  @ApiOperation({
+    summary: '🏈 리시빙 스탯 모든 정렬 방식 크롤링',
+    description: `
+    ## 🏈 리시빙 스탯을 5가지 정렬로 크롤링하여 모든 선수 수집
+    기존의 50명 제한을 우회하기 위해 각 정렬 방식별로 크롤링합니다.
+    
+    ### 📋 크롤링하는 정렬 방식
+    1. **REC**: 리시빙 횟수순 (캐치 능력)
+    2. **REC YDS**: 리시빙 야드순 (야드 생산성)
+    3. **AVG**: 리시빙당 야드순 (효율성)
+    4. **TD**: 리시빙 터치다운순 (득점 능력)
+    5. **LNG**: 최장 리시빙순 (빅플레이 능력)
+
+    ### 🎯 목적
+    - 50명 → 80-100명으로 확장
+    - 다양한 특성별 상위 리시버 발견
+    - 기존 0값 오류 해결
+    
+    ### ⚡ 특징
+    - axios + cheerio 사용
+    - 중복 제거 로직
+    - JSON 파일 자동 업데이트
+    `,
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: 'uni: 대학리그, soc: 사회인리그',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '크롤링 성공 - 리시빙 스탯 다중 정렬 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: {
+          type: 'string',
+          example: '대학 리시빙 스탯을 5가지 정렬로 크롤링 완료',
+        },
+        data: {
+          type: 'object',
+          properties: {
+            league: { type: 'string', example: 'uni' },
+            statType: { type: 'string', example: 'receiving' },
+            uniquePlayers: { type: 'number', example: 75 },
+            totalCrawled: { type: 'number', example: 250 },
+            duplicatesRemoved: { type: 'number', example: 175 },
+            processingTime: { type: 'string', example: '10.2s' },
+          },
+        },
+      },
+    },
+  })
+  async scrapeReceivingAllSorts(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+
+      const result =
+        await this.kafaStatsService.scrapeReceivingWithAllSorts(league);
+
+      const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+
+      return {
+        success: true,
+        message: `${league === 'uni' ? '대학' : '사회인'} 리시빙 스탯을 5가지 정렬로 크롤링 완료`,
+        data: {
+          ...result,
+          processingTime: `${processingTime}s`,
+        },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `리시빙 다중 정렬 크롤링 실패: ${error.message}`,
+        error: error.message,
+      };
+    }
+  }
+
+  @Post('scrape-fumbles-all-sorts/:league')
+  @ApiOperation({
+    summary: '🏈 펌블 스탯 모든 정렬 방식 크롤링',
+    description: `
+    ## 🏈 펌블 스탯을 3가지 정렬로 크롤링하여 모든 선수 수집
+    기존의 50명 제한을 우회하기 위해 각 정렬 방식별로 크롤링합니다.
+    
+    ### 📋 크롤링하는 정렬 방식
+    1. **FF**: 강제 펌블순 (수비수들의 펌블 유발 능력)
+    2. **FR**: 펌블 회수순 (펌블 볼 회수 능력)
+    3. **TD**: 펌블 회수 터치다운순 (회수 후 득점)
+
+    ### 🎯 목적
+    - 50명 → 60-80명으로 확장
+    - 다양한 수비 특성별 상위 선수 발견
+    - 기존 0값 오류 해결
+    
+    ### ⚡ 특징
+    - axios + cheerio 사용
+    - 중복 제거 로직
+    - JSON 파일 자동 업데이트
+    `
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: 'uni: 대학리그, soc: 사회인리그'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '크롤링 성공 - 펌블 스탯 다중 정렬 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: { type: 'string', example: '대학 펌블 스탯을 3가지 정렬로 크롤링 완료' },
+        data: {
+          type: 'object',
+          properties: {
+            league: { type: 'string', example: 'uni' },
+            statType: { type: 'string', example: 'fumbles' },
+            uniquePlayers: { type: 'number', example: 65 },
+            totalCrawled: { type: 'number', example: 150 },
+            duplicatesRemoved: { type: 'number', example: 85 },
+            processingTime: { type: 'string', example: '4.2s' }
           }
         }
       }
     }
   })
-  async scrapeRushingAllSorts(@Param('league') league: 'uni' | 'soc') {
+  async scrapeFumblesAllSorts(@Param('league') league: 'uni' | 'soc') {
     try {
       const startTime = Date.now();
       
-      const result = await this.kafaStatsService.scrapeRushingWithAllSorts(league);
+      const result = await this.kafaStatsService.scrapeFumblesWithAllSorts(league);
       
       const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
       
       return {
         success: true,
-        message: `${league === 'uni' ? '대학' : '사회인'} 러싱 스탯을 5가지 정렬로 크롤링 완료`,
+        message: `${league === 'uni' ? '대학' : '사회인'} 펌블 스탯을 3가지 정렬로 크롤링 완료`,
         data: {
           ...result,
           processingTime: `${processingTime}s`
@@ -2517,10 +2854,547 @@ export class KafaStatsController {
     } catch (error) {
       return {
         success: false,
-        message: `러싱 다중 정렬 크롤링 실패: ${error.message}`,
+        message: `펌블 다중 정렬 크롤링 실패: ${error.message}`,
         error: error.message
       };
     }
   }
 
+  @Post('scrape-tackles-all-sorts/:league')
+  @ApiOperation({
+    summary: '🏈 태클 스탯 모든 정렬 방식 크롤링',
+    description: `
+    ## 🏈 태클 스탯을 4가지 정렬로 크롤링하여 모든 선수 수집
+    기존의 50명 제한을 우회하기 위해 각 정렬 방식별로 크롤링합니다.
+    
+    ### 📋 크롤링하는 정렬 방식
+    1. **TOT**: 총 태클순 (전체 수비 기여도)
+    2. **SACKS**: 색순 (QB 사이킹 전문)
+    3. **SOLO**: 단독 태클순 (1대1 수비 능력)
+    4. **AST**: 어시스트 태클순 (팀워크 수비)
+
+    ### 🎯 목적
+    - 50명 → 80-120명으로 확장
+    - 다양한 수비 특성별 상위 선수 발견
+    - 기존 0값 오류 해결
+    
+    ### ⚡ 특징
+    - axios + cheerio 사용
+    - 중복 제거 로직
+    - JSON 파일 자동 업데이트
+    `
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: 'uni: 대학리그, soc: 사회인리그'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '크롤링 성공 - 태클 스탯 다중 정렬 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: { type: 'string', example: '대학 태클 스탯을 4가지 정렬로 크롤링 완료' },
+        data: {
+          type: 'object',
+          properties: {
+            league: { type: 'string', example: 'uni' },
+            statType: { type: 'string', example: 'tackles' },
+            uniquePlayers: { type: 'number', example: 95 },
+            totalCrawled: { type: 'number', example: 200 },
+            duplicatesRemoved: { type: 'number', example: 105 },
+            processingTime: { type: 'string', example: '7.8s' }
+          }
+        }
+      }
+    }
+  })
+  async scrapeTacklesAllSorts(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+      
+      const result = await this.kafaStatsService.scrapeTacklesWithAllSorts(league);
+      
+      const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      return {
+        success: true,
+        message: `${league === 'uni' ? '대학' : '사회인'} 태클 스탯을 4가지 정렬로 크롤링 완료`,
+        data: {
+          ...result,
+          processingTime: `${processingTime}s`
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `태클 다중 정렬 크롤링 실패: ${error.message}`,
+        error: error.message
+      };
+    }
+  }
+
+  @Post('scrape-interceptions-all-sorts/:league')
+  @ApiOperation({
+    summary: '🏈 인터셉션 스탯 모든 정렬 방식 크롤링',
+    description: `
+    ## 🏈 인터셉션 스탯을 4가지 정렬로 크롤링하여 모든 선수 수집
+    기존의 50명 제한을 우회하기 위해 각 정렬 방식별로 크롤링합니다.
+    
+    ### 📋 크롤링하는 정렬 방식
+    1. **INT**: 인터셉션 개수순 (패스 차단 능력)
+    2. **TD**: 인터셉션 터치다운순 (픽식스 득점)
+    3. **YDS**: 인터셉션 리턴 야드순 (리턴 능력)
+    4. **LNG**: 최장 인터셉션 리턴순 (빅플레이 능력)
+
+    ### 🎯 목적
+    - 50명 → 70-100명으로 확장
+    - 다양한 수비 특성별 상위 선수 발견
+    - 기존 0값 오류 해결
+    
+    ### ⚡ 특징
+    - axios + cheerio 사용
+    - 중복 제거 로직
+    - JSON 파일 자동 업데이트
+    `
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: 'uni: 대학리그, soc: 사회인리그'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '크롤링 성공 - 인터셉션 스탯 다중 정렬 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: { type: 'string', example: '대학 인터셉션 스탯을 4가지 정렬로 크롤링 완료' },
+        data: {
+          type: 'object',
+          properties: {
+            league: { type: 'string', example: 'uni' },
+            statType: { type: 'string', example: 'interceptions' },
+            uniquePlayers: { type: 'number', example: 85 },
+            totalCrawled: { type: 'number', example: 200 },
+            duplicatesRemoved: { type: 'number', example: 115 },
+            processingTime: { type: 'string', example: '6.4s' }
+          }
+        }
+      }
+    }
+  })
+  async scrapeInterceptionsAllSorts(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+      
+      const result = await this.kafaStatsService.scrapeInterceptionsWithAllSorts(league);
+      
+      const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      return {
+        success: true,
+        message: `${league === 'uni' ? '대학' : '사회인'} 인터셉션 스탯을 4가지 정렬로 크롤링 완료`,
+        data: {
+          ...result,
+          processingTime: `${processingTime}s`
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `인터셉션 다중 정렬 크롤링 실패: ${error.message}`,
+        error: error.message
+      };
+    }
+  }
+
+  @Post('scrape-fieldgoals-all-sorts/:league')
+  @ApiOperation({
+    summary: '🏈 필드골 스탯 모든 정렬 방식 크롤링',
+    description: `
+    ## 🏈 필드골 스탯을 6가지 정렬로 크롤링하여 모든 선수 수집
+    기존의 50명 제한을 우회하기 위해 각 정렬 방식별로 크롤링합니다.
+    
+    ### 📋 크롤링하는 정렬 방식
+    1. **FG%**: 필드골 성공률순 (정확도)
+    2. **AVG**: 평균 야드순 (킥킹 거리)
+    3. **FGM**: 필드골 성공 개수순 (득점 기여)
+    4. **ATT**: 시도 횟수순 (킥킹 빈도)
+    5. **YDS**: 총 야드순 (전체 거리)
+    6. **LNG**: 최장거리순 (킥킹 파워)
+
+    ### 🎯 목적
+    - 50명 → 70-100명으로 확장
+    - 다양한 킥킹 특성별 상위 선수 발견
+    - 기존 0값 오류 해결
+    
+    ### ⚡ 특징
+    - axios + cheerio 사용
+    - 중복 제거 로직
+    - JSON 파일 자동 업데이트
+    `
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: 'uni: 대학리그, soc: 사회인리그'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '크롤링 성공 - 필드골 스탯 다중 정렬 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: { type: 'string', example: '대학 필드골 스탯을 6가지 정렬로 크롤링 완료' },
+        data: {
+          type: 'object',
+          properties: {
+            league: { type: 'string', example: 'uni' },
+            statType: { type: 'string', example: 'fieldgoals' },
+            uniquePlayers: { type: 'number', example: 75 },
+            totalCrawled: { type: 'number', example: 300 },
+            duplicatesRemoved: { type: 'number', example: 225 },
+            processingTime: { type: 'string', example: '8.2s' }
+          }
+        }
+      }
+    }
+  })
+  async scrapeFieldGoalsAllSorts(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+      
+      const result = await this.kafaStatsService.scrapeFieldGoalsWithAllSorts(league);
+      
+      const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      return {
+        success: true,
+        message: `${league === 'uni' ? '대학' : '사회인'} 필드골 스탯을 6가지 정렬로 크롤링 완료`,
+        data: {
+          ...result,
+          processingTime: `${processingTime}s`
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `필드골 다중 정렬 크롤링 실패: ${error.message}`,
+        error: error.message
+      };
+    }
+  }
+
+  @Post('scrape-kickoffs-all-sorts/:league')
+  @ApiOperation({
+    summary: '🏈 킥오프 스탯 모든 정렬 방식 크롤링',
+    description: `
+    ## 🏈 킥오프 스탯을 5가지 정렬로 크롤링하여 모든 선수 수집
+    기존의 50명 제한을 우회하기 위해 각 정렬 방식별로 크롤링합니다.
+    
+    ### 📋 크롤링하는 정렬 방식
+    1. **AVG**: 평균 야드순 (킥오프 거리)
+    2. **KO**: 킥오프 횟수순 (킥킹 빈도)
+    3. **YDS**: 총 야드순 (전체 거리)
+    4. **TD**: 터치다운순 (킥오프 TD)
+    5. **LNG**: 최장거리순 (킥킹 파워)
+
+    ### 🎯 목적
+    - 50명 → 70-100명으로 확장
+    - 다양한 킥킹 특성별 상위 선수 발견
+    - 기존 0값 오류 해결
+    
+    ### ⚡ 특징
+    - axios + cheerio 사용
+    - 중복 제거 로직
+    - JSON 파일 자동 업데이트
+    `
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: 'uni: 대학리그, soc: 사회인리그'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '크롤링 성공 - 킥오프 스탯 다중 정렬 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: { type: 'string', example: '대학 킥오프 스탯을 5가지 정렬로 크롤링 완료' },
+        data: {
+          type: 'object',
+          properties: {
+            league: { type: 'string', example: 'uni' },
+            statType: { type: 'string', example: 'kickoffs' },
+            uniquePlayers: { type: 'number', example: 85 },
+            totalCrawled: { type: 'number', example: 250 },
+            duplicatesRemoved: { type: 'number', example: 165 },
+            processingTime: { type: 'string', example: '5.2s' }
+          }
+        }
+      }
+    }
+  })
+  async scrapeKickoffsAllSorts(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+      
+      const result = await this.kafaStatsService.scrapeKickoffsWithAllSorts(league);
+      
+      const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      return {
+        success: true,
+        message: `${league === 'uni' ? '대학' : '사회인'} 킥오프 스탯을 5가지 정렬로 크롤링 완료`,
+        data: {
+          ...result,
+          processingTime: `${processingTime}s`
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `킥오프 다중 정렬 크롤링 실패: ${error.message}`,
+        error: error.message
+      };
+    }
+  }
+
+  @Post('scrape-kickoffreturns-all-sorts/:league')
+  @ApiOperation({
+    summary: '🏈 킥오프 리턴 스탯 모든 정렬 방식 크롤링',
+    description: `
+    ## 🏈 킥오프 리턴 스탯을 5가지 정렬로 크롤링하여 모든 선수 수집
+    기존의 50명 제한을 우회하기 위해 각 정렬 방식별로 크롤링합니다.
+    
+    ### 📋 크롤링하는 정렬 방식
+    1. **AVG**: 평균 야드순 (리턴 거리)
+    2. **RET**: 킥오프 리턴 횟수순 (리턴 빈도)
+    3. **YDS**: 총 리턴 야드순 (전체 거리)
+    4. **TD**: 터치다운순 (리턴 TD)
+    5. **LNG**: 최장 리턴순 (리턴 파워)
+
+    ### 🎯 목적
+    - 50명 → 70-100명으로 확장
+    - 다양한 리턴 특성별 상위 선수 발견
+    - 기존 0값 오류 해결
+    
+    ### ⚡ 특징
+    - axios + cheerio 사용
+    - 중복 제거 로직
+    - JSON 파일 자동 업데이트
+    `
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: 'uni: 대학리그, soc: 사회인리그'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '크롤링 성공 - 킥오프 리턴 스탯 다중 정렬 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: { type: 'string', example: '대학 킥오프 리턴 스탯을 5가지 정렬로 크롤링 완료' },
+        data: {
+          type: 'object',
+          properties: {
+            league: { type: 'string', example: 'uni' },
+            statType: { type: 'string', example: 'kickoffreturns' },
+            uniquePlayers: { type: 'number', example: 75 },
+            totalCrawled: { type: 'number', example: 250 },
+            duplicatesRemoved: { type: 'number', example: 175 },
+            processingTime: { type: 'string', example: '4.8s' }
+          }
+        }
+      }
+    }
+  })
+  async scrapeKickoffReturnsAllSorts(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+      
+      const result = await this.kafaStatsService.scrapeKickoffReturnsWithAllSorts(league);
+      
+      const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      return {
+        success: true,
+        message: `${league === 'uni' ? '대학' : '사회인'} 킥오프 리턴 스탯을 5가지 정렬로 크롤링 완료`,
+        data: {
+          ...result,
+          processingTime: `${processingTime}s`
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `킥오프 리턴 다중 정렬 크롤링 실패: ${error.message}`,
+        error: error.message
+      };
+    }
+  }
+
+  @Post('scrape-punts-all-sorts/:league')
+  @ApiOperation({
+    summary: '🏈 펀트 스탯 모든 정렬 방식 크롤링',
+    description: `
+    ## 🏈 펀트 스탯을 5가지 정렬로 크롤링하여 모든 선수 수집
+    기존의 50명 제한을 우회하기 위해 각 정렬 방식별로 크롤링합니다.
+    
+    ### 📋 크롤링하는 정렬 방식
+    1. **AVG**: 평균 야드순 (펀팅 거리)
+    2. **PUNTS**: 펀트 횟수순 (펀팅 빈도)
+    3. **YDS**: 총 야드순 (전체 거리)
+    4. **TD**: 터치다운순 (펀트 TD)
+    5. **LNG**: 최장거리순 (펀팅 파워)
+
+    ### 🎯 목적
+    - 50명 → 70-100명으로 확장
+    - 다양한 펀팅 특성별 상위 선수 발견
+    - 기존 0값 오류 해결
+    
+    ### ⚡ 특징
+    - axios + cheerio 사용
+    - 중복 제거 로직
+    - JSON 파일 자동 업데이트
+    `
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: 'uni: 대학리그, soc: 사회인리그'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '크롤링 성공 - 펀트 스탯 다중 정렬 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: { type: 'string', example: '대학 펀트 스탯을 5가지 정렬로 크롤링 완료' },
+        data: {
+          type: 'object',
+          properties: {
+            league: { type: 'string', example: 'uni' },
+            statType: { type: 'string', example: 'punts' },
+            uniquePlayers: { type: 'number', example: 65 },
+            totalCrawled: { type: 'number', example: 250 },
+            duplicatesRemoved: { type: 'number', example: 185 },
+            processingTime: { type: 'string', example: '5.8s' }
+          }
+        }
+      }
+    }
+  })
+  async scrapePuntsAllSorts(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+      
+      const result = await this.kafaStatsService.scrapePuntsWithAllSorts(league);
+      
+      const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      return {
+        success: true,
+        message: `${league === 'uni' ? '대학' : '사회인'} 펀트 스탯을 5가지 정렬로 크롤링 완료`,
+        data: {
+          ...result,
+          processingTime: `${processingTime}s`
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `펀트 다중 정렬 크롤링 실패: ${error.message}`,
+        error: error.message
+      };
+    }
+  }
+
+  @Post('scrape-puntreturns-all-sorts/:league')
+  @ApiOperation({
+    summary: '🏈 펀트 리턴 스탯 모든 정렬 방식 크롤링',
+    description: `
+    ## 🏈 펀트 리턴 스탯을 5가지 정렬로 크롤링하여 모든 선수 수집
+    기존의 50명 제한을 우회하기 위해 각 정렬 방식별로 크롤링합니다.
+    
+    ### 📋 크롤링하는 정렬 방식
+    1. **AVG**: 평균 야드순 (리턴 거리)
+    2. **RET**: 펀트 리턴 횟수순 (리턴 빈도)
+    3. **YDS**: 총 리턴 야드순 (전체 거리)
+    4. **TD**: 터치다운순 (리턴 TD)
+    5. **LNG**: 최장 리턴순 (리턴 파워)
+
+    ### 🎯 목적
+    - 50명 → 70-100명으로 확장
+    - 다양한 리턴 특성별 상위 선수 발견
+    - 기존 0값 오류 해결
+    
+    ### ⚡ 특징
+    - axios + cheerio 사용
+    - 중복 제거 로직
+    - JSON 파일 자동 업데이트
+    `
+  })
+  @ApiParam({
+    name: 'league',
+    enum: ['uni', 'soc'],
+    description: 'uni: 대학리그, soc: 사회인리그'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '크롤링 성공 - 펀트 리턴 스탯 다중 정렬 완료',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: { type: 'string', example: '대학 펀트 리턴 스탯을 5가지 정렬로 크롤링 완료' },
+        data: {
+          type: 'object',
+          properties: {
+            league: { type: 'string', example: 'uni' },
+            statType: { type: 'string', example: 'puntreturns' },
+            uniquePlayers: { type: 'number', example: 80 },
+            totalCrawled: { type: 'number', example: 250 },
+            duplicatesRemoved: { type: 'number', example: 170 },
+            processingTime: { type: 'string', example: '5.1s' }
+          }
+        }
+      }
+    }
+  })
+  async scrapePuntReturnsAllSorts(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+      
+      const result = await this.kafaStatsService.scrapePuntReturnsWithAllSorts(league);
+      
+      const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      return {
+        success: true,
+        message: `${league === 'uni' ? '대학' : '사회인'} 펀트 리턴 스탯을 5가지 정렬로 크롤링 완료`,
+        data: {
+          ...result,
+          processingTime: `${processingTime}s`
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `펀트 리턴 다중 정렬 크롤링 실패: ${error.message}`,
+        error: error.message
+      };
+    }
+  }
 }

@@ -30,7 +30,7 @@ export class KafaMatchInfoService {
       // 로그인 폼 입력
       await page.type('#user_id', 'stech');
       await page.type('#user_password', 'Startup901()');
-      
+
       // 로그인 버튼 클릭
       await page.click('#login_btn');
       await page.waitForNavigation({ waitUntil: 'networkidle2' });
@@ -74,24 +74,29 @@ export class KafaMatchInfoService {
         const result: any = {};
 
         // 1. 리그 종류
-        const leagueSelect = document.querySelector('select[id*="L_league"]') as HTMLSelectElement;
-        result.leagueType = leagueSelect?.selectedOptions?.[0]?.textContent?.trim() || '';
+        const leagueSelect = document.querySelector('select[id*="L_league"]');
+        result.leagueType =
+          (leagueSelect as HTMLSelectElement)?.selectedOptions?.[0]?.textContent?.trim() || '';
 
         // 2. 경기 날짜
         const dateInput = document.querySelector('input[id*="day"]');
         result.gameDate = (dateInput as HTMLInputElement)?.value || '';
 
         // 3. 홈팀 정보
-        const homeTeamSelect = document.querySelector('select[name*="home_team"]') as HTMLSelectElement;
-        const homeTeamOption = homeTeamSelect?.selectedOptions?.[0];
+        const homeTeamSelect = document.querySelector(
+          'select[name*="home_team"]',
+        );
+        const homeTeamOption = (homeTeamSelect as HTMLSelectElement)?.selectedOptions?.[0];
         result.homeTeam = {
           name: homeTeamOption?.textContent?.trim() || '',
           initial: homeTeamOption?.getAttribute('value') || '',
         };
 
         // 4. 어웨이팀 정보
-        const awayTeamSelect = document.querySelector('select[name*="away_team"]') as HTMLSelectElement;
-        const awayTeamOption = awayTeamSelect?.selectedOptions?.[0];
+        const awayTeamSelect = document.querySelector(
+          'select[name*="away_team"]',
+        );
+        const awayTeamOption = (awayTeamSelect as HTMLSelectElement)?.selectedOptions?.[0];
         result.awayTeam = {
           name: awayTeamOption?.textContent?.trim() || '',
           initial: awayTeamOption?.getAttribute('value') || '',
@@ -117,7 +122,7 @@ export class KafaMatchInfoService {
         const scoreTable = document.querySelector('table.match_score');
         if (scoreTable) {
           const rows = scoreTable.querySelectorAll('tr');
-          
+
           // 홈팀 점수 (첫번째 행)
           const homeRow = rows[1];
           if (homeRow) {
@@ -146,7 +151,9 @@ export class KafaMatchInfoService {
         }
 
         // 추가 정보
-        const startTimeInput = document.querySelector('input[id*="start_time"]');
+        const startTimeInput = document.querySelector(
+          'input[id*="start_time"]',
+        );
         scores.startTime = (startTimeInput as HTMLInputElement)?.value || '';
 
         const endTimeInput = document.querySelector('input[id*="end_time"]');
@@ -159,7 +166,11 @@ export class KafaMatchInfoService {
       });
 
       // 스코어 표시 문자열 생성
-      if (generalInfo.homeTeam && generalInfo.awayTeam && detailedScores.quarterlyScores) {
+      if (
+        generalInfo.homeTeam &&
+        generalInfo.awayTeam &&
+        detailedScores.quarterlyScores
+      ) {
         generalInfo.score = {
           home: detailedScores.quarterlyScores.home.total || 0,
           away: detailedScores.quarterlyScores.away.total || 0,
@@ -178,7 +189,10 @@ export class KafaMatchInfoService {
         },
       };
     } catch (error) {
-      this.logger.error(`❌ 경기 ${matchId} 일반 정보 추출 실패:`, error.message);
+      this.logger.error(
+        `❌ 경기 ${matchId} 일반 정보 추출 실패:`,
+        error.message,
+      );
       return {
         success: false,
         error: error.message,
@@ -229,7 +243,10 @@ export class KafaMatchInfoService {
         },
       };
     } catch (error) {
-      this.logger.error(`❌ 경기 ${matchId} 완전한 데이터 조회 실패:`, error.message);
+      this.logger.error(
+        `❌ 경기 ${matchId} 완전한 데이터 조회 실패:`,
+        error.message,
+      );
       return {
         success: false,
         error: error.message,
@@ -306,11 +323,17 @@ export class KafaMatchInfoService {
         data: {
           matchId,
           quarters: playData,
-          totalPlays: Object.values(playData).reduce((sum: number, q: any) => sum + q.plays.length, 0),
+          totalPlays: Object.values(playData).reduce(
+            (sum: number, q: any) => sum + q.plays.length,
+            0,
+          ),
         },
       };
     } catch (error) {
-      this.logger.error(`❌ 경기 ${matchId} 플레이 데이터 크롤링 실패:`, error.message);
+      this.logger.error(
+        `❌ 경기 ${matchId} 플레이 데이터 크롤링 실패:`,
+        error.message,
+      );
       return {
         success: false,
         error: error.message,

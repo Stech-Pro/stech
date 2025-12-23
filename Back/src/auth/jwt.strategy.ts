@@ -24,7 +24,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       console.log('사용자를 찾을 수 없음:', payload.id);
       throw new UnauthorizedException();
     }
-    console.log('JWT 검증 성공:', user.username, 'memos count:', user.memos?.length || 0);
+    console.log(
+      'JWT 검증 성공:',
+      user.username,
+      'memos count:',
+      user.memos?.length || 0,
+    );
     return {
       id: user._id,
       username: user.username,

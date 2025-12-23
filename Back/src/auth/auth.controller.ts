@@ -414,7 +414,11 @@ export class AuthController {
     @UploadedFile() file: Express.Multer.File,
     @Body() createProfileDto: CreateProfileDto,
   ) {
-    return this.authService.createProfileWithAvatar(req.user.id, createProfileDto, file);
+    return this.authService.createProfileWithAvatar(
+      req.user.id,
+      createProfileDto,
+      file,
+    );
   }
 
   @Get('highlights')
@@ -515,9 +519,9 @@ export class AuthController {
                 },
                 rawYardString: '258 (전진 : 295 / 후퇴 : -37)',
                 lastUpdated: '2025-01-15T10:30:00.000Z',
-              }
-            ]
-          }
+              },
+            ],
+          },
         },
       },
     },

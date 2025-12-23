@@ -31,7 +31,7 @@ export class KafaLeagueCrawlerService {
 
       await page.type('#user_id', 'stech');
       await page.type('#user_password', 'Startup901()');
-      
+
       await page.click('#login_btn');
       await page.waitForNavigation({ waitUntil: 'networkidle2' });
 
@@ -57,7 +57,9 @@ export class KafaLeagueCrawlerService {
       await page.setCookie(...this.cookies);
 
       // 경기 결과 페이지로 이동
-      await page.goto('https://member.kafa.or.kr/match_result.html', { waitUntil: 'networkidle2' });
+      await page.goto('https://member.kafa.or.kr/match_result.html', {
+        waitUntil: 'networkidle2',
+      });
 
       // 리그 목록 추출
       const leagues = await page.evaluate(() => {
@@ -75,7 +77,8 @@ export class KafaLeagueCrawlerService {
               name: text,
               category: text.includes('대학') ? 'university' : 'social',
               division: text.includes('2부') ? '2부' : '1부',
-              season: text.match(/\d{4}/)?.[0] || new Date().getFullYear().toString(),
+              season:
+                text.match(/\d{4}/)?.[0] || new Date().getFullYear().toString(),
             });
           }
         });
@@ -87,7 +90,7 @@ export class KafaLeagueCrawlerService {
       for (const league of leagues) {
         await this.kafaLeagueModel.findOneAndUpdate(
           { leagueId: league.leagueId },
-          { 
+          {
             $set: {
               ...league,
               lastUpdated: new Date(),
@@ -160,7 +163,8 @@ export class KafaLeagueCrawlerService {
 
           // 다음 페이지 버튼 확인
           const nextButton = document.querySelector('.pagination a.next');
-          const hasMore = nextButton && !nextButton.classList.contains('disabled');
+          const hasMore =
+            nextButton && !nextButton.classList.contains('disabled');
 
           return { matches: matchList, hasMore };
         });
@@ -204,7 +208,9 @@ export class KafaLeagueCrawlerService {
 
       await page.close();
 
-      this.logger.log(`✅ 리그 ${leagueId} 경기 목록 크롤링 완료: ${matches.length}경기`);
+      this.logger.log(
+        `✅ 리그 ${leagueId} 경기 목록 크롤링 완료: ${matches.length}경기`,
+      );
       return {
         success: true,
         leagueId,
@@ -223,15 +229,22 @@ export class KafaLeagueCrawlerService {
       const league = await this.kafaLeagueModel.findOne({ leagueId }).exec();
       const matches = await this.kafaMatchModel.find({ leagueId }).exec();
 
-      const completedMatches = matches.filter((m) => m.status === 'completed').length;
-      const crawledMatches = matches.filter((m) => m.status === 'crawled').length;
+      const completedMatches = matches.filter(
+        (m) => m.status === 'completed',
+      ).length;
+      const crawledMatches = matches.filter(
+        (m) => m.status === 'crawled',
+      ).length;
 
       return {
         league: league?.name || `리그 ${leagueId}`,
         totalMatches: matches.length,
         completedMatches,
         crawledMatches,
-        crawlingProgress: matches.length > 0 ? Math.round((crawledMatches / matches.length) * 100) : 0,
+        crawlingProgress:
+          matches.length > 0
+            ? Math.round((crawledMatches / matches.length) * 100)
+            : 0,
       };
     } catch (error) {
       this.logger.error(`리그 ${leagueId} 요약 정보 조회 실패:`, error);
@@ -242,7 +255,10 @@ export class KafaLeagueCrawlerService {
   // 모든 리그 상태 조회
   async getAllLeagueStatus() {
     try {
-      const leagues = await this.kafaLeagueModel.find().sort({ leagueId: 1 }).exec();
+      const leagues = await this.kafaLeagueModel
+        .find()
+        .sort({ leagueId: 1 })
+        .exec();
       const summaries = [];
 
       for (const league of leagues) {

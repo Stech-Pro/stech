@@ -20,7 +20,7 @@ export function parseRushingYards(yardString: string): ParsedRushingYards {
     totalYards: 0,
     forwardYards: 0,
     backwardYards: 0,
-    rawString: yardString
+    rawString: yardString,
   };
 
   try {
@@ -51,7 +51,6 @@ export function parseRushingYards(yardString: string): ParsedRushingYards {
     if (Math.abs(calculatedTotal - result.totalYards) > 1) {
       console.warn(`야드 계산 불일치: ${yardString}`);
     }
-
   } catch (error) {
     console.error(`러싱 야드 파싱 실패: ${yardString}`, error);
   }
@@ -61,7 +60,7 @@ export function parseRushingYards(yardString: string): ParsedRushingYards {
 
 /**
  * 사용 예시
- * 
+ *
  * const parsed = parseRushingYards("383 (전진 : 434 / 후퇴 : -51)");
  * console.log(parsed);
  * // {

@@ -2,508 +2,758 @@
   "statType": "interceptions",
   "statName": "INTERCEPTIONS",
   "league": "uni",
-  "crawledAt": "2025-12-18T04:39:42.363Z",
-  "totalCount": 50,
+  "crawledAt": "2025-12-23T17:44:04.248Z",
+  "totalCount": 75,
   "players": [
     {
       "rank": 1,
       "playerName": "양병욱",
       "university": "서울시립대학교",
       "jerseyNumber": 82,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
+      "interceptions": 5,
+      "interceptionTouchdowns": 1,
+      "interceptionYards": 106,
+      "longestInterception": 54
     },
     {
       "rank": 2,
-      "playerName": "이재혁",
-      "university": "서강대학교",
-      "jerseyNumber": 38,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 3,
-      "playerName": "김정헌",
-      "university": "서울대학교",
-      "jerseyNumber": 34,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 4,
-      "playerName": "옥기주",
-      "university": "경성대학교",
-      "jerseyNumber": 7,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 5,
-      "playerName": "윤상준",
-      "university": "고려대학교",
-      "jerseyNumber": 10,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 6,
-      "playerName": "정재연",
-      "university": "국민대학교",
-      "jerseyNumber": 35,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 7,
-      "playerName": "황희재",
-      "university": "경북대학교",
-      "jerseyNumber": 8,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 8,
       "playerName": "엄홍재",
       "university": "서강대학교",
       "jerseyNumber": 31,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
+      "interceptions": 3,
+      "interceptionTouchdowns": 1,
+      "interceptionYards": 38,
+      "longestInterception": 25
     },
     {
-      "rank": 9,
-      "playerName": "박서준",
-      "university": "서강대학교",
-      "jerseyNumber": 45,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 10,
-      "playerName": "김성민",
-      "university": "서울대학교",
-      "jerseyNumber": 15,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 11,
-      "playerName": "정재성",
-      "university": "성균관대학교",
-      "jerseyNumber": 22,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 12,
-      "playerName": "박재형",
-      "university": "강원대학교",
-      "jerseyNumber": 3,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 13,
-      "playerName": "최승종",
-      "university": "연세대학교",
-      "jerseyNumber": 26,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 14,
-      "playerName": "변지욱",
-      "university": "경일대학교",
-      "jerseyNumber": 32,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 15,
-      "playerName": "박승원",
-      "university": "성균관대학교",
-      "jerseyNumber": 87,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 16,
-      "playerName": "박병민",
-      "university": "경일대학교",
-      "jerseyNumber": 11,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 17,
-      "playerName": "이승호",
-      "university": "강원대학교",
-      "jerseyNumber": 6,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 18,
-      "playerName": "이민준",
-      "university": "영남대학교",
-      "jerseyNumber": 5,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 19,
-      "playerName": "황성현",
-      "university": "고려대학교",
-      "jerseyNumber": 99,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 20,
-      "playerName": "정창균",
-      "university": "영남대학교",
-      "jerseyNumber": 35,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 21,
-      "playerName": "노건호",
-      "university": "한양대학교",
-      "jerseyNumber": 23,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 22,
-      "playerName": "김민겸",
-      "university": "한양대학교",
-      "jerseyNumber": 26,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 23,
-      "playerName": "조다빈",
-      "university": "성균관대학교",
-      "jerseyNumber": 80,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 24,
-      "playerName": "박종후",
+      "rank": 3,
+      "playerName": "이소율",
       "university": "경성대학교",
-      "jerseyNumber": 93,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
+      "jerseyNumber": 57,
+      "interceptions": 1,
+      "interceptionTouchdowns": 1,
+      "interceptionYards": 46,
+      "longestInterception": 46
     },
     {
-      "rank": 25,
-      "playerName": "오승욱",
-      "university": "숭실대학교",
-      "jerseyNumber": 14,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
+      "rank": 4,
+      "playerName": "장민석",
+      "university": "경일대학교",
+      "jerseyNumber": 33,
+      "interceptions": 1,
+      "interceptionTouchdowns": 1,
+      "interceptionYards": 60,
+      "longestInterception": 60
     },
     {
-      "rank": 26,
-      "playerName": "김태우",
-      "university": "동국대학교",
-      "jerseyNumber": 8,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 27,
-      "playerName": "곽효석",
-      "university": "중앙대학교",
-      "jerseyNumber": 87,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 28,
-      "playerName": "김무성",
-      "university": "단국대학교",
-      "jerseyNumber": 13,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 29,
-      "playerName": "서동주",
-      "university": "서울대학교",
-      "jerseyNumber": 0,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 30,
-      "playerName": "박현우",
-      "university": "경북대학교",
-      "jerseyNumber": 9,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 31,
-      "playerName": "김민재",
-      "university": "금오공과대학교",
-      "jerseyNumber": 74,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 32,
-      "playerName": "윤석진",
-      "university": "서울시립대학교",
-      "jerseyNumber": 27,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 33,
+      "rank": 5,
       "playerName": "한지섭",
       "university": "한림대학교",
       "jerseyNumber": 24,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
+      "interceptions": 1,
+      "interceptionTouchdowns": 1,
+      "interceptionYards": 53,
+      "longestInterception": 53
     },
     {
-      "rank": 34,
-      "playerName": "동방상원",
-      "university": "동아대학교",
-      "jerseyNumber": 21,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 35,
-      "playerName": "박규민",
-      "university": "연세대학교",
-      "jerseyNumber": 4,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 36,
-      "playerName": "이민석",
-      "university": "강원대학교",
-      "jerseyNumber": 13,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 37,
-      "playerName": "이상훈",
-      "university": "대구한의대학교",
-      "jerseyNumber": 5,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 38,
-      "playerName": "김민성",
-      "university": "홍익대학교",
-      "jerseyNumber": 4,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 39,
-      "playerName": "방정현",
-      "university": "한국해양대학교",
-      "jerseyNumber": 91,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 40,
-      "playerName": "권동훈",
-      "university": "홍익대학교",
-      "jerseyNumber": 57,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 41,
-      "playerName": "전수혁",
-      "university": "숭실대학교",
-      "jerseyNumber": 88,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 42,
-      "playerName": "이현호",
-      "university": "동서대학교",
-      "jerseyNumber": 27,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 43,
+      "rank": 6,
       "playerName": "이대희",
       "university": "연세대학교",
       "jerseyNumber": 18,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
+      "interceptions": 1,
+      "interceptionTouchdowns": 1,
+      "interceptionYards": 0,
+      "longestInterception": 0
     },
     {
-      "rank": 44,
-      "playerName": "백준하",
-      "university": "신라대학교",
-      "jerseyNumber": 9,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 45,
-      "playerName": "조성환",
-      "university": "연세대학교",
-      "jerseyNumber": 28,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
-    },
-    {
-      "rank": 46,
+      "rank": 7,
       "playerName": "박재영",
       "university": "강원대학교",
       "jerseyNumber": 15,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
+      "interceptions": 1,
+      "interceptionTouchdowns": 1,
+      "interceptionYards": 20,
+      "longestInterception": 20
+    },
+    {
+      "rank": 8,
+      "playerName": "강미루",
+      "university": "연세대학교",
+      "jerseyNumber": 1,
+      "interceptions": 1,
+      "interceptionTouchdowns": 1,
+      "interceptionYards": 20,
+      "longestInterception": 20
+    },
+    {
+      "rank": 9,
+      "playerName": "이민준",
+      "university": "영남대학교",
+      "jerseyNumber": 5,
+      "interceptions": 2,
+      "interceptionTouchdowns": 1,
+      "interceptionYards": 65,
+      "longestInterception": 50
+    },
+    {
+      "rank": 10,
+      "playerName": "황성현",
+      "university": "고려대학교",
+      "jerseyNumber": 99,
+      "interceptions": 2,
+      "interceptionTouchdowns": 1,
+      "interceptionYards": 58,
+      "longestInterception": 32
+    },
+    {
+      "rank": 11,
+      "playerName": "권용욱",
+      "university": "홍익대학교",
+      "jerseyNumber": 9,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 5,
+      "longestInterception": 5
+    },
+    {
+      "rank": 12,
+      "playerName": "곽도영",
+      "university": "대구대학교",
+      "jerseyNumber": 88,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
+    },
+    {
+      "rank": 13,
+      "playerName": "이현준",
+      "university": "경일대학교",
+      "jerseyNumber": 47,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 20,
+      "longestInterception": 20
+    },
+    {
+      "rank": 14,
+      "playerName": "권동규",
+      "university": "신라대학교",
+      "jerseyNumber": 18,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 20,
+      "longestInterception": 20
+    },
+    {
+      "rank": 15,
+      "playerName": "신희철",
+      "university": "한신대학교",
+      "jerseyNumber": 7,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
+    },
+    {
+      "rank": 16,
+      "playerName": "김민겸",
+      "university": "한양대학교",
+      "jerseyNumber": 26,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 26,
+      "longestInterception": 22
+    },
+    {
+      "rank": 17,
+      "playerName": "조다빈",
+      "university": "성균관대학교",
+      "jerseyNumber": 80,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 13,
+      "longestInterception": 13
+    },
+    {
+      "rank": 18,
+      "playerName": "이재현",
+      "university": "강원대학교",
+      "jerseyNumber": 57,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 21,
+      "longestInterception": 21
+    },
+    {
+      "rank": 19,
+      "playerName": "박종후",
+      "university": "경성대학교",
+      "jerseyNumber": 93,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 96,
+      "longestInterception": 71
+    },
+    {
+      "rank": 20,
+      "playerName": "정민수",
+      "university": "고려대학교",
+      "jerseyNumber": 54,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 6,
+      "longestInterception": 6
+    },
+    {
+      "rank": 21,
+      "playerName": "유효석",
+      "university": "강원대학교",
+      "jerseyNumber": 45,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 1,
+      "longestInterception": 1
+    },
+    {
+      "rank": 22,
+      "playerName": "이상운",
+      "university": "서울시립대학교",
+      "jerseyNumber": 11,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
+    },
+    {
+      "rank": 23,
+      "playerName": "구도현",
+      "university": "경북대학교",
+      "jerseyNumber": 23,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 7,
+      "longestInterception": 7
+    },
+    {
+      "rank": 24,
+      "playerName": "김범수",
+      "university": "울산대학교",
+      "jerseyNumber": 5,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 25,
+      "longestInterception": 25
+    },
+    {
+      "rank": 25,
+      "playerName": "정재연",
+      "university": "국민대학교",
+      "jerseyNumber": 35,
+      "interceptions": 3,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 89,
+      "longestInterception": 43
+    },
+    {
+      "rank": 26,
+      "playerName": "권지훈",
+      "university": "영남대학교",
+      "jerseyNumber": 3,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
+    },
+    {
+      "rank": 27,
+      "playerName": "이주헌",
+      "university": "동국대학교",
+      "jerseyNumber": 22,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
+    },
+    {
+      "rank": 28,
+      "playerName": "박재현",
+      "university": "한양대학교",
+      "jerseyNumber": 8,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 45,
+      "longestInterception": 45
+    },
+    {
+      "rank": 29,
+      "playerName": "박온",
+      "university": "성균관대학교",
+      "jerseyNumber": 18,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 4,
+      "longestInterception": 4
+    },
+    {
+      "rank": 30,
+      "playerName": "문의찬",
+      "university": "서울시립대학교",
+      "jerseyNumber": 45,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 35,
+      "longestInterception": 35
+    },
+    {
+      "rank": 31,
+      "playerName": "이예승",
+      "university": "부산외국어대학교",
+      "jerseyNumber": 9,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 5,
+      "longestInterception": 5
+    },
+    {
+      "rank": 32,
+      "playerName": "송호진",
+      "university": "대구대학교",
+      "jerseyNumber": 19,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 3,
+      "longestInterception": 3
+    },
+    {
+      "rank": 33,
+      "playerName": "오승욱",
+      "university": "숭실대학교",
+      "jerseyNumber": 14,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 32,
+      "longestInterception": 32
+    },
+    {
+      "rank": 34,
+      "playerName": "김준영",
+      "university": "강원대학교",
+      "jerseyNumber": 47,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 7,
+      "longestInterception": 7
+    },
+    {
+      "rank": 35,
+      "playerName": "김동현",
+      "university": "경성대학교",
+      "jerseyNumber": 1,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
+    },
+    {
+      "rank": 36,
+      "playerName": "박은민",
+      "university": "홍익대학교",
+      "jerseyNumber": 10,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
+    },
+    {
+      "rank": 37,
+      "playerName": "김태우",
+      "university": "동국대학교",
+      "jerseyNumber": 8,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 13,
+      "longestInterception": 13
+    },
+    {
+      "rank": 38,
+      "playerName": "강경서",
+      "university": "금오공과대학교",
+      "jerseyNumber": 21,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
+    },
+    {
+      "rank": 39,
+      "playerName": "황희재",
+      "university": "경북대학교",
+      "jerseyNumber": 8,
+      "interceptions": 3,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 31,
+      "longestInterception": 16
+    },
+    {
+      "rank": 40,
+      "playerName": "김건원",
+      "university": "서울시립대학교",
+      "jerseyNumber": 21,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 40,
+      "longestInterception": 40
+    },
+    {
+      "rank": 41,
+      "playerName": "장준영",
+      "university": "카이스트",
+      "jerseyNumber": 10,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
+    },
+    {
+      "rank": 42,
+      "playerName": "신재윤",
+      "university": "인하대학교",
+      "jerseyNumber": 8,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 4,
+      "longestInterception": 4
+    },
+    {
+      "rank": 43,
+      "playerName": "곽효석",
+      "university": "중앙대학교",
+      "jerseyNumber": 87,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 2,
+      "longestInterception": 2
+    },
+    {
+      "rank": 44,
+      "playerName": "이재욱",
+      "university": "한양대학교",
+      "jerseyNumber": 28,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 13,
+      "longestInterception": 13
+    },
+    {
+      "rank": 45,
+      "playerName": "최재혁",
+      "university": "단국대학교",
+      "jerseyNumber": 24,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 8,
+      "longestInterception": 8
+    },
+    {
+      "rank": 46,
+      "playerName": "임윤서",
+      "university": "대구한의대학교",
+      "jerseyNumber": 21,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
     },
     {
       "rank": 47,
-      "playerName": "김현서",
-      "university": "연세대학교",
-      "jerseyNumber": 15,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
+      "playerName": "강채민",
+      "university": "부산외국어대학교",
+      "jerseyNumber": 81,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 10,
+      "longestInterception": 10
     },
     {
       "rank": 48,
-      "playerName": "정훈민",
-      "university": "한동대학교",
-      "jerseyNumber": 12,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
+      "playerName": "최성원",
+      "university": "한국해양대학교",
+      "jerseyNumber": 20,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
     },
     {
       "rank": 49,
-      "playerName": "유동윤",
-      "university": "경일대학교",
-      "jerseyNumber": 18,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
+      "playerName": "김무성",
+      "university": "단국대학교",
+      "jerseyNumber": 13,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 72,
+      "longestInterception": 62
     },
     {
       "rank": 50,
-      "playerName": "윤정근",
-      "university": "금오공과대학교",
-      "jerseyNumber": 8,
-      "interceptions": 0,
-      "returnYards": 0,
-      "touchdowns": 0,
-      "longest": 0
+      "playerName": "홍재우",
+      "university": "연세대학교",
+      "jerseyNumber": 10,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 0,
+      "longestInterception": 0
+    },
+    {
+      "rank": 51,
+      "playerName": "박재형",
+      "university": "강원대학교",
+      "jerseyNumber": 3,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 62,
+      "longestInterception": 39
+    },
+    {
+      "rank": 52,
+      "playerName": "유동윤",
+      "university": "경일대학교",
+      "jerseyNumber": 18,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 45,
+      "longestInterception": 45
+    },
+    {
+      "rank": 53,
+      "playerName": "배민재",
+      "university": "경일대학교",
+      "jerseyNumber": 89,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 45,
+      "longestInterception": 45
+    },
+    {
+      "rank": 54,
+      "playerName": "김성민",
+      "university": "서울대학교",
+      "jerseyNumber": 15,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 44,
+      "longestInterception": 25
+    },
+    {
+      "rank": 55,
+      "playerName": "임지민",
+      "university": "동의대학교",
+      "jerseyNumber": 10,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 35,
+      "longestInterception": 35
+    },
+    {
+      "rank": 56,
+      "playerName": "변지욱",
+      "university": "경일대학교",
+      "jerseyNumber": 32,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 32,
+      "longestInterception": 27
+    },
+    {
+      "rank": 57,
+      "playerName": "박병민",
+      "university": "경일대학교",
+      "jerseyNumber": 11,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 30,
+      "longestInterception": 18
+    },
+    {
+      "rank": 58,
+      "playerName": "옥기주",
+      "university": "경성대학교",
+      "jerseyNumber": 7,
+      "interceptions": 3,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 28,
+      "longestInterception": 16
+    },
+    {
+      "rank": 59,
+      "playerName": "김정헌",
+      "university": "서울대학교",
+      "jerseyNumber": 34,
+      "interceptions": 4,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 27,
+      "longestInterception": 18
+    },
+    {
+      "rank": 60,
+      "playerName": "박규민",
+      "university": "연세대학교",
+      "jerseyNumber": 4,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 25,
+      "longestInterception": 25
+    },
+    {
+      "rank": 61,
+      "playerName": "정재성",
+      "university": "성균관대학교",
+      "jerseyNumber": 22,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 24,
+      "longestInterception": 20
+    },
+    {
+      "rank": 62,
+      "playerName": "김민성",
+      "university": "홍익대학교",
+      "jerseyNumber": 4,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 22,
+      "longestInterception": 22
+    },
+    {
+      "rank": 63,
+      "playerName": "문태웅",
+      "university": "동국대학교",
+      "jerseyNumber": 26,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 20,
+      "longestInterception": 20
+    },
+    {
+      "rank": 64,
+      "playerName": "윤상준",
+      "university": "고려대학교",
+      "jerseyNumber": 10,
+      "interceptions": 3,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 20,
+      "longestInterception": 20
+    },
+    {
+      "rank": 65,
+      "playerName": "정민영",
+      "university": "고려대학교",
+      "jerseyNumber": 3,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 20,
+      "longestInterception": 20
+    },
+    {
+      "rank": 66,
+      "playerName": "김현성",
+      "university": "한동대학교",
+      "jerseyNumber": 16,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 20,
+      "longestInterception": 20
+    },
+    {
+      "rank": 67,
+      "playerName": "이재승",
+      "university": "중앙대학교",
+      "jerseyNumber": 99,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 18,
+      "longestInterception": 18
+    },
+    {
+      "rank": 68,
+      "playerName": "장우영",
+      "university": "숭실대학교",
+      "jerseyNumber": 26,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 17,
+      "longestInterception": 17
+    },
+    {
+      "rank": 69,
+      "playerName": "이승호",
+      "university": "강원대학교",
+      "jerseyNumber": 6,
+      "interceptions": 2,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 16,
+      "longestInterception": 16
+    },
+    {
+      "rank": 70,
+      "playerName": "소예준",
+      "university": "신라대학교",
+      "jerseyNumber": 34,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 15,
+      "longestInterception": 15
+    },
+    {
+      "rank": 71,
+      "playerName": "이민석",
+      "university": "강원대학교",
+      "jerseyNumber": 13,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 15,
+      "longestInterception": 15
+    },
+    {
+      "rank": 72,
+      "playerName": "전수혁",
+      "university": "숭실대학교",
+      "jerseyNumber": 88,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 14,
+      "longestInterception": 14
+    },
+    {
+      "rank": 73,
+      "playerName": "조성환",
+      "university": "연세대학교",
+      "jerseyNumber": 28,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 14,
+      "longestInterception": 14
+    },
+    {
+      "rank": 74,
+      "playerName": "반태우",
+      "university": "경희대학교",
+      "jerseyNumber": 3,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 13,
+      "longestInterception": 13
+    },
+    {
+      "rank": 75,
+      "playerName": "윤제혁",
+      "university": "울산대학교",
+      "jerseyNumber": 44,
+      "interceptions": 1,
+      "interceptionTouchdowns": 0,
+      "interceptionYards": 13,
+      "longestInterception": 13
     }
   ]
 }

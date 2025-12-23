@@ -3,8 +3,8 @@ import { Document } from 'mongoose';
 
 export type KafaPlayerStatsDocument = KafaPlayerStats & Document;
 
-@Schema({ 
-  collection: 'kafa_player_stats'
+@Schema({
+  collection: 'kafa_player_stats',
 })
 export class KafaPlayerStats {
   @Prop({ required: true })
@@ -27,13 +27,13 @@ export class KafaPlayerStats {
 
   @Prop({ type: Object, required: true })
   rushing: {
-    totalYards: number;      // 전체 러싱 야드 (전진 + 후퇴)
-    forwardYards: number;    // 전진 야드
-    backwardYards: number;   // 후퇴 야드 (음수값)
+    totalYards: number; // 전체 러싱 야드 (전진 + 후퇴)
+    forwardYards: number; // 전진 야드
+    backwardYards: number; // 후퇴 야드 (음수값)
     yardsPerAttempt: number; // 평균 러싱 야드
-    attempts: number;        // 러싱 시도 횟수
-    touchdowns: number;      // 러싱 터치다운
-    longest: number;         // 최장 러싱 거리
+    attempts: number; // 러싱 시도 횟수
+    touchdowns: number; // 러싱 터치다운
+    longest: number; // 최장 러싱 거리
   };
 
   @Prop({ required: true })
@@ -75,7 +75,7 @@ export class KafaPlayerStats {
     interceptions: number;
     forcedFumbles: number;
   };
-
 }
 
-export const KafaPlayerStatsSchema = SchemaFactory.createForClass(KafaPlayerStats);
+export const KafaPlayerStatsSchema =
+  SchemaFactory.createForClass(KafaPlayerStats);

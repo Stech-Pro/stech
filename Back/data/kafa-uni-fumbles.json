@@ -2,458 +2,971 @@
   "statType": "fumbles",
   "statName": "FUMBLES",
   "league": "uni",
-  "crawledAt": "2025-12-18T04:39:37.946Z",
-  "totalCount": 50,
+  "crawledAt": "2025-12-23T13:29:04.159Z",
+  "totalCount": 107,
   "players": [
     {
       "rank": 1,
       "playerName": "윤여진",
       "university": "연세대학교",
       "jerseyNumber": 13,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 10,
+      "fumbleRecoveries": 4,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 2,
       "playerName": "박병민",
       "university": "경일대학교",
       "jerseyNumber": 11,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 7,
+      "fumbleRecoveries": 5,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 3,
       "playerName": "성지훈",
       "university": "단국대학교",
       "jerseyNumber": 26,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 6,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 4,
-      "playerName": "임규성",
-      "university": "카이스트",
-      "jerseyNumber": 1,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 5,
-      "playerName": "우재윤",
-      "university": "국민대학교",
-      "jerseyNumber": 11,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 6,
       "playerName": "장혜성",
       "university": "성균관대학교",
       "jerseyNumber": 9,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 5,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 5,
+      "playerName": "임규성",
+      "university": "카이스트",
+      "jerseyNumber": 1,
+      "forcedFumbles": 5,
+      "fumbleRecoveries": 4,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 6,
+      "playerName": "우재윤",
+      "university": "국민대학교",
+      "jerseyNumber": 11,
+      "forcedFumbles": 5,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 7,
-      "playerName": "문찬호",
-      "university": "고려대학교",
-      "jerseyNumber": 9,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 8,
-      "playerName": "구준수",
-      "university": "영남대학교",
-      "jerseyNumber": 34,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 9,
-      "playerName": "최수종",
-      "university": "고려대학교",
-      "jerseyNumber": 86,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 10,
-      "playerName": "이기쁨",
-      "university": "강원대학교",
-      "jerseyNumber": 7,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 11,
-      "playerName": "송지헌",
-      "university": "단국대학교",
-      "jerseyNumber": 9,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 12,
       "playerName": "이찬희",
       "university": "한양대학교",
       "jerseyNumber": 12,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 13,
+      "rank": 8,
       "playerName": "김도윤",
       "university": "숭실대학교",
       "jerseyNumber": 1,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 14,
+      "rank": 9,
       "playerName": "배수환",
       "university": "중앙대학교",
       "jerseyNumber": 1,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 10,
+      "playerName": "문찬호",
+      "university": "고려대학교",
+      "jerseyNumber": 9,
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 11,
+      "playerName": "구준수",
+      "university": "영남대학교",
+      "jerseyNumber": 34,
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 1
+    },
+    {
+      "rank": 12,
+      "playerName": "최수종",
+      "university": "고려대학교",
+      "jerseyNumber": 86,
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 13,
+      "playerName": "이기쁨",
+      "university": "강원대학교",
+      "jerseyNumber": 7,
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 14,
+      "playerName": "송지헌",
+      "university": "단국대학교",
+      "jerseyNumber": 9,
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 15,
-      "playerName": "이재승",
-      "university": "중앙대학교",
-      "jerseyNumber": 99,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 16,
-      "playerName": "구도현",
-      "university": "경북대학교",
-      "jerseyNumber": 23,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 17,
-      "playerName": "장우영",
-      "university": "숭실대학교",
-      "jerseyNumber": 26,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 18,
-      "playerName": "김서진",
-      "university": "건국대학교",
-      "jerseyNumber": 20,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 19,
-      "playerName": "정택훈",
-      "university": "연세대학교",
-      "jerseyNumber": 12,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 20,
-      "playerName": "김민서",
-      "university": "동아대학교",
-      "jerseyNumber": 1,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 21,
       "playerName": "김동현",
       "university": "경성대학교",
       "jerseyNumber": 1,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 22,
+      "rank": 16,
       "playerName": "서한솔",
       "university": "부산외국어대학교",
       "jerseyNumber": 4,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 23,
+      "rank": 17,
       "playerName": "이창빈",
       "university": "부산대학교",
       "jerseyNumber": 13,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 24,
+      "rank": 18,
       "playerName": "신재웅",
       "university": "영남대학교",
       "jerseyNumber": 4,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 25,
+      "rank": 19,
       "playerName": "변지성",
       "university": "성균관대학교",
       "jerseyNumber": 1,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 26,
+      "rank": 20,
       "playerName": "이주람",
       "university": "한동대학교",
       "jerseyNumber": 1,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 27,
+      "rank": 21,
       "playerName": "이준상",
       "university": "연세대학교",
       "jerseyNumber": 7,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 22,
+      "playerName": "이재승",
+      "university": "중앙대학교",
+      "jerseyNumber": 99,
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 23,
+      "playerName": "구도현",
+      "university": "경북대학교",
+      "jerseyNumber": 23,
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 1
+    },
+    {
+      "rank": 24,
+      "playerName": "장우영",
+      "university": "숭실대학교",
+      "jerseyNumber": 26,
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 25,
+      "playerName": "김서진",
+      "university": "건국대학교",
+      "jerseyNumber": 20,
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 26,
+      "playerName": "정택훈",
+      "university": "연세대학교",
+      "jerseyNumber": 12,
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 27,
+      "playerName": "김민서",
+      "university": "동아대학교",
+      "jerseyNumber": 1,
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 28,
-      "playerName": "이종혁",
-      "university": "서울대학교",
-      "jerseyNumber": 8,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 29,
-      "playerName": "김태우",
-      "university": "동국대학교",
-      "jerseyNumber": 8,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 30,
-      "playerName": "이수민",
-      "university": "용인대학교",
-      "jerseyNumber": 16,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 31,
-      "playerName": "윤정근",
-      "university": "금오공과대학교",
-      "jerseyNumber": 8,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 32,
-      "playerName": "전민재",
-      "university": "영남대학교",
-      "jerseyNumber": 29,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 33,
-      "playerName": "이찬유",
-      "university": "한신대학교",
-      "jerseyNumber": 1,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 34,
-      "playerName": "이재호",
-      "university": "동국대학교",
-      "jerseyNumber": 7,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 35,
-      "playerName": "고승주",
-      "university": "경북대학교",
-      "jerseyNumber": 15,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 36,
-      "playerName": "제용현",
-      "university": "국민대학교",
-      "jerseyNumber": 55,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 37,
-      "playerName": "김민겸",
-      "university": "한양대학교",
-      "jerseyNumber": 26,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 38,
-      "playerName": "김하은",
-      "university": "성균관대학교",
-      "jerseyNumber": 88,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 39,
       "playerName": "이재원",
       "university": "계명대학교",
       "jerseyNumber": 10,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 40,
+      "rank": 29,
       "playerName": "원재훈",
       "university": "국민대학교",
       "jerseyNumber": 8,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 41,
+      "rank": 30,
       "playerName": "홍세민",
       "university": "경성대학교",
       "jerseyNumber": 95,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 42,
+      "rank": 31,
       "playerName": "한시훈",
       "university": "단국대학교",
       "jerseyNumber": 10,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 43,
+      "rank": 32,
       "playerName": "배성민",
       "university": "성균관대학교",
       "jerseyNumber": 10,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 44,
+      "rank": 33,
       "playerName": "최은찬",
       "university": "동국대학교",
       "jerseyNumber": 10,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 45,
+      "rank": 34,
       "playerName": "백운성",
       "university": "서강대학교",
       "jerseyNumber": 7,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 46,
+      "rank": 35,
       "playerName": "김민준",
       "university": "울산대학교",
       "jerseyNumber": 18,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 47,
+      "rank": 36,
       "playerName": "이민석",
       "university": "강원대학교",
       "jerseyNumber": 13,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 48,
+      "rank": 37,
       "playerName": "김민성",
       "university": "홍익대학교",
       "jerseyNumber": 4,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 49,
+      "rank": 38,
       "playerName": "박윤서",
       "university": "인하대학교",
       "jerseyNumber": 49,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 50,
+      "rank": 39,
       "playerName": "이동규",
       "university": "서울대학교",
       "jerseyNumber": 7,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 40,
+      "playerName": "박종후",
+      "university": "경성대학교",
+      "jerseyNumber": 93,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 41,
+      "playerName": "김무성",
+      "university": "단국대학교",
+      "jerseyNumber": 13,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 42,
+      "playerName": "김대웅",
+      "university": "홍익대학교",
+      "jerseyNumber": 15,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 43,
+      "playerName": "권우진",
+      "university": "서울시립대학교",
+      "jerseyNumber": 22,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 44,
+      "playerName": "김두호",
+      "university": "경희대학교",
+      "jerseyNumber": 17,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 45,
+      "playerName": "손혁빈",
+      "university": "경희대학교",
+      "jerseyNumber": 25,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 46,
+      "playerName": "이시욱",
+      "university": "부산외국어대학교",
+      "jerseyNumber": 36,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 47,
+      "playerName": "이상현",
+      "university": "단국대학교",
+      "jerseyNumber": 17,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 48,
+      "playerName": "신재윤",
+      "university": "인하대학교",
+      "jerseyNumber": 8,
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 49,
+      "playerName": "한상천",
+      "university": "서울시립대학교",
+      "jerseyNumber": 17,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 50,
+      "playerName": "이준서",
+      "university": "동서대학교",
+      "jerseyNumber": 25,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 51,
+      "playerName": "박준서",
+      "university": "성균관대학교",
+      "jerseyNumber": 57,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 5,
+      "fumbleRecoveryTDs": 1
+    },
+    {
+      "rank": 52,
+      "playerName": "전민재",
+      "university": "영남대학교",
+      "jerseyNumber": 29,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 4,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 53,
+      "playerName": "김민겸",
+      "university": "한양대학교",
+      "jerseyNumber": 26,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 4,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 54,
+      "playerName": "방정현",
+      "university": "한국해양대학교",
+      "jerseyNumber": 91,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 4,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 55,
+      "playerName": "김도훈",
+      "university": "고려대학교",
+      "jerseyNumber": 89,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 2
+    },
+    {
+      "rank": 56,
+      "playerName": "김건우",
+      "university": "성균관대학교",
+      "jerseyNumber": 77,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 57,
+      "playerName": "이민서",
+      "university": "부산외국어대학교",
+      "jerseyNumber": 1,
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 4,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 58,
+      "playerName": "이찬유",
+      "university": "한신대학교",
+      "jerseyNumber": 1,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 59,
+      "playerName": "김민준",
+      "university": "경성대학교",
+      "jerseyNumber": 12,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 60,
+      "playerName": "이현민",
+      "university": "연세대학교",
+      "jerseyNumber": 0,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 61,
+      "playerName": "허우인",
+      "university": "건국대학교",
+      "jerseyNumber": 22,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 62,
+      "playerName": "김록겸",
+      "university": "고려대학교",
+      "jerseyNumber": 7,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 63,
+      "playerName": "허유현",
+      "university": "한동대학교",
+      "jerseyNumber": 33,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 64,
+      "playerName": "서재호",
+      "university": "숭실대학교",
+      "jerseyNumber": 19,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 65,
+      "playerName": "김동섭",
+      "university": "부산대학교",
+      "jerseyNumber": 6,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 66,
+      "playerName": "제용현",
+      "university": "국민대학교",
+      "jerseyNumber": 55,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 67,
+      "playerName": "정종은",
+      "university": "동국대학교",
+      "jerseyNumber": 14,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 68,
+      "playerName": "유동윤",
+      "university": "경일대학교",
+      "jerseyNumber": 18,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 69,
+      "playerName": "정현식",
+      "university": "경북대학교",
+      "jerseyNumber": 77,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 70,
+      "playerName": "박윤선",
+      "university": "국민대학교",
+      "jerseyNumber": 26,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 71,
+      "playerName": "최인우",
+      "university": "용인대학교",
+      "jerseyNumber": 1,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 72,
+      "playerName": "김준영",
+      "university": "강원대학교",
+      "jerseyNumber": 47,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 73,
+      "playerName": "동방상원",
+      "university": "동아대학교",
+      "jerseyNumber": 21,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 74,
+      "playerName": "오승욱",
+      "university": "숭실대학교",
+      "jerseyNumber": 14,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 75,
+      "playerName": "이재성",
+      "university": "연세대학교",
+      "jerseyNumber": 21,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 76,
+      "playerName": "이수민",
+      "university": "용인대학교",
+      "jerseyNumber": 16,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 77,
+      "playerName": "안현태",
+      "university": "동서대학교",
+      "jerseyNumber": 77,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 78,
+      "playerName": "박재형",
+      "university": "강원대학교",
+      "jerseyNumber": 3,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 79,
+      "playerName": "황희재",
+      "university": "경북대학교",
+      "jerseyNumber": 8,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 80,
+      "playerName": "심윤범",
+      "university": "경북대학교",
+      "jerseyNumber": 27,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 1
+    },
+    {
+      "rank": 81,
+      "playerName": "문준호",
+      "university": "한양대학교",
+      "jerseyNumber": 16,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 1
+    },
+    {
+      "rank": 82,
+      "playerName": "김종원",
+      "university": "한양대학교",
+      "jerseyNumber": 15,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 1
+    },
+    {
+      "rank": 83,
+      "playerName": "김민준",
+      "university": "강원대학교",
+      "jerseyNumber": 62,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 1
+    },
+    {
+      "rank": 84,
+      "playerName": "이준섭",
+      "university": "부산외국어대학교",
+      "jerseyNumber": 3,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 1
+    },
+    {
+      "rank": 85,
+      "playerName": "공성욱",
+      "university": "건국대학교",
+      "jerseyNumber": 87,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 1
+    },
+    {
+      "rank": 86,
+      "playerName": "김진혁",
+      "university": "서울대학교",
+      "jerseyNumber": 58,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 1
+    },
+    {
+      "rank": 87,
+      "playerName": "김찬희",
+      "university": "용인대학교",
+      "jerseyNumber": 55,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 88,
+      "playerName": "송민건",
+      "university": "한림대학교",
+      "jerseyNumber": 87,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 89,
+      "playerName": "김민석",
+      "university": "경일대학교",
+      "jerseyNumber": 91,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 90,
+      "playerName": "조치현",
+      "university": "강원대학교",
+      "jerseyNumber": 56,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 91,
+      "playerName": "송재환",
+      "university": "단국대학교",
+      "jerseyNumber": 12,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 92,
+      "playerName": "현세영",
+      "university": "대구가톨릭대학교",
+      "jerseyNumber": 34,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 93,
+      "playerName": "남민재",
+      "university": "경성대학교",
+      "jerseyNumber": 10,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 94,
+      "playerName": "엄홍재",
+      "university": "서강대학교",
+      "jerseyNumber": 31,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 95,
+      "playerName": "고필원",
+      "university": "서울대학교",
+      "jerseyNumber": 75,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 96,
+      "playerName": "소진규",
+      "university": "한양대학교",
+      "jerseyNumber": 10,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 97,
+      "playerName": "박태현",
+      "university": "부산대학교",
+      "jerseyNumber": 11,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 98,
+      "playerName": "서창일",
+      "university": "금오공과대학교",
+      "jerseyNumber": 4,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 99,
+      "playerName": "최태준",
+      "university": "영남대학교",
+      "jerseyNumber": 80,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 100,
+      "playerName": "김준형",
+      "university": "경북대학교",
+      "jerseyNumber": 69,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 101,
+      "playerName": "최준",
+      "university": "서울대학교",
+      "jerseyNumber": 9,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 102,
+      "playerName": "임건민",
+      "university": "대구대학교",
+      "jerseyNumber": 64,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 103,
+      "playerName": "배병찬",
+      "university": "성균관대학교",
+      "jerseyNumber": 79,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 104,
+      "playerName": "이종혁",
+      "university": "서울대학교",
+      "jerseyNumber": 8,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 105,
+      "playerName": "장지훈",
+      "university": "신라대학교",
+      "jerseyNumber": 1,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 106,
+      "playerName": "박지훈",
+      "university": "강원대학교",
+      "jerseyNumber": 88,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 107,
+      "playerName": "김대현",
+      "university": "한국외국어대학교",
+      "jerseyNumber": 27,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     }
   ]
 }

@@ -574,7 +574,8 @@ export class AuthService {
           'profile.career': profileData.career,
           'profile.positions.PS1': profileData.position,
           'profile.joinDate': new Date(),
-          'profile.avatar': profileData.avatar || 'https://via.placeholder.com/250x300',
+          'profile.avatar':
+            profileData.avatar || 'https://via.placeholder.com/250x300',
         },
       },
       { new: true },
@@ -634,16 +635,18 @@ export class AuthService {
 
     // S3에 업로드
     const s3Result = await this.s3UploadService.uploadToS3(file, 'avatars');
-    
+
     if (!s3Result.success) {
-      throw new BadRequestException(s3Result.error || '이미지 업로드에 실패했습니다.');
+      throw new BadRequestException(
+        s3Result.error || '이미지 업로드에 실패했습니다.',
+      );
     }
 
     // 사용자 프로필에 avatar URL 저장
     const user = await this.userModel.findByIdAndUpdate(
       userId,
       { $set: { 'profile.avatar': s3Result.url } },
-      { new: true }
+      { new: true },
     );
 
     if (!user) {
@@ -659,11 +662,18 @@ export class AuthService {
     };
   }
 
-  async createProfileWithAvatar(userId: string, profileData: CreateProfileDto, file: Express.Multer.File) {
+  async createProfileWithAvatar(
+    userId: string,
+    profileData: CreateProfileDto,
+    file: Express.Multer.File,
+  ) {
     console.log('=== 프로필 + 이미지 생성 ===');
     console.log('userId:', userId);
     console.log('profileData:', profileData);
-    console.log('file:', file ? `${file.originalname} (${file.size} bytes)` : 'No file');
+    console.log(
+      'file:',
+      file ? `${file.originalname} (${file.size} bytes)` : 'No file',
+    );
 
     const user = await this.userModel.findById(userId);
     if (!user) {
@@ -685,9 +695,11 @@ export class AuthService {
       }
 
       const s3Result = await this.s3UploadService.uploadToS3(file, 'avatars');
-      
+
       if (!s3Result.success) {
-        throw new BadRequestException(s3Result.error || '이미지 업로드에 실패했습니다.');
+        throw new BadRequestException(
+          s3Result.error || '이미지 업로드에 실패했습니다.',
+        );
       }
 
       avatarUrl = s3Result.url;
@@ -841,13 +853,14 @@ export class AuthService {
     let kafaStats = null;
     try {
       const currentSeason = '2025';
-      const teamKeyword = user.teamName.includes('한양') ? '한양대' : 
-                          user.teamName.replace('대학교', '').replace(' ', '');
-      
+      const teamKeyword = user.teamName.includes('한양')
+        ? '한양대'
+        : user.teamName.replace('대학교', '').replace(' ', '');
+
       const kafaData = await this.kafaStatsService.getKafaPlayerStatsFromDB(
         'uni', // 대학 리그
         currentSeason,
-        teamKeyword
+        teamKeyword,
       );
 
       if (kafaData && kafaData.length > 0) {
@@ -855,7 +868,7 @@ export class AuthService {
           totalPlayers: kafaData.length,
           season: currentSeason,
           league: '대학',
-          players: kafaData.map(player => ({
+          players: kafaData.map((player) => ({
             playerName: player.playerName,
             jerseyNumber: player.jerseyNumber,
             position: player.position,
@@ -871,7 +884,7 @@ export class AuthService {
             },
             rawYardString: player.rawYardString,
             lastUpdated: player.lastUpdated,
-          }))
+          })),
         };
       }
     } catch (error) {

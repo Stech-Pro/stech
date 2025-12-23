@@ -6,18 +6,12 @@ import { KafaLeagueCrawlerService } from './kafa-league-crawler.service';
 import { KafaBatchService } from './kafa-batch.service';
 import { KafaV2CrawlerService } from './kafa-v2-crawler.service';
 import { KafaStatsController } from './kafa-stats.controller';
-import { 
-  KafaPlayerStats, 
-  KafaPlayerStatsSchema 
+import {
+  KafaPlayerStats,
+  KafaPlayerStatsSchema,
 } from '../schemas/kafa-player-stats.schema';
-import {
-  KafaLeague,
-  KafaLeagueSchema
-} from '../schemas/kafa-league.schema';
-import {
-  KafaMatch,
-  KafaMatchSchema
-} from '../schemas/kafa-match.schema';
+import { KafaLeague, KafaLeagueSchema } from '../schemas/kafa-league.schema';
+import { KafaMatch, KafaMatchSchema } from '../schemas/kafa-match.schema';
 
 @Module({
   imports: [
@@ -28,19 +22,19 @@ import {
     ]),
   ],
   providers: [
-    KafaStatsService, 
-    KafaMatchInfoService, 
+    KafaStatsService,
+    KafaMatchInfoService,
     KafaLeagueCrawlerService,
     KafaBatchService,
-    KafaV2CrawlerService
+    KafaV2CrawlerService,
   ],
   controllers: [KafaStatsController],
   exports: [
-    KafaStatsService, 
-    KafaMatchInfoService, 
+    KafaStatsService,
+    KafaMatchInfoService,
     KafaLeagueCrawlerService,
     KafaBatchService,
-    KafaV2CrawlerService
+    KafaV2CrawlerService,
   ], // 다른 모듈에서 사용 가능
 })
 export class KafaStatsModule {}
