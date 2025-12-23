@@ -2413,4 +2413,114 @@ export class KafaStatsController {
     }
   }
 
+  // 러싱 스탯 다중 정렬 크롤링 API
+  @Post('scrape-rushing-all-sorts/:league')
+  @ApiOperation({
+    summary: '🏃‍♂️ 러싱 스탯 모든 정렬 방식 크롤링',
+    description: `
+    ## 🏃‍♂️ 러싱 스탯을 5가지 정렬로 크롤링하여 모든 선수 수집
+
+    기존의 50명 제한을 우회하기 위해 각 정렬 방식별로 크롤링합니다.
+    
+    ### 📋 크롤링하는 정렬 방식
+    1. **RUSH YDS**: 러싱 야드순 (기본)
+    2. **YDS/ATT**: 평균 야드순
+    3. **ATT**: 시도 횟수순
+    4. **TD**: 터치다운순
+    5. **LNG**: 최장거리순
+    
+    ### 🎯 특징
+    - **JavaScript 클릭 이벤트**: Puppeteer로 정렬 버튼 클릭
+    - **중복 제거**: 선수명+팀명 기준으로 유니크
+    - **완전한 데이터**: 모든 러싱 참여 선수 수집
+    - **안전한 테스트**: 기존 API 보존
+    
+    ### ⚠️ 주의사항
+    - 크롤링 시간이 기존보다 5배 더 소요될 수 있음
+    - 각 정렬별로 3초씩 대기하여 안전하게 크롤링
+    `,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 러싱 스탯 다중 정렬 크롤링 성공',
+    content: {
+      'application/json': {
+        schema: {
+          example: {
+            success: true,
+            message: '대학 러싱 스탯을 5가지 정렬로 크롤링 완료',
+            data: {
+              league: 'uni',
+              statType: 'rushing',
+              sortMethods: [
+                { name: 'RUSH YDS', players: 50, uniquePlayers: 45 },
+                { name: 'YDS/ATT', players: 50, uniquePlayers: 38 },
+                { name: 'ATT', players: 50, uniquePlayers: 42 },
+                { name: 'TD', players: 50, uniquePlayers: 35 },
+                { name: 'LNG', players: 50, uniquePlayers: 40 }
+              ],
+              totalCrawled: 250,
+              uniquePlayers: 127,
+              duplicatesRemoved: 123,
+              processingTime: '45.2s',
+              samplePlayers: [
+                {
+                  rank: 1,
+                  playerName: '이효원',
+                  university: '한양대학교',
+                  jerseyNumber: 7,
+                  rushingYards: 485,
+                  yardsPerAttempt: 6.8,
+                  attempts: 71,
+                  touchdowns: 6,
+                  longest: 45,
+                  foundInSorts: ['YDS/ATT', 'ATT']
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  })
+  @ApiResponse({
+    status: 400,
+    description: '❌ 크롤링 실패',
+    content: {
+      'application/json': {
+        schema: {
+          example: {
+            success: false,
+            message: 'Puppeteer 초기화 실패',
+            error: 'Browser launch failed'
+          }
+        }
+      }
+    }
+  })
+  async scrapeRushingAllSorts(@Param('league') league: 'uni' | 'soc') {
+    try {
+      const startTime = Date.now();
+      
+      const result = await this.kafaStatsService.scrapeRushingWithAllSorts(league);
+      
+      const processingTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      
+      return {
+        success: true,
+        message: `${league === 'uni' ? '대학' : '사회인'} 러싱 스탯을 5가지 정렬로 크롤링 완료`,
+        data: {
+          ...result,
+          processingTime: `${processingTime}s`
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `러싱 다중 정렬 크롤링 실패: ${error.message}`,
+        error: error.message
+      };
+    }
+  }
+
 }

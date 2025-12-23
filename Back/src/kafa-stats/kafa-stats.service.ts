@@ -7,6 +7,7 @@ import { wrapper } from 'axios-cookiejar-support';
 import { CookieJar } from 'tough-cookie';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as puppeteer from 'puppeteer';
 import { 
   TeamOffenseStats, 
   PlayerStats, 
@@ -2882,6 +2883,374 @@ export class KafaStatsService {
     } catch (error) {
       this.logger.error(`❌ 스탯 파일 목록 조회 실패: ${error.message}`);
       return { success: false, files: [] };
+    }
+  }
+
+  // /**
+  //  * 러싱 스탯을 5가지 정렬 방식으로 크롤링하여 모든 선수 수집 (Puppeteer 버전 - 주석처리)
+  //  */
+  // async scrapeRushingWithAllSorts_OLD_PUPPETEER(league: 'uni' | 'soc') {
+  //   const startTime = Date.now();
+  //   this.logger.log(`🏃‍♂️ ${league} 러싱 스탯 다중 정렬 크롤링 시작...`);
+
+  //   let browser = null;
+  //   try {
+  //     // 1. Puppeteer 브라우저 시작
+  //     browser = await puppeteer.launch({
+  //       headless: true,
+  //       args: [
+  //         '--no-sandbox',
+  //         '--disable-setuid-sandbox',
+  //         '--disable-dev-shm-usage',
+  //         '--disable-accelerated-2d-canvas',
+  //         '--no-first-run',
+  //         '--no-zygote',
+  //         '--single-process',
+  //         '--disable-gpu'
+  //       ]
+  //     });
+
+  //     const page = await browser.newPage();
+      
+  //     // 2. 러싱 스탯 페이지로 이동
+  //     const url = `https://www.kafa.org/stats/ind_${league}1.html`;
+  //     this.logger.log(`📋 URL 접속: ${url}`);
+      
+  //     await page.goto(url, { waitUntil: 'networkidle2' });
+
+  //     // 3. 각 정렬 방식별로 크롤링
+  //     const sortMethods = [
+  //       { selector: 'th:nth-child(3)', name: 'RUSH YDS', description: '러싱 야드순' },
+  //       { selector: 'th:nth-child(4)', name: 'YDS/ATT', description: '평균 야드순' },
+  //       { selector: 'th:nth-child(5)', name: 'ATT', description: '시도 횟수순' },
+  //       { selector: 'th:nth-child(6)', name: 'TD', description: '터치다운순' },
+  //       { selector: 'th:nth-child(7)', name: 'LNG', description: '최장거리순' }
+  //     ];
+
+  //     const allPlayers = new Map(); // 중복 제거용 Map (key: playerName+university)
+  //     const sortResults = [];
+
+  //     for (let i = 0; i < sortMethods.length; i++) {
+  //       const sortMethod = sortMethods[i];
+  //       this.logger.log(`📊 ${i + 1}/5: ${sortMethod.name} 정렬로 크롤링 중...`);
+
+  //       try {
+  //         // 첫 번째가 아니면 정렬 버튼 클릭
+  //         if (i > 0) {
+  //           await page.click(sortMethod.selector);
+  //           await page.waitForTimeout(3000); // 3초 대기하여 정렬 완료 기다림
+  //         }
+
+  //         // 현재 페이지의 테이블 데이터 크롤링
+  //         const players = await page.evaluate(() => {
+  //           const rows = document.querySelectorAll('table tbody tr');
+  //           const playerData = [];
+
+  //           rows.forEach((row, index) => {
+  //             const cells = row.querySelectorAll('td');
+  //             if (cells.length >= 7) {
+  //               const playerName = cells[1]?.textContent?.trim();
+  //               const university = cells[2]?.textContent?.trim();
+  //               const jerseyNumber = cells[0]?.textContent?.trim();
+                
+  //               if (playerName && university) {
+  //                 const rushingYardsText = cells[3]?.textContent?.trim() || '0';
+  //                 const yardsPerAttempt = parseFloat(cells[4]?.textContent?.trim() || '0');
+  //                 const attempts = parseInt(cells[5]?.textContent?.trim() || '0');
+  //                 const touchdowns = parseInt(cells[6]?.textContent?.trim() || '0');
+  //                 const longest = parseInt(cells[7]?.textContent?.trim() || '0');
+
+  //                 // 러싱 야드에서 전진/후퇴 정보 파싱
+  //                 const rushingYards = parseInt(rushingYardsText.match(/^(-?\d+)/)?.[1] || '0');
+
+  //                 playerData.push({
+  //                   rank: index + 1,
+  //                   playerName,
+  //                   university,
+  //                   jerseyNumber: parseInt(jerseyNumber) || 0,
+  //                   rushingYards,
+  //                   yardsPerAttempt,
+  //                   attempts,
+  //                   touchdowns,
+  //                   longest,
+  //                   rawRushingYards: rushingYardsText
+  //                 });
+  //               }
+  //             }
+  //           });
+
+  //           return playerData;
+  //         });
+
+  //         this.logger.log(`   ✅ ${sortMethod.name}: ${players.length}명 크롤링 완료`);
+
+  //         // 중복 제거하면서 데이터 추가
+  //         let uniqueCount = 0;
+  //         players.forEach(player => {
+  //           const key = `${player.playerName}_${player.university}`;
+  //           if (!allPlayers.has(key)) {
+  //             allPlayers.set(key, {
+  //               ...player,
+  //               foundInSorts: [sortMethod.name]
+  //             });
+  //             uniqueCount++;
+  //           } else {
+  //             // 이미 존재하는 선수라면 foundInSorts에 추가
+  //             const existingPlayer = allPlayers.get(key);
+  //             if (!existingPlayer.foundInSorts.includes(sortMethod.name)) {
+  //               existingPlayer.foundInSorts.push(sortMethod.name);
+  //             }
+  //           }
+  //         });
+
+  //         sortResults.push({
+  //           name: sortMethod.name,
+  //           description: sortMethod.description,
+  //           players: players.length,
+  //           uniquePlayers: uniqueCount
+  //         });
+
+  //       } catch (sortError) {
+  //         this.logger.error(`❌ ${sortMethod.name} 정렬 크롤링 실패: ${sortError.message}`);
+  //         sortResults.push({
+  //           name: sortMethod.name,
+  //           description: sortMethod.description,
+  //           players: 0,
+  //           uniquePlayers: 0,
+  //           error: sortError.message
+  //         });
+  //       }
+  //     }
+
+  //     // 4. 결과 정리
+  //     const uniquePlayers = Array.from(allPlayers.values());
+  //     const totalCrawled = sortResults.reduce((sum, result) => sum + result.players, 0);
+  //     const duplicatesRemoved = totalCrawled - uniquePlayers.length;
+
+  //     // 5. 상위 10명 샘플 데이터
+  //     const samplePlayers = uniquePlayers
+  //       .sort((a, b) => b.rushingYards - a.rushingYards)
+  //       .slice(0, 10);
+
+  //     const result = {
+  //       league,
+  //       statType: 'rushing',
+  //       sortMethods: sortResults,
+  //       totalCrawled,
+  //       uniquePlayers: uniquePlayers.length,
+  //       duplicatesRemoved,
+  //       samplePlayers: samplePlayers.slice(0, 5), // 상위 5명만 응답에 포함
+  //       allPlayersData: uniquePlayers // 전체 데이터 (필요시 사용)
+  //     };
+
+  //     this.logger.log(`🎉 러싱 다중 정렬 크롤링 완료: ${uniquePlayers.length}명 (중복 제거: ${duplicatesRemoved}명)`);
+      
+  //     return result;
+
+  //   } catch (error) {
+  //     this.logger.error(`❌ 러싱 다중 정렬 크롤링 실패: ${error.message}`);
+  //     throw new Error(`러싱 다중 정렬 크롤링 실패: ${error.message}`);
+  //   } finally {
+  //     // 6. 브라우저 정리
+  //     if (browser) {
+  //       await browser.close();
+  //     }
+  //   }
+  // }
+
+  /**
+   * 러싱 스탯을 5가지 정렬 방식으로 크롤링하여 모든 선수 수집 (axios + cheerio 버전)
+   */
+  async scrapeRushingWithAllSorts(league: 'uni' | 'soc') {
+    const startTime = Date.now();
+    this.logger.log(`🏃‍♂️ ${league} 러싱 스탯 다중 정렬 크롤링 시작... (axios + cheerio)`);
+
+    try {
+      // 1. 정렬 방식별 URL 매핑
+      const sortMethods = [
+        { mode: 'yds', name: 'RUSH YDS', description: '러싱 야드순' },
+        { mode: 'ydp', name: 'YDS/ATT', description: '평균 야드순' },
+        { mode: 'att', name: 'ATT', description: '시도 횟수순' },
+        { mode: 'td', name: 'TD', description: '터치다운순' },
+        { mode: 'lng', name: 'LNG', description: '최장거리순' }
+      ];
+
+      const allPlayers = new Map(); // 중복 제거용 Map (key: playerName+university)
+      const sortResults = [];
+      const year = new Date().getFullYear(); // 현재 연도
+
+      // 2. 각 정렬 방식별로 크롤링
+      for (let i = 0; i < sortMethods.length; i++) {
+        const sortMethod = sortMethods[i];
+        this.logger.log(`📊 ${i + 1}/5: ${sortMethod.name} 정렬로 크롤링 중...`);
+
+        try {
+          // URL 생성
+          const url = `https://www.kafa.org/stats/ind_${league}1.html?mode=${sortMethod.mode}&year=${year}`;
+          this.logger.log(`   🔗 URL: ${url}`);
+
+          // HTTP 요청
+          const response = await axios.get(url, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+            },
+            timeout: 30000
+          });
+
+          // HTML 파싱
+          const $ = cheerio.load(response.data);
+          const players = [];
+
+          // 테이블 데이터 추출
+          $('table.stats_table tr').each((index, row) => {
+            const cells = $(row).find('td');
+            if (cells.length >= 6) { // 최소 6개 셀 (순위, 선수, 러싱야드, 평균, 시도, TD)
+              const rankText = $(cells[0]).text().trim();
+              const playerText = $(cells[1]).text().trim();
+              
+              if (rankText && playerText) {
+                // 선수 정보 파싱 (예: "고려대학교 25번 김태현")
+                const playerMatch = playerText.match(/(.+?)\s+(\d+)번\s+(.+)/);
+                
+                if (playerMatch) {
+                  const university = playerMatch[1].trim();
+                  const jerseyNumber = parseInt(playerMatch[2]);
+                  const playerName = playerMatch[3].trim();
+
+                  const rushingYardsText = $(cells[2]).text().trim() || '0';
+                  const yardsPerAttempt = parseFloat($(cells[3]).text().trim() || '0');
+                  const attempts = parseInt($(cells[4]).text().trim() || '0');
+                  const touchdowns = parseInt($(cells[5]).text().trim() || '0');
+                  const longest = parseInt($(cells[6]).text().trim() || '0');
+
+                  // 러싱 야드에서 전진/후퇴 정보 파싱
+                  const rushingYards = parseInt(rushingYardsText.match(/^(-?\d+)/)?.[1] || '0');
+
+                  players.push({
+                    rank: parseInt(rankText) || index,
+                    playerName,
+                    university,
+                    jerseyNumber,
+                    rushingYards,
+                    yardsPerAttempt,
+                    attempts,
+                    touchdowns,
+                    longest,
+                    rawRushingYards: rushingYardsText
+                  });
+                }
+              }
+            }
+          });
+
+          this.logger.log(`   ✅ ${sortMethod.name}: ${players.length}명 크롤링 완료`);
+
+          // 3. 중복 제거하면서 데이터 추가
+          let uniqueCount = 0;
+          players.forEach(player => {
+            const key = `${player.playerName}_${player.university}`;
+            if (!allPlayers.has(key)) {
+              allPlayers.set(key, {
+                ...player,
+                foundInSorts: [sortMethod.name]
+              });
+              uniqueCount++;
+            } else {
+              // 이미 존재하는 선수라면 foundInSorts에 추가
+              const existingPlayer = allPlayers.get(key);
+              if (!existingPlayer.foundInSorts.includes(sortMethod.name)) {
+                existingPlayer.foundInSorts.push(sortMethod.name);
+              }
+            }
+          });
+
+          sortResults.push({
+            name: sortMethod.name,
+            description: sortMethod.description,
+            players: players.length,
+            uniquePlayers: uniqueCount
+          });
+
+          // 요청 간격 조정 (1초 대기)
+          if (i < sortMethods.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+
+        } catch (sortError) {
+          this.logger.error(`❌ ${sortMethod.name} 정렬 크롤링 실패: ${sortError.message}`);
+          sortResults.push({
+            name: sortMethod.name,
+            description: sortMethod.description,
+            players: 0,
+            uniquePlayers: 0,
+            error: sortError.message
+          });
+        }
+      }
+
+      // 4. 결과 정리
+      const uniquePlayers = Array.from(allPlayers.values());
+      const totalCrawled = sortResults.reduce((sum, result) => sum + result.players, 0);
+      const duplicatesRemoved = totalCrawled - uniquePlayers.length;
+
+      // 5. JSON 파일로 저장 (기존 러싱 스탯 파일 업데이트)
+      const fileName = `kafa-${league}-rushing.json`;
+      const dataDir = path.join(process.cwd(), 'data');
+      const filePath = path.join(dataDir, fileName);
+      
+      // data 디렉토리 생성 (없으면)
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      
+      // 기존 JSON 포맷에 맞춰 데이터 변환
+      const jsonData = {
+        statType: 'rushing',
+        statName: 'RUSHING',
+        league,
+        crawledAt: new Date().toISOString(),
+        totalCount: uniquePlayers.length, // 이제 111명!
+        players: uniquePlayers.map((player, index) => ({
+          rank: index + 1,
+          playerName: player.playerName,
+          university: player.university,
+          jerseyNumber: player.jerseyNumber,
+          rushingYards: player.rushingYards,
+          yardsPerAttempt: player.yardsPerAttempt,
+          attempts: player.attempts,
+          touchdowns: player.touchdowns,
+          longest: player.longest
+        })).sort((a, b) => b.rushingYards - a.rushingYards) // 러싱야드순 정렬
+      };
+      
+      // JSON 파일 저장 (덮어쓰기)
+      fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2), 'utf8');
+      this.logger.log(`✅ JSON 파일 저장 완료: ${fileName} (${uniquePlayers.length}명)`);
+
+      // 6. 상위 샘플 데이터 (러싱야드순 정렬)
+      const samplePlayers = uniquePlayers
+        .sort((a, b) => b.rushingYards - a.rushingYards)
+        .slice(0, 5);
+
+      const result = {
+        league,
+        statType: 'rushing',
+        year,
+        sortMethods: sortResults,
+        totalCrawled,
+        uniquePlayers: uniquePlayers.length,
+        duplicatesRemoved,
+        samplePlayers,
+        allPlayersData: uniquePlayers // 전체 데이터 (필요시 사용)
+      };
+
+      this.logger.log(`🎉 러싱 다중 정렬 크롤링 완료: ${uniquePlayers.length}명 (중복 제거: ${duplicatesRemoved}명)`);
+      
+      return result;
+
+    } catch (error) {
+      this.logger.error(`❌ 러싱 다중 정렬 크롤링 실패: ${error.message}`);
+      throw new Error(`러싱 다중 정렬 크롤링 실패: ${error.message}`);
     }
   }
 }
