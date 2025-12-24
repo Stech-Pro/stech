@@ -2,128 +2,129 @@
   "statType": "kickoffs",
   "statName": "KICKOFFS",
   "league": "soc",
-  "crawledAt": "2025-12-16T06:00:16.071Z",
-  "totalCount": 12,
+  "crawledAt": "2025-12-24T03:34:03.431Z",
+  "totalCount": 11,
   "players": [
     {
       "rank": 1,
-      "playerName": "김상진",
-      "university": "삼성 블루스톰",
-      "jerseyNumber": 24,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
-    },
-    {
-      "rank": 2,
-      "playerName": "이기태",
-      "university": "부산 그리폰즈",
-      "jerseyNumber": 22,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
-    },
-    {
-      "rank": 3,
       "playerName": "최경서",
       "university": "삼성 블루스톰",
       "jerseyNumber": 8,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
+      "yardsAverage": 52.3,
+      "kickoffs": 29,
+      "totalYards": 1,
+      "touchdowns": 0,
+      "longestKickoff": 70
     },
     {
-      "rank": 4,
-      "playerName": "소윤호",
-      "university": "인천 라이노스",
-      "jerseyNumber": 65,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
-    },
-    {
-      "rank": 5,
-      "playerName": "황미륵",
-      "university": "서울 디펜더스",
-      "jerseyNumber": 99,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
-    },
-    {
-      "rank": 6,
+      "rank": 2,
       "playerName": "김세종",
       "university": "군위 피닉스",
       "jerseyNumber": 16,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
+      "yardsAverage": 49.4,
+      "kickoffs": 29,
+      "totalYards": 1,
+      "touchdowns": 0,
+      "longestKickoff": 63
     },
     {
-      "rank": 7,
+      "rank": 3,
       "playerName": "박준수",
       "university": "부산 그리폰즈",
       "jerseyNumber": 57,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
+      "yardsAverage": 49.4,
+      "kickoffs": 20,
+      "totalYards": 987,
+      "touchdowns": 0,
+      "longestKickoff": 60
     },
     {
-      "rank": 8,
+      "rank": 4,
+      "playerName": "한규철",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 22,
+      "yardsAverage": 31.2,
+      "kickoffs": 19,
+      "totalYards": 593,
+      "touchdowns": 0,
+      "longestKickoff": 57
+    },
+    {
+      "rank": 5,
       "playerName": "김주오",
       "university": "서울 바이킹스",
       "jerseyNumber": 97,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
+      "yardsAverage": 48,
+      "kickoffs": 12,
+      "totalYards": 576,
+      "touchdowns": 0,
+      "longestKickoff": 60
     },
     {
-      "rank": 9,
+      "rank": 6,
+      "playerName": "황미륵",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 99,
+      "yardsAverage": 49.4,
+      "kickoffs": 10,
+      "totalYards": 494,
+      "touchdowns": 0,
+      "longestKickoff": 55
+    },
+    {
+      "rank": 7,
       "playerName": "이준기",
       "university": "서울 바이킹스",
       "jerseyNumber": 52,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
+      "yardsAverage": 44,
+      "kickoffs": 10,
+      "totalYards": 440,
+      "touchdowns": 0,
+      "longestKickoff": 57
+    },
+    {
+      "rank": 8,
+      "playerName": "이기태",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 22,
+      "yardsAverage": 52.7,
+      "kickoffs": 3,
+      "totalYards": 158,
+      "touchdowns": 0,
+      "longestKickoff": 60
+    },
+    {
+      "rank": 9,
+      "playerName": "소윤호",
+      "university": "인천 라이노스",
+      "jerseyNumber": 65,
+      "yardsAverage": 50.3,
+      "kickoffs": 3,
+      "totalYards": 151,
+      "touchdowns": 0,
+      "longestKickoff": 58
     },
     {
       "rank": 10,
-      "playerName": "인천 라이노스 ??번 김연준",
-      "university": "미상",
-      "jerseyNumber": 0,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
+      "playerName": "김상진",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 24,
+      "yardsAverage": 58,
+      "kickoffs": 1,
+      "totalYards": 58,
+      "touchdowns": 0,
+      "longestKickoff": 58
     },
     {
       "rank": 11,
       "playerName": "이지원",
       "university": "군위 피닉스",
       "jerseyNumber": 1,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
-    },
-    {
-      "rank": 12,
-      "playerName": "한규철",
-      "university": "서울 골든이글스",
-      "jerseyNumber": 22,
-      "kickoffs": 0,
-      "yards": 0,
-      "touchbacks": 0,
-      "average": 0
+      "yardsAverage": 35,
+      "kickoffs": 1,
+      "totalYards": 35,
+      "touchdowns": 0,
+      "longestKickoff": 35
     }
   ]
 }

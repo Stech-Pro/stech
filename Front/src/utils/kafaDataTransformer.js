@@ -191,7 +191,7 @@ function transformSocialLeague(kafaDataByStatType) {
  */
 function mapPlayerFields(player, kafaStatType) {
   const baseFields = {
-    name: player.name || player.playerName || '이름 없음',
+    name: player.playerName || player.name || '이름 없음',
   };
 
   // Stat-specific field mappings (실제 KAFA JSON 필드에 맞춤)
@@ -205,24 +205,24 @@ function mapPlayerFields(player, kafaStatType) {
     },
     'passing': {
       passingYards: player.passingYards || 0,
-      passingCompletions: player.completions || 0,
-      passingAttempts: player.attempts || 0,
-      avgYardsPerAttempt: player.passingYards && player.attempts
+      completions: player.completions || 0,
+      attempts: player.attempts || 0,
+      avgYardsPerAttempt: player.yardsPerAttempt || (player.passingYards && player.attempts
         ? Number((player.passingYards / player.attempts).toFixed(1))
-        : 0,
-      completionPercentage: player.completions && player.attempts
+        : 0),
+      completionPercentage: player.completionPercentage || (player.completions && player.attempts
         ? Number(((player.completions / player.attempts) * 100).toFixed(1))
-        : 0,
-      passingTouchdowns: player.touchdowns || 0,
+        : 0),
+      touchdowns: player.touchdowns || 0,
       interceptions: player.interceptions || 0,
-      longestPass: player.longest || 0,
+      longest: player.longest || 0,
     },
     'receiving': {
       receptions: player.receptions || 0,
       receivingYards: player.receivingYards || 0,
       yardsPerReception: player.yardsPerReception || 0,
-      receivingTouchdowns: player.touchdowns || 0,
-      longestReception: player.longest || 0,
+      touchdowns: player.touchdowns || 0,
+      longest: player.longest || 0,
     },
     'fumbles': {
       fumbles: player.forcedFumbles || 0,
@@ -250,32 +250,33 @@ function mapPlayerFields(player, kafaStatType) {
       longestFieldGoal: player.longestFieldGoal || 0,
     },
     'kickoffs': {
-      averageKickoffYards: player.yardsAverage || 0,
+      averageKickoffYards: player.yardsAverage || player.average || 0,
       kickoffCount: player.kickoffs || 0,
-      kickoffYards: player.totalYards || 0,
+      kickoffYards: player.totalYards || player.yards || 0,
       kickoffTouchdowns: player.touchdowns || 0,
-      longestKickoff: player.longestKickoff || 0,
+      longestKickoff: player.longestKickoff || player.longest || 0,
+      touchbacks: player.touchbacks || 0,
     },
     'kickoffreturns': {
-      averageKickReturnYards: player.yardsAverage || 0,
-      kickReturnCount: player.kickoffReturns || 0,
-      kickReturnYards: player.totalReturnYards || 0,
+      averageKickReturnYards: player.yardsAverage || player.average || 0,
+      kickReturnCount: player.kickoffReturns || player.returns || 0,
+      kickReturnYards: player.totalReturnYards || player.returnYards || 0,
       kickReturnTouchdowns: player.touchdowns || 0,
-      longestKickReturn: player.longestReturn || 0,
+      longestKickReturn: player.longestReturn || player.longest || 0,
     },
     'punting': {
-      averagePuntYards: player.yardsAverage || 0,
+      averagePuntYards: player.yardsAverage || player.average || 0,
       puntCount: player.punts || 0,
-      puntYards: player.totalYards || 0,
+      puntYards: player.totalYards || player.yards || 0,
       puntTouchdowns: player.touchdowns || 0,
-      longestPunt: player.longestPunt || 0,
+      longestPunt: player.longestPunt || player.longest || 0,
     },
     'puntreturns': {
-      averagePuntReturnYards: player.yardsAverage || 0,
-      puntReturnCount: player.puntReturns || 0,
-      puntReturnYards: player.totalReturnYards || 0,
+      averagePuntReturnYards: player.yardsAverage || player.average || 0,
+      puntReturnCount: player.puntReturns || player.returns || 0,
+      puntReturnYards: player.totalReturnYards || player.returnYards || 0,
       puntReturnTouchdowns: player.touchdowns || 0,
-      longestPuntReturn: player.longestReturn || 0,
+      longestPuntReturn: player.longestReturn || player.longest || 0,
     },
   };
 
