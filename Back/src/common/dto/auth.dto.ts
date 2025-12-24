@@ -175,7 +175,11 @@ export class CreateProfileDto {
   @IsString()
   playerID?: string;
 
-  @ApiProperty({ example: 'https://via.placeholder.com/250x300', description: '프로필 사진 URL', required: false })
+  @ApiProperty({
+    example: 'https://via.placeholder.com/250x300',
+    description: '프로필 사진 URL',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   avatar?: string;
@@ -235,19 +239,19 @@ export class UpdateProfileDto {
 
   @ApiProperty({ example: 180, description: '키 (cm)', required: false })
   @IsOptional()
-  @Transform(({ value }) => value ? parseInt(value) : undefined)
+  @Transform(({ value }) => (value ? parseInt(value) : undefined))
   @IsNumber()
   height?: number;
 
   @ApiProperty({ example: 75, description: '몸무게 (kg)', required: false })
   @IsOptional()
-  @Transform(({ value }) => value ? parseInt(value) : undefined)
+  @Transform(({ value }) => (value ? parseInt(value) : undefined))
   @IsNumber()
   weight?: number;
 
   @ApiProperty({ example: 22, description: '나이', required: false })
   @IsOptional()
-  @Transform(({ value }) => value ? parseInt(value) : undefined)
+  @Transform(({ value }) => (value ? parseInt(value) : undefined))
   @IsNumber()
   age?: number;
 
@@ -265,7 +269,11 @@ export class UpdateProfileDto {
   @IsString()
   position?: string;
 
-  @ApiProperty({ example: 'https://via.placeholder.com/250x300', description: '프로필 사진 URL', required: false })
+  @ApiProperty({
+    example: 'https://via.placeholder.com/250x300',
+    description: '프로필 사진 URL',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   avatar?: string;

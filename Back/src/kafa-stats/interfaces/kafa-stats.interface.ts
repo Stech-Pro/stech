@@ -50,7 +50,7 @@ export interface GameRecordStats {
   homeTeam: string;
   awayTeam: string;
   totalPlays: number;
-  
+
   // 팀별 통계
   teamStats: {
     [teamCode: string]: {
@@ -70,7 +70,7 @@ export interface GameRecordStats {
       thirdDownPercentage: number;
     };
   };
-  
+
   // 쿼터별 통계
   quarterStats: {
     [quarter: string]: {

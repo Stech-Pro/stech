@@ -31,7 +31,7 @@ export class KafaBatchService {
 
       await page.type('#user_id', 'stech');
       await page.type('#user_password', 'Startup901()');
-      
+
       await page.click('#login_btn');
       await page.waitForNavigation({ waitUntil: 'networkidle2' });
 
@@ -90,8 +90,9 @@ export class KafaBatchService {
         };
 
         // 리그 정보
-        const leagueSelect = document.querySelector('select[id*="L_league"]') as HTMLSelectElement;
-        data.leagueType = leagueSelect?.selectedOptions?.[0]?.textContent?.trim() || '';
+        const leagueSelect = document.querySelector('select[id*="L_league"]');
+        data.leagueType =
+          (leagueSelect as HTMLSelectElement)?.selectedOptions?.[0]?.textContent?.trim() || '';
 
         // 경기 날짜
         const dateInput = document.querySelector('input[id*="day"]');
@@ -102,16 +103,20 @@ export class KafaBatchService {
         data.venue = (venueInput as HTMLInputElement)?.value || '';
 
         // 팀 정보
-        const homeTeamSelect = document.querySelector('select[name*="home_team"]') as HTMLSelectElement;
-        const homeTeamOption = homeTeamSelect?.selectedOptions?.[0];
+        const homeTeamSelect = document.querySelector(
+          'select[name*="home_team"]',
+        );
+        const homeTeamOption = (homeTeamSelect as HTMLSelectElement)?.selectedOptions?.[0];
         data.homeTeam = {
           name: homeTeamOption?.textContent?.trim() || '',
           initial: homeTeamOption?.getAttribute('value') || '',
           fullName: homeTeamOption?.textContent?.trim() || '',
         };
 
-        const awayTeamSelect = document.querySelector('select[name*="away_team"]') as HTMLSelectElement;
-        const awayTeamOption = awayTeamSelect?.selectedOptions?.[0];
+        const awayTeamSelect = document.querySelector(
+          'select[name*="away_team"]',
+        );
+        const awayTeamOption = (awayTeamSelect as HTMLSelectElement)?.selectedOptions?.[0];
         data.awayTeam = {
           name: awayTeamOption?.textContent?.trim() || '',
           initial: awayTeamOption?.getAttribute('value') || '',
@@ -122,7 +127,7 @@ export class KafaBatchService {
         const scoreTable = document.querySelector('table.match_score');
         if (scoreTable) {
           const rows = scoreTable.querySelectorAll('tr');
-          
+
           const homeRow = rows[1];
           if (homeRow) {
             const cells = homeRow.querySelectorAll('td');
@@ -162,7 +167,7 @@ export class KafaBatchService {
         quarterTabs.forEach((tab) => {
           const quarterName = tab.textContent?.trim() || '';
           const playTable = document.querySelector(`#${quarterName}_plays`);
-          
+
           if (playTable) {
             const rows = playTable.querySelectorAll('tr');
             rows.forEach((row, index) => {
@@ -236,7 +241,9 @@ export class KafaBatchService {
     try {
       const totalLeagues = await this.kafaLeagueModel.countDocuments();
       const totalMatches = await this.kafaMatchModel.countDocuments();
-      const crawledMatches = await this.kafaMatchModel.countDocuments({ status: 'crawled' });
+      const crawledMatches = await this.kafaMatchModel.countDocuments({
+        status: 'crawled',
+      });
 
       const lastCrawled = await this.kafaMatchModel
         .findOne({ status: 'crawled' })
@@ -247,13 +254,18 @@ export class KafaBatchService {
         totalLeagues,
         totalMatches,
         crawledMatches,
-        crawlingProgress: totalMatches > 0 ? Math.round((crawledMatches / totalMatches) * 100) : 0,
-        lastCrawledMatch: lastCrawled ? {
-          matchId: lastCrawled.matchId,
-          homeTeam: lastCrawled.homeTeam?.name,
-          awayTeam: lastCrawled.awayTeam?.name,
-          crawledAt: lastCrawled.crawledAt,
-        } : null,
+        crawlingProgress:
+          totalMatches > 0
+            ? Math.round((crawledMatches / totalMatches) * 100)
+            : 0,
+        lastCrawledMatch: lastCrawled
+          ? {
+              matchId: lastCrawled.matchId,
+              homeTeam: lastCrawled.homeTeam?.name,
+              awayTeam: lastCrawled.awayTeam?.name,
+              crawledAt: lastCrawled.crawledAt,
+            }
+          : null,
       };
     } catch (error) {
       this.logger.error('배치 상태 조회 실패:', error);
@@ -302,7 +314,9 @@ export class KafaBatchService {
             const cells = row.querySelectorAll('td');
             if (cells.length > 0) {
               const matchLink = cells[0]?.querySelector('a');
-              const matchId = matchLink?.getAttribute('href')?.match(/L_index=(\d+)/)?.[1];
+              const matchId = matchLink
+                ?.getAttribute('href')
+                ?.match(/L_index=(\d+)/)?.[1];
 
               if (matchId) {
                 matches.push({
@@ -332,7 +346,7 @@ export class KafaBatchService {
       // 리그 정보 업데이트
       await this.kafaLeagueModel.findOneAndUpdate(
         { leagueId },
-        { 
+        {
           $set: {
             totalMatches,
             matches: matches.map((m) => m.matchId),
@@ -346,7 +360,7 @@ export class KafaBatchService {
       for (const match of matches) {
         await this.kafaMatchModel.findOneAndUpdate(
           { matchId: match.matchId },
-          { 
+          {
             $set: {
               ...match,
               leagueId,
@@ -381,10 +395,14 @@ export class KafaBatchService {
       const page = await this.browser.newPage();
       await page.setCookie(...this.cookies);
 
-      await page.goto('https://member.kafa.or.kr/match_result.html', { waitUntil: 'networkidle2' });
+      await page.goto('https://member.kafa.or.kr/match_result.html', {
+        waitUntil: 'networkidle2',
+      });
 
       const leagues = await page.evaluate(() => {
-        const leagueOptions = document.querySelectorAll('select[name="L_l_index"] option');
+        const leagueOptions = document.querySelectorAll(
+          'select[name="L_l_index"] option',
+        );
         const leagues: any[] = [];
 
         leagueOptions.forEach((option) => {
@@ -461,7 +479,6 @@ export class KafaBatchService {
   async getAllMatches() {
     return await this.kafaMatchModel.find().exec();
   }
-
 
   async onModuleDestroy() {
     if (this.browser) {

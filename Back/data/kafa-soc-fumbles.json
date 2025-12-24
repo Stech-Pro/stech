@@ -2,332 +2,629 @@
   "statType": "fumbles",
   "statName": "FUMBLES",
   "league": "soc",
-  "crawledAt": "2025-12-16T06:00:08.910Z",
-  "totalCount": 36,
+  "crawledAt": "2025-12-24T02:40:34.727Z",
+  "totalCount": 69,
   "players": [
     {
       "rank": 1,
       "playerName": "정승호",
       "university": "서울 골든이글스",
       "jerseyNumber": 9,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 7,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 2,
       "playerName": "이찬우",
       "university": "삼성 블루스톰",
       "jerseyNumber": 2,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 6,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 3,
       "playerName": "박용운",
       "university": "서울 디펜더스",
       "jerseyNumber": 4,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 4,
       "playerName": "김영인",
       "university": "서울 골든이글스",
       "jerseyNumber": 90,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 5,
-      "playerName": "이민우",
-      "university": "군위 피닉스",
-      "jerseyNumber": 9,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 6,
       "playerName": "배준호",
       "university": "삼성 블루스톰",
       "jerseyNumber": 28,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 7,
+      "rank": 6,
       "playerName": "이기태",
       "university": "부산 그리폰즈",
       "jerseyNumber": 22,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 8,
+      "rank": 7,
       "playerName": "손창민",
       "university": "삼성 블루스톰",
       "jerseyNumber": 21,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 9,
+      "rank": 8,
       "playerName": "남현욱",
       "university": "서울 바이킹스",
       "jerseyNumber": 11,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 5,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 9,
+      "playerName": "이민우",
+      "university": "군위 피닉스",
+      "jerseyNumber": 9,
+      "forcedFumbles": 5,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 10,
-      "playerName": "하민수",
-      "university": "군위 피닉스",
-      "jerseyNumber": 15,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 11,
-      "playerName": "신정한",
-      "university": "인천 라이노스",
-      "jerseyNumber": 12,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 12,
-      "playerName": "현봉민",
-      "university": "부산 그리폰즈",
-      "jerseyNumber": 3,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 13,
       "playerName": "신용우",
       "university": "인천 라이노스",
       "jerseyNumber": 9,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 11,
+      "playerName": "하민수",
+      "university": "군위 피닉스",
+      "jerseyNumber": 15,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 12,
+      "playerName": "신정한",
+      "university": "인천 라이노스",
+      "jerseyNumber": 12,
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 13,
+      "playerName": "현봉민",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 3,
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
     },
     {
       "rank": 14,
-      "playerName": "안정원",
-      "university": "서울 디펜더스",
-      "jerseyNumber": 2,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 15,
-      "playerName": "최훈식",
-      "university": "군위 피닉스",
-      "jerseyNumber": 32,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 16,
-      "playerName": "이재건",
-      "university": "부산 그리폰즈",
-      "jerseyNumber": 23,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 17,
-      "playerName": "김영훈",
-      "university": "인천 라이노스",
-      "jerseyNumber": 0,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 18,
-      "playerName": "강지원",
-      "university": "삼성 블루스톰",
-      "jerseyNumber": 39,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 19,
-      "playerName": "인천 라이노스 ??번 김연준",
-      "university": "미상",
-      "jerseyNumber": 0,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 20,
-      "playerName": "조지훈",
-      "university": "삼성 블루스톰",
-      "jerseyNumber": 4,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 21,
-      "playerName": "고동현",
-      "university": "인천 라이노스",
-      "jerseyNumber": 27,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 22,
-      "playerName": "염준석",
-      "university": "서울 골든이글스",
-      "jerseyNumber": 16,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 23,
-      "playerName": "김우혁",
-      "university": "서울 바이킹스",
-      "jerseyNumber": 81,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
-    },
-    {
-      "rank": 24,
       "playerName": "안준범",
       "university": "인천 라이노스",
       "jerseyNumber": 20,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 25,
+      "rank": 15,
       "playerName": "황윤경",
       "university": "군위 피닉스",
       "jerseyNumber": 0,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 26,
+      "rank": 16,
       "playerName": "지현학",
       "university": "군위 피닉스",
       "jerseyNumber": 10,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 27,
+      "rank": 17,
       "playerName": "이대기",
       "university": "서울 골든이글스",
       "jerseyNumber": 5,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 28,
+      "rank": 18,
       "playerName": "김남기",
       "university": "서울 디펜더스",
       "jerseyNumber": 10,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 29,
+      "rank": 19,
       "playerName": "고도영",
       "university": "부산 그리폰즈",
       "jerseyNumber": 15,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 3,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 30,
+      "rank": 20,
       "playerName": "손지우",
       "university": "군위 피닉스",
       "jerseyNumber": 11,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 31,
+      "rank": 21,
       "playerName": "최재훈",
       "university": "인천 라이노스",
       "jerseyNumber": 18,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 32,
+      "rank": 22,
       "playerName": "김세종",
       "university": "군위 피닉스",
       "jerseyNumber": 16,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 33,
+      "rank": 23,
       "playerName": "이정규",
       "university": "인천 라이노스",
       "jerseyNumber": 24,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 34,
+      "rank": 24,
       "playerName": "한재덕",
       "university": "서울 바이킹스",
       "jerseyNumber": 44,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 4,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 35,
+      "rank": 25,
       "playerName": "김찬솔",
       "university": "인천 라이노스",
       "jerseyNumber": 8,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     },
     {
-      "rank": 36,
+      "rank": 26,
       "playerName": "전홍덕",
       "university": "삼성 블루스톰",
       "jerseyNumber": 25,
-      "fumbles": 0,
-      "lost": 0,
-      "recovered": 0
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 27,
+      "playerName": "안정원",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 2,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 28,
+      "playerName": "최훈식",
+      "university": "군위 피닉스",
+      "jerseyNumber": 32,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 29,
+      "playerName": "이재건",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 23,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 30,
+      "playerName": "김영훈",
+      "university": "인천 라이노스",
+      "jerseyNumber": 0,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 31,
+      "playerName": "강지원",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 39,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 32,
+      "playerName": "조지훈",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 4,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 33,
+      "playerName": "고동현",
+      "university": "인천 라이노스",
+      "jerseyNumber": 27,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 34,
+      "playerName": "염준석",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 16,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 35,
+      "playerName": "김우혁",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 81,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 0,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 36,
+      "playerName": "류도현",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 81,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 5,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 37,
+      "playerName": "우제욱",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 44,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 38,
+      "playerName": "황미륵",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 99,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 39,
+      "playerName": "정진송",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 35,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 40,
+      "playerName": "박준수",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 57,
+      "forcedFumbles": 2,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 41,
+      "playerName": "김성연",
+      "university": "군위 피닉스",
+      "jerseyNumber": 55,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 42,
+      "playerName": "최지훈",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 58,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 3,
+      "fumbleRecoveryTDs": 1
+    },
+    {
+      "rank": 43,
+      "playerName": "이준기",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 52,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 44,
+      "playerName": "김용환",
+      "university": "군위 피닉스",
+      "jerseyNumber": 2,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 45,
+      "playerName": "김창익",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 0,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 46,
+      "playerName": "안태현",
+      "university": "군위 피닉스",
+      "jerseyNumber": 59,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 47,
+      "playerName": "김성동",
+      "university": "군위 피닉스",
+      "jerseyNumber": 39,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 48,
+      "playerName": "김상진",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 24,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 49,
+      "playerName": "배현웅",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 50,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 50,
+      "playerName": "박강현",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 69,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 51,
+      "playerName": "김동균",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 97,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 52,
+      "playerName": "박경균",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 3,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 53,
+      "playerName": "김우영",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 87,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 54,
+      "playerName": "정재훈",
+      "university": "인천 라이노스",
+      "jerseyNumber": 26,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 55,
+      "playerName": "부동환",
+      "university": "군위 피닉스",
+      "jerseyNumber": 96,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 56,
+      "playerName": "박준성",
+      "university": "부산 그리폰즈",
+      "jerseyNumber": 54,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 57,
+      "playerName": "박재상",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 33,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 58,
+      "playerName": "신태섭",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 62,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 59,
+      "playerName": "스위프트(Gregg Swift)",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 3,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 60,
+      "playerName": "권영준",
+      "university": "인천 라이노스",
+      "jerseyNumber": 83,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 61,
+      "playerName": "정성진",
+      "university": "서울 바이킹스",
+      "jerseyNumber": 98,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 62,
+      "playerName": "정예담",
+      "university": "서울 골든이글스",
+      "jerseyNumber": 98,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 63,
+      "playerName": "윤형섭",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 55,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 64,
+      "playerName": "차원경",
+      "university": "서울 디펜더스",
+      "jerseyNumber": 78,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 65,
+      "playerName": "황준근",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 36,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 66,
+      "playerName": "양두열",
+      "university": "군위 피닉스",
+      "jerseyNumber": 3,
+      "forcedFumbles": 1,
+      "fumbleRecoveries": 2,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 67,
+      "playerName": "황상권",
+      "university": "인천 라이노스",
+      "jerseyNumber": 90,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 68,
+      "playerName": "공웅록",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 64,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
+    },
+    {
+      "rank": 69,
+      "playerName": "정승훈",
+      "university": "삼성 블루스톰",
+      "jerseyNumber": 33,
+      "forcedFumbles": 0,
+      "fumbleRecoveries": 1,
+      "fumbleRecoveryTDs": 0
     }
   ]
 }

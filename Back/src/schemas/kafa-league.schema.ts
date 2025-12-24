@@ -5,7 +5,7 @@ export type KafaLeagueDocument = KafaLeague & Document;
 
 @Schema({
   timestamps: true,
-  collection: 'kafa_leagues'
+  collection: 'kafa_leagues',
 })
 export class KafaLeague {
   @Prop({ required: true, unique: true })
@@ -26,10 +26,10 @@ export class KafaLeague {
   @Prop({ required: true })
   division: string; // 대학, 사회인
 
-  @Prop({ 
+  @Prop({
     type: String,
     enum: ['active', 'inactive', 'completed'],
-    default: 'active'
+    default: 'active',
   })
   status: string;
 

@@ -16,7 +16,7 @@ export class TeamInfo {
   fullName: string; // 한양대학교 LIONS
 }
 
-// 점수 정보 서브스키마  
+// 점수 정보 서브스키마
 @Schema({ _id: false })
 export class QuarterScore {
   @Prop({ default: 0 })
@@ -86,7 +86,7 @@ export class PlayData {
 
 @Schema({
   timestamps: true,
-  collection: 'kafa_matches'
+  collection: 'kafa_matches',
 })
 export class KafaMatch {
   @Prop({ required: true })
@@ -128,10 +128,10 @@ export class KafaMatch {
   @Prop()
   weather: string; // 날씨
 
-  @Prop({ 
+  @Prop({
     type: String,
     enum: ['scheduled', 'completed', 'crawled', 'failed'],
-    default: 'scheduled'
+    default: 'scheduled',
   })
   status: string;
 

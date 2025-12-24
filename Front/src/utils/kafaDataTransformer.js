@@ -191,7 +191,7 @@ function transformSocialLeague(kafaDataByStatType) {
  */
 function mapPlayerFields(player, kafaStatType) {
   const baseFields = {
-    name: player.name || player.playerName || '이름 없음',
+    name: player.playerName || player.name || '이름 없음',
   };
 
   // Stat-specific field mappings (실제 KAFA JSON 필드에 맞춤)
@@ -205,24 +205,24 @@ function mapPlayerFields(player, kafaStatType) {
     },
     'passing': {
       passingYards: player.passingYards || 0,
-      passingCompletions: player.completions || 0,
-      passingAttempts: player.attempts || 0,
-      avgYardsPerAttempt: player.passingYards && player.attempts
+      completions: player.completions || 0,
+      attempts: player.attempts || 0,
+      avgYardsPerAttempt: player.yardsPerAttempt || (player.passingYards && player.attempts
         ? Number((player.passingYards / player.attempts).toFixed(1))
-        : 0,
-      completionPercentage: player.completions && player.attempts
+        : 0),
+      completionPercentage: player.completionPercentage || (player.completions && player.attempts
         ? Number(((player.completions / player.attempts) * 100).toFixed(1))
-        : 0,
-      passingTouchdowns: player.touchdowns || 0,
+        : 0),
+      touchdowns: player.touchdowns || 0,
       interceptions: player.interceptions || 0,
-      longestPass: player.longest || 0,
+      longest: player.longest || 0,
     },
     'receiving': {
       receptions: player.receptions || 0,
       receivingYards: player.receivingYards || 0,
       yardsPerReception: player.yardsPerReception || 0,
-      receivingTouchdowns: player.touchdowns || 0,
-      longestReception: player.longest || 0,
+      touchdowns: player.touchdowns || 0,
+      longest: player.longest || 0,
     },
     'fumbles': {
       fumbles: player.forcedFumbles || 0,
@@ -237,45 +237,46 @@ function mapPlayerFields(player, kafaStatType) {
     },
     'interceptions': {
       interceptions: player.interceptions || 0,
-      interceptionTouchdowns: player.touchdowns || 0,
-      interceptionYards: player.returnYards || 0,
-      longestInterception: player.longest || 0,
+      interceptionTouchdowns: player.interceptionTouchdowns || 0,
+      interceptionYards: player.interceptionYards || 0,
+      longestInterception: player.longestInterception || 0,
     },
     'fieldgoals': {
-      fieldGoalPercentage: player.percentage || 0,
-      averageFieldGoalDistance: player.averageDistance || 0,
+      fieldGoalPercentage: player.fieldGoalPercentage || 0,
+      averageFieldGoalDistance: player.yardsAverage || 0,
       fieldGoalsMade: player.fieldGoalsMade || 0,
-      fieldGoalsAttempted: player.fieldGoalsAttempted || 0,
+      fieldGoalsAttempted: player.attempts || 0,
       fieldGoalYards: player.totalYards || 0,
-      longestFieldGoal: player.longest || 0,
+      longestFieldGoal: player.longestFieldGoal || 0,
     },
     'kickoffs': {
-      averageKickoffYards: player.averageDistance || 0,
+      averageKickoffYards: player.yardsAverage || player.average || 0,
       kickoffCount: player.kickoffs || 0,
-      kickoffYards: player.yards || 0,
+      kickoffYards: player.totalYards || player.yards || 0,
       kickoffTouchdowns: player.touchdowns || 0,
-      longestKickoff: player.longest || 0,
+      longestKickoff: player.longestKickoff || player.longest || 0,
+      touchbacks: player.touchbacks || 0,
     },
     'kickoffreturns': {
-      averageKickReturnYards: player.average || 0,
-      kickReturnCount: player.returns || 0,
-      kickReturnYards: player.returnYards || 0,
+      averageKickReturnYards: player.yardsAverage || player.average || 0,
+      kickReturnCount: player.kickoffReturns || player.returns || 0,
+      kickReturnYards: player.totalReturnYards || player.returnYards || 0,
       kickReturnTouchdowns: player.touchdowns || 0,
-      longestKickReturn: player.longest || 0,
+      longestKickReturn: player.longestReturn || player.longest || 0,
     },
     'punting': {
-      averagePuntYards: player.average || 0,
+      averagePuntYards: player.yardsAverage || player.average || 0,
       puntCount: player.punts || 0,
-      puntYards: player.yards || 0,
+      puntYards: player.totalYards || player.yards || 0,
       puntTouchdowns: player.touchdowns || 0,
-      longestPunt: player.longest || 0,
+      longestPunt: player.longestPunt || player.longest || 0,
     },
     'puntreturns': {
-      averagePuntReturnYards: player.average || 0,
-      puntReturnCount: player.returns || 0,
-      puntReturnYards: player.returnYards || 0,
+      averagePuntReturnYards: player.yardsAverage || player.average || 0,
+      puntReturnCount: player.puntReturns || player.returns || 0,
+      puntReturnYards: player.totalReturnYards || player.returnYards || 0,
       puntReturnTouchdowns: player.touchdowns || 0,
-      longestPuntReturn: player.longest || 0,
+      longestPuntReturn: player.longestReturn || player.longest || 0,
     },
   };
 
