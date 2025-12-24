@@ -3333,10 +3333,10 @@ export class KafaStatsService {
       // 1. 정렬 방식별 URL 매핑
       const sortMethods = [
         { mode: 'yds', name: 'PASS YDS', description: '패싱 야드순' },
-        { mode: 'pct', name: 'COMP %', description: '패스 성공률순' },
+        { mode: 'cmpp', name: 'COMP %', description: '패스 성공률순' },
         { mode: 'att', name: 'ATT', description: '패스 시도순' },
         { mode: 'td', name: 'TD', description: '패싱 터치다운순' },
-        { mode: 'int', name: 'INT', description: '인터셉션 적은순' },
+        { mode: 'intcp', name: 'INT', description: '인터셉션 적은순' },
         { mode: 'lng', name: 'LNG', description: '최장 패스순' },
       ];
 
@@ -3923,10 +3923,10 @@ export class KafaStatsService {
     try {
       // 1. 정렬 방식별 URL 매핑
       const sortMethods = [
-        { mode: 'tot', name: 'TOT', description: '총 태클순' },
-        { mode: 'sacks', name: 'SACKS', description: '색순' },
+        { mode: 'att', name: 'ATT', description: '총 태클순' },
+        { mode: 'sack', name: 'SACK', description: '색순' },
         { mode: 'solo', name: 'SOLO', description: '단독 태클순' },
-        { mode: 'ast', name: 'AST', description: '어시스트 태클순' }
+        { mode: 'combo', name: 'COMBO', description: '어시스트 태클순' }
       ];
       
       const allPlayers = new Map(); // 중복 제거용 Map (key: playerName+university)
@@ -3951,14 +3951,30 @@ export class KafaStatsService {
             timeout: 30000
           });
           
+          this.logger.log(`   📡 응답 수신: ${response.status} - ${response.data.length} bytes`);
+          
           // HTML 파싱
           const $ = cheerio.load(response.data);
           const players = [];
           
-          // 테이블 데이터 추출
+          // 디버깅: 테이블 존재 확인
+          const tableCount = $('table.stats_table').length;
+          this.logger.log(`   📋 테이블 개수: ${tableCount}`);
+          
+          // 디버깅: 전체 tr 개수 확인
+          const totalRows = $('table.stats_table tr').length;
+          this.logger.log(`   📊 전체 행 개수: ${totalRows}`);
+          
+          // 테이블 데이터 추출 (러싱 로직 복사)
           $('table.stats_table tr').each((index, row) => {
             const cells = $(row).find('td');
-            if (cells.length >= 6) { // 태클은 6개 이상 컬럼
+            
+            // 디버깅: 첫 5줄의 셀 정보 출력
+            if (index < 5) {
+              this.logger.log(`   🔍 Row ${index}: ${cells.length} cells - [${Array.from(cells).map(cell => $(cell).text().trim()).join(' | ')}]`);
+            }
+            
+            if (cells.length >= 6) { // 태클은 6개 셀 (순위, 선수, ATT, SACK, SOLO, COMBO)
               const rankText = $(cells[0]).text().trim();
               const playerText = $(cells[1]).text().trim();
               
@@ -3976,6 +3992,11 @@ export class KafaStatsService {
                   const sacks = parseInt($(cells[3]).text().trim() || '0');
                   const soloTackles = parseInt($(cells[4]).text().trim() || '0');
                   const assistTackles = parseInt($(cells[5]).text().trim() || '0');
+                  
+                  // 디버깅: 첫 3명 선수 정보 출력
+                  if (players.length < 3) {
+                    this.logger.log(`   👤 Player ${players.length + 1}: ${playerName} (${university}) - ATT:${totalTackles}, SACK:${sacks}, SOLO:${soloTackles}, COMBO:${assistTackles}`);
+                  }
                   
                   players.push({
                     rank: parseInt(rankText) || index,
@@ -4097,7 +4118,7 @@ export class KafaStatsService {
     try {
       // 1. 정렬 방식별 URL 매핑
       const sortMethods = [
-        { mode: 'int', name: 'INT', description: '인터셉션 개수순' },
+        { mode: 'att', name: 'INT', description: '인터셉션 개수순' },
         { mode: 'td', name: 'TD', description: '인터셉션 터치다운순' },
         { mode: 'yds', name: 'YDS', description: '인터셉션 리턴 야드순' },
         { mode: 'lng', name: 'LNG', description: '최장 인터셉션 리턴순' }

@@ -2,7 +2,7 @@
   "statType": "passing",
   "statName": "PASSING",
   "league": "soc",
-  "crawledAt": "2025-12-24T02:36:31.865Z",
+  "crawledAt": "2025-12-24T14:44:32.092Z",
   "totalCount": 17,
   "players": [
     {
@@ -217,20 +217,6 @@
     },
     {
       "rank": 16,
-      "playerName": "지현학",
-      "university": "군위 피닉스",
-      "jerseyNumber": 10,
-      "passingYards": 0,
-      "yardsPerAttempt": 0,
-      "completionPercentage": 0,
-      "attempts": 1,
-      "completions": 0,
-      "touchdowns": 0,
-      "interceptions": 0,
-      "longest": 0
-    },
-    {
-      "rank": 17,
       "playerName": "이승엽",
       "university": "서울 바이킹스",
       "jerseyNumber": 18,
@@ -241,6 +227,20 @@
       "completions": 0,
       "touchdowns": 0,
       "interceptions": 1,
+      "longest": 0
+    },
+    {
+      "rank": 17,
+      "playerName": "지현학",
+      "university": "군위 피닉스",
+      "jerseyNumber": 10,
+      "passingYards": 0,
+      "yardsPerAttempt": 0,
+      "completionPercentage": 0,
+      "attempts": 1,
+      "completions": 0,
+      "touchdowns": 0,
+      "interceptions": 0,
       "longest": 0
     }
   ]
