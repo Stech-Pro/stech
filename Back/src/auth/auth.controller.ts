@@ -759,4 +759,65 @@ export class AuthController {
   async getMyTeamStats(@Request() req, @Query('type') type?: string) {
     return this.authService.getMyTeamStats(req.user.id, type || 'total');
   }
+
+  @Delete('withdraw')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '🗑️ 계정 탈퇴',
+    description: `
+    ## 🗑️ 계정 완전 탈퇴 API
+
+    사용자의 계정을 완전히 삭제합니다.
+    
+    ### 🔥 주의사항
+    - **복구 불가능**: 삭제된 계정은 복구할 수 없습니다
+    - **즉시 로그아웃**: 탈퇴 즉시 로그인이 불가능해집니다
+    - **팀 접근 차단**: 팀 소속이 해제되어 경기 영상 등 접근이 차단됩니다
+    
+    ### 📋 삭제되는 데이터
+    - 사용자 계정 정보 (로그인 불가)
+    - 팀 소속 정보 (팀 컨텐츠 접근 불가)
+    
+    ### 📋 보존되는 데이터  
+    - 작성한 메모 및 기록들 (다른 팀원들이 볼 수 있음)
+    - 경기 통계 데이터 (경기 기록 보존)
+    `,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 탈퇴 완료',
+    schema: {
+      example: {
+        success: true,
+        message: '계정이 성공적으로 탈퇴되었습니다. 이용해 주셔서 감사합니다.',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: '❌ 인증 필요',
+    schema: {
+      example: {
+        success: false,
+        message: '로그인이 필요합니다.',
+        code: 'UNAUTHORIZED',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: '❌ 사용자를 찾을 수 없음',
+    schema: {
+      example: {
+        success: false,
+        message: '탈퇴할 계정을 찾을 수 없습니다.',
+        code: 'USER_NOT_FOUND',
+      },
+    },
+  })
+  async withdrawUser(@Request() req) {
+    return this.authService.withdrawUser(req.user.id);
+  }
 }
