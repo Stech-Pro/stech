@@ -1242,4 +1242,36 @@ export class AuthService {
 
     return positionArray.length > 0 ? positionArray : ['미설정'];
   }
+
+  // 계정 탈퇴 (계정 완전 삭제)
+  async withdrawUser(userId: string) {
+    try {
+      // 사용자 존재 확인
+      const user = await this.userModel.findById(userId);
+      if (!user) {
+        throw new BadRequestException({
+          success: false,
+          message: '탈퇴할 계정을 찾을 수 없습니다.',
+          code: 'USER_NOT_FOUND',
+        });
+      }
+
+      // 계정 삭제 (하드 딜리트)
+      await this.userModel.findByIdAndDelete(userId);
+
+      return {
+        success: true,
+        message: '계정이 성공적으로 탈퇴되었습니다. 이용해 주셔서 감사합니다.',
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException({
+        success: false,
+        message: '탈퇴 처리 중 오류가 발생했습니다.',
+        code: 'WITHDRAW_ERROR',
+      });
+    }
+  }
 }
