@@ -19,6 +19,7 @@ export const API_CONFIG = {
     VERIFY_TOKEN: '/auth/verify-token',
     MY_PROFILE: '/auth/my-profile',
     UPLOAD_AVATAR: '/auth/upload-avatar',
+    WITHDRAW_USER: '/auth/withdraw',
 
     //video upload
     UPLOAD_VIDEO: '/video/upload',
