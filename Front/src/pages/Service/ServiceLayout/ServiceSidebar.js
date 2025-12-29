@@ -10,6 +10,8 @@ import { BiSolidBarChartAlt2 } from 'react-icons/bi';
 import { MdOutlineSupportAgent, MdOutlineQuiz } from 'react-icons/md';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { CgProfile } from 'react-icons/cg';
+import { MdManageAccounts } from "react-icons/md";
+
 
 const ServiceSidebar = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -69,8 +71,8 @@ const ServiceSidebar = () => {
     },
   ];
 
-  // 추가 메뉴 아이템 (member) - 하위 메뉴 포함
-  const memberMenuItems = [
+  // 선수 메뉴 아이템
+  const playerMenuItems = [
     {
       path: '/service',
       label: '홈',
@@ -125,6 +127,69 @@ const ServiceSidebar = () => {
     },
   ];
 
+  // 코치 메뉴 아이템
+  const coachMenuItems = [
+    {
+      path: '/service',
+      label: '홈',
+      icon: <GoHome />,
+      description: 'Dashboard overview',
+    },
+    {
+      path: '/service/game',
+      label: '소속팀 경기',
+      icon: <BsPlayBtn />,
+      description: 'Video analysis',
+    },
+    {
+      path: '/service/stat/team',
+      label: '스탯',
+      icon: <BiSolidBarChartAlt2 />,
+      description: 'Performance analytics',
+      hasSubmenu: true,
+      submenu: [
+        // {
+        //   path: '/service/stat/league',
+        //   label: '리그 순위',
+        //   icon: <BiSolidBarChartAlt2 />,
+        //   description: 'League rankings',
+        // },
+        {
+          path: '/service/stat/team',
+          label: '리그 팀 순위',
+          icon: <BiSolidBarChartAlt2 />,
+          description: 'Team rankings',
+        },
+        {
+          path: '/service/stat/player',
+          label: '리그 선수 순위',
+          icon: <BiSolidBarChartAlt2 />,
+          description: 'Player rankings',
+        },
+      ],
+    },
+    // {
+    //   path: '/service/highlight',
+    //   label: '경기 하이라이트',
+    //   icon: <BsPlayBtn />,
+    //   description: 'Video analysis',
+    // },
+    {
+      path: '/service/manage',
+      label: '선수 관리',
+      icon: <MdManageAccounts />,
+      description: 'Manage players',
+    },
+    {
+      path: '/service/suggestion',
+      label: 'Stech 제안',
+      icon: <GoLightBulb />,
+      description: 'AI recommendations',
+      badge: 'βeta', // 베타 태그 추가
+    },
+  ];
+
+  // 관리자 메뉴 아이템
   const adminMenuItems = [
     {
       path: '/service',
@@ -271,7 +336,7 @@ const ServiceSidebar = () => {
 
   // 페이지 로드 시 현재 경로에 해당하는 상위 메뉴 자동 확장
   React.useEffect(() => {
-    [...guestMenuItems, ...memberMenuItems].forEach((item) => {
+    [...guestMenuItems, ...playerMenuItems, ...coachMenuItems, ...adminMenuItems].forEach((item) => {
       if (item.hasSubmenu && isStatMenuActive(item)) {
         setExpandedMenus((prev) => ({
           ...prev,
@@ -412,14 +477,26 @@ const ServiceSidebar = () => {
       {/* Sidebar Menu */}
       <nav className="sidebarNav">
         <div className="menuSection">
-          <div className="sectionTitle">Main Menu</div>
+          <div className="sectionTitle">
+            {user?.role === 'admin'
+              ? 'Admin Menu'
+              : user?.role === 'coach'
+              ? 'Coach Menu'
+              : isAuthenticated
+              ? 'Player Menu'
+              : 'Main Menu'}
+          </div>
           {user?.role === 'admin' ? (
             <ul className="navMenu">
               {adminMenuItems.map((item) => renderMenuItem(item))}
             </ul>
+          ) : user?.role === 'coach' ? (
+            <ul className="navMenu">
+              {coachMenuItems.map((item) => renderMenuItem(item))}
+            </ul>
           ) : isAuthenticated ? (
             <ul className="navMenu">
-              {memberMenuItems.map((item) => renderMenuItem(item))}
+              {playerMenuItems.map((item) => renderMenuItem(item))}
             </ul>
           ) : (
             <ul className="navMenu">
