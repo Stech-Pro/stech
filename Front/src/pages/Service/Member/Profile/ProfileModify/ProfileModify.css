@@ -63,6 +63,17 @@
   transition: transform-color 0.3s;
 }
 
+.withdraw-button {
+  padding: 15px 60px;
+  border: none;
+  background-color: #a70c0c;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: transform-color 0.3s;
+}
 .profile-save-button:hover {
   background-color: #3f71dd;
 }
@@ -377,4 +388,90 @@
   width: 20px; /* 로고 크기를 줄여서 높이에 맞춤 */
   height: 20px;
   object-fit: contain;
+}
+
+/* 회원 탈퇴 확인 모달 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #2a2a2a;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-title {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modal-message {
+  color: #e0e0e0;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.modal-button {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.modal-button.cancel {
+  background-color: #616161;
+  color: white;
+}
+
+.modal-button.cancel:hover {
+  background-color: #757575;
+}
+
+.modal-button.confirm {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.modal-button.confirm:hover {
+  background-color: #f44336;
 }

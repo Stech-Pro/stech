@@ -407,3 +407,27 @@ export async function updateProfile(payload, accessToken) {
     data
   );
 }
+
+
+export async function withdrawUser(accessToken) {
+  if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
+
+  const res = await fetch(
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.WITHDRAW_USER}`, // '/auth/withdraw'
+    {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  const data = await jsonOrText(res);
+  if (res.ok) return data;
+  throw new APIError(
+    typeof data === 'object' ? data.message || '회원 탈퇴 실패' : '회원 탈퇴 실패',
+    res.status,
+    data
+  );
+}
