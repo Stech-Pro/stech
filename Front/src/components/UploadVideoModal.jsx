@@ -10,6 +10,7 @@ import {
   putToS3,
 } from '../api/videoUploadAPI';
 import DateTimeDropdown from './DateTimeDropdown.js';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -193,9 +194,13 @@ function getLeagueName(matchDate, regionKey) {
   return `${year} ${regionLabel} 추계`;
 }
 
-const GAME_TYPES = ['리그', '친선전', '스크리미지'];
+const GAME_TYPES = ['리그', '친선전', '스크리미지', '훈련'];
 const toBackendGameType = (t) =>
-  t === '리그' ? 'League' : t === '친선전' ? 'Friendly' : 'Scrimmage';
+  t === '리그' ? 'League'
+  : t === '친선전' ? 'Friendly'
+  : t === '스크리미지' ? 'Scrimmage'
+  : t === '훈련' ? 'Training'
+  : 'Scrimmage';
 
 /* ───────── 팀 선택 2단 드롭다운 ───────── */
 function LeagueTeamSelect({
@@ -353,6 +358,44 @@ function QuarterRow({ q, files, onPick, onClear }) {
   );
 }
 
+/* ───────── 훈련 영상 업로드 라인 ───────── */
+function TrainingVideoUpload({ files, onPick, onClear }) {
+  const inputRef = useRef(null);
+  return (
+    <div className="trainingUploadRow">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="video/*"
+        className="hiddenFile"
+        multiple
+        onChange={(e) => {
+          if (e.target.files) onPick(Array.from(e.target.files));
+        }}
+      />
+      <button
+        className="qbtn primary"
+        type="button"
+        onClick={() => inputRef.current?.click()}
+      >
+        훈련 영상 업로드
+      </button>
+      <button
+        className="qbtn ghost"
+        type="button"
+        disabled={files.length === 0}
+        onClick={onClear}
+        title={files.length > 0 ? '선택한 파일 모두 제거' : '파일 없음'}
+      >
+        초기화
+      </button>
+      <span className="quarterFilename">
+        {files.length > 0 ? `${files.length}개 파일 선택됨` : '선택된 파일 없음'}
+      </span>
+    </div>
+  );
+}
+
 const UploadVideoModal = ({
   isOpen,
   onClose,
@@ -360,6 +403,8 @@ const UploadVideoModal = ({
   defaultHomeTeam,
   defaultAwayTeam,
 }) => {
+  const { user } = useAuth();
+  const userTeam = user?.teamId || user?.teamID || user?.team || user?.teamName;
   const teamsList = VISIBLE_TEAMS;
 
   // View 전환 상태: 'form' | 'preview'
@@ -384,6 +429,10 @@ const UploadVideoModal = ({
   const [q2, setQ2] = useState([]);
   const [q3, setQ3] = useState([]);
   const [q4, setQ4] = useState([]);
+
+  // 훈련 전용 상태
+  const [trainingPosition, setTrainingPosition] = useState('');
+  const [trainingFiles, setTrainingFiles] = useState([]);
 
   // UI 상태
   const [dtOpen, setDtOpen] = useState(false);
@@ -484,15 +533,21 @@ const UploadVideoModal = ({
   }, [isLeague, regionKey, week]);
 
   const handleRemoveFile = (quarter, index) => {
-    const updaters = { Q1: setQ1, Q2: setQ2, Q3: setQ3, Q4: setQ4 };
+    const updaters = {
+      Q1: setQ1,
+      Q2: setQ2,
+      Q3: setQ3,
+      Q4: setQ4,
+      Training: setTrainingFiles,
+    };
     const setFn = updaters[quarter];
     if (!setFn) return;
     setFn((prev) => prev.filter((_, i) => i !== index));
   };
 
   const filesByQuarter = useMemo(
-    () => ({ Q1: q1, Q2: q2, Q3: q3, Q4: q4 }),
-    [q1, q2, q3, q4],
+    () => ({ Q1: q1, Q2: q2, Q3: q3, Q4: q4, Training: trainingFiles }),
+    [q1, q2, q3, q4, trainingFiles],
   );
 
   const canShowStep3 = useMemo(() => {
@@ -506,15 +561,26 @@ const UploadVideoModal = ({
     setError('');
 
     if (!gameType) return setError('경기 유형을 선택해 주세요.');
-    if (gameType === '리그' && !regionKey)
-      return setError('리그 경기의 지역을 선택해 주세요.');
-    if (!stadium) return setError('경기장을 입력/선택해 주세요.');
-    if (!home || !away) return setError('홈/원정 팀을 선택해 주세요.');
-    if (home?.id === away?.id)
-      return setError('홈팀과 원정팀이 동일할 수 없습니다.');
-    if (!matchDate) return setError('경기 날짜를 선택해 주세요.');
-    if (q1.length + q2.length + q3.length + q4.length === 0)
-      return setError('최소 1개 분기 영상을 업로드해 주세요.');
+
+    // 훈련 모드 유효성 검사
+    if (gameType === '훈련') {
+      if (!userTeam) return setError('로그인된 사용자의 팀 정보가 없습니다.');
+      if (!matchDate) return setError('훈련 날짜를 선택해 주세요.');
+      if (!trainingPosition) return setError('훈련 포지션을 입력해 주세요.');
+      if (trainingFiles.length === 0) return setError('최소 1개 영상을 업로드해 주세요.');
+    }
+    // 기존 모드 유효성 검사
+    else {
+      if (gameType === '리그' && !regionKey)
+        return setError('리그 경기의 지역을 선택해 주세요.');
+      if (!stadium) return setError('경기장을 입력/선택해 주세요.');
+      if (!home || !away) return setError('홈/원정 팀을 선택해 주세요.');
+      if (home?.id === away?.id)
+        return setError('홈팀과 원정팀이 동일할 수 없습니다.');
+      if (!matchDate) return setError('경기 날짜를 선택해 주세요.');
+      if (q1.length + q2.length + q3.length + q4.length === 0)
+        return setError('최소 1개 분기 영상을 업로드해 주세요.');
+    }
 
     try {
       setLoading(true);
@@ -536,25 +602,46 @@ const UploadVideoModal = ({
         return String(teamId).slice(0, 2).toUpperCase();
       };
 
-      const homeCode = getTeamCode(home.id);
-      const awayCode = getTeamCode(away.id);
+      let gameKey, gameInfo, quarterVideoCounts;
 
-      const gameKey = `${homeCode}${awayCode}${d.format('YYYYMMDD')}`;
+      if (gameType === '훈련') {
+        // 훈련 모드 - userTeam 사용
+        const teamCode = getTeamCode(userTeam);
+        gameKey = `${teamCode}TRAIN${d.format('YYYYMMDD')}`;
 
-      const gameInfo = {
-        homeTeam: home.id,
-        awayTeam: away.id,
-        date: dateWithKoreanDow,
-        type: toBackendGameType(gameType),
-        score: { home: Number(scoreHome || 0), away: Number(scoreAway || 0) },
-        location: stadium,
-        region: regionKey,
-        ...(gameType === '리그' ? { week, leagueName: leagueNameAuto } : {}),
-      };
+        gameInfo = {
+          team: userTeam,
+          date: dateWithKoreanDow,
+          type: 'Training',
+          position: trainingPosition,
+          location: stadium || '',
+          region: regionKey || '',
+        };
 
-      const quarterVideoCounts = {
-        Q1: q1.length, Q2: q2.length, Q3: q3.length, Q4: q4.length,
-      };
+        quarterVideoCounts = {
+          Training: trainingFiles.length,
+        };
+      } else {
+        // 기존 모드 (리그, 친선전, 스크리미지)
+        const homeCode = getTeamCode(home.id);
+        const awayCode = getTeamCode(away.id);
+        gameKey = `${homeCode}${awayCode}${d.format('YYYYMMDD')}`;
+
+        gameInfo = {
+          homeTeam: home.id,
+          awayTeam: away.id,
+          date: dateWithKoreanDow,
+          type: toBackendGameType(gameType),
+          score: { home: Number(scoreHome || 0), away: Number(scoreAway || 0) },
+          location: stadium,
+          region: regionKey,
+          ...(gameType === '리그' ? { week, leagueName: leagueNameAuto } : {}),
+        };
+
+        quarterVideoCounts = {
+          Q1: q1.length, Q2: q2.length, Q3: q3.length, Q4: q4.length,
+        };
+      }
 
       // 1) 업로드 준비
       setUploadProgress({ show: true, message: '서버에 업로드 준비 중...', type: 'loading' });
@@ -563,9 +650,11 @@ const UploadVideoModal = ({
         gameInfo,
         quarterVideoCounts,
       });
-      const { data } = prep; // { uploadUrls: {Q1:[...], Q2:[...]}, ... }
+      const { data } = prep; // { uploadUrls: {Q1:[...], Q2:[...]} or {Training:[...]} }
 
-      const fileMap = { Q1: q1, Q2: q2, Q3: q3, Q4: q4 };
+      const fileMap = gameType === '훈련'
+        ? { Training: trainingFiles }
+        : { Q1: q1, Q2: q2, Q3: q3, Q4: q4 };
       const uploadUrls = data.uploadUrls || {};
 
       const pairs = [];
@@ -916,35 +1005,41 @@ const UploadVideoModal = ({
               {/* 3행 이후: 팀, 날짜, 스코어 */}
               {canShowStep3 && (
                 <>
-                  <div className="uvm-row">
-                    <div className="uvm-field two">
-                      <label>홈팀 (HOME)</label>
-                      <LeagueTeamSelect
-                        value={home}
-                        options={selectableHomes}
-                        onChange={setHome}
-                        placeholder={
-                          gameType === '리그' ? '해당 지역 홈팀 선택' : '홈팀 선택'
-                        }
-                      />
-                    </div>
+                  {gameType === '훈련' ? (
+                    // 훈련 모드: 팀 선택 UI 없음 (user.team 사용)
+                    null
+                  ) : (
+                    // 기존 모드: 홈팀/어웨이팀
+                    <div className="uvm-row">
+                      <div className="uvm-field two">
+                        <label>홈팀 (HOME)</label>
+                        <LeagueTeamSelect
+                          value={home}
+                          options={selectableHomes}
+                          onChange={setHome}
+                          placeholder={
+                            gameType === '리그' ? '해당 지역 홈팀 선택' : '홈팀 선택'
+                          }
+                        />
+                      </div>
 
-                    <div className="uvm-field two">
-                      <label>원정팀 (AWAY)</label>
-                      <LeagueTeamSelect
-                        value={away}
-                        options={selectableAways}
-                        onChange={setAway}
-                        placeholder={
-                          gameType === '리그' ? '해당 지역 원정팀 선택' : '원정팀 선택'
-                        }
-                      />
+                      <div className="uvm-field two">
+                        <label>원정팀 (AWAY)</label>
+                        <LeagueTeamSelect
+                          value={away}
+                          options={selectableAways}
+                          onChange={setAway}
+                          placeholder={
+                            gameType === '리그' ? '해당 지역 원정팀 선택' : '원정팀 선택'
+                          }
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="uvm-row">
                     <div className="uvm-field two uvm-dtp-wrap">
-                      <label>경기 날짜/시간</label>
+                      <label>{gameType === '훈련' ? '훈련 날짜/시간' : '경기 날짜/시간'}</label>
 
                       <button
                         type="button"
@@ -966,26 +1061,38 @@ const UploadVideoModal = ({
                       )}
                     </div>
 
-                    <div className="uvm-field two">
-                      <label>스코어 (홈팀 | 어웨이팀)</label>
-                      <div className="uvm-row uvm-row-3col">
+                    {gameType === '훈련' ? (
+                      <div className="uvm-field two">
+                        <label>훈련 포지션</label>
                         <input
-                          type="number"
-                          min="0"
-                          value={scoreHome}
-                          onChange={(e) => setScoreHome(e.target.value)}
-                          placeholder="HOME"
-                        />
-                        <span className="uvm-sep">:</span>
-                        <input
-                          type="number"
-                          min="0"
-                          value={scoreAway}
-                          onChange={(e) => setScoreAway(e.target.value)}
-                          placeholder="AWAY"
+                          type="text"
+                          value={trainingPosition}
+                          onChange={(e) => setTrainingPosition(e.target.value)}
+                          placeholder="예: QB, RB, WR 등"
                         />
                       </div>
-                    </div>
+                    ) : (
+                      <div className="uvm-field two">
+                        <label>스코어 (홈팀 | 어웨이팀)</label>
+                        <div className="uvm-row uvm-row-3col">
+                          <input
+                            type="number"
+                            min="0"
+                            value={scoreHome}
+                            onChange={(e) => setScoreHome(e.target.value)}
+                            placeholder="HOME"
+                          />
+                          <span className="uvm-sep">:</span>
+                          <input
+                            type="number"
+                            min="0"
+                            value={scoreAway}
+                            onChange={(e) => setScoreAway(e.target.value)}
+                            placeholder="AWAY"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
@@ -993,46 +1100,63 @@ const UploadVideoModal = ({
 
             {/* 오른쪽: 업로드 */}
             <section className="uvm-col right">
-              <h3 className="uvm-section-title">경기 영상 업로드</h3>
-              <div className="uvm-quarter-rows">
-                <QuarterRow
-                  q="Q1"
-                  files={q1}
-                  onPick={(f) => setQ1((p) => [...p, ...f])}
-                  onClear={() => setQ1([])}
-                />
-                <QuarterRow
-                  q="Q2"
-                  files={q2}
-                  onPick={(f) => setQ2((p) => [...p, ...f])}
-                  onClear={() => setQ2([])}
-                />
-                <QuarterRow
-                  q="Q3"
-                  files={q3}
-                  onPick={(f) => setQ3((p) => [...p, ...f])}
-                  onClear={() => setQ3([])}
-                />
-                <QuarterRow
-                  q="Q4"
-                  files={q4}
-                  onPick={(f) => setQ4((p) => [...p, ...f])}
-                  onClear={() => setQ4([])}
-                />
+              <h3 className="uvm-section-title">
+                {gameType === '훈련' ? '훈련 영상 업로드' : '경기 영상 업로드'}
+              </h3>
 
-                {error && <p className="uvm-error">{error}</p>}
-              </div>
+              {gameType === '훈련' ? (
+                <div className="uvm-quarter-rows">
+                  <TrainingVideoUpload
+                    files={trainingFiles}
+                    onPick={(f) => setTrainingFiles((p) => [...p, ...f])}
+                    onClear={() => setTrainingFiles([])}
+                  />
+                  {error && <p className="uvm-error">{error}</p>}
+                </div>
+              ) : (
+                <div className="uvm-quarter-rows">
+                  <QuarterRow
+                    q="Q1"
+                    files={q1}
+                    onPick={(f) => setQ1((p) => [...p, ...f])}
+                    onClear={() => setQ1([])}
+                  />
+                  <QuarterRow
+                    q="Q2"
+                    files={q2}
+                    onPick={(f) => setQ2((p) => [...p, ...f])}
+                    onClear={() => setQ2([])}
+                  />
+                  <QuarterRow
+                    q="Q3"
+                    files={q3}
+                    onPick={(f) => setQ3((p) => [...p, ...f])}
+                    onClear={() => setQ3([])}
+                  />
+                  <QuarterRow
+                    q="Q4"
+                    files={q4}
+                    onPick={(f) => setQ4((p) => [...p, ...f])}
+                    onClear={() => setQ4([])}
+                  />
+                  {error && <p className="uvm-error">{error}</p>}
+                </div>
+              )}
 
               <div className="uvm-actions">
                 <button
                   type="button"
                   className="btn"
                   onClick={() => {
-                    setActiveTab('Q1');
+                    setActiveTab(gameType === '훈련' ? 'Training' : 'Q1');
                     setView('preview');
                   }}
                   disabled={
-                    loading || (q1.length + q2.length + q3.length + q4.length === 0)
+                    loading || (
+                      gameType === '훈련'
+                        ? trainingFiles.length === 0
+                        : q1.length + q2.length + q3.length + q4.length === 0
+                    )
                   }
                   style={{ marginRight: 8 }}
                 >
@@ -1054,21 +1178,32 @@ const UploadVideoModal = ({
           <div className="uvm-body uvm-body-preview">
             <section className="uvm-col left" style={{ gridColumn: '1 / -1' }}>
               <div className="uvm-preview-head">
-                <h3 className="uvm-section-title">분기별 영상 확인</h3>
+                <h3 className="uvm-section-title">
+                  {gameType === '훈련' ? '훈련 영상 확인' : '분기별 영상 확인'}
+                </h3>
                 <div className="uvm-tabline">
-                  {['Q1', 'Q2', 'Q3', 'Q4'].map((t) => (
+                  {gameType === '훈련' ? (
                     <button
-                      key={t}
                       type="button"
-                      className={`fpm-tab inline ${activeTab === t ? 'active' : ''}`}
-                      onClick={() => {
-                        closePreviewVideos();
-                        setActiveTab(t);
-                      }}
+                      className="inline fpm-tab active"
                     >
-                      {t} ({(filesByQuarter?.[t] || []).length})
+                      훈련 영상 ({(filesByQuarter?.Training || []).length})
                     </button>
-                  ))}
+                  ) : (
+                    ['Q1', 'Q2', 'Q3', 'Q4'].map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        className={`fpm-tab inline ${activeTab === t ? 'active' : ''}`}
+                        onClick={() => {
+                          closePreviewVideos();
+                          setActiveTab(t);
+                        }}
+                      >
+                        {t} ({(filesByQuarter?.[t] || []).length})
+                      </button>
+                    ))
+                  )}
                   <div className="spacer" />
                   <button
                     type="button"
@@ -1083,11 +1218,11 @@ const UploadVideoModal = ({
                 </div>
               </div>
 
-              <div className="fpm-body inline">
+              <div className="inline fpm-body">
                 {(filesByQuarter?.[activeTab] || []).length === 0 ? (
                   <div className="fpm-empty">파일이 없습니다.</div>
                 ) : (
-                  <ul className="fpm-list inline">
+                  <ul className="inline fpm-list">
                     {(filesByQuarter?.[activeTab] || []).map((file, idx) => (
                       <PreviewListItem
                         key={`${file.name}-${file.size}-${file.lastModified || 0}`}

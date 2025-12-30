@@ -14,13 +14,7 @@
     z-index: 100; /* 필요하면 조정 */
 }
 
-/* ------ 레이아웃 컨테이너 ------ */
-.serviceLayoutContainer {
-    padding-left: var(--sidebar-width); /* ← 사이드바만큼 밀기 */
-    min-height: 100vh;
-    display: flex; /* 세로로 header/본문 쌓기용 */
-    flex-direction: column;
-}
+
 
 /* ------ main 내부(헤더·본문) ------ */
 .serviceLayoutContainer > main {
