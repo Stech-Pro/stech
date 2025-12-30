@@ -28,7 +28,7 @@ const ServiceLayout = () => {
           <Outlet />
         </div>
       ) : (
-        <div className="serviceLayoutContainer">
+        <div className="pl-[var(--sidebar-width)] min-h-screen flex flex-col">
           <ServiceSidebar className="serviceSidebar" />
           <main className="flex-1">
             <Outlet />
