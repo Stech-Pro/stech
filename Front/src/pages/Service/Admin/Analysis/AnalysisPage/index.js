@@ -107,6 +107,17 @@ export default function AnalysisPage() {
     });
   }, [games, selectedDate, selectedType, selectedUploader]);
 
+  /* 경기와 훈련 분리 */
+  const regularGames = useMemo(() =>
+    filteredGames.filter(g => g.type !== '훈련' && g.type !== 'Training'),
+    [filteredGames]
+  );
+
+  const trainingGames = useMemo(() =>
+    filteredGames.filter(g => g.type === '훈련' || g.type === 'Training'),
+    [filteredGames]
+  );
+
   /* 클립 페이지로 이동 */
   const openClips = (game) => {
     navigate(`/service/admin/analysis/${game.gameKey}/clips`, { state: { game } });
@@ -244,6 +255,7 @@ export default function AnalysisPage() {
 
       {/* ===== 경기 표 ===== */}
       <div className="APanalysis-container" style={{ display: loading ? 'none' : 'block' }}>
+        <h2 style={{ marginBottom: '20px', paddingLeft: '20px' }}>경기 목록</h2>
         <div className="APanalysis-header-row">
           <div className="APanalysis-header-cell">날짜</div>
           <div className="APanalysis-header-cell">경기</div>
@@ -257,11 +269,11 @@ export default function AnalysisPage() {
           {loading && <div className="APanalysis-loading">불러오는 중…</div>}
           {error && <div className="APanalysis-error">{error}</div>}
 
-          {!loading && !error && filteredGames.length === 0 && (
+          {!loading && !error && regularGames.length === 0 && (
             <div className="APanalysis-empty">분석 대기중인 경기가 없습니다.</div>
           )}
 
-          {filteredGames.map((g) => {
+          {regularGames.map((g) => {
             const homeMeta = TEAM_BY_ID[g.homeTeam];
             const awayMeta = TEAM_BY_ID[g.awayTeam];
             const uploaderMeta = TEAM_BY_ID[g.uploader];
@@ -345,6 +357,88 @@ export default function AnalysisPage() {
           })}
         </div>
       </div>
+
+      {/* ===== 훈련 영상 표 ===== */}
+      {trainingGames.length > 0 && (
+        <div className="APanalysis-container" style={{ marginTop: '40px' }}>
+          <h2 style={{ marginBottom: '20px', paddingLeft: '20px' }}>훈련 영상 목록</h2>
+          <div className="APanalysis-header-row">
+            <div className="APanalysis-header-cell">날짜</div>
+            <div className="APanalysis-header-cell">팀</div>
+            <div className="APanalysis-header-cell">포지션</div>
+            <div className="APanalysis-header-cell">업로더</div>
+            <div className="APanalysis-header-cell">영상 수</div>
+            <div className="APanalysis-header-cell">상태</div>
+          </div>
+
+          <div className="APanalysis-list">
+            {trainingGames.map((g) => {
+              const teamMeta = TEAM_BY_ID[g.team];
+              const uploaderMeta = TEAM_BY_ID[g.uploader];
+              const videoCount = getVideoCount(g);
+
+              return (
+                <div
+                  key={g.gameKey}
+                  className="APanalysis-card"
+                  onClick={() => openClips(g)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && openClips(g)}
+                >
+                  <div className="APanalysis-date">{g.date}</div>
+
+                  <div className="APanalysis-game">
+                    <div className="APanalysis-teams">
+                      <div className="APanalysis-team">
+                        {teamMeta?.logo && (
+                          <div className="APanalysis-team-logo">
+                            <img
+                              src={teamMeta.logo}
+                              alt={`${teamMeta.name} 로고`}
+                              className={`APanalysis-team-logo-img ${
+                                teamMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                              }`}
+                            />
+                          </div>
+                        )}
+                        <span className="APanalysis-team-name">{teamMeta?.name || g.team} 훈련</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="APanalysis-location">{g.position || '-'}</div>
+
+                  <div className="APanalysis-uploader">
+                    {uploaderMeta?.logo && (
+                      <div className="APanalysis-uploader-logo">
+                        <img
+                          src={uploaderMeta.logo}
+                          alt={`${uploaderMeta.name} 로고`}
+                          className={`APanalysis-uploader-logo-img ${
+                            uploaderMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                          }`}
+                        />
+                      </div>
+                    )}
+                    <span className="APanalysis-uploader-name">{uploaderMeta?.name || g.uploader}</span>
+                  </div>
+
+                  <div className="APanalysis-video-count">
+                    <FaVideo className="APvideo-icon" />
+                    <span>{typeof videoCount === 'number' ? `${videoCount}개` : videoCount}</span>
+                  </div>
+
+                  <div className="APanalysis-status APpending">
+                    <FaUpload className="APstatus-icon" />
+                    <span>분석 대기</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

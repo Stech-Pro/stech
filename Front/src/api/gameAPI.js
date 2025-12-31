@@ -246,3 +246,20 @@ const url = `${API_CONFIG.ENDPOINTS.REQUEST_EDIT}`
     data
   );
 }
+
+/* 영상 URL 가져오기: GET /api/game/get-video-url/:gameKey/:quarter/:fileName */
+export async function getVideoUrl(gameKey, quarter, fileName) {
+  const url = `${API_CONFIG.BASE_URL}/game/get-video-url/${encodeURIComponent(gameKey)}/${encodeURIComponent(quarter)}/${encodeURIComponent(fileName)}`;
+  const res = await apiFetch(url, { method: 'GET' });
+  const data = await jsonOrText(res);
+
+  if (!res.ok) {
+    throw new APIError(
+      typeof data === 'object' ? data.message || '영상 URL 가져오기 실패' : '영상 URL 가져오기 실패',
+      res.status,
+      data
+    );
+  }
+
+  return data.url;
+}
