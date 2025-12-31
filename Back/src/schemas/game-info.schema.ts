@@ -14,7 +14,7 @@ export class GameInfo {
   @Prop({ required: true })
   type: string;
 
-  @Prop({ type: Object, required: true })
+  @Prop({ type: Object, required: false })
   score: {
     home: number;
     away: number;
@@ -26,11 +26,14 @@ export class GameInfo {
   @Prop({ required: true })
   location: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   homeTeam: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   awayTeam: string;
+
+  @Prop({ type: [String], default: [] })
+  trainingPositions: string[]; // 훈련 시 선택된 포지션들
 
   @Prop({ required: true })
   uploader: string; // 업로드한 팀명

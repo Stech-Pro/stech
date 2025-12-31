@@ -1794,11 +1794,28 @@ export class GameController {
     try {
       const { gameKey, gameInfo, quarterVideoCounts } = body;
 
-      if (!gameKey || !gameInfo || !quarterVideoCounts) {
+      if (!gameKey || !gameInfo) {
         throw new HttpException(
           {
             success: false,
-            message: 'gameKey, gameInfo, quarterVideoCounts가 필요합니다',
+            message: 'gameKey, gameInfo가 필요합니다',
+            code: 'MISSING_PARAMETERS',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      // 훈련용 처리
+      if (gameInfo.type === '훈련') {
+        return this.prepareTrainingUpload(gameKey, gameInfo, req);
+      }
+
+      // 경기용 처리 (기존 로직)
+      if (!quarterVideoCounts) {
+        throw new HttpException(
+          {
+            success: false,
+            message: '경기용 업로드는 quarterVideoCounts가 필요합니다',
             code: 'MISSING_PARAMETERS',
           },
           HttpStatus.BAD_REQUEST,
@@ -1931,6 +1948,108 @@ export class GameController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  // 훈련용 업로드 준비 (별도 메소드)
+  private async prepareTrainingUpload(gameKey: string, gameInfo: any, req: any) {
+    console.log(`🏃‍♂️ 훈련 업로드 준비 시작: ${gameKey}`);
+
+    // gameKey 형식 검증 (훈련용: TR{팀코드}{번호} 형식)
+    if (!/^TR[A-Z]{2}[0-9]{4}$/.test(gameKey)) {
+      throw new HttpException(
+        {
+          success: false,
+          message: '훈련용 gameKey 형식이 올바르지 않습니다 (예: TRHY1111)',
+          code: 'INVALID_TRAINING_GAMEKEY_FORMAT',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // gameKey에서 팀 코드 추출하여 검증
+    const teamCodeFromKey = gameKey.substring(2, 4); // TR 다음 2글자
+    const { team: uploaderTeam } = req.user;
+    
+    // 팀명에서 팀 코드 추출 (예: HYlions -> HY)
+    const uploaderTeamCode = uploaderTeam.substring(0, 2).toUpperCase();
+    
+    console.log(`🔍 gameKey 팀코드: ${teamCodeFromKey}, 업로더 팀코드: ${uploaderTeamCode}`);
+    
+    if (teamCodeFromKey !== uploaderTeamCode) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `팀 코드가 일치하지 않습니다. gameKey는 TR${uploaderTeamCode}XXXX 형식이어야 합니다`,
+          code: 'TEAM_CODE_MISMATCH',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // 훈련용은 한 번에 여러 영상 업로드 가능
+    const videoCount = gameInfo.videoCount || 1; // 기본 1개
+    console.log(`📊 훈련 영상 개수: ${videoCount}개`);
+
+    // 업로드 URL 생성
+    const uploadUrls = [];
+    let totalVideos = 0;
+
+    for (let i = 1; i <= videoCount; i++) {
+      const fileName = `${gameKey}_training${i}.mp4`;
+      const s3Path = `videos/${gameKey}/training/${fileName}`;
+      
+      console.log(`📁 훈련 폴더에 ${fileName} 생성`);
+
+      // S3 업로드 URL 생성
+      const uploadUrl = await this.s3Service.generatePresignedUploadUrl(
+        s3Path,
+        'video/mp4',
+        3600, // 1시간 유효
+      );
+
+      uploadUrls.push({
+        videoNumber: i,
+        fileName,
+        uploadUrl,
+        s3Path,
+      });
+
+      totalVideos++;
+    }
+
+    console.log(`🔍 JWT에서 추출된 업로더 팀: ${uploaderTeam}`);
+
+    // 예상 videoUrls 구조 생성 (훈련용)
+    const expectedVideoUrls = {
+      training: uploadUrls.map(url => url.fileName)
+    };
+
+    // 훈련 정보 저장 (pending 상태)
+    await this.gameService.createGameInfo({
+      gameKey,
+      date: gameInfo.date || gameInfo.trainingDate, // 훈련 날짜
+      type: '훈련',
+      location: gameInfo.location,
+      uploader: uploaderTeam,
+      uploadStatus: 'pending',
+      videoUrls: expectedVideoUrls,
+      trainingPositions: gameInfo.positions || [], // 훈련 포지션
+      // score, homeTeam, awayTeam은 훈련용에서 생략
+    });
+
+    console.log(`✅ ${gameKey} 훈련 저장 완료 - 업로더: ${uploaderTeam}`);
+
+    return {
+      success: true,
+      message: '훈련 업로드 URL 생성 완료',
+      data: {
+        gameKey,
+        totalVideos,
+        uploadUrls,
+        type: '훈련',
+        expiresIn: 3600,
+      },
+    };
   }
 
   @Post('upload-video')

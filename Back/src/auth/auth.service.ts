@@ -1274,4 +1274,60 @@ export class AuthService {
       });
     }
   }
+
+  // 팀 탈퇴 (팀 소속만 해제, 계정과 기록은 보존)
+  async leaveTeam(userId: string) {
+    try {
+      // 사용자 존재 여부 확인
+      const user = await this.userModel.findById(userId);
+      if (!user) {
+        throw new BadRequestException({
+          success: false,
+          message: '사용자를 찾을 수 없습니다.',
+          code: 'USER_NOT_FOUND',
+        });
+      }
+
+      // 현재 팀에 소속되어 있는지 확인
+      if (!user.teamName) {
+        throw new BadRequestException({
+          success: false,
+          message: '현재 소속된 팀이 없습니다.',
+          code: 'NO_TEAM_MEMBERSHIP',
+        });
+      }
+
+      // 팀 관련 필드만 null로 변경 (기록은 보존)
+      const updatedUser = await this.userModel.findByIdAndUpdate(
+        userId,
+        {
+          $set: {
+            teamName: null,
+            region: null,
+            authCode: null,
+          },
+        },
+        { new: true, runValidators: true }
+      );
+
+      return {
+        success: true,
+        message: '팀에서 성공적으로 탈퇴했습니다. 개인 기능만 이용 가능합니다.',
+        data: {
+          username: updatedUser.username,
+          role: updatedUser.role,
+          teamStatus: 'independent',
+        },
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException({
+        success: false,
+        message: '팀 탈퇴 처리 중 오류가 발생했습니다.',
+        code: 'LEAVE_TEAM_ERROR',
+      });
+    }
+  }
 }
