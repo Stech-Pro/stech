@@ -820,4 +820,70 @@ export class AuthController {
   async withdrawUser(@Request() req) {
     return this.authService.withdrawUser(req.user.id);
   }
+
+  @Patch('leave-team')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '🚪 팀 탈퇴',
+    description: `
+    ## 🚪 팀 탈퇴 API
+
+    현재 소속 팀에서 탈퇴합니다. 계정은 유지되며 개인 기능만 사용 가능합니다.
+    
+    ### 📋 변경사항
+    - **팀 소속 해제**: teamName, region, authCode 제거
+    - **팀 컨텐츠 접근 차단**: 경기 영상, 팀 메모, 팀 스탯 접근 불가
+    - **개인 기능 유지**: 마이페이지, 개인 프로필, 개인 통계 접근 가능
+    
+    ### 📋 보존되는 데이터
+    - **모든 개인 기록 보존**: 과거 메모, 경기 통계, 개인 정보 유지
+    - **팀원들은 여전히 볼 수 있음**: 탈퇴한 선수의 과거 기록을 팀에서 조회 가능
+    
+    ### 🔄 재가입 가능
+    - 새로운 인증코드로 다른 팀 가입 가능
+    - 개인 기록은 그대로 유지됨
+    `,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 팀 탈퇴 완료',
+    schema: {
+      example: {
+        success: true,
+        message: '팀에서 성공적으로 탈퇴했습니다. 개인 기능만 이용 가능합니다.',
+        data: {
+          username: 'player123',
+          role: 'player',
+          teamStatus: 'independent',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: '❌ 이미 팀에 소속되지 않음',
+    schema: {
+      example: {
+        success: false,
+        message: '현재 소속된 팀이 없습니다.',
+        code: 'NO_TEAM_MEMBERSHIP',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: '❌ 인증 필요',
+    schema: {
+      example: {
+        success: false,
+        message: '로그인이 필요합니다.',
+        code: 'UNAUTHORIZED',
+      },
+    },
+  })
+  async leaveTeam(@Request() req) {
+    return this.authService.leaveTeam(req.user.id);
+  }
 }
