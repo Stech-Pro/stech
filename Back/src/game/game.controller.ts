@@ -1951,7 +1951,7 @@ export class GameController {
   }
 
   // 훈련용 업로드 준비 (별도 메소드)
-  private async prepareTrainingUpload(gameKey: string, gameInfo: any, quarterVideoCounts: any, req: any) {
+  private async prepareTrainingUpload(gameKey: string, gameInfo: any, quarterVideoCounts?: any, req?: any) {
     console.log(`🏃‍♂️ 훈련 업로드 준비 시작: ${gameKey}`);
 
     // gameKey 형식 검증 (훈련용: TR{팀코드}{날짜 YYYYMMDD} 형식)
@@ -1997,7 +1997,7 @@ export class GameController {
 
     for (let i = 1; i <= videoCount; i++) {
       const fileName = `${gameKey}_clip${i}.mp4`;
-      const s3Path = `videos/${gameKey}/Training/${fileName}`;
+      const s3Path = `videos/${gameKey}/training/${fileName}`;
 
       console.log(`📁 훈련 폴더에 ${fileName} 생성`);
 
@@ -2022,7 +2022,7 @@ export class GameController {
 
     // 예상 videoUrls 구조 생성 (훈련용)
     const expectedVideoUrls = {
-      Training: uploadUrls.map(url => url.fileName)
+      training: uploadUrls.map(url => url.fileName)
     };
 
     // 훈련 정보 저장 (pending 상태)

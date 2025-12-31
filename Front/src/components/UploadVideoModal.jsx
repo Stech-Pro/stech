@@ -735,7 +735,7 @@ const UploadVideoModal = ({
 
       const uploadedVideos = gameType === '훈련'
         ? {
-            Training: (uploadUrls.Training || []).map((u) => u.fileName),
+            training: (uploadUrls.Training || uploadUrls.training || []).map((u) => u.fileName),
           }
         : {
             Q1: (uploadUrls.Q1 || []).map((u) => u.fileName),

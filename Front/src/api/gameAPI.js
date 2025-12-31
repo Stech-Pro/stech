@@ -59,6 +59,11 @@ export async function fetchTeamGames(teamNameOrId) {
     length: g.length || '-',   // 없으면 '-'
     report: !!g.report,        // bool
     uploadStatus: g.uploadStatus || 'completed', // pending, completed
+    // 훈련 영상 관련 필드
+    team: g.team,              // 훈련 영상의 팀 ID (레거시)
+    uploader: g.uploader,       // 훈련 영상 업로더 팀 ID
+    position: g.position,       // 훈련 영상의 포지션
+    videoUrls: g.videoUrls,     // 업로드된 비디오 파일 URL 목록
   }));
 }
 
