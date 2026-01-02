@@ -145,6 +145,7 @@ function PlayerCore({ stateData }) {
     teamOptions,
     teamMeta,
     initialPlayId,
+    isTraining = false,
   } = stateData;
 
   const clipFilterParams = useMemo(
@@ -975,11 +976,12 @@ const teamSummaryNode = selectedTeamOpt ? (
                 </div>
               </div>
             </div>
-            <div
-              className="videoFilterControls"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="filterRow">
+            {!isTraining && (
+              <div
+                className="videoFilterControls"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="filterRow">
                 <Dropdown
                   label="쿼터"
                   summary={quarterSummary}
@@ -1167,7 +1169,8 @@ const teamSummaryNode = selectedTeamOpt ? (
                   초기화{' '}
                 </button>
               </div>
-            </div>
+              </div>
+            )}
             <div className="videoPlaysList">
               {clips.length > 0 ? (
                 clips.map((p) => (

@@ -173,9 +173,9 @@ export default function GamePage() {
   const openClips = (game) => {
     const isTraining = game.type === 'Training' || game.type === '훈련';
 
-    // 훈련 영상은 분석 불필요 - 바로 이동
+    // 훈련 영상은 TrainingClipPage로 이동
     if (isTraining) {
-      navigate(`/service/game/${game.gameKey}/clip`, { state: { game } });
+      navigate(`/service/game/${game.gameKey}/training-clip`, { state: { game } });
       return;
     }
 
