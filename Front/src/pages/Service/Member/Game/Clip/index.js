@@ -757,12 +757,13 @@ const teamSummaryNode = selectedTeamOpt ? (
           <div className="clip-list">
             {isTraining ? (
               /* 훈련 영상 목록 */
-              game?.videoUrls?.training && game.videoUrls.training.length > 0 ? (
-                game.videoUrls.training.map((fileName, index) => (
+              (game?.videoUrls?.Training || game?.videoUrls?.training) &&
+              (game.videoUrls.Training || game.videoUrls.training).length > 0 ? (
+                (game.videoUrls.Training || game.videoUrls.training).map((fileName, index) => (
                   <div
                     key={`training-video-${index}`}
                     className="training-video-item"
-                    onClick={() => playVideoFile('training', fileName)}
+                    onClick={() => playVideoFile('Training', fileName)}
                     style={{
                       cursor: 'pointer',
                       padding: '16px 20px',
