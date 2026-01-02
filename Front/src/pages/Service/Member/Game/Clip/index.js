@@ -8,7 +8,7 @@ import UploadVideoModal from '../../../../../components/UploadVideoModal';
 import defaultLogo from '../../../../../assets/images/logos/Stechlogo.svg';
 import { useAuth } from '../../../../../context/AuthContext';
 import { fetchTeamStatsByKey } from '../../../../../api/teamAPI';
-import { fetchGameClips } from '../../../../../api/gameAPI';
+import { fetchGameClips, getVideoUrl } from '../../../../../api/gameAPI';
 
 /* ========== 공용 드롭다운 (이 페이지 내부 구현) ========== */
 function Dropdown({ label, summary, isOpen, onToggle, onClose, children , className}) {
@@ -177,9 +177,32 @@ export default function ClipPage() {
 
   const [game, setGame] = useState(gameFromState);
 
+  /* 훈련 영상 감지 */
+  const isTraining = useMemo(() => {
+    return game?.type === 'Training' || game?.type === '훈련';
+  }, [game?.type]);
+
+  /* 비디오 파일 재생 함수 */
+  const playVideoFile = async (quarter, fileName) => {
+    try {
+      const url = await getVideoUrl(resolvedGameKey, quarter, fileName);
+      window.open(url, '_blank');
+    } catch (error) {
+      console.error('영상 재생 오류:', error);
+      alert(error.message || '영상을 재생할 수 없습니다.');
+    }
+  };
+
   useEffect(() => {
     if (!resolvedGameKey) {
       setStatsLoading(false);
+      return;
+    }
+
+    // 훈련 영상은 팀 스탯이 없으므로 스킵
+    if (isTraining) {
+      setStatsLoading(false);
+      setTeamStats(null);
       return;
     }
 
@@ -225,7 +248,7 @@ export default function ClipPage() {
     return () => {
       controller.abort();
     };
-  }, [resolvedGameKey]); // gameKey가 변경될 때마다 이 effect를 다시 실행합니다.
+  }, [resolvedGameKey, isTraining]); // gameKey 또는 훈련 상태가 변경될 때마다 이 effect를 다시 실행합니다.
 
   // 드롭다운 상태
   const [openMenu, setOpenMenu] = useState(null); // 'team'|'quarter'|'playType'|'significant'|null
@@ -318,6 +341,13 @@ export default function ClipPage() {
   useEffect(() => {
     if (!resolvedGameKey) return;
 
+    // 훈련 영상은 클립 데이터가 없으므로 스킵
+    if (isTraining) {
+      setClipsLoading(false);
+      setRawClips([]);
+      return;
+    }
+
     let abort = false;
     setClipsLoading(true);
     setClipsError(null);
@@ -368,7 +398,7 @@ export default function ClipPage() {
     return () => {
       abort = true;
     };
-  }, [resolvedGameKey]);
+  }, [resolvedGameKey, isTraining]);
 
   /* ========== 훅 사용 (필터/클립/요약/초기화/네비) ========== */
   const persistKey = `clipFilters:${
@@ -692,8 +722,25 @@ const teamSummaryNode = selectedTeamOpt ? (
               )}
               <span className="clip-team-name">{homeMeta?.name || '홈팀'}</span>
             </div>
+          ) : (
+            /* 일반 경기 헤더 */
+            <div className="clip-header">
+              <div className="clip-team left">
+                {homeMeta?.logo && (
+                  <div className="clip-team-logo">
+                    <img
+                      src={homeMeta.logo}
+                      alt={`${homeMeta.name} 로고`}
+                      className={`clip-team-logo-img ${
+                        homeMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                      }`}
+                    />
+                  </div>
+                )}
+                <span className="clip-team-name">{homeMeta?.name}</span>
+              </div>
 
-            <div className="clip-vs">VS</div>
+              <div className="clip-vs">VS</div>
 
             <div className="clip-team right">
               {awayMeta?.logo && (
@@ -709,28 +756,55 @@ const teamSummaryNode = selectedTeamOpt ? (
               )}
               <span className="clip-team-name">{awayMeta?.name || '원정팀'}</span>
             </div>
-          </div>
+          )}
           <div className="clip-list">
-            {clips.map((c, index) => {
-              const safeKey = c.id ?? `${c.clipKey ?? 'noid'}__${index}`;
-              return (
-                <div
-                  key={safeKey}
-                  className="clip-row"
-                  onClick={() => onClickClip(c)}
-                >
-                  <div className="quarter-name">
-                    <div>{c.quarter}Q</div>
-                  </div>
-
-                  <div className="clip-rows">
-                    <div className="clip-row1">
-                      <div className="clip-down">{getDownDisplay(c)}</div>
-
-                      <div className="clip-type">
-                        {renderPlayType(c.playType)}
-                      </div>
+            {isTraining ? (
+              /* 훈련 영상 목록 */
+              game?.videoUrls?.training && game.videoUrls.training.length > 0 ? (
+                game.videoUrls.training.map((fileName, index) => (
+                  <div
+                    key={`training-video-${index}`}
+                    className="training-video-item"
+                    onClick={() => playVideoFile('training', fileName)}
+                    style={{
+                      cursor: 'pointer',
+                      padding: '16px 20px',
+                      borderBottom: '1px solid #333',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '16px',
+                      transition: 'background-color 0.2s',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1a1a1a'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <div style={{
+                      fontSize: '16px',
+                      fontWeight: '500',
+                      color: '#fff',
+                      flex: 1,
+                    }}>
+                      {fileName}
                     </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty">업로드된 훈련 영상이 없습니다.</div>
+              )
+            ) : (
+              /* 일반 경기 클립 목록 */
+              <>
+                {clips.map((c, index) => {
+                  const safeKey = c.id ?? `${c.clipKey ?? 'noid'}__${index}`;
+                  return (
+                    <div
+                      key={safeKey}
+                      className="clip-row"
+                      onClick={() => onClickClip(c)}
+                    >
+                      <div className="quarter-name">
+                        <div>{c.quarter}Q</div>
+                      </div>
 
                     <div className="clip-row2">
                       <div className="clip-oT">
@@ -739,29 +813,44 @@ const teamSummaryNode = selectedTeamOpt ? (
                           : `${awayMeta?.name || '원정팀'}`}
                       </div>
 
-                      {Array.isArray(c.displaySignificantPlays) &&
-                      c.displaySignificantPlays.length > 0 ? (
-                        <div className="clip-sig">
-                          {c.displaySignificantPlays.map((label, idx) => (
-                            <span key={`${safeKey}-sig-${idx}`}># {label}</span>
-                          ))}
+                          <div className="clip-type">
+                            {renderPlayType(c.playType)}
+                          </div>
                         </div>
-                      ) : (
-                        <div className="clip-sig" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
 
-            {clips.length === 0 && (
-              <div className="empty">일치하는 플레이가 없습니다.</div>
+                        <div className="clip-row2">
+                          <div className="clip-oT">
+                            {c.offensiveTeam == 'Home'
+                              ? `${homeMeta?.name}`
+                              : `${awayMeta?.name}`}
+                          </div>
+
+                          {Array.isArray(c.displaySignificantPlays) &&
+                          c.displaySignificantPlays.length > 0 ? (
+                            <div className="clip-sig">
+                              {c.displaySignificantPlays.map((label, idx) => (
+                                <span key={`${safeKey}-sig-${idx}`}># {label}</span>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="clip-sig" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {clips.length === 0 && (
+                  <div className="empty">일치하는 플레이가 없습니다.</div>
+                )}
+              </>
             )}
           </div>
         </div>
-        <div className="clip-data">
-          {teamStats && !statsLoading && (
+        {!isTraining && (
+          <div className="clip-data">
+            {teamStats && !statsLoading && (
             <div className="clip-playcall">
               <div className="clip-playcall-header">플레이콜 비율</div>
               <div className="clip-playcall-content">
@@ -918,6 +1007,7 @@ const teamSummaryNode = selectedTeamOpt ? (
             )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );
