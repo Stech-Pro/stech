@@ -34,14 +34,59 @@ export default function TrainingClipPage() {
   const trainingTeamId = game?.uploader || game?.team;
   const trainingTeamMeta = trainingTeamId ? TEAM_BY_ID[trainingTeamId] : null;
 
-  /* 비디오 파일 재생 함수 (ClipPage와 동일) */
-  const playVideoFile = async (quarter, fileName) => {
+  /* 훈련 영상을 클립 형태로 변환 */
+  const trainingClips = useMemo(() => {
+    const videos = game?.videoUrls?.Training || game?.videoUrls?.training;
+    if (!videos) return [];
+
+    return videos.map((fileName, index) => ({
+      id: `training-${index}`,
+      clipKey: `training-${index}`,
+      playIndex: index,
+      fileName: fileName,
+      clipUrl: null, // VideoPlayer에서 getVideoUrl로 가져올 예정
+      quarter: 'Training',
+      isTraining: true,
+    }));
+  }, [game?.videoUrls?.Training, game?.videoUrls?.training]);
+
+  /* 클립 클릭 → 비디오 플레이어로 이동 */
+  const onClickClip = async (clip) => {
     try {
-      const url = await getVideoUrl(resolvedGameKey, quarter, fileName);
-      window.open(url, '_blank');
+      // AWS S3에서 실제 영상 URL 가져오기
+      const videoUrl = await getVideoUrl(resolvedGameKey, 'Training', clip.fileName);
+
+      // URL을 포함한 클립 데이터로 업데이트
+      const clipsWithUrl = trainingClips.map((c) => {
+        if (c.clipKey === clip.clipKey) {
+          return { ...c, clipUrl: videoUrl };
+        }
+        return c;
+      });
+
+      navigate('/service/video', {
+        state: {
+          // 훈련 영상 데이터 전달 (URL 포함)
+          rawClips: clipsWithUrl,
+          initialFilters: {}, // 훈련은 필터 없음
+          teamOptions: [],
+
+          // 비디오 플레이어 UI 구성 정보
+          initialPlayId: String(clip.clipKey),
+          initialPlayIndex: clip.playIndex,
+          clipKey: clip.clipKey,
+          gameKey: resolvedGameKey,
+          isTraining: true, // 훈련 영상 플래그
+          teamMeta: {
+            teamName: trainingTeamMeta?.name,
+            teamLogo: trainingTeamMeta?.logo,
+          },
+          fileName: clip.fileName, // 훈련 영상 파일명
+        },
+      });
     } catch (error) {
-      console.error('영상 재생 오류:', error);
-      alert(error.message || '영상을 재생할 수 없습니다.');
+      console.error('영상 URL 가져오기 실패:', error);
+      alert(error.message || '영상을 불러올 수 없습니다.');
     }
   };
 
@@ -97,13 +142,12 @@ export default function TrainingClipPage() {
 
           {/* 훈련 영상 목록 */}
           <div className="clip-list">
-            {(game?.videoUrls?.Training || game?.videoUrls?.training) &&
-             (game.videoUrls.Training || game.videoUrls.training).length > 0 ? (
-              (game.videoUrls.Training || game.videoUrls.training).map((fileName, index) => (
+            {trainingClips.length > 0 ? (
+              trainingClips.map((clip) => (
                 <div
-                  key={`training-video-${index}`}
+                  key={clip.id}
                   className="training-video-item"
-                  onClick={() => playVideoFile('Training', fileName)}
+                  onClick={() => onClickClip(clip)}
                   style={{
                     cursor: 'pointer',
                     padding: '16px 20px',
@@ -122,7 +166,7 @@ export default function TrainingClipPage() {
                     color: '#fff',
                     flex: 1,
                   }}>
-                    {fileName}
+                    {clip.fileName}
                   </div>
                 </div>
               ))
