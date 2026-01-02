@@ -13,7 +13,7 @@ import { CgProfile } from 'react-icons/cg';
 import { MdManageAccounts } from "react-icons/md";
 
 
-const ServiceSidebar = () => {
+const ServiceSidebar = ({className, id, ...props}) => {
   const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -439,7 +439,7 @@ const ServiceSidebar = () => {
   };
 
   return (
-    <aside className="sidebar">
+    <aside id={id} className={className}>
       {/* Sidebar Header */}
       <div className="sidebarHeader">
         <div className="stech-logo-box">
