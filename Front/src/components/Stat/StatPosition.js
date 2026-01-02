@@ -445,7 +445,7 @@ export default function StatPosition({ teams = [], data = null }) {
       <div className="table-wrapper">
         <div className="stat-table">
           <div className="table-head">
-            <div className="table-row">
+            <div className="!grid !grid-cols-[21rem_1fr] !items-stretch !py-0 !text-[#a5a5a5] !font-bold">
               <div className="table-row1">
                 <div className="table-header-cell rank-column">순위</div>
                 <div className="table-header-cell player-column">선수</div>
@@ -515,7 +515,7 @@ export default function StatPosition({ teams = [], data = null }) {
                     <div className="table-cell player-name">
                       {row.name}
                     </div>
-                    <div className="table-cell team-name">
+                    <div className="self-center items-center justify-start grid grid-cols-[minmax(0,1fr)_auto] gap-2">
                       {teamInfo?.logo && (
                         <div className="team-logo">
                           <img
@@ -529,7 +529,7 @@ export default function StatPosition({ teams = [], data = null }) {
                           />
                         </div>
                       )}
-                      <span>{row.team}</span>
+                      <div>{row.team}</div>
                     </div>
                   </div>
                   <div

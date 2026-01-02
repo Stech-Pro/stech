@@ -889,10 +889,10 @@ export default function StatLeague({ data, teams = [] }) {
             )}
 
             {!isExcepted && currentDivision?.groups?.length > 0 && (
-              <div className="groups-container">
+              <div className="flex  items-stretch justify-between gap-5 pt-12 max-[1600px]:flex-col">
                 {hasMultipleGroups ? (
                   currentDivision.groups.map((group) => (
-                    <div key={group.name} className="group-section">
+                    <div key={group.name} className="w-full rounded-lg">
                       <div className="group-header">
                         {currentDivision.name} {group.name} 순위
                       </div>
@@ -908,7 +908,7 @@ export default function StatLeague({ data, teams = [] }) {
                 ) : (
                   <>
                     {currentDivision.groups.map((group) => (
-                      <div key={group.name} className="group-section">
+                      <div key={group.name} className="w-full rounded-lg">
                         <div className="group-header">
                           {currentDivision.name} 순위
                         </div>
@@ -921,7 +921,7 @@ export default function StatLeague({ data, teams = [] }) {
                         </div>
                       </div>
                     ))}
-                    <div className="group-section no-group">
+                    <div className="w-full flex justify-center items-center overflow-hidden rounded-lg  max-[1600px]:hidden ">
                       <img
                         src={NoGroupImg}
                         alt={'no-group-section'}

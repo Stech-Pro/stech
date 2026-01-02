@@ -1,18 +1,4 @@
-:root {
-    --sidebar-width: 300px;
-} /* 한 줄만 바꾸면 폭 수정 가능 */
 
-/* ------ 사이드바 ------ */
-.serviceSidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: var(--sidebar-width);
-    height: 100vh;
-    background: #0f1012;
-    overflow-y: auto; /* 내부 스크롤(선택) */
-    z-index: 100; /* 필요하면 조정 */
-}
 
 
 
