@@ -418,7 +418,7 @@
 .navLink:focus,
 .logoutButton:focus,
 .loginButton:focus {
-  outline: 2px solid #fffff;
+  /* outline: 2px solid #fffff; */
   outline-offset: 2px;
   box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }

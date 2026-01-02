@@ -35,7 +35,7 @@ const ServiceLayout = () => {
         </div>
       ) : (
         <div className="min-h-screen flex flex-col md:pl-[300px]">
-          <header className="md:hidden sticky top-0 z-30 bg-[#141414]/90 backdrop-blur border-b border-[#1f2023]">
+          <header className="md:hidden sticky top-0 z-30 bg-[#141414] backdrop-blur border-b border-[#1f2023]">
             <div className="flex items-center justify-between px-4 h-14">
               <button
                 type="button"
@@ -43,12 +43,12 @@ const ServiceLayout = () => {
                 aria-controls='service-sidebar-mobile'
                 aria-expanded={sidebarOpen}
                 onClick={() => setSidebarOpen(true)}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-[#1f2023] bg-[#141414] text-white"
+                className="inline-flex items-center gap-2 px-3 py-2  bg-[#141414] text-white"
               >
-                <Menu className="w-5 h-5" />
+                <Menu className="w-4 h-4" />
               </button>
 
-              <NotificationHoverIcon className='px-3 py-2 text-white rounded-xl'/>
+              <NotificationHoverIcon className='bg-transparent border-none '/>
         
             </div>
           </header>
@@ -74,7 +74,7 @@ const ServiceLayout = () => {
           >
             {/* 드로어 헤더(닫기 버튼) */}
             <div className="h-14 px-4 border-b border-[#1f2023] flex items-center justify-between">
-              <span className="text-sm text-white/80">메뉴</span>
+              <span className="text-sm text-white/80"></span>
               <button
                 type="button"
                 aria-label="Close sidebar"

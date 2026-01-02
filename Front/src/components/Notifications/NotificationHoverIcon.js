@@ -14,6 +14,7 @@ export default function NotificationHoverIcon({
   iconSize = 24,
   className = '',
   staleMs = 60_000,
+  ...props
 }) {
   const { items, unread, loading, refresh, readOne, readAll, clearLocal } =
     useNotifications({ limit, pollMs });
@@ -111,7 +112,7 @@ export default function NotificationHoverIcon({
     >
       <button
         type="button"
-        className="nh-bell"
+        className={`${className} nh-bell`}
         aria-haspopup="true"
         aria-expanded={open}
       >
