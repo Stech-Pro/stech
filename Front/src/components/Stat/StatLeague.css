@@ -125,18 +125,34 @@ height:100%;
   font-weight: 700;
 }
 
-@media (min-width: 1280px) {
-  .group-header,
-  .playoffs-header,
-  .final-header,
-  .promotion-header {
-    font-size: 1rem;
-    padding-bottom: 0.75rem;
-  }
+
+.group-standings-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* 스크롤바 커스터마이징 */
+.group-standings-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.group-standings-container::-webkit-scrollbar-track {
+  background: rgba(26, 26, 26, 0.5);
+  border-radius: 3px;
+}
+
+.group-standings-container::-webkit-scrollbar-thumb {
+  background: rgba(102, 102, 102, 0.8);
+  border-radius: 3px;
+}
+
+.group-standings-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(136, 136, 136, 0.9);
 }
 
 .group-standings {
   width: 100%;
+  min-width: 600px;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -152,11 +168,7 @@ height:100%;
   font-size: 0.75rem;
 }
 
-@media (min-width: 768px) {
-  .standings-header {
-    font-size: 1rem;
-  }
-}
+
 
 /* 데이터 행 */
 .standings-row {
@@ -190,26 +202,16 @@ height:100%;
   font-size: 0.75rem;
 }
 
-@media (min-width: 768px) {
-  .standings-cell {
-    padding: 0.75rem 0;
-    font-size: 1rem;
-  }
-}
+
 
 /* 순위 셀 */
 .rank-cell {
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 0.75rem;
   color: #ffffff;
   width: 40px;
 }
 
-@media (min-width: 768px) {
-  .rank-cell {
-    font-size: 1.125rem;
-  }
-}
 
 .team-logo {
   width: 1.563rem; /* 25px */
@@ -269,6 +271,7 @@ height:100%;
 .match-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
 }
 
@@ -501,6 +504,7 @@ height:100%;
 
 @media (min-width: 768px) {
   .match-header {
+    justify-content: space-between;
     padding: 0.75rem 0;
     font-size: 1rem;
   }
