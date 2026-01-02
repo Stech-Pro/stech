@@ -607,7 +607,7 @@ const UploadVideoModal = ({
       if (gameType === '훈련') {
         // 훈련 모드 - userTeam 사용
         const teamCode = getTeamCode(userTeam);
-        gameKey = `${teamCode}TRAIN${d.format('YYYYMMDD')}`;
+        gameKey = `TR${teamCode}${d.format('YYYYMMDD')}`;
 
         gameInfo = {
           team: userTeam,
@@ -732,12 +732,24 @@ const UploadVideoModal = ({
       // 3) 완료 보고
       setUploadProgress({ show: true, message: '업로드 완료 처리 중...', type: 'loading' });
 
-      const uploadedVideos = {
-        Q1: (uploadUrls.Q1 || []).map((u) => u.fileName),
-        Q2: (uploadUrls.Q2 || []).map((u) => u.fileName),
-        Q3: (uploadUrls.Q3 || []).map((u) => u.fileName),
-        Q4: (uploadUrls.Q4 || []).map((u) => u.fileName),
-      };
+      // 훈련용과 경기용 구분하여 uploadedVideos 생성
+      let uploadedVideos = {};
+      
+      if (gameType === '훈련') {
+        // 훈련용: Training 키에서 파일명 추출
+        uploadedVideos = {
+          Training: (uploadUrls.Training || []).map((u) => u.fileName),
+          Q1: [], Q2: [], Q3: [], Q4: [], // 빈 배열로 초기화
+        };
+      } else {
+        // 경기용: 기존 로직
+        uploadedVideos = {
+          Q1: (uploadUrls.Q1 || []).map((u) => u.fileName),
+          Q2: (uploadUrls.Q2 || []).map((u) => u.fileName),
+          Q3: (uploadUrls.Q3 || []).map((u) => u.fileName),
+          Q4: (uploadUrls.Q4 || []).map((u) => u.fileName),
+        };
+      }
 
       await completeMatchUpload({ gameKey, uploadedVideos }, { timeoutMs: 120000 });
 

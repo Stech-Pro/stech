@@ -116,9 +116,15 @@ export async function fetchGameClips(gameKey) {
   let clips = [];
   if (typeof data === 'object' && data.success && data.data && Array.isArray(data.data.Clips)) {
     clips = data.data.Clips;
+    console.log('✅ 클립 데이터 추출 성공:', clips);
   } else if (Array.isArray(data)) {
     clips = data;
+    console.log('✅ 직접 배열 처리:', clips);
+  } else {
+    console.log('❌ 클립 데이터 구조를 인식할 수 없음:', data);
   }
+  
+  console.log(`📊 최종 반환할 클립 수: ${clips.length}개`);
   return clips;
 }
 
