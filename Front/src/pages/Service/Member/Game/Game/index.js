@@ -159,14 +159,16 @@ export default function GamePage() {
   }, [games, selectedDate, selectedType, selectedOpps]);
 
   /* 일반 경기와 훈련 영상 분리 */
-  const regularGames = useMemo(() =>
-    filteredGames.filter(g => g.type !== 'Training' && g.type !== '훈련'),
-    [filteredGames]
+  const regularGames = useMemo(
+    () =>
+      filteredGames.filter((g) => g.type !== 'Training' && g.type !== '훈련'),
+    [filteredGames],
   );
 
-  const trainingGames = useMemo(() =>
-    filteredGames.filter(g => g.type === 'Training' || g.type === '훈련'),
-    [filteredGames]
+  const trainingGames = useMemo(
+    () =>
+      filteredGames.filter((g) => g.type === 'Training' || g.type === '훈련'),
+    [filteredGames],
   );
 
   /* 이동 */
@@ -175,7 +177,9 @@ export default function GamePage() {
 
     // 훈련 영상은 TrainingClipPage로 이동
     if (isTraining) {
-      navigate(`/service/game/${game.gameKey}/training-clip`, { state: { game } });
+      navigate(`/service/game/${game.gameKey}/training-clip`, {
+        state: { game },
+      });
       return;
     }
 
@@ -191,7 +195,7 @@ export default function GamePage() {
   return (
     <div className="gamepage-root">
       {/* ===== 헤더 ===== */}
-      <header className="stechHeader">
+      <header className="max-md:hidden  p-[3.75rem] pb-0 bg-[#141414] text-[#e5e7eb]">
         <div className="headerContainer">
           {/* 왼쪽: 내 팀 */}
           <div className="header-team-box">
@@ -401,6 +405,46 @@ export default function GamePage() {
         )}
       </header>
 
+      <header className="md:hidden p-4 bg-[#141414] text-[#e5e7eb] ">
+        <div className="flex items-center  justify-between h-16 border-b border-b-[#fff]">
+          {/* 왼쪽: 내 팀 */}
+          <div className="h-[3rem] flex  items-center">
+            <div className="w-auto h-auto">
+              <img
+                src={logoSrc}
+                alt={label}
+                className="object-cover w-8 h-8 position-center"
+              />
+            </div>
+            <span className="text-white font-base">{label}</span>
+          </div>
+          <div className="flex items-center text-base">
+              <button
+                className="rounded-2xl bg-[#1a58e0] w-[6rem] h-[3rem] text-white"
+                onClick={() => setShowUpload(true)}
+              >
+                경기 업로드
+              </button>
+          </div>
+        
+            <UploadVideoModal
+              isOpen={showUpload}
+              onClose={() => setShowUpload(false)}
+              onUploaded={async () => {
+                setShowUpload(false);
+                try {
+                  const list = await fetchTeamGames(MY_TEAM_ID);
+                  setGames(list);
+                } catch (e) {
+                  console.error('경기 목록 갱신 실패:', e);
+                }
+              }}
+            />
+        </div>
+        <div>
+          {/* 모바일 필터는 추후 구현 예정 */}
+        </div>
+      </header>
       {/* ===== 경기 표 ===== */}
 
       {loading && <div className="game-loading">불러오는 중…</div>}
@@ -415,7 +459,7 @@ export default function GamePage() {
             <div className="game-header-cell">경기 결과</div>
             <div className="game-header-cell">세부사항</div>
             <div className="game-header-cell">영상 분석</div>
-                  </div>
+          </div>
 
           <div className="game-list">
             {regularGames.map((g) => {
@@ -482,13 +526,14 @@ export default function GamePage() {
                   </div>
 
                   <div
-                    className={`game-report ${g.report ? 'reportY' : 'reportN'}`}
+                    className={`game-report ${
+                      g.report ? 'reportY' : 'reportN'
+                    }`}
                   >
                     <span className="report-text">
                       {g.report ? '분석 완료' : '분석 중…'}
                     </span>
                   </div>
-
                 </div>
               );
             })}
@@ -498,7 +543,10 @@ export default function GamePage() {
 
       {/* 훈련 영상 컨테이너 */}
       {!loading && !error && trainingGames.length > 0 && (
-        <div className="game-container" style={{ marginTop: regularGames.length > 0 ? '60px' : '0' }}>
+        <div
+          className="game-container"
+          style={{ marginTop: regularGames.length > 0 ? '60px' : '0' }}
+        >
           <h2 className="game-section-title">훈련 목록</h2>
           <div className="game-header">
             <div className="game-header-cell">날짜</div>
@@ -538,7 +586,10 @@ export default function GamePage() {
                         </div>
                       )}
                       <span className="game-team-name">
-                        {trainingTeamMeta?.name || g.uploader || g.team || '훈련'}
+                        {trainingTeamMeta?.name ||
+                          g.uploader ||
+                          g.team ||
+                          '훈련'}
                       </span>
                     </div>
                     <div className="game-score" style={{ fontSize: '14px' }}>
@@ -552,13 +603,14 @@ export default function GamePage() {
                   </div>
 
                   <div
-                    className={`game-report ${g.report ? 'reportY' : 'reportN'}`}
+                    className={`game-report ${
+                      g.report ? 'reportY' : 'reportN'
+                    }`}
                   >
                     <span className="report-text">
                       {g.report ? '분석 완료' : '분석 중…'}
                     </span>
                   </div>
-
                 </div>
               );
             })}
@@ -566,9 +618,12 @@ export default function GamePage() {
         </div>
       )}
 
-      {!loading && !error && regularGames.length === 0 && trainingGames.length === 0 && (
-        <div className="game-empty">경기 데이터가 없습니다.</div>
-      )}
+      {!loading &&
+        !error &&
+        regularGames.length === 0 &&
+        trainingGames.length === 0 && (
+          <div className="game-empty">경기 데이터가 없습니다.</div>
+        )}
     </div>
   );
 }
