@@ -1951,10 +1951,10 @@ export class GameController {
   }
 
   // 훈련용 업로드 준비 (별도 메소드)
-  private async prepareTrainingUpload(gameKey: string, gameInfo: any, quarterVideoCounts?: any, req?: any) {
+  private async prepareTrainingUpload(gameKey: string, gameInfo: any, quarterVideoCounts: any, req: any) {
     console.log(`🏃‍♂️ 훈련 업로드 준비 시작: ${gameKey}`);
 
-    // gameKey 형식 검증 (훈련용: TR{팀코드}{날짜 YYYYMMDD} 형식)
+    // gameKey 형식 검증 (훈련용: TR{팀코드}{날짜} 형식)
     if (!/^TR[A-Z]{2}[0-9]{8}$/.test(gameKey)) {
       throw new HttpException(
         {
@@ -1969,26 +1969,26 @@ export class GameController {
     // gameKey에서 팀 코드 추출하여 검증
     const teamCodeFromKey = gameKey.substring(2, 4); // TR 다음 2글자
     const { team: uploaderTeam } = req.user;
-
-    // 팀명에서 팀 코드 추출 (대문자만 추출, 예: HYlions -> HY, KKragingbulls -> KK)
+    
+    // 팀명에서 팀 코드 추출 (대문자만 추출하여 중복 방지)
     const upperCaseLetters = uploaderTeam.match(/[A-Z]/g) || [];
     const uploaderTeamCode = upperCaseLetters.slice(0, 2).join('');
-
+    
     console.log(`🔍 gameKey 팀코드: ${teamCodeFromKey}, 업로더 팀코드: ${uploaderTeamCode}`);
-
+    
     if (teamCodeFromKey !== uploaderTeamCode) {
       throw new HttpException(
         {
           success: false,
-          message: `팀 코드가 일치하지 않습니다. gameKey는 TR${uploaderTeamCode}YYYYMMDD 형식이어야 합니다`,
+          message: `팀 코드가 일치하지 않습니다. gameKey는 TR${uploaderTeamCode}XXXXXXXX 형식이어야 합니다`,
           code: 'TEAM_CODE_MISMATCH',
         },
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    // 훈련용 영상 개수 가져오기
-    const videoCount = quarterVideoCounts?.Training || gameInfo.videoCount || 1;
+    // 훈련용은 한 번에 여러 영상 업로드 가능
+    const videoCount = quarterVideoCounts?.Training || gameInfo.videoCount || 1; // 기본 1개
     console.log(`📊 훈련 영상 개수: ${videoCount}개`);
 
     // 업로드 URL 생성
@@ -1997,9 +1997,9 @@ export class GameController {
 
     for (let i = 1; i <= videoCount; i++) {
       const fileName = `${gameKey}_clip${i}.mp4`;
-      const s3Path = `videos/${gameKey}/training/${fileName}`;
-
-      console.log(`📁 훈련 폴더에 ${fileName} 생성`);
+      const s3Path = `videos/${gameKey}/Training/${fileName}`;
+      
+      console.log(`📁 Training 폴더에 ${fileName} 생성`);
 
       // S3 업로드 URL 생성
       const uploadUrl = await this.s3Service.generatePresignedUploadUrl(
@@ -2022,7 +2022,7 @@ export class GameController {
 
     // 예상 videoUrls 구조 생성 (훈련용)
     const expectedVideoUrls = {
-      training: uploadUrls.map(url => url.fileName)
+      Training: uploadUrls.map(url => url.fileName)
     };
 
     // 훈련 정보 저장 (pending 상태)
@@ -2038,7 +2038,7 @@ export class GameController {
       // score, homeTeam, awayTeam은 훈련용에서 생략
     });
 
-    console.log(`✅ ${gameKey} 훈련 저장 완료 - 업로더: ${uploaderTeam}`);
+    console.log(`✅ ${gameKey} Training 저장 완료 - 업로더: ${uploaderTeam}`);
 
     return {
       success: true,
@@ -2049,36 +2049,10 @@ export class GameController {
         uploadUrls: {
           Training: uploadUrls,
         },
-        type: '훈련',
+        type: 'Training',
         expiresIn: 3600,
       },
     };
-  }
-
-  @Get('get-video-url/:gameKey/:quarter/:fileName')
-  @UseGuards(JwtAuthGuard)
-  async getVideoUrl(
-    @Param('gameKey') gameKey: string,
-    @Param('quarter') quarter: string,
-    @Param('fileName') fileName: string,
-  ) {
-    try {
-      const s3Path = `videos/${gameKey}/${quarter}/${fileName}`;
-      const url = await this.s3Service.getSignedUrl(s3Path, 3600);
-
-      return {
-        success: true,
-        url,
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          success: false,
-          message: error.message || '영상 URL 생성 실패',
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
   }
 
   @Post('upload-video')
@@ -2426,5 +2400,56 @@ export class GameController {
   getTestSlackPage(@Res() res) {
     const filePath = join(process.cwd(), 'public', 'test-slack.html');
     return res.sendFile(filePath);
+  }
+
+  @Get('get-video-url/:gameKey/:quarter/:fileName')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: '📺 경기 영상 URL 조회',
+    description: '업로드된 경기 영상 파일의 presigned URL을 생성하여 스트리밍 재생 가능한 URL을 제공합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 영상 URL 생성 성공',
+    schema: {
+      example: {
+        success: true,
+        url: 'https://s3.amazonaws.com/bucket/videos/TRHY20251231/Training/TRHY20251231_clip1.mp4?presigned...',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: '❌ 영상 URL 생성 실패',
+    schema: {
+      example: {
+        success: false,
+        message: '영상 파일을 찾을 수 없습니다',
+      },
+    },
+  })
+  async getVideoUrl(
+    @Param('gameKey') gameKey: string,
+    @Param('quarter') quarter: string,
+    @Param('fileName') fileName: string,
+  ) {
+    try {
+      const s3Path = `videos/${gameKey}/${quarter}/${fileName}`;
+      const url = await this.s3Service.getSignedUrl(s3Path, 3600); // 1시간 유효
+
+      return {
+        success: true,
+        url,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: error.message || '영상 URL 생성 실패',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
