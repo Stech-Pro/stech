@@ -2039,7 +2039,7 @@ export class GameController {
       gameKey,
       date: gameInfo.date || gameInfo.trainingDate, // 훈련 날짜
       type: 'Training',
-      location: gameInfo.location,
+      location: gameInfo.location || '훈련장',
       uploader: uploaderTeam,
       uploadStatus: 'pending',
       videoUrls: expectedVideoUrls,
@@ -2248,8 +2248,19 @@ export class GameController {
       } else {
         console.log(`🆕 새 게임 생성: ${gameKey}`);
 
-        // 게임 정보가 없으면 기본값 사용
-        const defaultGameInfo = {
+        // 훈련용인지 확인
+        const isTraining = gameKey.startsWith('TR');
+        
+        // 게임 정보가 없으면 기본값 사용 (훈련/경기 구분)
+        const defaultGameInfo = isTraining ? {
+          date: new Date().toISOString(),
+          type: 'Training',
+          homeTeam: 'Training',
+          awayTeam: 'Session',
+          location: '훈련장',
+          region: 'Seoul',
+          score: { home: 0, away: 0 },
+        } : {
           date: new Date().toISOString(),
           type: 'League',
           homeTeam: 'Team A',
@@ -2258,9 +2269,6 @@ export class GameController {
           region: 'Seoul',
           score: { home: 0, away: 0 },
         };
-
-        // 훈련용인지 확인
-        const isTraining = gameKey.startsWith('TR');
         
         const gameData = {
           gameKey,
@@ -2321,7 +2329,7 @@ export class GameController {
           // 기본 클립 데이터 생성 - clipUrl 포함
           const basicClips = allVideoFiles.map((fileName, index) => {
             // S3에서 파일의 실제 URL 생성
-            const clipUrl = `https://stechvideo.s3.ap-northeast-2.amazonaws.com/${gameKey}/${fileName}`;
+            const clipUrl = `https://stechpro-frontend.s3.ap-northeast-2.amazonaws.com/${gameKey}/${fileName}`;
             
             return {
               quarter: Math.floor(index / 5) + 1, // 5개씩 쿼터 나누기
