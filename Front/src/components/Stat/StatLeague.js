@@ -273,6 +273,8 @@ function MatchRow({
   teams = [],
   hasMultipleGroups,
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const homeTeam = teams.find((t) => t.name === match.home) || {
     name: match.home,
     logo: '',
@@ -288,56 +290,101 @@ function MatchRow({
     return `${match.homeScore} : ${match.awayScore}`;
   };
 
-  return (
-    <div
-      className={`match-row ${currentDivision.name === '2부' ? 'minor' : ''}`}
-    >
-      {group ? (
-        <div className="match-round">
-          {hasMultipleGroups ? `${group} ` : ''}
-          {index + 1} 경기
-        </div>
-      ) : (
-        <div className="match-round">
-          {currentDivision.name} {match.stage}
-        </div>
-      )}
+  const handleClick = () => {
+    // 1280px 이하에서만 토글 작동
+    if (window.innerWidth < 1280) {
+      setIsExpanded(!isExpanded);
+    }
+  };
 
-      <div className="match-teams">
-        <div className="team-vs">
-          <div className="home-team">
-            <div className="team-logo">
-              <img
-                src={homeTeam.logo}
-                alt={`${homeTeam.name} 로고`}
-                className={`team-logo-img ${
-                  homeTeam.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
-                }`}
-              />
+  return (
+    <div className={isExpanded ? '' : 'mb-5'}>
+      {/* 메인 행 (항상 표시) */}
+      <div
+        className={`match-row ${
+          currentDivision.name === '2부' ? 'minor' : ''
+        } ${isExpanded ? 'expanded' : ''}`}
+        onClick={handleClick}
+      >
+        {group ? (
+          <div className="match-round">
+            {hasMultipleGroups ? `${group} ` : ''}
+            {index + 1} 경기
+          </div>
+        ) : (
+          <div className="match-round">
+            {currentDivision.name} {match.stage}
+          </div>
+        )}
+
+        <div className="match-teams">
+          <div className="team-vs">
+            <div className="home-team">
+              <div className="team-logo">
+                <img
+                  src={homeTeam.logo}
+                  alt={`${homeTeam.name} 로고`}
+                  className={`team-logo-img ${
+                    homeTeam.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                  }`}
+                />
+              </div>
+              <div className="text-xs min-[768px]:text-[8px] min-[900px]:text-xs min-[1280px]:text-sm">
+                {homeTeam.name}
+              </div>
             </div>
-            <div className="team-name" style={{ fontSize: '14px' }}>
-              {homeTeam.name}
+            <div className="match-score text-xs min-[768px]:text-[8px] min-[900px]:text-xs min-[1280px]:text-sm">{getScore()}</div>
+            <div className="away-team">
+              <div className="team-logo">
+                <img
+                  src={awayTeam.logo}
+                  alt={`${awayTeam.name} 로고`}
+                  className={`team-logo-img ${
+                    awayTeam.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                  }`}
+                />
+              </div>
+              <div className="text-xs min-[768px]:text-[8px] min-[900px]:text-xs min-[1280px]:text-sm">
+                {awayTeam.name}
+              </div>
             </div>
           </div>
-          <div className="match-score">{getScore()}</div>
-          <div className="away-team">
-            <div className="team-logo">
-              <img
-                src={awayTeam.logo}
-                alt={`${awayTeam.name} 로고`}
-                className={`team-logo-img ${
-                  awayTeam.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
-                }`}
-              />
-            </div>
-            <div className="team-name" style={{ fontSize: '14px' }}>
-              {awayTeam.name}
-            </div>
-          </div>
+        </div>
+
+        {/* 데스크톱에서는 항상 표시 */}
+        <div className="match-location">
+          {match.location || '-'}
+        </div>
+        <div className="match-date">{match.date || '-'}</div>
+
+        {/* 모바일 펼침 아이콘 */}
+        <div className="match-chevron">
+          <FaChevronDown
+            className={`transition-transform duration-200 text-white ${
+              isExpanded ? 'rotate-180' : ''
+            }`}
+            size={16}
+          />
         </div>
       </div>
-      <div className="match-location">{match.location || '-'}</div>
-      <div className="match-date">{match.date || '-'}</div>
+
+      {/* 모바일 확장 영역 */}
+      {isExpanded && (
+        <div
+          className={`match-expanded ${
+            currentDivision.name === '2부' ? 'minor' : ''
+          }`}
+        >
+          <div className="expanded-row">
+            <span className="expanded-label">세부사항</span>
+            <span className="expanded-value">{match.location || '-'}</span>
+          </div>
+          <div className="expanded-row">
+            <span className="expanded-label">날짜</span>
+            <span className="expanded-value">{match.date || '-'}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -357,6 +404,7 @@ function MatchList({
           <div className="header-summary">경기 요약</div>
           <div className="header-detail">경기 세부 내용</div>
           <div className="header-date">경기 날짜</div>
+          <div className="header-chevron"></div>
         </div>
         {matches.map((match, index) => (
           <MatchRow
@@ -374,74 +422,57 @@ function MatchList({
   );
 }
 
-function FinalMatch({ currentDivision, teams = [] }) {
-  return (
-    <div className="matches-container">
-      <div className="final-header">
-        <div className="final-title">결승전</div>
-      </div>
-      <MatchList
-        currentDivision={currentDivision}
-        matches={currentDivision.final}
-        teams={teams}
-      />
-    </div>
-  );
-}
+// 통합된 토너먼트 섹션 컴포넌트
+function TournamentSection({ type, currentDivision, teams = [] }) {
+  const config = {
+    final: {
+      title: '결승전',
+      matches: currentDivision.final,
+      containerClass: 'matches-container',
+      headerClass: 'final-header',
+      titleClass: 'final-title',
+    },
+    semiFinals: {
+      title: '4강전',
+      matches: currentDivision.semiFinals,
+      containerClass: 'matches-container',
+      headerClass: 'final-header',
+      titleClass: 'final-title',
+    },
+    quarterFinals: {
+      title: '8강전',
+      matches: currentDivision.quarterFinals,
+      containerClass: 'matches-container',
+      headerClass: 'final-header',
+      titleClass: 'final-title',
+    },
+    playoffs: {
+      title: '순위결정전',
+      matches: currentDivision.playoffs,
+      containerClass: 'matches-container',
+      headerClass: 'playoffs-header',
+      titleClass: 'playoffs-title',
+    },
+    promotion: {
+      title: '승강전',
+      matches: currentDivision.promotion,
+      containerClass: 'promotion-matches-container',
+      headerClass: 'promotion-header',
+      titleClass: 'promotion-title',
+    },
+  };
 
-function SemiFinalMatches({ currentDivision, teams = [] }) {
-  return (
-    <div className="matches-container">
-      <div className="final-header">
-        <div className="final-title">4강전</div>
-      </div>
-      <MatchList
-        currentDivision={currentDivision}
-        matches={currentDivision.semiFinals}
-        teams={teams}
-      />
-    </div>
-  );
-}
+  const section = config[type];
+  if (!section || !section.matches || section.matches.length === 0) return null;
 
-function QuarterFinalMatches({ currentDivision, teams = [] }) {
   return (
-    <div className="matches-container">
-      <div className="final-header">
-        <div className="final-title">8강전</div>
+    <div className={section.containerClass}>
+      <div className={section.headerClass}>
+        <div className={section.titleClass}>{section.title}</div>
       </div>
       <MatchList
         currentDivision={currentDivision}
-        matches={currentDivision.quarterFinals}
-        teams={teams}
-      />
-    </div>
-  );
-}
-function PlayoffsMatches({ currentDivision, teams = [] }) {
-  return (
-    <div className="matches-container">
-      <div className="playoffs-header">
-        <div className="playoffs-title">순위결정전</div>
-      </div>
-      <MatchList
-        currentDivision={currentDivision}
-        matches={currentDivision.playoffs}
-        teams={teams}
-      />
-    </div>
-  );
-}
-
-function PromotionMatch({ currentDivision, teams = [] }) {
-  return (
-    <div className="promotion-matches-container">
-      <div className="promotion-header">
-        <div className="promotion-title">승강전</div>
-      </div>
-      <MatchList
-        currentDivision={currentDivision}
-        matches={currentDivision.promotion}
+        matches={section.matches}
         teams={teams}
       />
     </div>
@@ -717,15 +748,11 @@ export default function StatLeague({ data, teams = [] }) {
   }, [data, selectedYear, selectedLeague]);
 
   const divisionList = useMemo(
-    () =>
-      Array.isArray(leagueNode?.divisions) ? leagueNode.divisions : [],
+    () => (Array.isArray(leagueNode?.divisions) ? leagueNode.divisions : []),
     [leagueNode],
   );
 
-  const hasDivisions = useMemo(
-    () => divisionList.length > 1,
-    [divisionList],
-  );
+  const hasDivisions = useMemo(() => divisionList.length > 1, [divisionList]);
 
   const divisionOptions = useMemo(
     () => divisionList.map((d) => ({ value: d.name, label: d.name })),
@@ -760,7 +787,13 @@ export default function StatLeague({ data, teams = [] }) {
     setSelectedDivision(division);
     setShowDivisionFilter(divs.length > 1);
     setInitializedFromUser(true);
-  }, [loaded, initializedFromUser, data, initialValues.league, initialValues.division]);
+  }, [
+    loaded,
+    initializedFromUser,
+    data,
+    initialValues.league,
+    initialValues.division,
+  ]);
 
   // 🔹 리그 변경 시
   const handleLeagueChange = (opt) => {
@@ -934,26 +967,28 @@ export default function StatLeague({ data, teams = [] }) {
             )}
           </div>
 
-          {currentDivision.final && currentDivision.final.length > 0 && (
-            <FinalMatch currentDivision={currentDivision} teams={teams} />
-          )}
-          {currentDivision.playoffs && currentDivision.playoffs.length > 0 && (
-            <PlayoffsMatches currentDivision={currentDivision} teams={teams} />
-          )}
-          {currentDivision.semiFinals &&
-            currentDivision.semiFinals.length > 0 && (
-              <SemiFinalMatches
-                currentDivision={currentDivision}
-                teams={teams}
-              />
-            )}
-          {currentDivision.quarterFinals &&
-            currentDivision.quarterFinals.length > 0 && (
-              <QuarterFinalMatches
-                currentDivision={currentDivision}
-                teams={teams}
-              />
-            )}
+          {/* 통합된 토너먼트 섹션 렌더링 */}
+          <TournamentSection
+            type="final"
+            currentDivision={currentDivision}
+            teams={teams}
+          />
+          <TournamentSection
+            type="playoffs"
+            currentDivision={currentDivision}
+            teams={teams}
+          />
+          <TournamentSection
+            type="semiFinals"
+            currentDivision={currentDivision}
+            teams={teams}
+          />
+          <TournamentSection
+            type="quarterFinals"
+            currentDivision={currentDivision}
+            teams={teams}
+          />
+
           {currentDivision.groups && currentDivision.groups.length > 0 && (
             <div className="group-container">
               {currentDivision.groups.map((group) => (
@@ -970,10 +1005,12 @@ export default function StatLeague({ data, teams = [] }) {
               ))}
             </div>
           )}
-          {currentDivision.promotion &&
-            currentDivision.promotion.length > 0 && (
-              <PromotionMatch currentDivision={currentDivision} teams={teams} />
-            )}
+
+          <TournamentSection
+            type="promotion"
+            currentDivision={currentDivision}
+            teams={teams}
+          />
         </div>
       )}
     </div>

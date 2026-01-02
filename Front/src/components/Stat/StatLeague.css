@@ -1,46 +1,99 @@
 .statTeamContainer {
   color: #ffffff;
   width: 100%;
-  padding-left: 3.75rem;
-  padding-right: 3.75rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 768px) {
+  .statTeamContainer {
+    padding-left: 3.75rem;
+    padding-right: 3.75rem;
+  }
 }
 
 .tournament-header {
   display: flex;
   align-items: center;
-  padding-top: 4.063rem;
+  padding-top: 2rem;
+}
+
+@media (min-width: 768px) {
+  .tournament-header {
+    padding-top: 4.063rem;
+  }
 }
 .dropdown-group {
   display: flex;
-  gap: 1.875rem;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .dropdown-group {
+    gap: 1.875rem;
+  }
 }
 
 .dropdown-container {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #c2c2c2;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
+  min-width: 6rem;
+  min-height: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .dropdown-container {
+    font-size: 0.875rem;
+    min-width: 8.125rem;
+    min-height: 3.438rem;
+  }
 }
 
 .dropdown-trigger {
-  width: 4.375rem;
-  height: 1.25rem;
+  width: 100%;
+  min-height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
   border: 1px solid var(--Gray-100, #e4e7e9);
   background: rgba(110, 110, 110, 0.2);
+  color: #c2c2c2;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+@media (min-width: 768px) {
+  .dropdown-trigger {
+    min-height: 3.438rem;
+    padding: 1rem 0.75rem;
+    font-size: 0.875rem;
+  }
 }
 
 .dropdown-arrow {
-  width: 1rem;
-  height: 1rem;
+  width: 0.75rem;
+  height: 0.75rem;
   color: #c2c2c2;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .dropdown-arrow {
+    width: 1rem;
+    height: 1rem;
+  }
 }
 
 .group-section.no-group {
@@ -65,11 +118,21 @@ height:100%;
 .promotion-header {
   display: flex;
   align-items: center;
-  font-size: 1.25rem;
+  font-size: 0.875rem;
   border-bottom: 1px solid #ffffff;
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
   color: #f5f5f5;
   font-weight: 700;
+}
+
+@media (min-width: 1280px) {
+  .group-header,
+  .playoffs-header,
+  .final-header,
+  .promotion-header {
+    font-size: 1rem;
+    padding-bottom: 0.75rem;
+  }
 }
 
 .group-standings {
@@ -86,6 +149,13 @@ height:100%;
   font-weight: bold;
   color: #a5a5a5;
   padding-top: 0.5rem;
+  font-size: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .standings-header {
+    font-size: 1rem;
+  }
 }
 
 /* 데이터 행 */
@@ -111,21 +181,34 @@ height:100%;
 
 /* 각 셀 공통 스타일 */
 .standings-cell {
-  padding: 0.75rem 0;
+  padding: 0.5rem 0;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #a5a5a5;
-  font-size: 16px;
+  font-size: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .standings-cell {
+    padding: 0.75rem 0;
+    font-size: 1rem;
+  }
 }
 
 /* 순위 셀 */
 .rank-cell {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 1rem;
   color: #ffffff;
   width: 40px;
+}
+
+@media (min-width: 768px) {
+  .rank-cell {
+    font-size: 1.125rem;
+  }
 }
 
 .team-logo {
@@ -184,14 +267,123 @@ height:100%;
 
 .match-row,
 .match-header {
-  display: grid;
-  grid-template-columns: 12.5rem 2fr 1.5fr 10rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 모바일: 경기유형, 경기요약, 아이콘 */
+.match-round {
+  flex: 0 0 4rem;
+  min-width: 4rem;
+}
+
+.match-teams {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.match-chevron,
+.header-chevron {
+  flex: 0 0 1.5rem;
+  min-width: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 모바일에서 숨김 */
+.match-row .match-location,
+.match-row .match-date,
+.match-header .header-detail,
+.match-header .header-date {
+  display: none;
+}
+
+/* 데스크톱 (1280px 이상) */
+@media (min-width: 1280px) {
+  .match-row,
+  .match-header {
+    gap: 1rem;
+  }
+
+  .match-round,
+  .header-stage {
+    flex: 0 0 10rem;
+    min-width: 10rem;
+  }
+
+  .match-teams,
+  .header-summary {
+    flex: 3 1 0;
+  }
+
+  .match-row .match-location,
+  .match-header .header-detail {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .match-row .match-date,
+  .match-header .header-date {
+    display: flex;
+    flex: 0 0 8rem;
+    min-width: 8rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .match-row .match-chevron,
+  .match-header .header-chevron {
+    display: none;
+  }
 }
 
 .match-header div,
 .match-row div {
   text-align: center;
   vertical-align: middle;
+}
+
+/* 모바일 확장 영역 */
+.match-expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid #6e6e6e;
+  border-top: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  background: rgba(110, 110, 110, 0.2);
+  font-size: 0.875rem;
+}
+
+.match-expanded.minor {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.expanded-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.expanded-label {
+  color: #ffffff;
+}
+
+.expanded-value {
+  color: #ffffff;
+}
+
+@media (min-width: 1280px) {
+  .match-expanded {
+    display: none;
+  }
 }
 
 .match-teams {
@@ -204,54 +396,114 @@ height:100%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  column-gap: 1.25rem;
+  column-gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .team-vs {
+    column-gap: 1.25rem;
+  }
 }
 
 .match-score {
   justify-self: center; /* 그리드 셀에서 가운데 */
-  width: 3.75rem;
-  height: 1.375rem;
+  width: 3rem;
+  height: 1.25rem;
   flex-shrink: 0;
   background: #363636;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+@media (min-width: 768px) {
+  .match-score {
+    width: 3.75rem;
+    height: 1.375rem;
+    font-size: 0.875rem;
+  }
+}
+
 .match-row {
   width: 100%;
-  height: 3.75rem;
+  height: 3rem;
   border-radius: 0.5rem;
   border: 0.015rem solid #6e6e6e;
   background: rgba(255, 255, 255, 0.4);
   color: #fff;
 
   font-family: 'Noto Sans', sans-serif;
-  font-size: 1rem;
+  font-size: 0.75rem;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.match-row.expanded {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+@media (min-width: 1280px) {
+  .match-row {
+    height: 3.75rem;
+    font-size: 0.875rem;
+    cursor: default;
+  }
+
+  .match-row.expanded {
+    border-radius: 0.5rem;
+  }
+}
+
+@media (max-width: 1279px) {
+  .match-row:active {
+    background: rgba(255, 255, 255, 0.5);
+  }
 }
 
 .match-list {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0;
+}
+
+@media (min-width: 768px) {
+  .match-list {
+    gap: 1.25rem;
+  }
 }
 
 .matches-container,
 .promotion-matches-container {
-  padding-top: 6.25rem;
+  padding-top: 3rem;
+}
+
+@media (min-width: 768px) {
+  .matches-container,
+  .promotion-matches-container {
+    padding-top: 6.25rem;
+  }
 }
 
 .match-header {
-  padding: 0.75rem 0;
+  padding: 0.5rem 0;
   text-align: center;
   align-items: center;
   justify-content: center;
   color: #a5a5a5;
+  font-size: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .match-header {
+    padding: 0.75rem 0;
+    font-size: 1rem;
+  }
 }
 .match-round,
 .match-location,
@@ -264,19 +516,43 @@ height:100%;
 
 .home-team {
   display: flex;
-  gap: 0.625rem;
+  gap: 0.25rem;
   align-items: center;
   justify-content: flex-end;
   flex-wrap: nowrap;
+}
+
+@media (min-width: 768px) {
+  .home-team {
+    gap: 0.625rem;
+  }
 }
 
 .away-team {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.25rem;
   flex-wrap: nowrap;
   width: 100%;
+}
+
+.match-row .home-team .team-name,
+.match-row .away-team .team-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: normal;
+}
+
+@media (min-width: 1280px) {
+  .match-row .home-team .team-name,
+  .match-row .away-team .team-name {
+    font-size: 0.875rem;
+  }
+
+  .away-team {
+    gap: 0.625rem;
+  }
 }
 
 .promotion-matches-container .match-row,
@@ -285,43 +561,15 @@ height:100%;
   background: rgba(110, 110, 110, 0.2);
 }
 .promotion-matches-container {
-  padding-bottom: 6.25rem;
+  padding-bottom: 3rem;
 }
 
-.dropdown-group {
-  display: flex;
-  gap: 1.875rem;
+@media (min-width: 768px) {
+  .promotion-matches-container {
+    padding-bottom: 6.25rem;
+  }
 }
 
-.dropdown-container {
-  width: 8.125rem;
-  height: 3.438rem;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #c2c2c2;
-  font-size: 0.875rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.dropdown-trigger {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #e4e7e9;
-  background: rgba(110, 110, 110, 0.2);
-  color: #c2c2c2;
-  font-size: 0.875rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
 
 .dropdown-trigger:hover:not(.disabled) {
   background: rgba(110, 110, 110, 0.35);
@@ -342,14 +590,13 @@ height:100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 0.75rem;
 }
 
-.dropdown-arrow {
-  width: 1rem;
-  height: 1rem;
-  color: #c2c2c2;
-  transition: transform 0.2s ease;
-  flex-shrink: 0;
+@media (min-width: 768px) {
+  .dropdown-text {
+    font-size: 0.875rem;
+  }
 }
 
 .dropdown-arrow.rotated {
@@ -368,8 +615,15 @@ height:100%;
   border-radius: 0.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   overflow-y: auto;
+  max-height: 15rem;
   display: flex;
   flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .dropdown-menu {
+    max-height: 20rem;
+  }
 }
 
 .dropdown-list {
@@ -384,11 +638,17 @@ height:100%;
   background: none;
   border: none;
   color: #c2c2c2;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-align: left;
   cursor: pointer;
   transition: transform-color 0.15s ease;
+}
+
+@media (min-width: 768px) {
+  .dropdown-option {
+    font-size: 0.875rem;
+  }
 }
 
 .dropdown-option:hover {
