@@ -2328,15 +2328,15 @@ export class GameController {
           
           // 기본 클립 데이터 생성 - clipUrl 포함
           const basicClips = allVideoFiles.map((fileName, index) => {
-            // S3에서 파일의 실제 URL 생성
-            const clipUrl = `https://stechpro-frontend.s3.ap-northeast-2.amazonaws.com/${gameKey}/${fileName}`;
+            // S3에서 파일의 실제 URL 생성 (Training 폴더 경로 포함)
+            const clipUrl = `https://stechpro-frontend.s3.ap-northeast-2.amazonaws.com/videos/${gameKey}/Training/${fileName}`;
             
             return {
-              quarter: Math.floor(index / 5) + 1, // 5개씩 쿼터 나누기
+              quarter: 'Training', // 훈련 영상은 모두 'Training' 쿼터로 설정
               clipNumber: index + 1,
               clipKey: `${gameKey}_clip${index + 1}`,
               fileName: fileName,
-              clipUrl: clipUrl, // 실제 S3 URL 추가
+              clipUrl: clipUrl, // 정확한 S3 URL 경로 (Training 폴더 포함)
               playType: 'TRAINING',
               description: `훈련 영상 ${index + 1}`,
               // 분석 데이터는 비워둠 - 영상만 볼 수 있게
@@ -2535,7 +2535,9 @@ export class GameController {
     @Param('fileName') fileName: string,
   ) {
     try {
-      const s3Path = `videos/${gameKey}/${quarter}/${fileName}`;
+      // 훈련 영상의 경우 대소문자 통일 처리
+      const normalizedQuarter = quarter.toLowerCase() === 'training' ? 'Training' : quarter;
+      const s3Path = `videos/${gameKey}/${normalizedQuarter}/${fileName}`;
       const url = await this.s3Service.getSignedUrl(s3Path, 3600); // 1시간 유효
 
       return {
