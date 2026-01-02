@@ -257,20 +257,35 @@ export default function ClipPage() {
   const handleMenuToggle = (menuName) => {
     setOpenMenu(openMenu === menuName ? null : menuName);
   };
-  const homeMeta = TEAM_BY_ID[game.homeId];
-  const awayMeta = TEAM_BY_ID[game.awayId];
+  // 훈련 영상의 경우 팀 메타데이터가 없을 수 있으므로 안전한 기본값 제공
+  const isTrainingGame = resolvedGameKey?.startsWith('TR');
+  
+  // 안전한 팀 메타데이터 생성
+  const homeMeta = game?.homeId ? TEAM_BY_ID[game.homeId] : null || { 
+    name: game?.homeTeam || (isTrainingGame ? '훈련' : 'Home'), 
+    logo: defaultLogo 
+  };
+  const awayMeta = game?.awayId ? TEAM_BY_ID[game.awayId] : null || { 
+    name: game?.awayTeam || (isTrainingGame ? '세션' : 'Away'), 
+    logo: defaultLogo 
+  };
 
 
   const teamOptions = useMemo(() => {
-  const arr = [];
-  if (homeMeta?.name) {
-    arr.push({ value: 'Home', label: homeMeta.name, logo: homeMeta.logo });
-  }
-  if (awayMeta?.name) {
-    arr.push({ value: 'Away', label: awayMeta.name, logo: awayMeta.logo });
-  }
-  return arr;
-}, [homeMeta, awayMeta]);
+    const arr = [];
+    // 훈련 비디오도 팀 옵션이 생성되도록 보장
+    if (homeMeta?.name) {
+      arr.push({ value: 'Home', label: homeMeta.name, logo: homeMeta.logo });
+    }
+    if (awayMeta?.name) {
+      arr.push({ value: 'Away', label: awayMeta.name, logo: awayMeta.logo });
+    }
+    // 훈련 모드에서 팀 옵션이 비어있을 경우 기본 옵션 추가
+    if (arr.length === 0 && isTrainingGame) {
+      arr.push({ value: 'Home', label: '훈련', logo: defaultLogo });
+    }
+    return arr;
+  }, [homeMeta, awayMeta, isTrainingGame]);
 
   const SPECIAL_DOWN_MAP = {
     TPT: '2PT',
@@ -515,7 +530,7 @@ const teamSummaryNode = selectedTeamOpt ? (
                 }`}
               />
             </div>
-            <span className="header-team-name">{label}</span>
+            <span className="header-team-name">{isTrainingGame ? '훈련 모드' : label}</span>
           </div>
 
           {/* 오른쪽: 필터 + 업로드 */}
@@ -692,31 +707,20 @@ const teamSummaryNode = selectedTeamOpt ? (
       {/* ===== 본문 ===== */}
       <div className="clip-page-container">
         <div className="clip-left">
-          {isTraining ? (
-            /* 훈련 영상 헤더 */
-            <div className="clip-header">
-              <div className="clip-team left">
-                {TEAM_BY_ID[game.uploader || game.team]?.logo && (
-                  <div className="clip-team-logo">
-                    <img
-                      src={TEAM_BY_ID[game.uploader || game.team].logo}
-                      alt={`${TEAM_BY_ID[game.uploader || game.team].name} 로고`}
-                      className={`clip-team-logo-img ${
-                        TEAM_BY_ID[game.uploader || game.team].logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
-                      }`}
-                    />
-                  </div>
-                )}
-                <span className="clip-team-name">
-                  {TEAM_BY_ID[game.uploader || game.team]?.name || game.uploader || game.team} 훈련
-                </span>
-              </div>
-              {game.position && (
-                <div className="clip-vs" style={{ fontSize: '14px' }}>
-                  {game.position}
+          <div className="clip-header">
+            <div className="clip-team left">
+              {homeMeta?.logo && (
+                <div className="clip-team-logo">
+                  <img
+                    src={homeMeta.logo}
+                    alt={`${homeMeta?.name || '홈팀'} 로고`}
+                    className={`clip-team-logo-img ${
+                      homeMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                    }`}
+                  />
                 </div>
               )}
-              <div className="clip-team right"></div>
+              <span className="clip-team-name">{homeMeta?.name || '홈팀'}</span>
             </div>
           ) : (
             /* 일반 경기 헤더 */
@@ -738,20 +742,19 @@ const teamSummaryNode = selectedTeamOpt ? (
 
               <div className="clip-vs">VS</div>
 
-              <div className="clip-team right">
-                {awayMeta?.logo && (
-                  <div className="clip-team-logo">
-                    <img
-                      src={awayMeta.logo}
-                      alt={`${awayMeta.name} 로고`}
-                      className={`clip-team-logo-img ${
-                        awayMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
-                      }`}
-                    />
-                  </div>
-                )}
-                <span className="clip-team-name">{awayMeta?.name}</span>
-              </div>
+            <div className="clip-team right">
+              {awayMeta?.logo && (
+                <div className="clip-team-logo">
+                  <img
+                    src={awayMeta.logo}
+                    alt={`${awayMeta?.name || '원정팀'} 로고`}
+                    className={`clip-team-logo-img ${
+                      awayMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                    }`}
+                  />
+                </div>
+              )}
+              <span className="clip-team-name">{awayMeta?.name || '원정팀'}</span>
             </div>
           )}
           <div className="clip-list">
@@ -804,9 +807,12 @@ const teamSummaryNode = selectedTeamOpt ? (
                         <div>{c.quarter}Q</div>
                       </div>
 
-                      <div className="clip-rows">
-                        <div className="clip-row1">
-                          <div className="clip-down">{getDownDisplay(c)}</div>
+                    <div className="clip-row2">
+                      <div className="clip-oT">
+                        {c.offensiveTeam == 'Home'
+                          ? `${homeMeta?.name || '홈팀'}`
+                          : `${awayMeta?.name || '원정팀'}`}
+                      </div>
 
                           <div className="clip-type">
                             {renderPlayType(c.playType)}
@@ -850,7 +856,7 @@ const teamSummaryNode = selectedTeamOpt ? (
               <div className="clip-playcall-header">플레이콜 비율</div>
               <div className="clip-playcall-content">
                 <div className="playcall-team">
-                  <div className="playcall-team-name">{homeMeta.name}</div>
+                  <div className="playcall-team-name">{homeMeta?.name || '홈팀'}</div>
                   <div className="pc-run">
                     <div className="pc-row1">
                       <div>런</div>
@@ -890,7 +896,7 @@ const teamSummaryNode = selectedTeamOpt ? (
                 </div>
 
                 <div className="playcall-team">
-                  <div className="playcall-team-name">{awayMeta.name}</div>
+                  <div className="playcall-team-name">{awayMeta?.name || '원정팀'}</div>
                   <div className="pc-run">
                     <div className="pc-row1">
                       <div>런</div>

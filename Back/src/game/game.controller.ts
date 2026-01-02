@@ -1229,7 +1229,8 @@ export class GameController {
 
     // 먼저 저장된 GameClips 데이터 조회
     const savedClips = await this.gameService.getGameClipsByKey(gameKey);
-
+    console.log(`🔍 ${gameKey}: 저장된 클립 조회 결과:`, savedClips ? 'found' : 'not found');
+    
     if (savedClips && savedClips.Clips && savedClips.Clips.length > 0) {
       console.log(
         `✅ ${gameKey}: 저장된 클립 데이터 발견 - ${savedClips.Clips.length}개 클립`,
@@ -1243,11 +1244,18 @@ export class GameController {
         );
 
         // clipKey 기반으로 올바른 videoUrl 매핑
-        const clipsWithUrls = savedClips.Clips.map((clip) => {
-          const clipNumber = parseInt(clip.clipKey);
+        const clipsWithUrls = savedClips.Clips.map((clip, index) => {
+          // clipKey에서 숫자 부분 추출 (예: "TRAD20260201_clip1" → 1)
+          const clipKeyMatch = clip.clipKey.match(/_clip(\d+)$/);
+          const clipNumber = clipKeyMatch ? parseInt(clipKeyMatch[1]) : index + 1;
+          
+          console.log(`🔗 클립 ${index}번에 ${clip.clipKey} URL 생성 중...`);
+          const assignedUrl = videoUrls[clipNumber - 1] || clip.clipUrl || null;
+          console.log(`🔗 클립 ${index}번 URL 생성 완료: ${clip.clipKey}`);
+          
           return {
             ...clip,
-            clipUrl: videoUrls[clipNumber - 1] || null, // clipKey "1" → videoUrls[0]
+            clipUrl: assignedUrl, // 기존 clipUrl이 있으면 유지, 없으면 S3에서 생성된 URL 사용
           };
         });
 
@@ -1345,6 +1353,7 @@ export class GameController {
         const s3Files = await this.s3Service.listVideosByGameKey(gameKey);
         videoCount = s3Files.length;
         console.log(`📂 ${gameKey}: S3에서 ${videoCount}개 영상 파일 발견`);
+    console.log(`⚠️ ${gameKey}: 저장된 클립 없음, 임시 클립 생성`);
       } catch (error) {
         console.error(`❌ ${gameKey}: S3 파일 조회 실패:`, error.message);
         videoCount = 0;
@@ -2030,7 +2039,7 @@ export class GameController {
       gameKey,
       date: gameInfo.date || gameInfo.trainingDate, // 훈련 날짜
       type: 'Training',
-      location: gameInfo.location,
+      location: gameInfo.location || '훈련장',
       uploader: uploaderTeam,
       uploadStatus: 'pending',
       videoUrls: expectedVideoUrls,
@@ -2205,6 +2214,7 @@ export class GameController {
       console.log(`👤 업로드 사용자: ${req.user?.team || req.user?.username}`);
 
       // 업로드된 영상들 검증
+      console.log(`🔍 uploadedVideos 구조:`, JSON.stringify(uploadedVideos, null, 2));
       const totalUploaded = Object.values(uploadedVideos).flat().length;
       console.log(`📊 업로드된 영상 수: ${totalUploaded}개`);
 
@@ -2214,11 +2224,15 @@ export class GameController {
       if (existingGame) {
         console.log(`📝 기존 게임 발견, 비디오 정보 업데이트: ${gameKey}`);
 
+        // 훈련용인지 확인
+        const isTraining = gameKey.startsWith('TR');
+        
         // 기존 게임에 비디오 정보 추가
         const updatedGame = await this.gameService.updateGameInfo(gameKey, {
-          uploadStatus: 'pending',
+          uploadStatus: isTraining ? 'completed' : 'pending', // 훈련용은 바로 완료
           videoUrls: uploadedVideos,
           uploadCompletedAt: new Date().toISOString(),
+          report: isTraining ? true : existingGame.report, // 훈련용은 바로 완료, 경기용은 기존값 유지
         });
 
         if (!updatedGame) {
@@ -2234,8 +2248,19 @@ export class GameController {
       } else {
         console.log(`🆕 새 게임 생성: ${gameKey}`);
 
-        // 게임 정보가 없으면 기본값 사용
-        const defaultGameInfo = {
+        // 훈련용인지 확인
+        const isTraining = gameKey.startsWith('TR');
+        
+        // 게임 정보가 없으면 기본값 사용 (훈련/경기 구분)
+        const defaultGameInfo = isTraining ? {
+          date: new Date().toISOString(),
+          type: 'Training',
+          homeTeam: 'Training',
+          awayTeam: 'Session',
+          location: '훈련장',
+          region: 'Seoul',
+          score: { home: 0, away: 0 },
+        } : {
           date: new Date().toISOString(),
           type: 'League',
           homeTeam: 'Team A',
@@ -2244,14 +2269,15 @@ export class GameController {
           region: 'Seoul',
           score: { home: 0, away: 0 },
         };
-
+        
         const gameData = {
           gameKey,
           ...(gameInfo || defaultGameInfo), // gameInfo가 있으면 사용, 없으면 기본값
           uploader: req.user?.team || req.user?.username,
-          uploadStatus: 'pending',
+          uploadStatus: isTraining ? 'completed' : 'pending', // 훈련용은 바로 완료
           videoUrls: uploadedVideos,
           uploadCompletedAt: new Date().toISOString(),
+          report: isTraining ? true : false, // 훈련용은 바로 완료, 경기용은 JSON 필요
         };
 
         const createdGame = await this.gameService.createGameInfo(gameData);
@@ -2265,6 +2291,80 @@ export class GameController {
             },
             HttpStatus.INTERNAL_SERVER_ERROR,
           );
+        }
+      }
+
+      // 훈련용인 경우 기본 클립 데이터 자동 생성
+      const isTraining = gameKey.startsWith('TR');
+      if (isTraining) {
+        console.log(`🏃‍♂️ 훈련용 기본 클립 데이터 생성 시작: ${gameKey}`);
+        
+        try {
+          // 훈련용 파일명 추출
+          const trainingFiles = uploadedVideos.Training || [];
+          const quarterKeys = ['Q1', 'Q2', 'Q3', 'Q4'];
+          const quarterFiles = quarterKeys.map(key => uploadedVideos[key] || []).flat();
+          let allVideoFiles = [...trainingFiles, ...quarterFiles].filter(fileName => fileName); // 빈 문자열 제거
+          allVideoFiles = [...new Set(allVideoFiles)]; // 중복 제거
+          
+          console.log(`📹 Training 파일: ${trainingFiles.length}개`);
+          console.log(`📹 Quarter 파일: ${quarterFiles.length - trainingFiles.length}개`);
+          console.log(`📹 총 파일 수: ${allVideoFiles.length}개`);
+          
+          // 파일이 없으면 S3에서 직접 조회
+          if (allVideoFiles.length === 0) {
+            console.log(`📂 uploadedVideos가 비어있음, S3에서 직접 파일 조회`);
+            try {
+              const s3Files = await this.s3Service.listVideosByGameKey(gameKey);
+              allVideoFiles = s3Files.map(file => file.split('/').pop()); // 파일명만 추출
+              console.log(`📂 S3에서 발견한 파일들:`, allVideoFiles);
+            } catch (s3Error) {
+              console.error(`❌ S3 파일 조회 실패:`, s3Error.message);
+              allVideoFiles = [`${gameKey}_clip1.mp4`]; // 최소 1개 클립 생성
+            }
+          }
+          
+          console.log(`📹 최종 생성할 클립 수: ${allVideoFiles.length}개`);
+          
+          // 기본 클립 데이터 생성 - clipUrl 포함
+          const basicClips = allVideoFiles.map((fileName, index) => {
+            // S3에서 파일의 실제 URL 생성
+            const clipUrl = `https://stechpro-frontend.s3.ap-northeast-2.amazonaws.com/${gameKey}/${fileName}`;
+            
+            return {
+              quarter: Math.floor(index / 5) + 1, // 5개씩 쿼터 나누기
+              clipNumber: index + 1,
+              clipKey: `${gameKey}_clip${index + 1}`,
+              fileName: fileName,
+              clipUrl: clipUrl, // 실제 S3 URL 추가
+              playType: 'TRAINING',
+              description: `훈련 영상 ${index + 1}`,
+              // 분석 데이터는 비워둠 - 영상만 볼 수 있게
+            };
+          });
+
+          // GameClips 스키마에 맞는 필수 필드들 추가
+          const trainingClipData = {
+            gameKey,
+            date: new Date().toISOString(),
+            type: 'Training',
+            score: { home: 0, away: 0 },
+            region: 'Seoul',
+            location: '훈련장',
+            homeTeam: 'Training',
+            awayTeam: 'Session',
+            Clips: basicClips,
+            uploader: req.user?.team || req.user?.username,
+          };
+
+          console.log(`📋 생성된 basicClips:`, JSON.stringify(basicClips, null, 2));
+          
+          const savedClips = await this.gameService.saveGameClips(trainingClipData);
+          console.log(`✅ 훈련용 클립 데이터 생성 완료: ${basicClips.length}개`);
+          console.log(`💾 저장된 클립 데이터:`, JSON.stringify(savedClips, null, 2));
+        } catch (clipError) {
+          console.error('❌ 훈련용 클립 데이터 생성 실패:', clipError);
+          // 클립 데이터 생성 실패해도 업로드는 성공으로 처리
         }
       }
 
