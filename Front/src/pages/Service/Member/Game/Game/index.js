@@ -17,6 +17,7 @@ const TYPES_LABEL = {
   League: '리그',
   Friendly: '친선전',
   Scrimmage: '스크리미지',
+  Training: '훈련',
 };
 /** region 코드 → 한글 라벨 */
 const REGION_LABEL = {
@@ -142,10 +143,14 @@ export default function GamePage() {
   /* 필터 적용 (모두 id 기준) */
   const filteredGames = useMemo(() => {
     return games.filter((g) => {
+      const isTraining = g.type === 'Training' || g.type === '훈련';
+
       if (selectedDate && !dayjs(g.date).isSame(selectedDate, 'day'))
         return false;
       if (selectedType && g.type !== selectedType) return false;
-      if (selectedOpps) {
+
+      // 훈련 영상은 상대팀 필터 무시
+      if (selectedOpps && !isTraining) {
         const oppId = selectedOpps.id;
         if (g.homeId !== oppId && g.awayId !== oppId) return false;
       }
@@ -153,8 +158,27 @@ export default function GamePage() {
     });
   }, [games, selectedDate, selectedType, selectedOpps]);
 
+  /* 일반 경기와 훈련 영상 분리 */
+  const regularGames = useMemo(() =>
+    filteredGames.filter(g => g.type !== 'Training' && g.type !== '훈련'),
+    [filteredGames]
+  );
+
+  const trainingGames = useMemo(() =>
+    filteredGames.filter(g => g.type === 'Training' || g.type === '훈련'),
+    [filteredGames]
+  );
+
   /* 이동 */
   const openClips = (game) => {
+    const isTraining = game.type === 'Training' || game.type === '훈련';
+
+    // 훈련 영상은 분석 불필요 - 바로 이동
+    if (isTraining) {
+      navigate(`/service/game/${game.gameKey}/clip`, { state: { game } });
+      return;
+    }
+
     // pending 상태 경기는 분석 중 팝업 표시
     if (game.uploadStatus === 'pending') {
       setShowAnalysisAlert(true);
@@ -379,99 +403,172 @@ export default function GamePage() {
 
       {/* ===== 경기 표 ===== */}
 
-      <div
-        className="game-container"
-        style={{ display: loading ? 'none' : 'block' }}
-      >
-        <div className="game-header">
-          <div className="game-header-cell">날짜</div>
-          <div className="game-header-cell">경기 결과</div>
-          <div className="game-header-cell">세부사항</div>
-          <div className="game-header-cell">경기보고서</div>
-          <div className="game-header-cell">길이</div>
-        </div>
+      {loading && <div className="game-loading">불러오는 중…</div>}
+      {error && <div className="game-error">{error}</div>}
 
-        <div className="game-list">
-          {loading && <div className="game-loading">불러오는 중…</div>}
-          {error && <div className="game-error">{error}</div>}
-
-          {filteredGames.map((g) => {
-            const homeMeta = TEAM_BY_ID[g.homeId];
-            const awayMeta = TEAM_BY_ID[g.awayId];
-
-            return (
-              <div
-                key={g.gameKey}
-                className="game-card"
-                onClick={() => openClips(g)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && openClips(g)}
-              >
-                <div className="date">{g.date}</div>
-
-                <div className="game-results">
-                  <div className="game-team left">
-                    <span className="game-team-name">
-                      {homeMeta?.name || g.homeId}
-                    </span>
-                    {homeMeta?.logo && (
-                      <div className="game-team-logo">
-                        <img
-                          src={homeMeta.logo}
-                          alt={`${homeMeta.name} 로고`}
-                          className={`game-team-logo-img ${
-                            homeMeta.logo.endsWith('.svg')
-                              ? 'svg-logo'
-                              : 'png-logo'
-                          }`}
-                        />
-                      </div>
-                    )}
+      {/* 일반 경기 컨테이너 */}
+      {!loading && !error && regularGames.length > 0 && (
+        <div className="game-container">
+          <h2 className="game-section-title">경기 목록</h2>
+          <div className="game-header">
+            <div className="game-header-cell">날짜</div>
+            <div className="game-header-cell">경기 결과</div>
+            <div className="game-header-cell">세부사항</div>
+            <div className="game-header-cell">영상 분석</div>
                   </div>
 
-                  <div className="game-score">
-                    {g.homeScore} : {g.awayScore}
-                  </div>
+          <div className="game-list">
+            {regularGames.map((g) => {
+              const homeMeta = TEAM_BY_ID[g.homeId];
+              const awayMeta = TEAM_BY_ID[g.awayId];
 
-                  <div className="game-team right">
-                    {awayMeta?.logo && (
-                      <div className="game-team-logo">
-                        <img
-                          src={awayMeta.logo}
-                          alt={`${awayMeta.name} 로고`}
-                          className={`game-team-logo-img ${
-                            awayMeta.logo.endsWith('.svg')
-                              ? 'svg-logo'
-                              : 'png-logo'
-                          }`}
-                        />
-                      </div>
-                    )}
-                    <span className="game-team-name">
-                      {awayMeta?.name || g.awayId}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="meta">
-                  <span>{g.location}</span>
-                </div>
-
+              return (
                 <div
-                  className={`game-report ${g.report ? 'reportY' : 'reportN'}`}
+                  key={g.gameKey}
+                  className="game-card"
+                  onClick={() => openClips(g)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && openClips(g)}
                 >
-                  <span className="report-text">
-                    {g.report ? '보고서 생성됨' : '보고서 생성 중…'}
-                  </span>
-                </div>
+                  <div className="date">{g.date}</div>
 
-                <div className="game-length">{g.length}</div>
-              </div>
-            );
-          })}
+                  <div className="game-results">
+                    <div className="game-team left">
+                      <span className="game-team-name">
+                        {homeMeta?.name || g.homeId}
+                      </span>
+                      {homeMeta?.logo && (
+                        <div className="game-team-logo">
+                          <img
+                            src={homeMeta.logo}
+                            alt={`${homeMeta.name} 로고`}
+                            className={`game-team-logo-img ${
+                              homeMeta.logo.endsWith('.svg')
+                                ? 'svg-logo'
+                                : 'png-logo'
+                            }`}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="game-score">
+                      {g.homeScore} : {g.awayScore}
+                    </div>
+
+                    <div className="game-team right">
+                      {awayMeta?.logo && (
+                        <div className="game-team-logo">
+                          <img
+                            src={awayMeta.logo}
+                            alt={`${awayMeta.name} 로고`}
+                            className={`game-team-logo-img ${
+                              awayMeta.logo.endsWith('.svg')
+                                ? 'svg-logo'
+                                : 'png-logo'
+                            }`}
+                          />
+                        </div>
+                      )}
+                      <span className="game-team-name">
+                        {awayMeta?.name || g.awayId}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="meta">
+                    <span>{g.location}</span>
+                  </div>
+
+                  <div
+                    className={`game-report ${g.report ? 'reportY' : 'reportN'}`}
+                  >
+                    <span className="report-text">
+                      {g.report ? '분석 완료' : '분석 중…'}
+                    </span>
+                  </div>
+
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* 훈련 영상 컨테이너 */}
+      {!loading && !error && trainingGames.length > 0 && (
+        <div className="game-container" style={{ marginTop: regularGames.length > 0 ? '60px' : '0' }}>
+          <h2 className="game-section-title">훈련 목록</h2>
+          <div className="game-header">
+            <div className="game-header-cell">날짜</div>
+            <div className="game-header-cell">훈련 팀</div>
+            <div className="game-header-cell">세부사항</div>
+            <div className="game-header-cell">영상 분석</div>
+          </div>
+
+          <div className="game-list">
+            {trainingGames.map((g) => {
+              const trainingTeamMeta = TEAM_BY_ID[g.uploader];
+
+              return (
+                <div
+                  key={g.gameKey}
+                  className="game-card"
+                  onClick={() => openClips(g)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && openClips(g)}
+                >
+                  <div className="date">{g.date}</div>
+
+                  <div className="game-results">
+                    <div className="game-team left">
+                      {trainingTeamMeta?.logo && (
+                        <div className="game-team-logo">
+                          <img
+                            src={trainingTeamMeta.logo}
+                            alt={`${trainingTeamMeta.name} 로고`}
+                            className={`game-team-logo-img ${
+                              trainingTeamMeta.logo.endsWith('.svg')
+                                ? 'svg-logo'
+                                : 'png-logo'
+                            }`}
+                          />
+                        </div>
+                      )}
+                      <span className="game-team-name">
+                        {trainingTeamMeta?.name || g.uploader || g.team || '훈련'}
+                      </span>
+                    </div>
+                    <div className="game-score" style={{ fontSize: '14px' }}>
+                      {g.position || '훈련 영상'}
+                    </div>
+                    <div className="game-team right"></div>
+                  </div>
+
+                  <div className="meta">
+                    <span>{g.location}</span>
+                  </div>
+
+                  <div
+                    className={`game-report ${g.report ? 'reportY' : 'reportN'}`}
+                  >
+                    <span className="report-text">
+                      {g.report ? '분석 완료' : '분석 중…'}
+                    </span>
+                  </div>
+
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && regularGames.length === 0 && trainingGames.length === 0 && (
+        <div className="game-empty">경기 데이터가 없습니다.</div>
+      )}
     </div>
   );
 }

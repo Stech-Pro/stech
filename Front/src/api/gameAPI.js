@@ -59,6 +59,11 @@ export async function fetchTeamGames(teamNameOrId) {
     length: g.length || '-',   // 없으면 '-'
     report: !!g.report,        // bool
     uploadStatus: g.uploadStatus || 'completed', // pending, completed
+    // 훈련 영상 관련 필드
+    team: g.team,              // 훈련 영상의 팀 ID (레거시)
+    uploader: g.uploader,       // 훈련 영상 업로더 팀 ID
+    position: g.position,       // 훈련 영상의 포지션
+    videoUrls: g.videoUrls,     // 업로드된 비디오 파일 URL 목록
   }));
 }
 
@@ -245,4 +250,21 @@ const url = `${API_CONFIG.ENDPOINTS.REQUEST_EDIT}`
     res.status,
     data
   );
+}
+
+/* 영상 URL 가져오기: GET /api/game/get-video-url/:gameKey/:quarter/:fileName */
+export async function getVideoUrl(gameKey, quarter, fileName) {
+  const url = `${API_CONFIG.BASE_URL}/game/get-video-url/${encodeURIComponent(gameKey)}/${encodeURIComponent(quarter)}/${encodeURIComponent(fileName)}`;
+  const res = await apiFetch(url, { method: 'GET' });
+  const data = await jsonOrText(res);
+
+  if (!res.ok) {
+    throw new APIError(
+      typeof data === 'object' ? data.message || '영상 URL 가져오기 실패' : '영상 URL 가져오기 실패',
+      res.status,
+      data
+    );
+  }
+
+  return data.url;
 }
