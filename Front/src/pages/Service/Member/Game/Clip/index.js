@@ -707,20 +707,31 @@ const teamSummaryNode = selectedTeamOpt ? (
       {/* ===== 본문 ===== */}
       <div className="clip-page-container">
         <div className="clip-left">
-          <div className="clip-header">
-            <div className="clip-team left">
-              {homeMeta?.logo && (
-                <div className="clip-team-logo">
-                  <img
-                    src={homeMeta.logo}
-                    alt={`${homeMeta?.name || '홈팀'} 로고`}
-                    className={`clip-team-logo-img ${
-                      homeMeta.logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
-                    }`}
-                  />
+          {isTraining ? (
+            /* 훈련 영상 헤더 */
+            <div className="clip-header">
+              <div className="clip-team left">
+                {TEAM_BY_ID[game.uploader || game.team]?.logo && (
+                  <div className="clip-team-logo">
+                    <img
+                      src={TEAM_BY_ID[game.uploader || game.team].logo}
+                      alt={`${TEAM_BY_ID[game.uploader || game.team].name} 로고`}
+                      className={`clip-team-logo-img ${
+                        TEAM_BY_ID[game.uploader || game.team].logo.endsWith('.svg') ? 'svg-logo' : 'png-logo'
+                      }`}
+                    />
+                  </div>
+                )}
+                <span className="clip-team-name">
+                  {TEAM_BY_ID[game.uploader || game.team]?.name || game.uploader || game.team} 훈련
+                </span>
+              </div>
+              {game.position && (
+                <div className="clip-vs" style={{ fontSize: '14px' }}>
+                  {game.position}
                 </div>
               )}
-              <span className="clip-team-name">{homeMeta?.name || '홈팀'}</span>
+              <div className="clip-team right"></div>
             </div>
           ) : (
             /* 일반 경기 헤더 */
@@ -755,6 +766,7 @@ const teamSummaryNode = selectedTeamOpt ? (
                 </div>
               )}
               <span className="clip-team-name">{awayMeta?.name || '원정팀'}</span>
+            </div>
             </div>
           )}
           <div className="clip-list">
@@ -807,12 +819,9 @@ const teamSummaryNode = selectedTeamOpt ? (
                         <div>{c.quarter}Q</div>
                       </div>
 
-                    <div className="clip-row2">
-                      <div className="clip-oT">
-                        {c.offensiveTeam == 'Home'
-                          ? `${homeMeta?.name || '홈팀'}`
-                          : `${awayMeta?.name || '원정팀'}`}
-                      </div>
+                      <div className="clip-rows">
+                        <div className="clip-row1">
+                          <div className="clip-down">{getDownDisplay(c)}</div>
 
                           <div className="clip-type">
                             {renderPlayType(c.playType)}
