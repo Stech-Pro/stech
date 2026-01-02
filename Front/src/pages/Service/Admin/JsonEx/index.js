@@ -243,10 +243,11 @@ export default function JsonEx() {
       {uploadStatus === "success" && <div className="success-result"><h3>✅ 업로드 완료!</h3></div>}
       {uploadStatus === "error" && <div className="error-result"><h3>⚠️ 업로드 실패</h3><p>{errorMessage}</p></div>}
 
+      {/* 경기 목록 */}
       <div className="game-list-section">
         <hr className="section-divider" />
         <div className="game-list-controls">
-          <h2>전체 게임 목록</h2>
+          <h2>경기 목록</h2>
           {user?.role === 'admin' && selectedGames.length > 0 && (
             <button onClick={handleDeleteSelected} disabled={loadingGames} className="delete-selected-button">
               <FaTrash size={12} />
@@ -254,25 +255,25 @@ export default function JsonEx() {
             </button>
           )}
         </div>
-        
+
         {gameError && <div className="error-result">{gameError}</div>}
 
         <div className="game-list-wrapper">
           <div className="game-list-header">
-            {user?.role === 'admin' && <div className="game-list-cell cell-checkbox"><input type="checkbox" onChange={handleSelectAll} checked={games.length > 0 && selectedGames.length === games.length} /></div>}
+            {user?.role === 'admin' && <div className="game-list-cell cell-checkbox"><input type="checkbox" onChange={handleSelectAll} checked={games.filter(g => g.type !== '훈련' && g.type !== 'Training').length > 0 && selectedGames.length === games.filter(g => g.type !== '훈련' && g.type !== 'Training').length} /></div>}
             <div className="game-list-cell cell-date">날짜</div>
             <div className="game-list-cell cell-match">경기</div>
             <div className="game-list-cell cell-location">장소</div>
             <div className="game-list-cell cell-type">타입</div>
             <div className="game-list-cell cell-key">Game Key</div>
           </div>
-          
+
           {loadingGames ? (
             <div className="list-placeholder">🔄 목록을 불러오는 중...</div>
-          ) : games.length === 0 ? (
-            <div className="list-placeholder">표시할 게임이 없습니다.</div>
+          ) : games.filter(g => g.type !== '훈련' && g.type !== 'Training').length === 0 ? (
+            <div className="list-placeholder">표시할 경기가 없습니다.</div>
           ) : (
-            games.map(game => {
+            games.filter(g => g.type !== '훈련' && g.type !== 'Training').map(game => {
               const homeName = TEAM_BY_ID?.[game.homeId]?.name || game.homeId;
               const awayName = TEAM_BY_ID?.[game.awayId]?.name || game.awayId;
               return (
@@ -285,6 +286,49 @@ export default function JsonEx() {
                   <div className="game-list-cell cell-date">{game.date}</div>
                   <div className="game-list-cell cell-match">{`${homeName} vs ${awayName}`}</div>
                   <div className="game-list-cell cell-location">{game.location}</div>
+                  <div className="game-list-cell cell-type">{game.type}</div>
+                  <div className="game-list-cell cell-key">{game.gameKey}</div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {/* 훈련 영상 목록 */}
+      <div className="game-list-section">
+        <hr className="section-divider" />
+        <div className="game-list-controls">
+          <h2>훈련 영상 목록</h2>
+        </div>
+
+        <div className="game-list-wrapper">
+          <div className="game-list-header">
+            {user?.role === 'admin' && <div className="game-list-cell cell-checkbox"></div>}
+            <div className="game-list-cell cell-date">날짜</div>
+            <div className="game-list-cell cell-match">팀</div>
+            <div className="game-list-cell cell-location">포지션</div>
+            <div className="game-list-cell cell-type">타입</div>
+            <div className="game-list-cell cell-key">Game Key</div>
+          </div>
+
+          {loadingGames ? (
+            <div className="list-placeholder">🔄 목록을 불러오는 중...</div>
+          ) : games.filter(g => g.type === '훈련' || g.type === 'Training').length === 0 ? (
+            <div className="list-placeholder">표시할 훈련 영상이 없습니다.</div>
+          ) : (
+            games.filter(g => g.type === '훈련' || g.type === 'Training').map(game => {
+              const teamName = TEAM_BY_ID?.[game.team]?.name || game.team || '알 수 없음';
+              return (
+                <div key={game.gameKey} className={`game-list-item ${selectedGames.includes(game.gameKey) ? 'selected' : ''}`} onClick={() => handleSelectGame(game.gameKey)}>
+                  {user?.role === 'admin' && (
+                    <div className="game-list-cell cell-checkbox">
+                      <input type="checkbox" checked={selectedGames.includes(game.gameKey)} onChange={() => handleSelectGame(game.gameKey)} onClick={(e) => e.stopPropagation()} />
+                    </div>
+                  )}
+                  <div className="game-list-cell cell-date">{game.date}</div>
+                  <div className="game-list-cell cell-match">{teamName} 훈련</div>
+                  <div className="game-list-cell cell-location">{game.position || '-'}</div>
                   <div className="game-list-cell cell-type">{game.type}</div>
                   <div className="game-list-cell cell-key">{game.gameKey}</div>
                 </div>

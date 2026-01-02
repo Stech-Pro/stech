@@ -595,11 +595,9 @@ const UploadVideoModal = ({
         gameType === '리그' ? getLeagueName(d, regionKey) : undefined;
 
       const getTeamCode = (teamId) => {
-        if (teamId === 'seoulVI') {
-          return 'VI';
-        }
-        // 기본 로직: 앞 두 글자 (예: 'GCF' -> 'GC', 'seoulVI' -> 'SE'였던 것을 위에서 처리)
-        return String(teamId).slice(0, 2).toUpperCase();
+        // 대문자만 추출해서 처음 2개 사용
+        const upperCaseLetters = String(teamId).match(/[A-Z]/g) || [];
+        return upperCaseLetters.slice(0, 2).join('');
       };
 
       let gameKey, gameInfo, quarterVideoCounts;
@@ -645,11 +643,13 @@ const UploadVideoModal = ({
 
       // 1) 업로드 준비
       setUploadProgress({ show: true, message: '서버에 업로드 준비 중...', type: 'loading' });
+
       const prep = await prepareMatchUpload({
         gameKey,
         gameInfo,
         quarterVideoCounts,
       });
+
       const { data } = prep; // { uploadUrls: {Q1:[...], Q2:[...]} or {Training:[...]} }
 
       const fileMap = gameType === '훈련'
@@ -662,10 +662,10 @@ const UploadVideoModal = ({
         (uploadUrls[quarter] || []).forEach((u, idx) => {
           const f = fileMap[quarter]?.[idx];
           if (f) {
-            pairs.push({ 
-              quarter, 
-              idx, 
-              url: u.uploadUrl, 
+            pairs.push({
+              quarter,
+              idx,
+              url: u.uploadUrl,
               file: f,
               uploadData: {
                 gameKey: gameKey,
@@ -676,6 +676,7 @@ const UploadVideoModal = ({
           }
         });
       });
+
       if (pairs.length === 0) throw new Error('업로드할 파일/URL이 없습니다.');
 
       // 🔔 S3 업로드 시작
