@@ -420,7 +420,7 @@ export default function GamePage() {
           </div>
           <div className="flex items-center text-base">
               <button
-                className="rounded-2xl bg-[#1a58e0] w-[6rem] h-[3rem] text-white"
+                className="rounded-2xl bg-[#1a58e0] w-[6rem] h-[2rem] text-white"
                 onClick={() => setShowUpload(true)}
               >
                 경기 업로드
@@ -452,13 +452,13 @@ export default function GamePage() {
 
       {/* 일반 경기 컨테이너 */}
       {!loading && !error && regularGames.length > 0 && (
-        <div className="game-container">
+        <div className="flex flex-col px-[1rem] md:px-[3.75rem] mt-[1.5rem]">
           <h2 className="game-section-title">경기 목록</h2>
           <div className="game-header">
             <div className="game-header-cell">날짜</div>
             <div className="game-header-cell">경기 결과</div>
-            <div className="game-header-cell">세부사항</div>
-            <div className="game-header-cell">영상 분석</div>
+            <div className="hidden game-header-cell md:block">세부사항</div>
+            <div className="hidden game-header-cell md:block">영상 분석</div>
           </div>
 
           <div className="game-list">
@@ -521,12 +521,12 @@ export default function GamePage() {
                     </div>
                   </div>
 
-                  <div className="meta">
+                  <div className="hidden md:block meta">
                     <span>{g.location}</span>
                   </div>
 
                   <div
-                    className={`game-report ${
+                    className={`hidden md:block game-report ${
                       g.report ? 'reportY' : 'reportN'
                     }`}
                   >

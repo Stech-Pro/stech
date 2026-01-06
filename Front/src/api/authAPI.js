@@ -431,3 +431,49 @@ export async function withdrawUser(accessToken) {
     data
   );
 }
+
+export async function myTeamStats(token) {
+  if (!token) throw new APIError('인증이 필요합니다.', 401);
+  
+  const res = await fetch(
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.MY_TEAM_STATS}`, // '/auth/my-team-stats'
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );  
+  const data = await jsonOrText(res);
+  console.log('myTeamStats response data:', data);
+  if (res.ok) return data;
+  throw new APIError(
+    typeof data === 'object' ? data.message || '팀 통계 조회 실패' : '팀 통계 조회 실패',
+    res.status,
+    data
+  );
+}
+
+export async function leaveTeam(accessToken) {
+  if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
+
+  const res = await fetch(
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.LEAVE_TEAM}`, // '/auth/leave-team'
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  const data = await jsonOrText(res);
+  if (res.ok) return data;
+  throw new APIError(
+    typeof data === 'object' ? data.message || '팀 탈퇴 실패' : '팀 탈퇴 실패',
+    res.status,
+    data
+  );
+}
