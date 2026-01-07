@@ -760,6 +760,78 @@ export class AuthController {
     return this.authService.getMyTeamStats(req.user.id, type || 'total');
   }
 
+  @Get('my-team-players')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: '👥 팀원 기본 정보 조회',
+    description: `
+    ## 👥 팀원 기본 정보 조회 API
+
+    로그인한 사용자와 같은 팀의 모든 팀원들의 기본 정보를 조회합니다.
+    
+    ### 📋 포함된 정보
+    - **선수명**: 실명 > playerID > username 순으로 표시
+    - **프로필 사진**: avatar URL (없으면 null)
+    - **포지션**: 선수의 포지션 배열
+    - **등번호**: 등번호 (없으면 null)
+    
+    ### 🎯 사용 목적
+    - 코치가 팀원 목록 확인
+    - 간단한 팀원 정보 표시
+    - 선수 선택 드롭다운 등에 활용
+    `,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 팀원 정보 조회 성공',
+    schema: {
+      example: {
+        success: true,
+        message: '팀원 정보를 조회했습니다.',
+        data: {
+          teamName: 'HYlions',
+          teamRegion: '서울 1부 리그',
+          totalPlayers: 3,
+          players: [
+            {
+              playerName: '김철수',
+              avatar: 'https://example.com/avatar1.jpg',
+              position: ['QB'],
+              jerseyNumber: 10
+            },
+            {
+              playerName: '박민수',
+              avatar: null,
+              position: ['WR', 'RB'],
+              jerseyNumber: 80
+            },
+            {
+              playerName: '이영희',
+              avatar: 'https://example.com/avatar3.jpg',
+              position: ['DB'],
+              jerseyNumber: 25
+            }
+          ]
+        }
+      }
+    }
+  })
+  @ApiResponse({
+    status: 401,
+    description: '❌ 인증 필요',
+    schema: {
+      example: {
+        success: false,
+        message: '로그인이 필요합니다.',
+        code: 'UNAUTHORIZED'
+      }
+    }
+  })
+  async getMyTeamPlayers(@Request() req) {
+    return this.authService.getMyTeamPlayers(req.user.id);
+  }
+
   @Delete('withdraw')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')

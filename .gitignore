@@ -19,3 +19,6 @@ dist/
 Back/*test*.json
 Back/*hanyang*.json
 Back/*hf_vs_hy*.json
+
+# 문서 파일들
+Back/document/

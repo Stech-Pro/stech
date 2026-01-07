@@ -7,7 +7,7 @@ import UploadVideoModal from '../../../components/UploadVideoModal.jsx';
 import useDeviceWidth from '../../../hooks/useDeviceWidth.js';
 import DeviceWarning from '../../../pages/Common/DeviceWarning/index.js';
 import './index.css';
-import { Menu, X } from 'lucide-react';
+import { HiMenu, HiX } from 'react-icons/hi';
 import NotificationHoverIcon from '../../../components/Notifications/NotificationHoverIcon.js';
 
 const SIDEBAR_ID = 'service-sidebar';
@@ -45,7 +45,7 @@ const ServiceLayout = () => {
                 onClick={() => setSidebarOpen(true)}
                 className="inline-flex items-center gap-2 px-3 py-2  bg-[#141414] text-white"
               >
-                <Menu className="w-4 h-4" />
+                <HiMenu className="w-4 h-4" />
               </button>
 
               <NotificationHoverIcon className='bg-transparent border-none '/>
@@ -81,7 +81,7 @@ const ServiceLayout = () => {
                 onClick={() => setSidebarOpen(false)}
                 className="p-2 rounded-lg border border-[#1f2023] text-white"
               >
-                <X className="w-4 h-4" />
+                <HiX className="w-4 h-4" />
               </button>
             </div>
 

@@ -1228,6 +1228,84 @@ export class AuthService {
     return `${koreanRegion} ${league} 리그`;
   }
 
+  // 팀원 기본 정보 조회
+  async getMyTeamPlayers(userId: string) {
+    console.log('=== 팀원 기본 정보 조회 ===');
+    console.log('userId:', userId);
+
+    const user = await this.userModel.findById(userId).lean();
+    if (!user) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    if (!user.teamName) {
+      throw new BadRequestException('팀에 소속되지 않은 사용자입니다.');
+    }
+
+    console.log('조회된 사용자:', {
+      username: user.username,
+      teamName: user.teamName,
+      region: user.region,
+    });
+
+    // 팀 정보 조회하여 league 정보 가져오기
+    const team = await this.teamModel
+      .findOne({ teamName: user.teamName })
+      .lean();
+    const league = team?.league || '1부';
+
+    // 같은 팀의 모든 팀원 조회 (PLAYER, COACH 역할만)
+    const teamPlayers = await this.userModel
+      .find({
+        teamName: user.teamName,
+        role: { $in: ['player', 'coach'] }, // 소문자로 수정
+        isActive: true, // 활성 사용자만
+      })
+      .select('username profile role')
+      .lean();
+
+    console.log(`팀원 수: ${teamPlayers.length}명`);
+
+    // 팀원 정보 포맷팅
+    const formattedPlayers = teamPlayers.map((player) => {
+      // profile 객체에서 필요한 정보 추출
+      const profile = player.profile || {};
+      
+      // 이름 우선순위: realName > playerID > username
+      const playerName = profile.realName || profile.playerID || player.username;
+      
+      // 포지션 정보 추출 (PS1, PS2, ... 형태에서 배열로 변환)
+      const positions = profile.positions || {};
+      const positionArray = Object.values(positions).filter(pos => pos) as string[];
+      
+      return {
+        playerName,
+        avatar: profile.avatar || null,
+        position: positionArray.length > 0 ? positionArray : ['Unknown'],
+        jerseyNumber: null, // jerseyNumber 필드가 스키마에 없음
+        role: player.role, // player, coach 구분
+      };
+    });
+
+    // 역할별로 정렬 (coach가 먼저, 그 다음 player들을 이름순)
+    formattedPlayers.sort((a, b) => {
+      if (a.role === 'coach' && b.role !== 'coach') return -1;
+      if (a.role !== 'coach' && b.role === 'coach') return 1;
+      return a.playerName.localeCompare(b.playerName);
+    });
+
+    return {
+      success: true,
+      message: '팀원 정보를 조회했습니다.',
+      data: {
+        teamName: user.teamName,
+        teamRegion: this.formatRegionWithLeague(user.region, league),
+        totalPlayers: formattedPlayers.length,
+        players: formattedPlayers,
+      },
+    };
+  }
+
   // 포지션 정보 포맷팅 헬퍼 함수
   private formatPositions(positions: any): string[] {
     if (!positions) return ['미설정'];
