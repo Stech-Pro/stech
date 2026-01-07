@@ -185,8 +185,27 @@ export default function ClipPage() {
   /* 비디오 파일 재생 함수 */
   const playVideoFile = async (quarter, fileName) => {
     try {
-      const url = await getVideoUrl(resolvedGameKey, quarter, fileName);
-      window.open(url, '_blank');
+      // 훈련 영상도 경기 영상처럼 전용 비디오 플레이어 페이지로 이동
+      const fakeClip = {
+        clipKey: `${resolvedGameKey}_${quarter}_${fileName}`,
+        quarter: quarter,
+        fileName: fileName,
+        playType: 'TRAINING',
+        description: `훈련 영상 - ${fileName}`,
+      };
+
+      navigate('/service/video', {
+        state: {
+          rawClips: [fakeClip],
+          initialFilters: {},
+          teamOptions: {},
+          initialPlayId: fakeClip.clipKey,
+          clipKey: fakeClip.clipKey,
+          gameKey: resolvedGameKey,
+          game: game,
+          isTraining: true,
+        },
+      });
     } catch (error) {
       console.error('영상 재생 오류:', error);
       alert(error.message || '영상을 재생할 수 없습니다.');
