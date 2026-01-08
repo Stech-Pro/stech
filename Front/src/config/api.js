@@ -20,8 +20,9 @@ export const API_CONFIG = {
     MY_PROFILE: '/auth/my-profile',
     UPLOAD_AVATAR: '/auth/upload-avatar',
     WITHDRAW_USER: '/auth/withdraw',
-    MY_TEAM_STATS: '/auth/my-team-stats',
+    MY_TEAM_PLAYERS: '/auth/my-team-players',
     LEAVE_TEAM  : '/auth/leave-team',
+    REMOVE_PLAYER:'/auth/remove-player',
 
     //video upload
     UPLOAD_VIDEO: '/video/upload',

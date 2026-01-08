@@ -432,11 +432,11 @@ export async function withdrawUser(accessToken) {
   );
 }
 
-export async function myTeamStats(token) {
+export async function myTeamPlayers(token) {
   if (!token) throw new APIError('인증이 필요합니다.', 401);
   
   const res = await fetch(
-    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.MY_TEAM_STATS}`, // '/auth/my-team-stats'
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.MY_TEAM_PLAYERS}`, // '/auth/my-team-stats'
     {
       method: 'GET',
       headers: {
@@ -473,6 +473,30 @@ export async function leaveTeam(accessToken) {
   if (res.ok) return data;
   throw new APIError(
     typeof data === 'object' ? data.message || '팀 탈퇴 실패' : '팀 탈퇴 실패',
+    res.status,
+    data
+  );
+}
+
+export async function removePlayer(accessToken, playerName){
+  if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
+
+  const res = await fetch(
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REMOVE_PLAYER}`, // '/auth/remove-player'
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ playerName }),
+    }
+  );
+
+  const data = await jsonOrText(res);
+  if (res.ok) return data;
+  throw new APIError(
+    typeof data === 'object' ? data.message || '선수 제거 실패' : '선수 제거 실패',
     res.status,
     data
   );
