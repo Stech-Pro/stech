@@ -837,11 +837,16 @@ export class AuthService {
       hasProfile: !!user.profile?.realName,
     });
 
-    // 팀 정보 조회하여 league 정보 가져오기
-    const team = await this.teamModel
-      .findOne({ teamName: user.teamName })
-      .lean();
-    const league = team?.league || '1부'; // 기본값 1부
+    // 팀 정보 조회하여 league 정보 가져오기 (팀에 소속된 경우만)
+    let team = null;
+    let league = '1부';
+    
+    if (user.teamName && user.teamName.trim() !== '') {
+      team = await this.teamModel
+        .findOne({ teamName: user.teamName })
+        .lean();
+      league = team?.league || '1부';
+    }
 
     // 프로필이 완성되지 않은 경우 체크
     const isProfileComplete = !!(
@@ -850,19 +855,20 @@ export class AuthService {
       user.profile?.physicalInfo?.height
     );
 
-    // KAFA 스탯 조회 (현재 시즌, 대학 리그)
+    // KAFA 스탯 조회 (현재 시즌, 대학 리그) - 팀에 소속된 경우만
     let kafaStats = null;
-    try {
-      const currentSeason = '2025';
-      const teamKeyword = user.teamName.includes('한양')
-        ? '한양대'
-        : user.teamName.replace('대학교', '').replace(' ', '');
+    if (user.teamName && user.teamName.trim() !== '') {
+      try {
+        const currentSeason = '2025';
+        const teamKeyword = user.teamName.includes('한양')
+          ? '한양대'
+          : user.teamName.replace('대학교', '').replace(' ', '');
 
-      const kafaData = await this.kafaStatsService.getKafaPlayerStatsFromDB(
-        'uni', // 대학 리그
-        currentSeason,
-        teamKeyword,
-      );
+        const kafaData = await this.kafaStatsService.getKafaPlayerStatsFromDB(
+          'uni', // 대학 리그
+          currentSeason,
+          teamKeyword,
+        );
 
       if (kafaData && kafaData.length > 0) {
         kafaStats = {
@@ -888,9 +894,10 @@ export class AuthService {
           })),
         };
       }
-    } catch (error) {
-      console.log('KAFA 스탯 조회 실패:', error.message);
-      // KAFA 스탯 조회 실패해도 프로필 조회는 계속 진행
+      } catch (error) {
+        console.log('KAFA 스탯 조회 실패:', error.message);
+        // KAFA 스탯 조회 실패해도 프로필 조회는 계속 진행
+      }
     }
 
     const profileData = {
@@ -907,8 +914,12 @@ export class AuthService {
       age: user.profile?.physicalInfo?.age || 0,
       career: user.profile?.career || '미설정',
       position: this.formatPositions(user.profile?.positions),
-      region: this.formatRegionWithLeague(user.region, league),
-      teamName: user.teamName,
+      region: (user.teamName && user.teamName.trim() !== '') 
+        ? this.formatRegionWithLeague(user.region, league) 
+        : 'N/A',
+      teamName: (user.teamName && user.teamName.trim() !== '') 
+        ? user.teamName 
+        : 'N/A',
       avatar: user.profile?.avatar || null, // 프로필 이미지 추가
       profileImage: user.profile?.avatar || null, // 프론트엔드 호환성을 위해 중복 필드
       kafaStats: kafaStats, // KAFA 협회 공식 스탯 추가
@@ -1047,6 +1058,19 @@ export class AuthService {
     const user = await this.userModel.findById(userId).lean();
     if (!user) {
       throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+
+    // 팀에 소속되지 않은 경우 처리
+    if (!user.teamName || user.teamName.trim() === '') {
+      return {
+        success: true,
+        message: '현재 팀에 소속되어 있지 않습니다.',
+        data: {
+          teamName: 'N/A',
+          teamRegion: 'N/A',
+          stats: {},
+        },
+      };
     }
 
     console.log('조회된 사용자:', {
@@ -1239,8 +1263,17 @@ export class AuthService {
       throw new BadRequestException('사용자를 찾을 수 없습니다.');
     }
 
-    if (!user.teamName) {
-      throw new BadRequestException('팀에 소속되지 않은 사용자입니다.');
+    if (!user.teamName || user.teamName.trim() === '') {
+      return {
+        success: true,
+        message: '현재 팀에 소속되어 있지 않습니다.',
+        data: {
+          teamName: 'N/A',
+          teamRegion: 'N/A',
+          totalPlayers: 0,
+          players: [],
+        },
+      };
     }
 
     console.log('조회된 사용자:', {
@@ -1483,7 +1516,7 @@ export class AuthService {
       const player = players[0];
       
       // 이미 팀에 소속되지 않은 경우 체크
-      if (!player.teamName) {
+      if (!player.teamName || player.teamName === '') {
         throw new BadRequestException({
           success: false,
           message: '해당 선수는 이미 팀에 소속되어 있지 않습니다.',
@@ -1491,14 +1524,18 @@ export class AuthService {
         });
       }
 
-      // 팀 소속 해제
-      await this.userModel.findByIdAndUpdate(player._id, {
-        $unset: {
-          teamName: '',
-          region: '',
-          authCode: '',
+      // 팀 소속 해제 (빈 문자열로 설정)
+      await this.userModel.findByIdAndUpdate(
+        player._id, 
+        {
+          $set: {
+            teamName: '',
+            region: '',
+            authCode: '',
+          },
         },
-      });
+        { new: true, runValidators: false }
+      );
 
       const playerDisplayName = player.profile?.realName || player.profile?.playerID || player.username;
       
