@@ -22,6 +22,7 @@ export const API_CONFIG = {
     WITHDRAW_USER: '/auth/withdraw',
     MY_TEAM_PLAYERS: '/auth/my-team-players',
     LEAVE_TEAM  : '/auth/leave-team',
+    REMOVE_PLAYER:'/auth/remove-player',
 
     //video upload
     UPLOAD_VIDEO: '/video/upload',

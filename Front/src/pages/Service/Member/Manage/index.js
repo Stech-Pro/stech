@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { leaveTeam, myTeamPlayers } from '../../../../api/authAPI';
+import { leaveTeam, myTeamPlayers, removePlayer } from '../../../../api/authAPI';
 import { useAuth } from '../../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -70,19 +70,19 @@ const ManagePage = () => {
     }
   };
 
-  const handleRemoveMember = async (memberId, memberName) => {
-    if (!window.confirm(`${memberName} 선수를 팀에서 내보내시겠습니까?`)) {
+  const handleRemoveMember = async (playerId, playerName) => {
+    if (!window.confirm(`${playerName} 선수를 팀에서 내보내시겠습니까?`)) {
       return;
     }
 
+    const token = localStorage.getItem('token');
     try {
-      // TODO: 백엔드에 선수 제거 API 추가 필요
-      // await removeMemberFromTeam(memberId);
-      toast.error('선수 내보내기 기능은 아직 구현되지 않았습니다.');
-      // fetchTeamData();
+      await removePlayer(token, playerId);
+      toast.success(`${playerName} 선수를 팀에서 내보냈습니다.`);
+      fetchTeamData(); // 팀원 목록 새로고침
     } catch (error) {
       console.error('선수 제거 실패:', error);
-      toast.error('선수를 내보내는데 실패했습니다.');
+      toast.error(error.message || '선수를 내보내는데 실패했습니다.');
     }
   };
 

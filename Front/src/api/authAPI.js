@@ -477,3 +477,26 @@ export async function leaveTeam(accessToken) {
     data
   );
 }
+
+export async function removePlayer(accessToken, playerId){
+  if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
+  
+  const res = await fetch(
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REMOVE_PLAYER}/${playerId}`, // '/auth/remove-player/:playerId'
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  const data = await jsonOrText(res);
+  if (res.ok) return data;
+  throw new APIError(
+    typeof data === 'object' ? data.message || '선수 제거 실패' : '선수 제거 실패',
+    res.status,
+    data
+  );
+}
