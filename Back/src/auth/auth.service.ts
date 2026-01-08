@@ -3,6 +3,7 @@ import {
   BadRequestException,
   UnauthorizedException,
   ConflictException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -1405,6 +1406,122 @@ export class AuthService {
         success: false,
         message: '팀 탈퇴 처리 중 오류가 발생했습니다.',
         code: 'LEAVE_TEAM_ERROR',
+      });
+    }
+  }
+
+  // 코치가 선수를 팀에서 탈퇴시키기
+  async removePlayer(coachId: string, playerName: string) {
+    try {
+      // 1. 코치 확인
+      const coach = await this.userModel.findById(coachId);
+      if (!coach) {
+        throw new BadRequestException({
+          success: false,
+          message: '코치를 찾을 수 없습니다.',
+          code: 'COACH_NOT_FOUND',
+        });
+      }
+
+      // 2. 코치 권한 및 팀 소속 확인
+      if (coach.role !== 'coach') {
+        throw new ForbiddenException({
+          success: false,
+          message: '코치만 선수를 탈퇴시킬 수 있습니다.',
+          code: 'COACH_PERMISSION_REQUIRED',
+        });
+      }
+
+      if (!coach.teamName) {
+        throw new BadRequestException({
+          success: false,
+          message: '팀에 소속되지 않은 코치입니다.',
+          code: 'COACH_NO_TEAM',
+        });
+      }
+
+      // 3. 같은 팀에서 해당 이름의 선수들 검색 (실명, playerID, username)
+      const players = await this.userModel.find({
+        teamName: coach.teamName,
+        role: { $ne: 'coach' }, // 코치가 아닌 사용자만 (선수들만)
+        $or: [
+          { 'profile.realName': playerName },
+          { 'profile.playerID': playerName },
+          { username: playerName }
+        ]
+      });
+
+      if (players.length === 0) {
+        throw new BadRequestException({
+          success: false,
+          message: '해당 이름의 팀원을 찾을 수 없습니다.',
+          code: 'PLAYER_NOT_FOUND',
+        });
+      }
+
+      // 4. 동명이인 처리
+      if (players.length > 1) {
+        // 여러 명 발견 시 선택할 수 있도록 목록 반환
+        const playersList = players.map(player => ({
+          id: player._id,
+          username: player.username,
+          realName: player.profile?.realName || '',
+          playerID: player.profile?.playerID || '',
+        }));
+
+        return {
+          success: false,
+          message: '동명이인이 발견되었습니다. 탈퇴시킬 선수를 선택해주세요.',
+          code: 'MULTIPLE_PLAYERS_FOUND',
+          data: {
+            players: playersList,
+          },
+        };
+      }
+
+      // 5. 1명만 발견된 경우 탈퇴 처리
+      const player = players[0];
+      
+      // 이미 팀에 소속되지 않은 경우 체크
+      if (!player.teamName) {
+        throw new BadRequestException({
+          success: false,
+          message: '해당 선수는 이미 팀에 소속되어 있지 않습니다.',
+          code: 'PLAYER_NOT_IN_TEAM',
+        });
+      }
+
+      // 팀 소속 해제
+      await this.userModel.findByIdAndUpdate(player._id, {
+        $unset: {
+          teamName: '',
+          region: '',
+          authCode: '',
+        },
+      });
+
+      const playerDisplayName = player.profile?.realName || player.profile?.playerID || player.username;
+      
+      return {
+        success: true,
+        message: `${playerDisplayName}님을 팀에서 탈퇴시켰습니다.`,
+        data: {
+          removedPlayer: playerDisplayName,
+          username: player.username,
+          teamName: coach.teamName,
+        },
+      };
+
+    } catch (error) {
+      if (error instanceof BadRequestException || error instanceof ForbiddenException) {
+        throw error;
+      }
+      
+      throw new BadRequestException({
+        success: false,
+        message: '선수 탈퇴 처리 중 오류가 발생했습니다.',
+        code: 'REMOVE_PLAYER_ERROR',
+        error: error.message,
       });
     }
   }
