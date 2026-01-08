@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { leaveTeam, myTeamStats } from '../../../../api/authAPI';
+import { leaveTeam, myTeamPlayers } from '../../../../api/authAPI';
 import { useAuth } from '../../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -21,23 +21,26 @@ const ManagePage = () => {
 
     try {
       setLoading(true);
-      const response = await myTeamStats(token);
-      const data = response.data;
+      const response = await myTeamPlayers(token);
+      console.log('API Response:', response);
 
-      setTeamData({
-        teamName: data.teamName,
-        league: data.teamRegion,
-      });
+      // response.data가 실제 데이터인지 확인
+      const data = response?.data?.data || response?.data || response;
+      console.log('Extracted data:', data);
 
-      // stats 객체에서 모든 포지션의 선수들을 추출
-      if (data?.stats) {
-        const allPlayers = [];
-        Object.keys(data.stats).forEach((position) => {
-          if (Array.isArray(data.stats[position])) {
-            allPlayers.push(...data.stats[position]);
-          }
+      if (data) {
+        setTeamData({
+          teamName: data.teamName || '',
+          league: data.teamRegion || '',
+          totalPlayers: data.totalPlayers || 0,
         });
-        setMembers(allPlayers);
+
+        // players 배열 직접 사용
+        if (data?.players && Array.isArray(data.players)) {
+          setMembers(data.players);
+        } else {
+          setMembers([]);
+        }
       }
     } catch (error) {
       console.error('팀 정보 조회 실패:', error);
@@ -91,6 +94,14 @@ const ManagePage = () => {
     );
   }
 
+  if (!teamData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg text-white">팀 정보를 불러올 수 없습니다.</div>
+      </div>
+    );
+  }
+
   const teamMeta = TEAM_BY_ID[teamData.teamName] || '';
 
   return (
@@ -135,32 +146,52 @@ const ManagePage = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {members.map((member) => (
+              {members.map((member, index) => (
                 <div
-                  key={member.playerId}
+                  key={`${member.playerName}-${index}`}
                   className="flex items-center justify-between bg-[#2a2a2a] rounded-lg p-4 hover:bg-[#333] transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#3a3a3a] flex items-center justify-center">
-                      <span className="text-lg font-bold text-white">
-                        {(member.playerName || '?')[0]}
-                      </span>
+                    {/* Avatar */}
+                    <div className="w-12 h-12 rounded-full bg-[#3a3a3a] flex items-center justify-center overflow-hidden">
+                      {member.avatar ? (
+                        <img
+                          src={member.avatar}
+                          alt={member.playerName}
+                          className="object-cover w-full h-full"
+                        />
+                      ) : (
+                        <span className="text-lg font-bold text-white">
+                          {(member.playerName || '?')[0]}
+                        </span>
+                      )}
                     </div>
+
+                    {/* Player Info */}
                     <div>
-                      <div className="font-semibold text-white">
-                        {member.playerId || '이름 없음'}
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-white">
+                          {member.playerName || '이름 없음'}
+                        </span>
+                        {member.jerseyNumber && (
+                          <span className="px-2 py-0.5 text-xs font-semibold text-white bg-[#444] rounded">
+                            #{member.jerseyNumber}
+                          </span>
+                        )}
                       </div>
                       <div className="text-sm text-gray-400">
-                        {member.position || '포지션 정보 없음'}
+                        {Array.isArray(member.position)
+                          ? member.position.join(', ')
+                          : member.position || '포지션 정보 없음'}
                       </div>
                     </div>
                   </div>
 
                   {/* 본인은 내보낼 수 없음 */}
-                  {member.playerId !== user?.playerId && (
+                  {member.playerName !== user?.playerName && (
                     <button
                       onClick={() =>
-                        handleRemoveMember(member.playerId, member.playerName)
+                        handleRemoveMember(member.playerName, member.playerName)
                       }
                       className="px-4 py-2 text-sm font-semibold text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700"
                     >
