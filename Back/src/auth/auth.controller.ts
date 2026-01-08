@@ -38,6 +38,7 @@ import {
   CheckUserExistsDto,
   CreateProfileDto,
   UpdateProfileDto,
+  RemovePlayerDto,
 } from '../common/dto/auth.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
@@ -957,5 +958,120 @@ export class AuthController {
   })
   async leaveTeam(@Request() req) {
     return this.authService.leaveTeam(req.user.id);
+  }
+
+  @Patch('remove-player')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '👤 코치가 선수 팀 탈퇴시키기',
+    description: `
+    ## 👤 코치가 선수를 팀에서 탈퇴시키는 API
+
+    코치가 같은 팀 선수를 팀에서 탈퇴시킬 수 있습니다.
+    
+    ### 📋 검증 과정
+    1. **코치 권한 확인**: 요청자가 코치(COACH) 역할인지 확인
+    2. **같은 팀 확인**: 입력한 선수가 코치와 같은 팀에 소속되어 있는지 확인
+    3. **동명이인 처리**: 같은 이름의 선수가 여러 명일 경우 목록 반환
+    
+    ### 📝 검색 방법
+    - **실명** (profile.realName)
+    - **플레이어ID** (profile.playerID)
+    - **사용자명** (username)
+    
+    ### 🔄 동명이인 처리
+    - 2명 이상 검색되면 선택할 수 있도록 목록 반환
+    - 1명만 검색되면 즉시 탈퇴 처리
+    `,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '✅ 선수 탈퇴 처리 완료 또는 동명이인 목록 반환',
+    schema: {
+      oneOf: [
+        {
+          description: '탈퇴 성공',
+          example: {
+            success: true,
+            message: 'player123님을 팀에서 탈퇴시켰습니다.',
+            data: {
+              removedPlayer: 'player123',
+              teamName: 'HYlions',
+            },
+          },
+        },
+        {
+          description: '동명이인 발견',
+          example: {
+            success: false,
+            message: '동명이인이 발견되었습니다. 탈퇴시킬 선수를 선택해주세요.',
+            code: 'MULTIPLE_PLAYERS_FOUND',
+            data: {
+              players: [
+                {
+                  id: '507f1f77bcf86cd799439011',
+                  username: 'player123',
+                },
+                {
+                  id: '507f1f77bcf86cd799439012',
+                  username: 'player456',
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: '❌ 잘못된 요청',
+    schema: {
+      oneOf: [
+        {
+          description: '선수를 찾을 수 없음',
+          example: {
+            success: false,
+            message: '해당 이름의 팀원을 찾을 수 없습니다.',
+            code: 'PLAYER_NOT_FOUND',
+          },
+        },
+        {
+          description: '이미 팀에 소속되지 않음',
+          example: {
+            success: false,
+            message: '해당 선수는 이미 팀에 소속되어 있지 않습니다.',
+            code: 'PLAYER_NOT_IN_TEAM',
+          },
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: '❌ 권한 없음',
+    schema: {
+      example: {
+        success: false,
+        message: '코치만 선수를 탈퇴시킬 수 있습니다.',
+        code: 'COACH_PERMISSION_REQUIRED',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: '❌ 인증 필요',
+    schema: {
+      example: {
+        success: false,
+        message: '로그인이 필요합니다.',
+        code: 'UNAUTHORIZED',
+      },
+    },
+  })
+  async removePlayer(@Request() req, @Body() removePlayerDto: RemovePlayerDto) {
+    return this.authService.removePlayer(req.user.id, removePlayerDto.playerName);
   }
 }

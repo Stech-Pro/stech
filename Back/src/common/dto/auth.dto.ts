@@ -278,3 +278,12 @@ export class UpdateProfileDto {
   @IsString()
   avatar?: string;
 }
+
+export class RemovePlayerDto {
+  @ApiProperty({ 
+    example: '이준',
+    description: '팀에서 탈퇴시킬 선수의 이름 (실명, playerID, username 모두 가능)'
+  })
+  @IsString()
+  playerName: string;
+}
