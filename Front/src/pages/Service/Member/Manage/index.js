@@ -70,14 +70,14 @@ const ManagePage = () => {
     }
   };
 
-  const handleRemoveMember = async (playerId, playerName) => {
+  const handleRemoveMember = async (playerName) => {
     if (!window.confirm(`${playerName} 선수를 팀에서 내보내시겠습니까?`)) {
       return;
     }
 
     const token = localStorage.getItem('token');
     try {
-      await removePlayer(token, playerId);
+      await removePlayer(token, playerName);
       toast.success(`${playerName} 선수를 팀에서 내보냈습니다.`);
       fetchTeamData(); // 팀원 목록 새로고침
     } catch (error) {
@@ -173,6 +173,11 @@ const ManagePage = () => {
                         <span className="font-semibold text-white">
                           {member.playerName || '이름 없음'}
                         </span>
+                        {member.role === 'coach' && (
+                          <span className="px-2 py-0.5 text-xs font-semibold text-white bg-blue-600 rounded">
+                            코치
+                          </span>
+                        )}
                         {member.jerseyNumber && (
                           <span className="px-2 py-0.5 text-xs font-semibold text-white bg-[#444] rounded">
                             #{member.jerseyNumber}
@@ -187,12 +192,10 @@ const ManagePage = () => {
                     </div>
                   </div>
 
-                  {/* 본인은 내보낼 수 없음 */}
-                  {member.playerName !== user?.playerName && (
+                  {/* 본인은 내보낼 수 없음, 코치는 내보낼 수 없음 */}
+                  {member.playerName !== user?.playerName && member.role !== 'coach' && (
                     <button
-                      onClick={() =>
-                        handleRemoveMember(member.playerName, member.playerName)
-                      }
+                      onClick={() => handleRemoveMember(member.playerName)}
                       className="px-4 py-2 text-sm font-semibold text-white transition-colors bg-red-600 rounded-lg hover:bg-red-700"
                     >
                       내보내기

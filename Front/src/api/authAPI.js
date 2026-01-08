@@ -478,17 +478,18 @@ export async function leaveTeam(accessToken) {
   );
 }
 
-export async function removePlayer(accessToken, playerId){
+export async function removePlayer(accessToken, playerName){
   if (!accessToken) throw new APIError('인증이 필요합니다.', 401);
-  
+
   const res = await fetch(
-    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REMOVE_PLAYER}/${playerId}`, // '/auth/remove-player/:playerId'
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REMOVE_PLAYER}`, // '/auth/remove-player'
     {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
+      body: JSON.stringify({ playerName }),
     }
   );
 
