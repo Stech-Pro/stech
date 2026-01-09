@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { FaChevronDown, FaRegFileAlt } from 'react-icons/fa';
+import { FaChevronDown, FaRegFileAlt, FaVideo } from 'react-icons/fa';
 import { useAuth } from '../../../../../context/AuthContext.js';
 import { fetchTeamGames } from '../../../../../api/gameAPI.js';
 import './GamePage.css';
@@ -38,14 +38,17 @@ export default function GamePage() {
 
   /* ===== 내 팀 (고정 표기) ===== */
   // 백엔드/스토리지에 따라 teamId가 다양한 키에 있을 수 있으니 방어적으로 가져오기
-  const MY_TEAM_ID = user?.team || user?.teamName;
+  const MY_TEAM_ID = user?.team || user?.teamName || null;
 
   const selfTeam = useMemo(
-    () => (MY_TEAM_ID ? TEAM_BY_ID[MY_TEAM_ID] : null) || TEAMS[0] || null,
+    () => {
+      if (!MY_TEAM_ID) return null;
+      return TEAM_BY_ID[MY_TEAM_ID] || null;
+    },
     [MY_TEAM_ID],
   );
   const logoSrc = selfTeam?.logo || defaultLogo;
-  const label = selfTeam?.name || 'Choose Team';
+  const label = selfTeam?.name || (MY_TEAM_ID ? '알 수 없는 팀' : '팀 없음');
 
   /* ===== 필터 상태 ===== */
   const [showDate, setShowDate] = useState(false);
@@ -128,8 +131,13 @@ export default function GamePage() {
         const list = await fetchTeamGames(MY_TEAM_ID);
         if (alive) setGames(list);
       } catch (e) {
-        if (alive) setError(e?.message || '경기 목록을 불러오지 못했습니다.');
-        console.error(e);
+        // 404 에러는 경기가 없는 정상 상태로 처리
+        if (e?.status === 404) {
+          if (alive) setGames([]);
+        } else {
+          if (alive) setError(e?.message || '경기 목록을 불러오지 못했습니다.');
+          console.error(e);
+        }
       } finally {
         if (alive) setLoading(false);
       }
@@ -170,6 +178,29 @@ export default function GamePage() {
       filteredGames.filter((g) => g.type === 'Training' || g.type === '훈련'),
     [filteredGames],
   );
+
+  /* 팀 정보 가져오기 헬퍼 (N/A 처리 포함) */
+  const getTeamInfo = (teamId) => {
+    if (!teamId || teamId === 'N/A') {
+      return {
+        name: 'N/A',
+        logo: defaultLogo,
+        isDeleted: true,
+      };
+    }
+    const team = TEAM_BY_ID[teamId];
+    if (!team) {
+      return {
+        name: teamId,
+        logo: defaultLogo,
+        isDeleted: true,
+      };
+    }
+    return {
+      ...team,
+      isDeleted: false,
+    };
+  };
 
   /* 이동 */
   const openClips = (game) => {
@@ -370,7 +401,12 @@ export default function GamePage() {
               const list = await fetchTeamGames(MY_TEAM_ID);
               setGames(list);
             } catch (e) {
-              console.error('경기 목록 갱신 실패:', e);
+              // 404 에러는 경기가 없는 정상 상태로 처리
+              if (e?.status === 404) {
+                setGames([]);
+              } else {
+                console.error('경기 목록 갱신 실패:', e);
+              }
             }
           }}
         />
@@ -436,7 +472,12 @@ export default function GamePage() {
                   const list = await fetchTeamGames(MY_TEAM_ID);
                   setGames(list);
                 } catch (e) {
-                  console.error('경기 목록 갱신 실패:', e);
+                  // 404 에러는 경기가 없는 정상 상태로 처리
+                  if (e?.status === 404) {
+                    setGames([]);
+                  } else {
+                    console.error('경기 목록 갱신 실패:', e);
+                  }
                 }
               }}
             />
@@ -449,6 +490,27 @@ export default function GamePage() {
 
       {loading && <div className="game-loading">불러오는 중…</div>}
       {error && <div className="game-error">{error}</div>}
+
+      {/* 빈 상태 - 경기가 없을 때 */}
+      {!loading &&
+        !error &&
+        regularGames.length === 0 &&
+        trainingGames.length === 0 && (
+          <div className="game-empty">
+            <FaVideo className="game-empty-icon" />
+            <div className="game-empty-title">경기 영상이 없습니다</div>
+            <div className="game-empty-message">
+              첫 경기 영상을 업로드하고 <br />
+              팀의 경기 분석을 시작해보세요
+            </div>
+            <button
+              className="game-empty-upload-button"
+              onClick={() => setShowUpload(true)}
+            >
+              경기 업로드
+            </button>
+          </div>
+        )}
 
       {/* 일반 경기 컨테이너 */}
       {!loading && !error && regularGames.length > 0 && (
@@ -463,8 +525,8 @@ export default function GamePage() {
 
           <div className="game-list">
             {regularGames.map((g) => {
-              const homeMeta = TEAM_BY_ID[g.homeId];
-              const awayMeta = TEAM_BY_ID[g.awayId];
+              const homeMeta = getTeamInfo(g.homeId);
+              const awayMeta = getTeamInfo(g.awayId);
 
               return (
                 <div
@@ -479,22 +541,24 @@ export default function GamePage() {
 
                   <div className="game-results">
                     <div className="game-team left">
-                      <span className="game-team-name">
-                        {homeMeta?.name || g.homeId}
+                      <span
+                        className={`game-team-name ${
+                          homeMeta.isDeleted ? 'deleted-team' : ''
+                        }`}
+                      >
+                        {homeMeta.name}
                       </span>
-                      {homeMeta?.logo && (
-                        <div className="game-team-logo">
-                          <img
-                            src={homeMeta.logo}
-                            alt={`${homeMeta.name} 로고`}
-                            className={`game-team-logo-img ${
-                              homeMeta.logo.endsWith('.svg')
-                                ? 'svg-logo'
-                                : 'png-logo'
-                            }`}
-                          />
-                        </div>
-                      )}
+                      <div className="game-team-logo">
+                        <img
+                          src={homeMeta.logo}
+                          alt={`${homeMeta.name} 로고`}
+                          className={`game-team-logo-img ${
+                            homeMeta.logo.endsWith('.svg')
+                              ? 'svg-logo'
+                              : 'png-logo'
+                          }`}
+                        />
+                      </div>
                     </div>
 
                     <div className="game-score">
@@ -502,21 +566,23 @@ export default function GamePage() {
                     </div>
 
                     <div className="game-team right">
-                      {awayMeta?.logo && (
-                        <div className="game-team-logo">
-                          <img
-                            src={awayMeta.logo}
-                            alt={`${awayMeta.name} 로고`}
-                            className={`game-team-logo-img ${
-                              awayMeta.logo.endsWith('.svg')
-                                ? 'svg-logo'
-                                : 'png-logo'
-                            }`}
-                          />
-                        </div>
-                      )}
-                      <span className="game-team-name">
-                        {awayMeta?.name || g.awayId}
+                      <div className="game-team-logo">
+                        <img
+                          src={awayMeta.logo}
+                          alt={`${awayMeta.name} 로고`}
+                          className={`game-team-logo-img ${
+                            awayMeta.logo.endsWith('.svg')
+                              ? 'svg-logo'
+                              : 'png-logo'
+                          }`}
+                        />
+                      </div>
+                      <span
+                        className={`game-team-name ${
+                          awayMeta.isDeleted ? 'deleted-team' : ''
+                        }`}
+                      >
+                        {awayMeta.name}
                       </span>
                     </div>
                   </div>
@@ -557,7 +623,7 @@ export default function GamePage() {
 
           <div className="game-list">
             {trainingGames.map((g) => {
-              const trainingTeamMeta = TEAM_BY_ID[g.uploader];
+              const trainingTeamMeta = getTeamInfo(g.uploader);
 
               return (
                 <div
@@ -572,24 +638,23 @@ export default function GamePage() {
 
                   <div className="game-results">
                     <div className="game-team left">
-                      {trainingTeamMeta?.logo && (
-                        <div className="game-team-logo">
-                          <img
-                            src={trainingTeamMeta.logo}
-                            alt={`${trainingTeamMeta.name} 로고`}
-                            className={`game-team-logo-img ${
-                              trainingTeamMeta.logo.endsWith('.svg')
-                                ? 'svg-logo'
-                                : 'png-logo'
-                            }`}
-                          />
-                        </div>
-                      )}
-                      <span className="game-team-name">
-                        {trainingTeamMeta?.name ||
-                          g.uploader ||
-                          g.team ||
-                          '훈련'}
+                      <div className="game-team-logo">
+                        <img
+                          src={trainingTeamMeta.logo}
+                          alt={`${trainingTeamMeta.name} 로고`}
+                          className={`game-team-logo-img ${
+                            trainingTeamMeta.logo.endsWith('.svg')
+                              ? 'svg-logo'
+                              : 'png-logo'
+                          }`}
+                        />
+                      </div>
+                      <span
+                        className={`game-team-name ${
+                          trainingTeamMeta.isDeleted ? 'deleted-team' : ''
+                        }`}
+                      >
+                        {trainingTeamMeta.name}
                       </span>
                     </div>
                     <div className="game-score" style={{ fontSize: '14px' }}>
@@ -617,13 +682,6 @@ export default function GamePage() {
           </div>
         </div>
       )}
-
-      {!loading &&
-        !error &&
-        regularGames.length === 0 &&
-        trainingGames.length === 0 && (
-          <div className="game-empty">경기 데이터가 없습니다.</div>
-        )}
     </div>
   );
 }

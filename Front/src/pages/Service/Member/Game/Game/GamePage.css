@@ -473,9 +473,75 @@
   margin-bottom: 2rem;
 }
 
+/* 삭제된 팀 스타일 */
+.deleted-team {
+  color: #9ca3af !important;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* 빈 상태 디자인 개선 */
 .game-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  margin: 2rem auto;
+  max-width: 500px;
   text-align: center;
-  padding: 3rem;
-  color: #888;
-  font-size: 1.125rem;
+}
+
+.game-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.game-empty-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  margin-bottom: 0.75rem;
+}
+
+.game-empty-message {
+  font-size: 1rem;
+  color: #9ca3af;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.game-empty-upload-button {
+  background: #1a58e0;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(26, 88, 224, 0.3);
+}
+
+.game-empty-upload-button:hover {
+  background: #1548c7;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(26, 88, 224, 0.4);
+}
+
+.game-empty-upload-button:active {
+  transform: translateY(0);
 }

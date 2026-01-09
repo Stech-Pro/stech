@@ -1,5 +1,5 @@
   // src/context/AuthContext.js
-  import React, { createContext, useContext, useEffect, useState } from 'react';
+  import { createContext, useContext, useEffect, useState } from 'react';
   import {
     login as apiLogin,
     signup as apiSignup,
@@ -70,6 +70,9 @@ import { listMemos } from '../api/memoAPI';
         const password = credentials.password;
         if (!username || !password)
           throw new Error('아이디와 비밀번호를 입력해주세요.');
+
+        // 로그인 전 이전 사용자 정보 완전 정리
+        clearAuthData();
 
         const data = await apiLogin(username, password); // { token, user? }
         const result = handleLoginResponse(data); // token 저장 + user 저장(있다면)
