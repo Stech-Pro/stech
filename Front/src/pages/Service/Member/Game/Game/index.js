@@ -63,6 +63,8 @@ export default function GamePage() {
 
   const [showUpload, setShowUpload] = useState(false);
   const [showAnalysisAlert, setShowAnalysisAlert] = useState(false);
+  const [showMobileFilter, setShowMobileFilter] = useState(false);
+  const [mobileActiveLeague, setMobileActiveLeague] = useState(null);
 
   /* 바깥 클릭 닫기 */
   const dateWrapRef = useRef(null);
@@ -97,6 +99,13 @@ export default function GamePage() {
     const extras = keys.filter((k) => !base.includes(k)).sort();
     return [...base.filter((k) => keys.includes(k)), ...extras];
   }, [teamsByLeague]);
+
+  // 자기 팀의 지역을 기본값으로 설정
+  const defaultLeague = useMemo(() => {
+    if (!selfTeam) return leaguesList[0] || null;
+    const teamRegion = REGION_LABEL[selfTeam.region];
+    return teamRegion || leaguesList[0] || null;
+  }, [selfTeam, leaguesList]);
 
   useEffect(() => {
     if (showOpps) {
@@ -225,8 +234,200 @@ export default function GamePage() {
 
   return (
     <div className="gamepage-root">
-      {/* ===== 헤더 ===== */}
-      <header className="max-md:hidden  p-[3.75rem] pb-0 bg-[#141414] text-[#e5e7eb]">
+      {/* ===== 모바일 헤더 ===== */}
+      <header className="md:hidden p-4 bg-[#141414] text-[#e5e7eb]">
+        <div className="flex items-center justify-between h-16 border-b border-b-[#fff]">
+          {/* 왼쪽: 내 팀 */}
+          <div className="h-[3rem] flex items-center gap-2">
+            <div className="w-auto h-auto">
+              <img
+                src={logoSrc}
+                alt={label}
+                className="object-cover w-8 h-8 position-center"
+              />
+            </div>
+            <span className="text-white font-base">{label}</span>
+          </div>
+          <div className="flex items-center gap-2 text-base">
+              <button
+                className="rounded-2xl bg-[#2a2a2a] px-3 h-[2rem] text-white text-sm"
+                onClick={() => setShowMobileFilter(true)}
+              >
+                필터
+              </button>
+              <button
+                className="rounded-2xl bg-[#1a58e0] px-3 h-[2rem] text-white text-sm"
+                onClick={() => setShowUpload(true)}
+              >
+                업로드
+              </button>
+          </div>
+
+        </div>
+
+        {/* 업로드 모달 */}
+        <UploadVideoModal
+          isOpen={showUpload}
+          onClose={() => setShowUpload(false)}
+          onUploaded={async () => {
+            setShowUpload(false);
+            try {
+              const list = await fetchTeamGames(MY_TEAM_ID);
+              setGames(list);
+            } catch (e) {
+              // 404 에러는 경기가 없는 정상 상태로 처리
+              if (e?.status === 404) {
+                setGames([]);
+              } else {
+                console.error('경기 목록 갱신 실패:', e);
+              }
+            }
+          }}
+        />
+
+        {/* 분석 중 알림 모달 */}
+        {showAnalysisAlert && (
+          <div
+            className="modal-overlay"
+            onClick={() => setShowAnalysisAlert(false)}
+          >
+            <div
+              className="analysis-alert-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="analysis-alert-content">
+                <div className="analysis-alert-icon">⏳</div>
+                <h3 className="analysis-alert-title">영상 분석 중입니다</h3>
+                <p className="analysis-alert-message">
+                  분석팀에서 영상을 분석하고 있습니다.
+                  <br />
+                  잠시만 기다려주세요.
+                </p>
+                <button
+                  className="analysis-alert-button"
+                  onClick={() => setShowAnalysisAlert(false)}
+                >
+                  확인
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 모바일 필터 바텀시트 */}
+        {showMobileFilter && (
+          <div className="mobile-filter-overlay" onClick={() => setShowMobileFilter(false)}>
+            <div className="mobile-filter-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="mobile-filter-header">
+                <h3>필터</h3>
+                <button onClick={() => setShowMobileFilter(false)}>✕</button>
+              </div>
+
+              <div className="mobile-filter-content">
+                {/* 날짜 필터 */}
+                <div className="mobile-filter-section">
+                  <label>날짜</label>
+                  <div className="mobile-date-picker" ref={dateWrapRef}>
+                    <button
+                      className={`mobile-filter-button ${selectedDate ? 'has-value' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowDate(!showDate);
+                      }}
+                    >
+                      <span>{selectedDate ? selectedDate.format('YYYY년 MM월 DD일') : '날짜 선택'}</span>
+                      <FaChevronDown size={12} style={{
+                        transform: showDate ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s'
+                      }} />
+                    </button>
+                    {showDate && (
+                      <div className="mobile-calendar-dropdown">
+                        <CalendarDropdown
+                          value={selectedDate || dayjs()}
+                          onChange={(d) => {
+                            setSelectedDate(d);
+                            setShowDate(false);
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 유형 필터 */}
+                <div className="mobile-filter-section">
+                  <label>유형</label>
+                  <div className="mobile-type-options">
+                    {Object.entries(TYPES_LABEL).map(([key, label]) => (
+                      <button
+                        key={key}
+                        className={`mobile-chip ${selectedType === key ? 'active' : ''}`}
+                        onClick={() => setSelectedType(selectedType === key ? null : key)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 상대팀 필터 */}
+                <div className="mobile-filter-section">
+                  <label>상대팀</label>
+
+                  {/* 리그 탭 (가로 배치) */}
+                  <div className="mobile-league-tabs">
+                    {leaguesList.map((league) => (
+                      <button
+                        key={league}
+                        className={`mobile-league-tab ${(mobileActiveLeague || defaultLeague) === league ? 'active' : ''}`}
+                        onClick={() => setMobileActiveLeague(league)}
+                      >
+                        {league}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* 선택된 리그의 팀들 */}
+                  <div className="mobile-team-chips">
+                    {(teamsByLeague[mobileActiveLeague || defaultLeague] || []).map((t) => (
+                      <button
+                        key={t.id}
+                        className={`mobile-team-chip ${selectedOpps?.id === t.id ? 'active' : ''}`}
+                        onClick={() => setSelectedOpps(selectedOpps?.id === t.id ? null : t)}
+                      >
+                        {t.logo && (
+                          <img
+                            src={t.logo}
+                            alt={t.name}
+                            className="mobile-team-chip-logo"
+                          />
+                        )}
+                        {t.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mobile-filter-footer">
+                <button className="mobile-filter-reset" onClick={() => {
+                  resetFilters();
+                  setMobileActiveLeague(defaultLeague);
+                }}>
+                  초기화
+                </button>
+                <button className="mobile-filter-apply" onClick={() => setShowMobileFilter(false)}>
+                  적용
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* ===== 데스크탑 헤더 ===== */}
+      <header className="max-md:hidden p-[3.75rem] pb-0 bg-[#141414] text-[#e5e7eb]">
         <div className="headerContainer">
           {/* 왼쪽: 내 팀 */}
           <div className="header-team-box">
@@ -278,7 +479,6 @@ export default function GamePage() {
                 </button>
                 {showType && (
                   <ul className="typeDropdown">
-                    {/* 수정된 부분: Object.entries를 사용해 객체를 배열로 변환 후 map 실행 */}
                     {Object.entries(TYPES_LABEL).map(([key, label]) => (
                       <li key={key}>
                         <button
@@ -286,12 +486,10 @@ export default function GamePage() {
                             selectedType === key ? 'active' : ''
                           }`}
                           onClick={() => {
-                            // 상태에는 영문 key를 저장해야 필터링이 정상 동작합니다.
                             setSelectedType(key);
                             setShowType(false);
                           }}
                         >
-                          {/* 사용자에게는 한글 label을 보여줍니다. */}
                           {label}
                         </button>
                       </li>
@@ -339,7 +537,7 @@ export default function GamePage() {
                             type="button"
                             className="oppsItem"
                             onClick={() => {
-                              setSelectedOpps(t); // 팀 객체 자체 저장
+                              setSelectedOpps(t);
                               setShowOpps(false);
                             }}
                           >
@@ -389,103 +587,8 @@ export default function GamePage() {
             </div>
           </div>
         </div>
-
-        {/* 업로드 모달 */}
-        <UploadVideoModal
-          isOpen={showUpload}
-          onClose={() => setShowUpload(false)}
-          onUploaded={async () => {
-            setShowUpload(false);
-            // 업로드 후 목록 갱신
-            try {
-              const list = await fetchTeamGames(MY_TEAM_ID);
-              setGames(list);
-            } catch (e) {
-              // 404 에러는 경기가 없는 정상 상태로 처리
-              if (e?.status === 404) {
-                setGames([]);
-              } else {
-                console.error('경기 목록 갱신 실패:', e);
-              }
-            }
-          }}
-        />
-
-        {/* 분석 중 알림 모달 */}
-        {showAnalysisAlert && (
-          <div
-            className="modal-overlay"
-            onClick={() => setShowAnalysisAlert(false)}
-          >
-            <div
-              className="analysis-alert-modal"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="analysis-alert-content">
-                <div className="analysis-alert-icon">⏳</div>
-                <h3 className="analysis-alert-title">영상 분석 중입니다</h3>
-                <p className="analysis-alert-message">
-                  분석팀에서 영상을 분석하고 있습니다.
-                  <br />
-                  잠시만 기다려주세요.
-                </p>
-                <button
-                  className="analysis-alert-button"
-                  onClick={() => setShowAnalysisAlert(false)}
-                >
-                  확인
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </header>
 
-      <header className="md:hidden p-4 bg-[#141414] text-[#e5e7eb] ">
-        <div className="flex items-center  justify-between h-16 border-b border-b-[#fff]">
-          {/* 왼쪽: 내 팀 */}
-          <div className="h-[3rem] flex  items-center">
-            <div className="w-auto h-auto">
-              <img
-                src={logoSrc}
-                alt={label}
-                className="object-cover w-8 h-8 position-center"
-              />
-            </div>
-            <span className="text-white font-base">{label}</span>
-          </div>
-          <div className="flex items-center text-base">
-              <button
-                className="rounded-2xl bg-[#1a58e0] w-[6rem] h-[2rem] text-white"
-                onClick={() => setShowUpload(true)}
-              >
-                경기 업로드
-              </button>
-          </div>
-        
-            <UploadVideoModal
-              isOpen={showUpload}
-              onClose={() => setShowUpload(false)}
-              onUploaded={async () => {
-                setShowUpload(false);
-                try {
-                  const list = await fetchTeamGames(MY_TEAM_ID);
-                  setGames(list);
-                } catch (e) {
-                  // 404 에러는 경기가 없는 정상 상태로 처리
-                  if (e?.status === 404) {
-                    setGames([]);
-                  } else {
-                    console.error('경기 목록 갱신 실패:', e);
-                  }
-                }
-              }}
-            />
-        </div>
-        <div>
-          {/* 모바일 필터는 추후 구현 예정 */}
-        </div>
-      </header>
       {/* ===== 경기 표 ===== */}
 
       {loading && <div className="game-loading">불러오는 중…</div>}
@@ -519,8 +622,8 @@ export default function GamePage() {
           <div className="game-header">
             <div className="game-header-cell">날짜</div>
             <div className="game-header-cell">경기 결과</div>
-            <div className="hidden game-header-cell md:block">세부사항</div>
-            <div className="hidden game-header-cell md:block">영상 분석</div>
+            <div className="game-header-cell">세부사항</div>
+            <div className="game-header-cell">영상 분석</div>
           </div>
 
           <div className="game-list">
@@ -587,12 +690,12 @@ export default function GamePage() {
                     </div>
                   </div>
 
-                  <div className="hidden md:block meta">
+                  <div className="meta">
                     <span>{g.location}</span>
                   </div>
 
                   <div
-                    className={`hidden md:block game-report ${
+                    className={`game-report ${
                       g.report ? 'reportY' : 'reportN'
                     }`}
                   >
@@ -609,26 +712,35 @@ export default function GamePage() {
 
       {/* 훈련 영상 컨테이너 */}
       {!loading && !error && trainingGames.length > 0 && (
-        <div
-          className="game-container"
-          style={{ marginTop: regularGames.length > 0 ? '60px' : '0' }}
-        >
+        <div className="flex flex-col px-[1rem] md:px-[3.75rem] mt-[3.75rem]">
           <h2 className="game-section-title">훈련 목록</h2>
-          <div className="game-header">
+          <div className="training-header">
             <div className="game-header-cell">날짜</div>
             <div className="game-header-cell">훈련 팀</div>
             <div className="game-header-cell">세부사항</div>
-            <div className="game-header-cell">영상 분석</div>
+            <div className="game-header-cell">영상 개수</div>
           </div>
 
           <div className="game-list">
             {trainingGames.map((g) => {
               const trainingTeamMeta = getTeamInfo(g.uploader);
+              // 여러 가능한 필드명 확인
+              const videoCount =
+                Array.isArray(g.videoUrls) ? g.videoUrls.length :
+                Array.isArray(g.videos) ? g.videos.length :
+                typeof g.videoCount === 'number' ? g.videoCount :
+                typeof g.clipCount === 'number' ? g.clipCount : 0;
+
+              // 디버깅: 첫 번째 훈련 데이터 확인
+              if (trainingGames.indexOf(g) === 0) {
+                console.log('훈련 데이터 샘플:', g);
+                console.log('영상 개수:', videoCount);
+              }
 
               return (
                 <div
                   key={g.gameKey}
-                  className="game-card"
+                  className="training-card"
                   onClick={() => openClips(g)}
                   role="button"
                   tabIndex={0}
@@ -636,45 +748,33 @@ export default function GamePage() {
                 >
                   <div className="date">{g.date}</div>
 
-                  <div className="game-results">
-                    <div className="game-team left">
-                      <div className="game-team-logo">
-                        <img
-                          src={trainingTeamMeta.logo}
-                          alt={`${trainingTeamMeta.name} 로고`}
-                          className={`game-team-logo-img ${
-                            trainingTeamMeta.logo.endsWith('.svg')
-                              ? 'svg-logo'
-                              : 'png-logo'
-                          }`}
-                        />
-                      </div>
-                      <span
-                        className={`game-team-name ${
-                          trainingTeamMeta.isDeleted ? 'deleted-team' : ''
+                  <div className="training-team">
+                    <div className="game-team-logo">
+                      <img
+                        src={trainingTeamMeta.logo}
+                        alt={`${trainingTeamMeta.name} 로고`}
+                        className={`game-team-logo-img ${
+                          trainingTeamMeta.logo.endsWith('.svg')
+                            ? 'svg-logo'
+                            : 'png-logo'
                         }`}
-                      >
-                        {trainingTeamMeta.name}
-                      </span>
+                      />
                     </div>
-                    <div className="game-score" style={{ fontSize: '14px' }}>
-                      {g.position || '훈련 영상'}
-                    </div>
-                    <div className="game-team right"></div>
+                    <span
+                      className={`game-team-name ${
+                        trainingTeamMeta.isDeleted ? 'deleted-team' : ''
+                      }`}
+                    >
+                      {trainingTeamMeta.name}
+                    </span>
                   </div>
 
                   <div className="meta">
                     <span>{g.location}</span>
                   </div>
 
-                  <div
-                    className={`game-report ${
-                      g.report ? 'reportY' : 'reportN'
-                    }`}
-                  >
-                    <span className="report-text">
-                      {g.report ? '분석 완료' : '분석 중…'}
-                    </span>
+                  <div className="video-count">
+                    <span>{videoCount}개</span>
                   </div>
                 </div>
               );
