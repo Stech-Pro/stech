@@ -46,6 +46,65 @@
   justify-content: space-between;
 }
 
+/* 768px ~ 1500px 사이에서 필터를 아래로 배치 */
+@media (min-width: 768px) and (max-width: 1500px) {
+  .headerContainer {
+    position: relative;
+    flex-wrap: wrap;
+    height: auto;
+    padding-bottom: 1.5rem;
+  }
+
+  .bottomRow {
+    width: 100%;
+  }
+
+  .filterGroup {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .header-right-group {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+}
+
+/* 768px ~ 1080px 사이에서 필터 버튼 크기 조절 */
+@media (min-width: 768px) and (max-width: 1080px) {
+  .filterGroup {
+    width: 100%;
+    gap: 1.25rem !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr 1fr !important;
+  }
+
+  .filterButton,
+  .resetButton {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 2.5rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  .header-team-name {
+    font-size: 1.25rem !important;
+  }
+
+  .header-team-logo-box {
+    height: 2.25rem !important;
+    width: 2.25rem !important;
+    flex: 0 0 2.25rem !important;
+  }
+
+  .header-team-logo-img.svg-logo {
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+  }
+}
+
 /* ───────── 필터 버튼 그룹 ───────── */
 .filterGroup {
   display: flex;
