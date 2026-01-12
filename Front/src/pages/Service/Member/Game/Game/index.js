@@ -66,6 +66,10 @@ export default function GamePage() {
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   const [mobileActiveLeague, setMobileActiveLeague] = useState(null);
 
+  /* 모바일 확장 상태 관리 */
+  const [expandedGames, setExpandedGames] = useState(new Set());
+  const [expandedTrainings, setExpandedTrainings] = useState(new Set());
+
   /* 바깥 클릭 닫기 */
   const dateWrapRef = useRef(null);
   const typeWrapRef = useRef(null);
@@ -122,6 +126,31 @@ export default function GamePage() {
     setShowDate(false);
     setShowType(false);
     setShowOpps(false);
+  };
+
+  /* 모바일 확장 토글 함수 */
+  const toggleGameExpand = (gameKey) => {
+    setExpandedGames((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(gameKey)) {
+        newSet.delete(gameKey);
+      } else {
+        newSet.add(gameKey);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleTrainingExpand = (gameKey) => {
+    setExpandedTrainings((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(gameKey)) {
+        newSet.delete(gameKey);
+      } else {
+        newSet.add(gameKey);
+      }
+      return newSet;
+    });
   };
 
   /* ===== 경기 리스트 ===== */
@@ -235,7 +264,7 @@ export default function GamePage() {
   return (
     <div className="gamepage-root">
       {/* ===== 모바일 헤더 ===== */}
-      <header className="md:hidden p-4 bg-[#141414] text-[#e5e7eb]">
+      <header className="md:hidden sticky top-14 z-40 p-4 bg-[#141414] text-[#e5e7eb]">
         <div className="flex items-center justify-between h-16 border-b border-b-[#fff]">
           {/* 왼쪽: 내 팀 */}
           <div className="h-[3rem] flex items-center gap-2">
@@ -626,7 +655,8 @@ export default function GamePage() {
             <div className="game-header-cell">영상 분석</div>
           </div>
 
-          <div className="game-list">
+          {/* 데스크톱용 게임 리스트 */}
+          <div className="game-list desktop-only">
             {regularGames.map((g) => {
               const homeMeta = getTeamInfo(g.homeId);
               const awayMeta = getTeamInfo(g.awayId);
@@ -707,6 +737,109 @@ export default function GamePage() {
               );
             })}
           </div>
+
+          {/* 모바일용 게임 리스트 */}
+          <div className="game-list mobile-only">
+            {regularGames.map((g) => {
+              const homeMeta = getTeamInfo(g.homeId);
+              const awayMeta = getTeamInfo(g.awayId);
+              const isExpanded = expandedGames.has(g.gameKey);
+
+              return (
+                <div key={g.gameKey} className={isExpanded ? '' : 'mb-5'}>
+                  <div
+                    className={`game-card-mobile ${isExpanded ? 'expanded' : ''}`}
+                    onClick={() => toggleGameExpand(g.gameKey)}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className="date">{g.date}</div>
+
+                    <div className="game-results">
+                      <div className="game-team left">
+                        <span
+                          className={`game-team-name ${
+                            homeMeta.isDeleted ? 'deleted-team' : ''
+                          }`}
+                        >
+                          {homeMeta.name}
+                        </span>
+                        <div className="game-team-logo">
+                          <img
+                            src={homeMeta.logo}
+                            alt={`${homeMeta.name} 로고`}
+                            className={`game-team-logo-img ${
+                              homeMeta.logo.endsWith('.svg')
+                                ? 'svg-logo'
+                                : 'png-logo'
+                            }`}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="game-score">
+                        {g.homeScore} : {g.awayScore}
+                      </div>
+
+                      <div className="game-team right">
+                        <div className="game-team-logo">
+                          <img
+                            src={awayMeta.logo}
+                            alt={`${awayMeta.name} 로고`}
+                            className={`game-team-logo-img ${
+                              awayMeta.logo.endsWith('.svg')
+                                ? 'svg-logo'
+                                : 'png-logo'
+                            }`}
+                          />
+                        </div>
+                        <span
+                          className={`game-team-name ${
+                            awayMeta.isDeleted ? 'deleted-team' : ''
+                          }`}
+                        >
+                          {awayMeta.name}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="game-chevron">
+                      <FaChevronDown
+                        className={`transition-transform duration-200 text-white ${
+                          isExpanded ? 'rotate-180' : ''
+                        }`}
+                        size={16}
+                      />
+                    </div>
+                  </div>
+
+                  {isExpanded && (
+                    <div
+                      className="game-expanded"
+                      onClick={() => openClips(g)}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      <div className="expanded-row">
+                        <span className="expanded-label">세부사항</span>
+                        <span className="expanded-value">{g.location || '-'}</span>
+                      </div>
+                      <div className="expanded-row">
+                        <span className="expanded-label">영상 분석</span>
+                        <span
+                          className={`expanded-value ${
+                            g.report ? 'reportY' : 'reportN'
+                          }`}
+                        >
+                          {g.report ? '분석 완료' : '분석 중…'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -721,21 +854,17 @@ export default function GamePage() {
             <div className="game-header-cell">영상 개수</div>
           </div>
 
-          <div className="game-list">
+          {/* 데스크톱용 훈련 리스트 */}
+          <div className="game-list desktop-only">
             {trainingGames.map((g) => {
               const trainingTeamMeta = getTeamInfo(g.uploader);
-              // 여러 가능한 필드명 확인
               const videoCount =
+                Array.isArray(g.videoUrls?.Training) ? g.videoUrls.Training.length :
+                Array.isArray(g.videoUrls?.training) ? g.videoUrls.training.length :
                 Array.isArray(g.videoUrls) ? g.videoUrls.length :
                 Array.isArray(g.videos) ? g.videos.length :
                 typeof g.videoCount === 'number' ? g.videoCount :
                 typeof g.clipCount === 'number' ? g.clipCount : 0;
-
-              // 디버깅: 첫 번째 훈련 데이터 확인
-              if (trainingGames.indexOf(g) === 0) {
-                console.log('훈련 데이터 샘플:', g);
-                console.log('영상 개수:', videoCount);
-              }
 
               return (
                 <div
@@ -776,6 +905,82 @@ export default function GamePage() {
                   <div className="video-count">
                     <span>{videoCount}개</span>
                   </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 모바일용 훈련 리스트 */}
+          <div className="game-list mobile-only">
+            {trainingGames.map((g) => {
+              const trainingTeamMeta = getTeamInfo(g.uploader);
+              const videoCount =
+                Array.isArray(g.videoUrls?.Training) ? g.videoUrls.Training.length :
+                Array.isArray(g.videoUrls?.training) ? g.videoUrls.training.length :
+                Array.isArray(g.videoUrls) ? g.videoUrls.length :
+                Array.isArray(g.videos) ? g.videos.length :
+                typeof g.videoCount === 'number' ? g.videoCount :
+                typeof g.clipCount === 'number' ? g.clipCount : 0;
+              const isExpanded = expandedTrainings.has(g.gameKey);
+
+              return (
+                <div key={g.gameKey} className={isExpanded ? '' : 'mb-5'}>
+                  <div
+                    className={`training-card-mobile ${isExpanded ? 'expanded' : ''}`}
+                    onClick={() => toggleTrainingExpand(g.gameKey)}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className="date">{g.date}</div>
+
+                    <div className="training-team">
+                      <div className="game-team-logo">
+                        <img
+                          src={trainingTeamMeta.logo}
+                          alt={`${trainingTeamMeta.name} 로고`}
+                          className={`game-team-logo-img ${
+                            trainingTeamMeta.logo.endsWith('.svg')
+                              ? 'svg-logo'
+                              : 'png-logo'
+                          }`}
+                        />
+                      </div>
+                      <span
+                        className={`game-team-name ${
+                          trainingTeamMeta.isDeleted ? 'deleted-team' : ''
+                        }`}
+                      >
+                        {trainingTeamMeta.name}
+                      </span>
+                    </div>
+
+                    <div className="training-chevron">
+                      <FaChevronDown
+                        className={`transition-transform duration-200 text-white ${
+                          isExpanded ? 'rotate-180' : ''
+                        }`}
+                        size={16}
+                      />
+                    </div>
+                  </div>
+
+                  {isExpanded && (
+                    <div
+                      className="training-expanded"
+                      onClick={() => openClips(g)}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      <div className="expanded-row">
+                        <span className="expanded-label">세부사항</span>
+                        <span className="expanded-value">{g.location || '-'}</span>
+                      </div>
+                      <div className="expanded-row">
+                        <span className="expanded-label">영상 개수</span>
+                        <span className="expanded-value">{videoCount}개</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
