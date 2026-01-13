@@ -294,55 +294,6 @@ export default function GamePage() {
 
         </div>
 
-        {/* 업로드 모달 */}
-        <UploadVideoModal
-          isOpen={showUpload}
-          onClose={() => setShowUpload(false)}
-          onUploaded={async () => {
-            setShowUpload(false);
-            try {
-              const list = await fetchTeamGames(MY_TEAM_ID);
-              setGames(list);
-            } catch (e) {
-              // 404 에러는 경기가 없는 정상 상태로 처리
-              if (e?.status === 404) {
-                setGames([]);
-              } else {
-                console.error('경기 목록 갱신 실패:', e);
-              }
-            }
-          }}
-        />
-
-        {/* 분석 중 알림 모달 */}
-        {showAnalysisAlert && (
-          <div
-            className="modal-overlay"
-            onClick={() => setShowAnalysisAlert(false)}
-          >
-            <div
-              className="analysis-alert-modal"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="analysis-alert-content">
-                <div className="analysis-alert-icon">⏳</div>
-                <h3 className="analysis-alert-title">영상 분석 중입니다</h3>
-                <p className="analysis-alert-message">
-                  분석팀에서 영상을 분석하고 있습니다.
-                  <br />
-                  잠시만 기다려주세요.
-                </p>
-                <button
-                  className="analysis-alert-button"
-                  onClick={() => setShowAnalysisAlert(false)}
-                >
-                  확인
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* 모바일 필터 바텀시트 */}
         {showMobileFilter && (
           <div className="mobile-filter-overlay" onClick={() => setShowMobileFilter(false)}>
@@ -617,6 +568,55 @@ export default function GamePage() {
           </div>
         </div>
       </header>
+
+      {/* ===== 업로드 모달 (공통) ===== */}
+      <UploadVideoModal
+        isOpen={showUpload}
+        onClose={() => setShowUpload(false)}
+        onUploaded={async () => {
+          setShowUpload(false);
+          try {
+            const list = await fetchTeamGames(MY_TEAM_ID);
+            setGames(list);
+          } catch (e) {
+            // 404 에러는 경기가 없는 정상 상태로 처리
+            if (e?.status === 404) {
+              setGames([]);
+            } else {
+              console.error('경기 목록 갱신 실패:', e);
+            }
+          }
+        }}
+      />
+
+      {/* ===== 분석 중 알림 모달 (공통) ===== */}
+      {showAnalysisAlert && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowAnalysisAlert(false)}
+        >
+          <div
+            className="analysis-alert-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="analysis-alert-content">
+              <div className="analysis-alert-icon">⏳</div>
+              <h3 className="analysis-alert-title">영상 분석 중입니다</h3>
+              <p className="analysis-alert-message">
+                분석팀에서 영상을 분석하고 있습니다.
+                <br />
+                잠시만 기다려주세요.
+              </p>
+              <button
+                className="analysis-alert-button"
+                onClick={() => setShowAnalysisAlert(false)}
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ===== 경기 표 ===== */}
 
