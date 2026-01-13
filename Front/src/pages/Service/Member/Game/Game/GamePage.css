@@ -46,6 +46,68 @@
   justify-content: space-between;
 }
 
+/* 768px ~ 1500px 사이에서 필터를 아래로 배치 */
+@media (min-width: 768px) and (max-width: 1500px) {
+  .headerContainer {
+    position: relative;
+    flex-wrap: wrap;
+    height: auto;
+    padding-bottom: 1.5rem;
+    padding-top: 3.5rem;
+  }
+
+  .bottomRow {
+    width: 100%;
+  }
+
+  .filterGroup {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .header-right-group {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    pointer-events: auto;
+  }
+}
+
+/* 768px ~ 1080px 사이에서 필터 버튼 크기 조절 */
+@media (min-width: 768px) and (max-width: 1080px) {
+  .filterGroup {
+    width: 100%;
+    gap: 1.25rem !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr 1fr !important;
+  }
+
+  .filterButton,
+  .resetButton {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 2.5rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  .header-team-name {
+    font-size: 1.25rem !important;
+  }
+
+  .header-team-logo-box {
+    height: 2.25rem !important;
+    width: 2.25rem !important;
+    flex: 0 0 2.25rem !important;
+  }
+
+  .header-team-logo-img.svg-logo {
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+  }
+}
+
 /* ───────── 필터 버튼 그룹 ───────── */
 .filterGroup {
   display: flex;
@@ -443,6 +505,8 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  position: relative;
+  z-index: 10;
 }
 
 
@@ -948,4 +1012,168 @@
   justify-content: center;
   font-size: 0.9rem;
   color: #e5e7eb;
+}
+
+/* ========== 데스크톱/모바일 분리 ========== */
+
+/* 데스크톱에서만 표시 */
+.desktop-only {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* 모바일에서만 표시 */
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 1279px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* 모바일에서 헤더 3번째, 4번째 컬럼 숨김 */
+  .game-header .game-header-cell:nth-child(3),
+  .game-header .game-header-cell:nth-child(4),
+  .training-header .game-header-cell:nth-child(3),
+  .training-header .game-header-cell:nth-child(4) {
+    display: none;
+  }
+
+  /* 모바일에서 헤더 그리드 조정 */
+  .game-header,
+  .training-header {
+    grid-template-columns: 4rem 1fr 1.5rem;
+    gap: 0.5rem;
+    padding: 0 0.75rem;
+    height: 3rem;
+  }
+}
+
+/* ========== 모바일 전용 카드 스타일 ========== */
+
+.game-card-mobile,
+.training-card-mobile {
+  width: 100%;
+  min-height: 3.5rem;
+  border-radius: 0.5rem;
+  border: 0.236px solid #6e6e6e;
+  background: rgba(110, 110, 110, 0.2);
+  color: white;
+  display: grid;
+  grid-template-columns: 4rem 1fr 1.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.game-card-mobile:active,
+.training-card-mobile:active {
+  background: rgba(110, 110, 110, 0.3);
+}
+
+.game-card-mobile.expanded,
+.training-card-mobile.expanded {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-bottom: 0;
+}
+
+.game-card-mobile > div,
+.training-card-mobile > div {
+  justify-self: center;
+}
+
+/* 모바일 카드 내부 요소 크기 조정 */
+.game-card-mobile .date,
+.training-card-mobile .date {
+  font-size: 0.75rem;
+  justify-self: start;
+}
+
+.game-card-mobile .game-results,
+.training-card-mobile .training-team {
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.game-card-mobile .game-team-logo,
+.training-card-mobile .game-team-logo {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.game-card-mobile .game-team-logo-img,
+.training-card-mobile .game-team-logo-img {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.game-card-mobile .game-score {
+  font-size: 0.75rem;
+  width: 3rem;
+  height: 1.125rem;
+  min-width: 3rem;
+}
+
+.game-card-mobile .game-team-name,
+.training-card-mobile .game-team-name {
+  font-size: 0.75rem;
+}
+
+/* Chevron 아이콘 */
+.game-chevron,
+.training-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 확장 영역 */
+.game-expanded,
+.training-expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.75rem;
+  margin-bottom: 1.25rem;
+  background: rgba(110, 110, 110, 0.15);
+  border: 0.236px solid #6e6e6e;
+  border-top: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.game-expanded:active,
+.training-expanded:active {
+  background: rgba(110, 110, 110, 0.25);
+}
+
+.expanded-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.375rem 0;
+}
+
+.expanded-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.expanded-value {
+  font-size: 0.8125rem;
+  color: #e5e7eb;
+  font-weight: 600;
 }

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib":["dom","dom.iterable","esnext"],
+    "allowJs": true,
+    "module": "commonjs",
+    "strict":true,
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "outDir": "dist"
+  },
+  "include": ["src/**/*"]
+}
